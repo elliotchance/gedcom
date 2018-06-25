@@ -1,5 +1,5 @@
 `github.com/elliotchance/gedcom` is a GEDCOM decoder that aims to support all
-GEDCOM files regardless of the version or propritary extensions by parsing the
+GEDCOM files regardless of the version or proprietary extensions by parsing the
 GEDCOM file into a generic nested structure.
 
 Example
@@ -13,4 +13,7 @@ document, err := decoder.Decode()
 if err != nil {
     panic(err)
 }
+
+// You can render the GEDCOM document back into its original data with:
+document.String()
 ```
