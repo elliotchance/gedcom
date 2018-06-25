@@ -27,9 +27,9 @@ func NewDecoder(r io.Reader) *Decoder {
 // DocumentNode will be returned with zero nodes.
 func (dec *Decoder) Decode() (*DocumentNode, error) {
 	documentNode := &DocumentNode{
-		Nodes: []*SimpleNode{},
+		Nodes: []Node{},
 	}
-	indents := []*SimpleNode{}
+	indents := []Node{}
 
 	finished := false
 	for !finished {
@@ -45,35 +45,35 @@ func (dec *Decoder) Decode() (*DocumentNode, error) {
 		node := parseLine(line)
 
 		// Skip blank lines.
-		if node.Tag == "" {
+		if node.Tag() == "" {
 			continue
 		}
 
 		// Add a root node to the document.
-		if node.Indent == 0 {
+		if node.Indent() == 0 {
 			documentNode.Nodes = append(documentNode.Nodes, node)
 			indents = append(indents, node)
 			continue
 		}
 
-		i := indents[node.Indent-1]
+		i := indents[node.Indent()-1]
 
 		// Move indent pointer if we are changing depth.
 		switch {
-		case node.Indent >= len(indents):
+		case node.Indent() >= len(indents):
 			indents = append(indents, node)
 
-		case node.Indent < len(indents)-1:
+		case node.Indent() < len(indents)-1:
 			indents = indents[:len(indents)-1]
 		}
 
-		i.Children = append(i.Children, node)
+		i.AddChildNode(node)
 	}
 
 	return documentNode, nil
 }
 
-func parseLine(line string) *SimpleNode {
+func parseLine(line string) Node {
 	parts := regexp.
 		MustCompile(`^(\d) (@\w+@ )?(\w+)( .+)?\n?$`).
 		FindStringSubmatch(line)
@@ -98,28 +98,5 @@ func parseLine(line string) *SimpleNode {
 		value = parts[4][1:]
 	}
 
-	return &SimpleNode{
-		Indent:   indent,
-		Tag:      tag,
-		Value:    value,
-		Pointer:  pointer,
-		Children: []*SimpleNode{},
-	}
-}
-
-// SimpleNode is used as the default node type when there is no more appropriate
-// or specific type to use.
-type SimpleNode struct {
-	Indent   int
-	Tag      string
-	Value    string
-	Pointer  string
-	Children []*SimpleNode
-}
-
-// DocumentNode represents a whole GEDCOM document. It is possible for a
-// DocumentNode to contain zero Nodes, this means the GEDCOM file was empty. It
-// may also (and usually) contain several Nodes.
-type DocumentNode struct {
-	Nodes []*SimpleNode
+	return NewSimpleNode(indent, tag, value, pointer, []Node{})
 }

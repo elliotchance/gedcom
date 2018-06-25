@@ -10,372 +10,132 @@ import (
 func TestDecoder_Decode(t *testing.T) {
 	tests := map[string]*gedcom.DocumentNode{
 		"": {
-			Nodes: []*gedcom.SimpleNode{},
+			Nodes: []gedcom.Node{},
 		},
 		"\n\n": {
-			Nodes: []*gedcom.SimpleNode{},
+			Nodes: []gedcom.Node{},
 		},
 		"0 HEAD": {
-			Nodes: []*gedcom.SimpleNode{
-				{
-					Indent:   0,
-					Tag:      "HEAD",
-					Value:    "",
-					Pointer:  "",
-					Children: []*gedcom.SimpleNode{},
-				},
+			Nodes: []gedcom.Node{
+				gedcom.NewSimpleNode(0, "HEAD", "", "", []gedcom.Node{}),
 			},
 		},
 		"0 HEAD\n1 CHAR UTF-8": {
-			Nodes: []*gedcom.SimpleNode{
-				{
-					Indent:  0,
-					Tag:     "HEAD",
-					Value:   "",
-					Pointer: "",
-					Children: []*gedcom.SimpleNode{
-						{
-							Indent:   1,
-							Tag:      "CHAR",
-							Value:    "UTF-8",
-							Pointer:  "",
-							Children: []*gedcom.SimpleNode{},
-						},
-					},
-				},
+			Nodes: []gedcom.Node{
+				gedcom.NewSimpleNode(0, "HEAD", "", "", []gedcom.Node{
+					gedcom.NewSimpleNode(1, "CHAR", "UTF-8", "", []gedcom.Node{}),
+				}),
 			},
 		},
 		"0 HEAD\n\n1 CHAR UTF-8\n": {
-			Nodes: []*gedcom.SimpleNode{
-				{
-					Indent:  0,
-					Tag:     "HEAD",
-					Value:   "",
-					Pointer: "",
-					Children: []*gedcom.SimpleNode{
-						{
-							Indent:   1,
-							Tag:      "CHAR",
-							Value:    "UTF-8",
-							Pointer:  "",
-							Children: []*gedcom.SimpleNode{},
-						},
-					},
-				},
+			Nodes: []gedcom.Node{
+				gedcom.NewSimpleNode(0, "HEAD", "", "", []gedcom.Node{
+					gedcom.NewSimpleNode(1, "CHAR", "UTF-8", "", []gedcom.Node{}),
+				}),
 			},
 		},
 		"0 HEAD\n1 CHAR UTF-8\n1 SOUR Ancestry.com Family Trees": {
-			Nodes: []*gedcom.SimpleNode{
-				{
-					Indent:  0,
-					Tag:     "HEAD",
-					Value:   "",
-					Pointer: "",
-					Children: []*gedcom.SimpleNode{
-						{
-							Indent:   1,
-							Tag:      "CHAR",
-							Value:    "UTF-8",
-							Pointer:  "",
-							Children: []*gedcom.SimpleNode{},
-						},
-						{
-							Indent:   1,
-							Tag:      "SOUR",
-							Value:    "Ancestry.com Family Trees",
-							Pointer:  "",
-							Children: []*gedcom.SimpleNode{},
-						},
-					},
-				},
+			Nodes: []gedcom.Node{
+				gedcom.NewSimpleNode(0, "HEAD", "", "", []gedcom.Node{
+					gedcom.NewSimpleNode(1, "CHAR", "UTF-8", "", []gedcom.Node{}),
+					gedcom.NewSimpleNode(1, "SOUR", "Ancestry.com Family Trees", "", []gedcom.Node{}),
+				}),
 			},
 		},
 		"0 HEAD\n1 CHAR UTF-8\n1 CHAR UTF-8": {
-			Nodes: []*gedcom.SimpleNode{
-				{
-					Indent:  0,
-					Tag:     "HEAD",
-					Value:   "",
-					Pointer: "",
-					Children: []*gedcom.SimpleNode{
-						{
-							Indent:   1,
-							Tag:      "CHAR",
-							Value:    "UTF-8",
-							Pointer:  "",
-							Children: []*gedcom.SimpleNode{},
-						},
-						{
-							Indent:   1,
-							Tag:      "CHAR",
-							Value:    "UTF-8",
-							Pointer:  "",
-							Children: []*gedcom.SimpleNode{},
-						},
-					},
-				},
+			Nodes: []gedcom.Node{
+				gedcom.NewSimpleNode(0, "HEAD", "", "", []gedcom.Node{
+					gedcom.NewSimpleNode(1, "CHAR", "UTF-8", "", []gedcom.Node{}),
+					gedcom.NewSimpleNode(1, "CHAR", "UTF-8", "", []gedcom.Node{}),
+				}),
 			},
 		},
 		"0 HEAD\n1 SOUR Ancestry.com Family Trees": {
-			Nodes: []*gedcom.SimpleNode{
-				{
-					Indent:  0,
-					Tag:     "HEAD",
-					Value:   "",
-					Pointer: "",
-					Children: []*gedcom.SimpleNode{
-						{
-							Indent:   1,
-							Tag:      "SOUR",
-							Value:    "Ancestry.com Family Trees",
-							Pointer:  "",
-							Children: []*gedcom.SimpleNode{},
-						},
-					},
-				},
+			Nodes: []gedcom.Node{
+				gedcom.NewSimpleNode(0, "HEAD", "", "", []gedcom.Node{
+					gedcom.NewSimpleNode(1, "SOUR", "Ancestry.com Family Trees", "", []gedcom.Node{}),
+				}),
 			},
 		},
 		"0 HEAD\n1 BIRT": {
-			Nodes: []*gedcom.SimpleNode{
-				{
-					Indent:  0,
-					Tag:     "HEAD",
-					Value:   "",
-					Pointer: "",
-					Children: []*gedcom.SimpleNode{
-						{
-							Indent:   1,
-							Tag:      "BIRT",
-							Value:    "",
-							Pointer:  "",
-							Children: []*gedcom.SimpleNode{},
-						},
-					},
-				},
+			Nodes: []gedcom.Node{
+				gedcom.NewSimpleNode(0, "HEAD", "", "", []gedcom.Node{
+					gedcom.NewSimpleNode(1, "BIRT", "", "", []gedcom.Node{}),
+				}),
 			},
 		},
 		"0 HEAD\n1 GEDC\n2 VERS (2010.3)": {
-			Nodes: []*gedcom.SimpleNode{
-				{
-					Indent:  0,
-					Tag:     "HEAD",
-					Value:   "",
-					Pointer: "",
-					Children: []*gedcom.SimpleNode{
-						{
-							Indent:  1,
-							Tag:     "GEDC",
-							Value:   "",
-							Pointer: "",
-							Children: []*gedcom.SimpleNode{
-								{
-									Indent:   2,
-									Tag:      "VERS",
-									Value:    "(2010.3)",
-									Pointer:  "",
-									Children: []*gedcom.SimpleNode{},
-								},
-							},
-						},
-					},
-				},
+			Nodes: []gedcom.Node{
+				gedcom.NewSimpleNode(0, "HEAD", "", "", []gedcom.Node{
+					gedcom.NewSimpleNode(1, "GEDC", "", "", []gedcom.Node{
+						gedcom.NewSimpleNode(2, "VERS", "(2010.3)", "", []gedcom.Node{}),
+					}),
+				}),
 			},
 		},
 		"0 HEAD\n1 GEDC\n2 VERS 5.5": {
-			Nodes: []*gedcom.SimpleNode{
-				{
-					Indent:  0,
-					Tag:     "HEAD",
-					Value:   "",
-					Pointer: "",
-					Children: []*gedcom.SimpleNode{
-						{
-							Indent:  1,
-							Tag:     "GEDC",
-							Value:   "",
-							Pointer: "",
-							Children: []*gedcom.SimpleNode{
-								{
-									Indent:   2,
-									Tag:      "VERS",
-									Value:    "5.5",
-									Pointer:  "",
-									Children: []*gedcom.SimpleNode{},
-								},
-							},
-						},
-					},
-				},
+			Nodes: []gedcom.Node{
+				gedcom.NewSimpleNode(0, "HEAD", "", "", []gedcom.Node{
+					gedcom.NewSimpleNode(1, "GEDC", "", "", []gedcom.Node{
+						gedcom.NewSimpleNode(2, "VERS", "5.5", "", []gedcom.Node{}),
+					}),
+				}),
 			},
 		},
 		"0 HEAD\n1 GEDC\n2 FORM LINEAGE-LINKED": {
-			Nodes: []*gedcom.SimpleNode{
-				{
-					Indent:  0,
-					Tag:     "HEAD",
-					Value:   "",
-					Pointer: "",
-					Children: []*gedcom.SimpleNode{
-						{
-							Indent:  1,
-							Tag:     "GEDC",
-							Value:   "",
-							Pointer: "",
-							Children: []*gedcom.SimpleNode{
-								{
-									Indent:   2,
-									Tag:      "FORM",
-									Value:    "LINEAGE-LINKED",
-									Pointer:  "",
-									Children: []*gedcom.SimpleNode{},
-								},
-							},
-						},
-					},
-				},
+			Nodes: []gedcom.Node{
+				gedcom.NewSimpleNode(0, "HEAD", "", "", []gedcom.Node{
+					gedcom.NewSimpleNode(1, "GEDC", "", "", []gedcom.Node{
+						gedcom.NewSimpleNode(2, "FORM", "LINEAGE-LINKED", "", []gedcom.Node{}),
+					}),
+				}),
 			},
 		},
 		"0 HEAD\n1 BIRT\n2 PLAC Camperdown, Nsw, Australia": {
-			Nodes: []*gedcom.SimpleNode{
-				{
-					Indent:  0,
-					Tag:     "HEAD",
-					Value:   "",
-					Pointer: "",
-					Children: []*gedcom.SimpleNode{
-						{
-							Indent:  1,
-							Tag:     "BIRT",
-							Value:   "",
-							Pointer: "",
-							Children: []*gedcom.SimpleNode{
-								{
-									Indent:   2,
-									Tag:      "PLAC",
-									Value:    "Camperdown, Nsw, Australia",
-									Pointer:  "",
-									Children: []*gedcom.SimpleNode{},
-								},
-							},
-						},
-					},
-				},
+			Nodes: []gedcom.Node{
+				gedcom.NewSimpleNode(0, "HEAD", "", "", []gedcom.Node{
+					gedcom.NewSimpleNode(1, "BIRT", "", "", []gedcom.Node{
+						gedcom.NewSimpleNode(2, "PLAC", "Camperdown, Nsw, Australia", "", []gedcom.Node{}),
+					}),
+				}),
 			},
 		},
 		"0 HEAD\n1 NAME Elliot Rupert de Peyster /Chance/": {
-			Nodes: []*gedcom.SimpleNode{
-				{
-					Indent:  0,
-					Tag:     "HEAD",
-					Value:   "",
-					Pointer: "",
-					Children: []*gedcom.SimpleNode{
-						{
-							Indent:   1,
-							Tag:      "NAME",
-							Value:    "Elliot Rupert de Peyster /Chance/",
-							Pointer:  "",
-							Children: []*gedcom.SimpleNode{},
-						},
-					},
-				},
+			Nodes: []gedcom.Node{
+				gedcom.NewSimpleNode(0, "HEAD", "", "", []gedcom.Node{
+					gedcom.NewSimpleNode(1, "NAME", "Elliot Rupert de Peyster /Chance/", "", []gedcom.Node{}),
+				}),
 			},
 		},
 		"0 HEAD\n0 @P1@ INDI": {
-			Nodes: []*gedcom.SimpleNode{
-				{
-					Indent:   0,
-					Tag:      "HEAD",
-					Value:    "",
-					Pointer:  "",
-					Children: []*gedcom.SimpleNode{},
-				},
-				{
-					Indent:   0,
-					Tag:      "INDI",
-					Value:    "",
-					Pointer:  "P1",
-					Children: []*gedcom.SimpleNode{},
-				},
+			Nodes: []gedcom.Node{
+				gedcom.NewSimpleNode(0, "HEAD", "", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode(0, "INDI", "", "P1", []gedcom.Node{}),
 			},
 		},
 		"0 HEAD\n1 SEX M\n0 @P1@ INDI": {
-			Nodes: []*gedcom.SimpleNode{
-				{
-					Indent:  0,
-					Tag:     "HEAD",
-					Value:   "",
-					Pointer: "",
-					Children: []*gedcom.SimpleNode{
-						{
-							Indent:   1,
-							Tag:      "SEX",
-							Value:    "M",
-							Pointer:  "",
-							Children: []*gedcom.SimpleNode{},
-						},
-					},
-				},
-				{
-					Indent:   0,
-					Tag:      "INDI",
-					Value:    "",
-					Pointer:  "P1",
-					Children: []*gedcom.SimpleNode{},
-				},
+			Nodes: []gedcom.Node{
+				gedcom.NewSimpleNode(0, "HEAD", "", "", []gedcom.Node{
+					gedcom.NewSimpleNode(1, "SEX", "M", "", []gedcom.Node{}),
+				}),
+				gedcom.NewSimpleNode(0, "INDI", "", "P1", []gedcom.Node{}),
 			},
 		},
 		"0 HEAD\n1 SEX M": {
-			Nodes: []*gedcom.SimpleNode{
-				{
-					Indent:  0,
-					Tag:     "HEAD",
-					Value:   "",
-					Pointer: "",
-					Children: []*gedcom.SimpleNode{
-						{
-							Indent:   1,
-							Tag:      "SEX",
-							Value:    "M",
-							Pointer:  "",
-							Children: []*gedcom.SimpleNode{},
-						},
-					},
-				},
+			Nodes: []gedcom.Node{
+				gedcom.NewSimpleNode(0, "HEAD", "", "", []gedcom.Node{
+					gedcom.NewSimpleNode(1, "SEX", "M", "", []gedcom.Node{}),
+				}),
 			},
 		},
 		"0 HEAD\n1 BIRT\n2 PLAC Camperdown, Nsw, Australia\n1 SEX M": {
-			Nodes: []*gedcom.SimpleNode{
-				{
-					Indent:  0,
-					Tag:     "HEAD",
-					Value:   "",
-					Pointer: "",
-					Children: []*gedcom.SimpleNode{
-						{
-							Indent:  1,
-							Tag:     "BIRT",
-							Value:   "",
-							Pointer: "",
-							Children: []*gedcom.SimpleNode{
-								{
-									Indent:   2,
-									Tag:      "PLAC",
-									Value:    "Camperdown, Nsw, Australia",
-									Pointer:  "",
-									Children: []*gedcom.SimpleNode{},
-								},
-							},
-						},
-						{
-							Indent:   1,
-							Tag:      "SEX",
-							Value:    "M",
-							Pointer:  "",
-							Children: []*gedcom.SimpleNode{},
-						},
-					},
-				},
+			Nodes: []gedcom.Node{
+				gedcom.NewSimpleNode(0, "HEAD", "", "", []gedcom.Node{
+					gedcom.NewSimpleNode(1, "BIRT", "", "", []gedcom.Node{
+						gedcom.NewSimpleNode(2, "PLAC", "Camperdown, Nsw, Australia", "", []gedcom.Node{}),
+					}),
+					gedcom.NewSimpleNode(1, "SEX", "M", "", []gedcom.Node{}),
+				}),
 			},
 		},
 	}
