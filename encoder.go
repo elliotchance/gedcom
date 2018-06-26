@@ -20,12 +20,12 @@ func NewEncoder(w io.Writer, document *Document) *Encoder {
 }
 
 func (enc *Encoder) renderNode(indent int, node Node) error {
-	_, err := enc.w.Write([]byte(fmt.Sprintf("%d %s\n", indent, node.String())))
+	_, err := enc.w.Write([]byte(fmt.Sprintf("%d %s\n", indent, node.gedcomLine())))
 	if err != nil {
 		return err
 	}
 
-	for _, child := range node.ChildNodes() {
+	for _, child := range node.Nodes() {
 		err = enc.renderNode(indent+1, child)
 		if err != nil {
 			return err

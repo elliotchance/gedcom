@@ -67,7 +67,7 @@ func (dec *Decoder) Decode() (*Document, error) {
 			indents = indents[:len(indents)-1]
 		}
 
-		i.AddChildNode(node)
+		i.AddNode(node)
 	}
 
 	return document, nil
@@ -98,5 +98,11 @@ func parseLine(line string) (Node, int) {
 		value = parts[4][1:]
 	}
 
-	return NewSimpleNode(tag, value, pointer, []Node{}), indent
+	switch tag {
+	case Name:
+		return NewNameNode(value, pointer, []Node{}), indent
+
+	default:
+		return NewSimpleNode(tag, value, pointer, []Node{}), indent
+	}
 }

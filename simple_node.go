@@ -35,15 +35,23 @@ func (node *SimpleNode) Pointer() string {
 	return node.pointer
 }
 
-func (node *SimpleNode) ChildNodes() []Node {
+func (node *SimpleNode) Nodes() []Node {
+	if node.children == nil {
+		return []Node{}
+	}
+
 	return node.children
 }
 
-func (node *SimpleNode) AddChildNode(n Node) {
+func (node *SimpleNode) AddNode(n Node) {
 	node.children = append(node.children, n)
 }
 
 func (node *SimpleNode) String() string {
+	return node.gedcomLine()
+}
+
+func (node *SimpleNode) gedcomLine() string {
 	buf := bytes.NewBufferString("")
 
 	if node.pointer != "" {
@@ -58,4 +66,15 @@ func (node *SimpleNode) String() string {
 	}
 
 	return buf.String()
+}
+
+func (node *SimpleNode) NodesWithTag(tag Tag) []Node {
+	nodes := []Node{}
+	for _, node := range node.Nodes() {
+		if node.Tag() == tag {
+			nodes = append(nodes, node)
+		}
+	}
+
+	return nodes
 }

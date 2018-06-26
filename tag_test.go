@@ -122,7 +122,7 @@ var tagTests = map[string]struct {
 	"REPO":  {gedcom.Repository, "Repository"},
 	"RESI":  {gedcom.Residence, "Residence"},
 	"RESN":  {gedcom.Restriction, "Restriction"},
-	"RETI":  {gedcom.Retirment, "Retirment"},
+	"RETI":  {gedcom.Retirement, "Retirement"},
 	"RFN":   {gedcom.RecordFileNumber, "RecordFileNumber"},
 	"RIN":   {gedcom.RecordIDNumber, "RecordIDNumber"},
 	"ROLE":  {gedcom.Role, "Role"},

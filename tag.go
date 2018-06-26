@@ -270,7 +270,10 @@ const (
 	// Information about the use of GEDCOM in a transmission.
 	GedcomInformation = Tag("GEDC")
 
-	// A given or earned name used for official identification of a person.
+	// A given or earned name used for official identification of a person. It
+	// is also commonly known as the "first name".
+	//
+	// The NameNode provides a GivenName() function.
 	GivenName = Tag("GIVN")
 
 	// An event of awarding educational diplomas or degrees to individuals.
@@ -341,6 +344,8 @@ const (
 	// A word or combination of words used to help identify an individual,
 	// title, or other item. More than one NAME line should be used for people
 	// who were known by multiple names.
+	//
+	// NAME tags will be interpreted with the NameNode type.
 	Name = Tag("NAME")
 
 	// The national heritage of an individual.
@@ -369,11 +374,15 @@ const (
 	// Text which appears on a name line before the given and surname parts of a
 	// name. i.e. ( Lt. Cmndr. ) Joseph /Allen/ jr. In this example Lt. Cmndr.
 	// is considered as the name prefix portion.
+	//
+	// The NameNode provides a Prefix() function.
 	NamePrefix = Tag("NPFX")
 
 	// Text which appears on a name line after or behind the given and surname
 	// parts of a name. i.e. Lt. Cmndr. Joseph /Allen/ ( jr. ) In this example
 	// jr. is considered as the name suffix portion.
+	//
+	// The NameNode provides a Suffix() function.
 	NameSuffix = Tag("NSFX")
 
 	// Pertaining to a grouping of attributes used in describing something.
@@ -447,7 +456,7 @@ const (
 
 	// An event of exiting an occupational relationship with an employer after a
 	// qualifying time period.
-	Retirment = Tag("RETI")
+	Retirement = Tag("RETI")
 
 	// A permanent number assigned to a record that uniquely identifies it
 	// within a known file.
@@ -501,6 +510,8 @@ const (
 	Submission = Tag("SUBN")
 
 	// A family name passed on or used by members of a family.
+	//
+	// The NameNode provides a Surname() function.
 	Surname = Tag("SURN")
 
 	// The name or code that represents the name a temple of the LDS Church.
@@ -518,6 +529,8 @@ const (
 	// book when used in a source context, or a formal designation used by an
 	// individual in connection with positions of royalty or other social
 	// status, such as Grand Duke.
+	//
+	// The NameNode provides a Title() function.
 	Title = Tag("TITL")
 
 	// At level 0, specifies the end of a GEDCOM transmission.
@@ -659,7 +672,7 @@ func (tag Tag) String() string {
 		Repository: "Repository",
 		Residence: "Residence",
 		Restriction: "Restriction",
-		Retirment: "Retirment",
+		Retirement: "Retirement",
 		RecordFileNumber: "RecordFileNumber",
 		RecordIDNumber: "RecordIDNumber",
 		Role: "Role",

@@ -102,7 +102,7 @@ var tests = map[string]*gedcom.Document{
 	"0 HEAD\n1 NAME Elliot Rupert de Peyster /Chance/": {
 		Nodes: []gedcom.Node{
 			gedcom.NewSimpleNode("HEAD", "", "", []gedcom.Node{
-				gedcom.NewSimpleNode("NAME", "Elliot Rupert de Peyster /Chance/", "", []gedcom.Node{}),
+				gedcom.NewNameNode("Elliot Rupert de Peyster /Chance/", "", []gedcom.Node{}),
 			}),
 		},
 	},
