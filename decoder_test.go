@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-var tests = map[string]*gedcom.DocumentNode{
+var tests = map[string]*gedcom.Document{
 	"": {
 		Nodes: []gedcom.Node{},
 	},
@@ -158,7 +158,7 @@ func trimSpaces(s string) string {
 	return s
 }
 
-func TestDocumentNode_String(t *testing.T) {
+func TestDocument_String(t *testing.T) {
 	for expected, actual := range tests {
 		t.Run("", func(t *testing.T) {
 			newGed := actual.String()

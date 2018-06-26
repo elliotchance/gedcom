@@ -50,23 +50,17 @@ func (node *SimpleNode) AddChildNode(n Node) {
 }
 
 func (node *SimpleNode) String() string {
-	buf := bytes.NewBufferString(fmt.Sprintf("%d", node.indent))
+	buf := bytes.NewBufferString("")
 
 	if node.pointer != "" {
-		buf.WriteString(fmt.Sprintf(" @%s@", node.pointer))
+		buf.WriteString(fmt.Sprintf("@%s@ ", node.pointer))
 	}
 
-	buf.WriteByte(' ')
 	buf.WriteString(node.tag)
 
 	if node.value != "" {
 		buf.WriteByte(' ')
 		buf.WriteString(node.value)
-	}
-
-	for _, child := range node.children {
-		buf.WriteByte('\n')
-		buf.WriteString(child.String())
 	}
 
 	return buf.String()

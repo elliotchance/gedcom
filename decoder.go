@@ -20,13 +20,13 @@ func NewDecoder(r io.Reader) *Decoder {
 }
 
 // Decode will parse the entire GEDCOM stream (until EOF is reached) and return
-// a DocumentNode. If the GEDCOM stream is not valid then the document node will
+// a Document. If the GEDCOM stream is not valid then the document node will
 // be nil and the error is returned.
 //
 // A blank GEDCOM or a GEDCOM that only contains empty lines is valid and a
-// DocumentNode will be returned with zero nodes.
-func (dec *Decoder) Decode() (*DocumentNode, error) {
-	documentNode := &DocumentNode{
+// Document will be returned with zero nodes.
+func (dec *Decoder) Decode() (*Document, error) {
+	document := &Document{
 		Nodes: []Node{},
 	}
 	indents := []Node{}
@@ -51,7 +51,7 @@ func (dec *Decoder) Decode() (*DocumentNode, error) {
 
 		// Add a root node to the document.
 		if node.Indent() == 0 {
-			documentNode.Nodes = append(documentNode.Nodes, node)
+			document.Nodes = append(document.Nodes, node)
 			indents = append(indents, node)
 			continue
 		}
@@ -70,7 +70,7 @@ func (dec *Decoder) Decode() (*DocumentNode, error) {
 		i.AddChildNode(node)
 	}
 
-	return documentNode, nil
+	return document, nil
 }
 
 func parseLine(line string) Node {
