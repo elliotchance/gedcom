@@ -77,7 +77,7 @@ var tagTests = map[string]struct {
 	"FORM":  {gedcom.Format, "Format"},
 	"GEDC":  {gedcom.GedcomInformation, "GedcomInformation"},
 	"GIVN":  {gedcom.GivenName, "GivenName"},
-	"GRAD":  {gedcom.Gradutation, "Gradutation"},
+	"GRAD":  {gedcom.Graduation, "Graduation"},
 	"HEAD":  {gedcom.Header, "Header"},
 	"HUSB":  {gedcom.Husband, "Husband"},
 	"IDNO":  {gedcom.IdentityNumber, "IdentityNumber"},

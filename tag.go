@@ -274,7 +274,7 @@ const (
 	GivenName = Tag("GIVN")
 
 	// An event of awarding educational diplomas or degrees to individuals.
-	Gradutation = Tag("GRAD")
+	Graduation = Tag("GRAD")
 
 	// Identifies information pertaining to an entire GEDCOM transmission.
 	Header = Tag("HEAD")
@@ -614,7 +614,7 @@ func (tag Tag) String() string {
 		Format: "Format",
 		GedcomInformation: "GedcomInformation",
 		GivenName: "GivenName",
-		Gradutation: "Gradutation",
+		Graduation: "Graduation",
 		Header: "Header",
 		Husband: "Husband",
 		IdentityNumber: "IdentityNumber",
