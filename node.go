@@ -5,8 +5,7 @@ import "fmt"
 type Node interface {
 	fmt.Stringer
 
-	Indent() int
-	Tag() string
+	Tag() Tag
 	Value() string
 	Pointer() string
 	ChildNodes() []Node

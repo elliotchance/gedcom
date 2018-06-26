@@ -8,16 +8,14 @@ import (
 // SimpleNode is used as the default node type when there is no more appropriate
 // or specific type to use.
 type SimpleNode struct {
-	indent   int
-	tag      string
+	tag      Tag
 	value    string
 	pointer  string
 	children []Node
 }
 
-func NewSimpleNode(indent int, tag, value, pointer string, children []Node) *SimpleNode {
+func NewSimpleNode(tag Tag, value, pointer string, children []Node) *SimpleNode {
 	return &SimpleNode{
-		indent:   indent,
 		tag:      tag,
 		value:    value,
 		pointer:  pointer,
@@ -25,11 +23,7 @@ func NewSimpleNode(indent int, tag, value, pointer string, children []Node) *Sim
 	}
 }
 
-func (node *SimpleNode) Indent() int {
-	return node.indent
-}
-
-func (node *SimpleNode) Tag() string {
+func (node *SimpleNode) Tag() Tag {
 	return node.tag
 }
 
@@ -56,7 +50,7 @@ func (node *SimpleNode) String() string {
 		buf.WriteString(fmt.Sprintf("@%s@ ", node.pointer))
 	}
 
-	buf.WriteString(node.tag)
+	buf.WriteString(string(node.tag))
 
 	if node.value != "" {
 		buf.WriteByte(' ')

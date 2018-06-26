@@ -42,7 +42,7 @@ func (dec *Decoder) Decode() (*Document, error) {
 			}
 		}
 
-		node := parseLine(line)
+		node, indent := parseLine(line)
 
 		// Skip blank lines.
 		if node.Tag() == "" {
@@ -50,20 +50,20 @@ func (dec *Decoder) Decode() (*Document, error) {
 		}
 
 		// Add a root node to the document.
-		if node.Indent() == 0 {
+		if indent == 0 {
 			document.Nodes = append(document.Nodes, node)
 			indents = append(indents, node)
 			continue
 		}
 
-		i := indents[node.Indent()-1]
+		i := indents[indent-1]
 
 		// Move indent pointer if we are changing depth.
 		switch {
-		case node.Indent() >= len(indents):
+		case indent >= len(indents):
 			indents = append(indents, node)
 
-		case node.Indent() < len(indents)-1:
+		case indent < len(indents)-1:
 			indents = indents[:len(indents)-1]
 		}
 
@@ -73,7 +73,7 @@ func (dec *Decoder) Decode() (*Document, error) {
 	return document, nil
 }
 
-func parseLine(line string) Node {
+func parseLine(line string) (Node, int) {
 	parts := regexp.
 		MustCompile(`^(\d) (@\w+@ )?(\w+)( .+)?\n?$`).
 		FindStringSubmatch(line)
@@ -88,9 +88,9 @@ func parseLine(line string) Node {
 		pointer = parts[2][1 : len(parts[2])-2]
 	}
 
-	tag := ""
+	tag := Tag("")
 	if len(parts) > 3 {
-		tag = parts[3]
+		tag = Tag(parts[3])
 	}
 
 	value := ""
@@ -98,5 +98,5 @@ func parseLine(line string) Node {
 		value = parts[4][1:]
 	}
 
-	return NewSimpleNode(indent, tag, value, pointer, []Node{})
+	return NewSimpleNode(tag, value, pointer, []Node{}), indent
 }
