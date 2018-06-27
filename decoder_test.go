@@ -145,6 +145,71 @@ var tests = map[string]*gedcom.Document{
 			}),
 		},
 	},
+	"0 HEAD\n1 GEDC\n2 FORM LINEAGE-LINKED\n0 @P1@ INDI": {
+		Nodes: []gedcom.Node{
+			gedcom.NewSimpleNode("HEAD", "", "", []gedcom.Node{
+				gedcom.NewSimpleNode("GEDC", "", "", []gedcom.Node{
+					gedcom.NewSimpleNode("FORM", "LINEAGE-LINKED", "", []gedcom.Node{}),
+				}),
+			}),
+			gedcom.NewIndividualNode("", "P1", []gedcom.Node{}),
+		},
+	},
+	"0 HEAD0\n1 HEAD1\n2 HEAD2\n3 HEAD3\n0 HEAD00": {
+		Nodes: []gedcom.Node{
+			gedcom.NewSimpleNode("HEAD0", "", "", []gedcom.Node{
+				gedcom.NewSimpleNode("HEAD1", "", "", []gedcom.Node{
+					gedcom.NewSimpleNode("HEAD2", "", "", []gedcom.Node{
+						gedcom.NewSimpleNode("HEAD3", "", "", []gedcom.Node{}),
+					}),
+				}),
+			}),
+			gedcom.NewSimpleNode("HEAD00", "", "", []gedcom.Node{}),
+		},
+	},
+	"0 HEAD0\n1 HEAD1\n2 HEAD2\n3 HEAD3\n1 HEAD10": {
+		Nodes: []gedcom.Node{
+			gedcom.NewSimpleNode("HEAD0", "", "", []gedcom.Node{
+				gedcom.NewSimpleNode("HEAD1", "", "", []gedcom.Node{
+					gedcom.NewSimpleNode("HEAD2", "", "", []gedcom.Node{
+						gedcom.NewSimpleNode("HEAD3", "", "", []gedcom.Node{}),
+					}),
+				}),
+				gedcom.NewSimpleNode("HEAD10", "", "", []gedcom.Node{}),
+			}),
+		},
+	},
+	"0 HEAD0\r1 HEAD1": {
+		Nodes: []gedcom.Node{
+			gedcom.NewSimpleNode("HEAD0", "", "", []gedcom.Node{
+				gedcom.NewSimpleNode("HEAD1", "", "", []gedcom.Node{}),
+			}),
+		},
+	},
+	"0 HEAD0\r\n1 HEAD1": {
+		Nodes: []gedcom.Node{
+			gedcom.NewSimpleNode("HEAD0", "", "", []gedcom.Node{
+				gedcom.NewSimpleNode("HEAD1", "", "", []gedcom.Node{}),
+			}),
+		},
+	},
+	"0 HEAD0\n1 HEAD1\n1 HEAD10\n2 HEAD2": {
+		Nodes: []gedcom.Node{
+			gedcom.NewSimpleNode("HEAD0", "", "", []gedcom.Node{
+				gedcom.NewSimpleNode("HEAD1", "", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode("HEAD10", "", "", []gedcom.Node{
+					gedcom.NewSimpleNode("HEAD2", "", "", []gedcom.Node{}),
+				}),
+			}),
+		},
+	},
+	"0 HEAD\n1 BIRT ": {
+		Nodes: []gedcom.Node{
+			gedcom.NewSimpleNode("HEAD", "", "", []gedcom.Node{
+				gedcom.NewSimpleNode("BIRT", "", "", []gedcom.Node{}),
+			}),
+		},
+	},
 }
 
 func TestDecoder_Decode(t *testing.T) {
@@ -161,6 +226,7 @@ func TestDecoder_Decode(t *testing.T) {
 
 func trimSpaces(s string) string {
 	s = strings.TrimSpace(s)
+	s = strings.Replace(s, "\r", "\n", -1)
 	s = strings.Replace(s, "\n\n", "\n", -1)
 
 	return s

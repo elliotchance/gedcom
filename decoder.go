@@ -5,6 +5,7 @@ import (
 	"bufio"
 	"strconv"
 	"regexp"
+	"bytes"
 )
 
 // Decoder represents a GEDCOM decoder.
@@ -33,38 +34,57 @@ func (dec *Decoder) Decode() (*Document, error) {
 
 	finished := false
 	for !finished {
-		line, err := dec.r.ReadString('\n')
+		line, err := dec.readLine()
 		if err != nil {
-			if err == io.EOF {
-				finished = true
-			} else {
+			if err != io.EOF {
 				return nil, err
 			}
+
+			finished = true
+		}
+
+		// Skip blank lines.
+		if line == "" {
+			continue
 		}
 
 		node, indent := parseLine(line)
 
-		// Skip blank lines.
-		if node.Tag() == "" {
-			continue
-		}
-
 		// Add a root node to the document.
 		if indent == 0 {
 			document.Nodes = append(document.Nodes, node)
+
+			// There can be multiple root nodes so make sure we always reset all
+			// indent pointers.
 			indents = []Node{node}
+
 			continue
 		}
 
 		i := indents[indent-1]
 
-		// Move indent pointer if we are changing depth.
 		switch {
 		case indent >= len(indents):
+			// Descending one level. It is not valid for a child to have an
+			// indent that is more than one greater than the parent. This would
+			// be a corrupt GEDCOM and lead to a panic.
 			indents = append(indents, node)
 
 		case indent < len(indents)-1:
-			indents = indents[:len(indents)-1]
+			// Moving back to a parent. It is possible for this leap to be
+			// greater than one so trim the indent levels back as many times as
+			// needed to represent the new indent level.
+			indents = indents[:indent+1]
+
+		default:
+			// This case would be "indent == len(indents)-1" (the indent does
+			// not change from the previous line). However, since it is the only
+			// other logical possibility there is no need to evaluate it for the
+			// case condition.
+			//
+			// Make sure we update the current indent with the new node so that
+			// children get place on this node and not the previous one.
+			indents[indent] = node
 		}
 
 		i.AddNode(node)
@@ -73,9 +93,32 @@ func (dec *Decoder) Decode() (*Document, error) {
 	return document, nil
 }
 
+func (dec *Decoder) readLine() (string, error) {
+	buf := new(bytes.Buffer)
+
+	for {
+		b, err := dec.r.ReadByte()
+		if err != nil {
+			return string(buf.Bytes()), err
+		}
+
+		// The line endings in the GEDCOM files can be different. A newline and
+		// carriage return are both considered to be the end of the line and empty
+		// lines are ignored so we can treat both of these characters as independent
+		// line terminators.
+		if b == '\n' || b == '\r' {
+			break
+		}
+
+		buf.WriteByte(b)
+	}
+
+	return string(buf.Bytes()), nil
+}
+
 func parseLine(line string) (Node, int) {
 	parts := regexp.
-		MustCompile(`^(\d) (@\w+@ )?(\w+)( .+)?\n?$`).
+		MustCompile(`^(\d) (@\w+@ )?(\w+)( .*)?$`).
 		FindStringSubmatch(line)
 
 	indent := 0
