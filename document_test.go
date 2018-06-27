@@ -9,10 +9,12 @@ import (
 var documentTests = []struct {
 	doc         *gedcom.Document
 	individuals []*gedcom.IndividualNode
+	p2          gedcom.Node
 }{
 	{
 		doc:         &gedcom.Document{},
 		individuals: []*gedcom.IndividualNode{},
+		p2:          nil,
 	},
 	{
 		doc: &gedcom.Document{
@@ -27,6 +29,7 @@ var documentTests = []struct {
 				gedcom.NewNameNode("Joe /Bloggs/", "", []gedcom.Node{}),
 			}),
 		},
+		p2: nil,
 	},
 	{
 		doc: &gedcom.Document{
@@ -48,6 +51,9 @@ var documentTests = []struct {
 				gedcom.NewNameNode("John /Doe/", "", []gedcom.Node{}),
 			}),
 		},
+		p2: gedcom.NewIndividualNode("", "P2", []gedcom.Node{
+			gedcom.NewNameNode("John /Doe/", "", []gedcom.Node{}),
+		}),
 	},
 }
 
@@ -55,6 +61,14 @@ func TestDocument_Individuals(t *testing.T) {
 	for _, test := range documentTests {
 		t.Run("", func(t *testing.T) {
 			assert.Equal(t, test.doc.Individuals(), test.individuals)
+		})
+	}
+}
+
+func TestDocument_NodeByPointer(t *testing.T) {
+	for _, test := range documentTests {
+		t.Run("", func(t *testing.T) {
+			assert.Equal(t, test.doc.NodeByPointer("P2"), test.p2)
 		})
 	}
 }

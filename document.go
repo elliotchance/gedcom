@@ -33,3 +33,13 @@ func (doc *Document) Individuals() []*IndividualNode {
 
 	return individuals
 }
+
+func (doc *Document) NodeByPointer(ptr string) Node {
+	for _, node := range doc.Nodes {
+		if node.Pointer() == ptr {
+			return node
+		}
+	}
+
+	return nil
+}
