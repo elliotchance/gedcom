@@ -7,7 +7,7 @@ type IndividualNode struct {
 
 func NewIndividualNode(value, pointer string, children []Node) *IndividualNode {
 	return &IndividualNode{
-		NewSimpleNode(Name, value, pointer, children),
+		NewSimpleNode(Individual, value, pointer, children),
 	}
 }
 

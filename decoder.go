@@ -52,7 +52,7 @@ func (dec *Decoder) Decode() (*Document, error) {
 		// Add a root node to the document.
 		if indent == 0 {
 			document.Nodes = append(document.Nodes, node)
-			indents = append(indents, node)
+			indents = []Node{node}
 			continue
 		}
 
@@ -99,6 +99,9 @@ func parseLine(line string) (Node, int) {
 	}
 
 	switch tag {
+	case Individual:
+		return NewIndividualNode(value, pointer, []Node{}), indent
+
 	case Name:
 		return NewNameNode(value, pointer, []Node{}), indent
 

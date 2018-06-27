@@ -109,7 +109,7 @@ var tests = map[string]*gedcom.Document{
 	"0 HEAD\n0 @P1@ INDI": {
 		Nodes: []gedcom.Node{
 			gedcom.NewSimpleNode("HEAD", "", "", []gedcom.Node{}),
-			gedcom.NewSimpleNode("INDI", "", "P1", []gedcom.Node{}),
+			gedcom.NewIndividualNode("", "P1", []gedcom.Node{}),
 		},
 	},
 	"0 HEAD\n1 SEX M\n0 @P1@ INDI": {
@@ -117,7 +117,7 @@ var tests = map[string]*gedcom.Document{
 			gedcom.NewSimpleNode("HEAD", "", "", []gedcom.Node{
 				gedcom.NewSimpleNode("SEX", "M", "", []gedcom.Node{}),
 			}),
-			gedcom.NewSimpleNode("INDI", "", "P1", []gedcom.Node{}),
+			gedcom.NewIndividualNode("", "P1", []gedcom.Node{}),
 		},
 	},
 	"0 HEAD\n1 SEX M": {
@@ -134,6 +134,14 @@ var tests = map[string]*gedcom.Document{
 					gedcom.NewSimpleNode("PLAC", "Camperdown, Nsw, Australia", "", []gedcom.Node{}),
 				}),
 				gedcom.NewSimpleNode("SEX", "M", "", []gedcom.Node{}),
+			}),
+		},
+	},
+	"0 HEAD\n0 @P1@ INDI\n1 BIRT": {
+		Nodes: []gedcom.Node{
+			gedcom.NewSimpleNode("HEAD", "", "", []gedcom.Node{}),
+			gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode("BIRT", "", "", []gedcom.Node{}),
 			}),
 		},
 	},
