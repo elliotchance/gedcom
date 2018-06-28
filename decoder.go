@@ -75,6 +75,7 @@ func (dec *Decoder) Decode() (*Document, error) {
 			// greater than one so trim the indent levels back as many times as
 			// needed to represent the new indent level.
 			indents = indents[:indent+1]
+			indents[indent] = node
 
 		default:
 			// This case would be "indent == len(indents)-1" (the indent does

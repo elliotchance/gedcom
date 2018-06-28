@@ -210,6 +210,18 @@ var tests = map[string]*gedcom.Document{
 			}),
 		},
 	},
+	"0 @P221@ INDI\n1 BIRT\n2 DATE 1851\n1 DEAT\n2 DATE 1856": {
+		Nodes: []gedcom.Node{
+			gedcom.NewIndividualNode("", "P221", []gedcom.Node{
+				gedcom.NewSimpleNode("BIRT", "", "", []gedcom.Node{
+					gedcom.NewSimpleNode("DATE", "1851", "", []gedcom.Node{}),
+				}),
+				gedcom.NewSimpleNode("DEAT", "", "", []gedcom.Node{
+					gedcom.NewSimpleNode("DATE", "1856", "", []gedcom.Node{}),
+				}),
+			}),
+		},
+	},
 }
 
 func TestDecoder_Decode(t *testing.T) {
