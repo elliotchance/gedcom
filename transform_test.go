@@ -8,14 +8,11 @@ import (
 
 var transformTests = []struct {
 	doc      *gedcom.Document
-	expected map[string]interface{}
+	expected []interface{}
 }{
 	{
-		doc: &gedcom.Document{},
-		expected: map[string]interface{}{
-			"individuals": map[string]interface{}{},
-			"other":       []interface{}{},
-		},
+		doc:      &gedcom.Document{},
+		expected: []interface{}{},
 	},
 	{
 		doc: &gedcom.Document{
@@ -23,13 +20,10 @@ var transformTests = []struct {
 				gedcom.NewSimpleNode(gedcom.Version, "5.5", "", nil),
 			},
 		},
-		expected: map[string]interface{}{
-			"individuals": map[string]interface{}{},
-			"other": []interface{}{
-				map[string]interface{}{
-					"tag": "VERS",
-					"val": "5.5",
-				},
+		expected: []interface{}{
+			map[string]interface{}{
+				"tag": "VERS",
+				"val": "5.5",
 			},
 		},
 	},
@@ -41,20 +35,17 @@ var transformTests = []struct {
 				}),
 			},
 		},
-		expected: map[string]interface{}{
-			"individuals": map[string]interface{}{
-				"P1": map[string]interface{}{
-					"tag": "INDI",
-					"ptr": "P1",
-					"nodes": []interface{}{
-						map[string]interface{}{
-							"tag": "NAME",
-							"val": "Joe /Bloggs/",
-						},
+		expected: []interface{}{
+			map[string]interface{}{
+				"tag": "INDI",
+				"ptr": "P1",
+				"nodes": []interface{}{
+					map[string]interface{}{
+						"tag": "NAME",
+						"val": "Joe /Bloggs/",
 					},
 				},
 			},
-			"other": []interface{}{},
 		},
 	},
 }

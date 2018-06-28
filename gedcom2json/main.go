@@ -6,19 +6,35 @@ import (
 	"os"
 	"log"
 	"encoding/json"
+	"strings"
 )
 
 var (
-	optionGedcomFile string
-	optionPrettyJSON bool
-	optionPrettyTags bool
+	optionGedcomFile           string
+	optionPrettyJSON           bool
+	optionPrettyTags           bool
+	optionNoPointers           bool
+	optionTagKeys              bool
+	optionStringName           bool
+	optionExcludeTags          string
 )
 
 func main() {
 	flag.StringVar(&optionGedcomFile, "gedcom", "", "Input GEDCOM file.")
 	flag.BoolVar(&optionPrettyJSON, "pretty-json", false, "Pretty print JSON.")
 	flag.BoolVar(&optionPrettyTags, "pretty-tags", false,
-		"Use descriptive names instead of raw tags.")
+		"Output tags with their descriptive name instead of their raw tag " +
+		`value. For example, "BIRT" would be output as "Birth".`)
+	flag.BoolVar(&optionNoPointers, "no-pointers", false,
+		`Do not include Pointer values ("ptr" attribute) in the output JSON. ` +
+		`This is useful to activate when comparing GEDCOM files that have ` +
+		`had pointers generated from different sources.`)
+	flag.BoolVar(&optionTagKeys, "tag-keys", false,
+		`Use tags (pretty or raw) as object keys rather than arrays.`)
+	flag.BoolVar(&optionStringName, "string-name", false,
+		`Convert NAME tags to a string (instead of the object parts).`)
+	flag.StringVar(&optionExcludeTags, "exclude-tags", "",
+		`Comma-separated list of tags to ignore.`)
 	flag.Parse()
 
 	file, err := os.Open(optionGedcomFile)
@@ -33,7 +49,11 @@ func main() {
 	}
 
 	options := gedcom.TransformOptions{
-		PrettyTags: optionPrettyTags,
+		PrettyTags:           optionPrettyTags,
+		NoPointers:           optionNoPointers,
+		TagKeys:              optionTagKeys,
+		StringName:           optionStringName,
+		ExcludeTags:          excludeTags(),
 	}
 
 	var bytes []byte
@@ -50,4 +70,17 @@ func main() {
 
 	os.Stdout.Write(bytes)
 	os.Stdout.Write([]byte{'\n'})
+}
+
+func excludeTags() []gedcom.Tag {
+	if optionExcludeTags == "" {
+		return []gedcom.Tag{}
+	}
+
+	tags := []gedcom.Tag{}
+	for _, t := range strings.Split(optionExcludeTags, ",") {
+		tags = append(tags, gedcom.Tag(t))
+	}
+
+	return tags
 }
