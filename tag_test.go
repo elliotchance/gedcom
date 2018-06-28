@@ -10,11 +10,21 @@ var tagTests = map[string]struct {
 	tag gedcom.Tag
 	s   string
 }{
+	"_COR":  {gedcom.Coordinates, "Coordinates"},
+	"_CRE":  {gedcom.Created, "Created"},
+	"_FID":  {gedcom.FamilySearchID, "FamilySearchID"},
+	"_LAD":  {gedcom.LatitudeDegrees, "LatitudeDegrees"},
+	"_LAM":  {gedcom.LatitudeMinutes, "LatitudeMinutes"},
+	"_LAS":  {gedcom.LatitudeSeconds, "LatitudeSeconds"},
+	"_LOD":  {gedcom.LongitudeDegress, "LongitudeDegress"},
+	"_LOM":  {gedcom.LongitudeMinutes, "LongitudeMinutes"},
+	"_LON":  {gedcom.LongitudeNorth, "LongitudeNorth"},
+	"_LOS":  {gedcom.LongitudeSeconds, "LongitudeSeconds"},
 	"ABBR":  {gedcom.Abbreviation, "Abbreviation"},
 	"ADDR":  {gedcom.Address, "Address"},
+	"ADOP":  {gedcom.Adoption, "Adoption"},
 	"ADR1":  {gedcom.Address1, "Address1"},
 	"ADR2":  {gedcom.Address2, "Address2"},
-	"ADOP":  {gedcom.Adoption, "Adoption"},
 	"AFN":   {gedcom.AncestralFileNumber, "AncestralFileNumber"},
 	"AGE":   {gedcom.Age, "Age"},
 	"AGNC":  {gedcom.Agency, "Agency"},
@@ -146,8 +156,8 @@ var tagTests = map[string]struct {
 	"TYPE":  {gedcom.Type, "Type"},
 	"VERS":  {gedcom.Version, "Version"},
 	"WIFE":  {gedcom.Wife, "Wife"},
-	"WWW":   {gedcom.WWW, "WWW"},
 	"WILL":  {gedcom.Will, "Will"},
+	"WWW":   {gedcom.WWW, "WWW"},
 }
 
 func TestTags(t *testing.T) {
