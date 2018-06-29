@@ -21,6 +21,9 @@ type TransformOptions struct {
 
 	// A list of tags to exclude from the output.
 	ExcludeTags []Tag
+
+	// When true only official GEDCOM tags will be included in the output.
+	OnlyOfficialTags bool
 }
 
 func Transform(doc *Document, options TransformOptions) []interface{} {
@@ -98,6 +101,10 @@ func transformNode(node Node, options TransformOptions) map[string]interface{} {
 		if node.Tag() == Tag(t) {
 			return nil
 		}
+	}
+
+	if options.OnlyOfficialTags && !node.Tag().IsOfficial() {
+		return nil
 	}
 
 	m := map[string]interface{}{}

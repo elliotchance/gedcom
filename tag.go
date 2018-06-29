@@ -756,3 +756,8 @@ func (tag Tag) String() string {
 
 	return string(tag)
 }
+
+// IsOfficial returns true if the tag is part of the GEDCOM 5.5 standard.
+func (tag Tag) IsOfficial() bool {
+	return tag[0] != '_'
+}
