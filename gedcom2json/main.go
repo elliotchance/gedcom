@@ -19,6 +19,7 @@ var (
 	optionExcludeTags      string
 	optionOnlyOfficialTags bool
 	optionOnlyTags         string
+	optionSingleName       bool
 )
 
 func main() {
@@ -41,6 +42,9 @@ func main() {
 		`Only include tags from the GEDCOM standard in the output.`)
 	flag.StringVar(&optionOnlyTags, "only-tags", "",
 		`Only include these tags in the output.`)
+	flag.BoolVar(&optionSingleName, "single-name", false,
+		`When there are multiple names for an individual this will return the `+
+			`first of the name nodes only.`)
 	flag.Parse()
 
 	file, err := os.Open(optionGedcomFile)
@@ -55,13 +59,14 @@ func main() {
 	}
 
 	options := gedcom.TransformOptions{
-		PrettyTags:       optionPrettyTags,
-		NoPointers:       optionNoPointers,
-		TagKeys:          optionTagKeys,
-		StringName:       optionStringName,
 		ExcludeTags:      splitTags(optionExcludeTags),
+		NoPointers:       optionNoPointers,
 		OnlyOfficialTags: optionOnlyOfficialTags,
 		OnlyTags:         splitTags(optionOnlyTags),
+		PrettyTags:       optionPrettyTags,
+		SingleName:       optionStringName,
+		StringName:       optionStringName,
+		TagKeys:          optionTagKeys,
 	}
 
 	var bytes []byte

@@ -27,6 +27,10 @@ type TransformOptions struct {
 
 	// Only output these provided tags. Leave empty to act as no filter.
 	OnlyTags []Tag
+
+	// When there are multiple names for an individual this will return the
+	// first of the name nodes only.
+	SingleName bool
 }
 
 func Transform(doc *Document, options TransformOptions) []interface{} {
@@ -40,13 +44,13 @@ func Transform(doc *Document, options TransformOptions) []interface{} {
 	}
 
 	if options.TagKeys {
-		r = []interface{}{reduceTagKeys(r)}
+		r = []interface{}{reduceTagKeys(r, options.SingleName)}
 	}
 
 	return r
 }
 
-func reduceTagKeys(m interface{}) interface{} {
+func reduceTagKeys(m interface{}, singleName bool) interface{} {
 	switch n := m.(type) {
 	case []interface{}:
 		r := map[string]interface{}{}
@@ -56,11 +60,17 @@ func reduceTagKeys(m interface{}) interface{} {
 			if _, ok := r[tag]; ok {
 				// It already exists, we may need to convert it to an array.
 				if _, ok := r[tag].([]interface{}); !ok {
+					// Single name.
+					if tag == "Name" || tag == "NAME" && singleName {
+						continue
+					}
+
 					r[tag] = []interface{}{r[tag]}
 				}
-				r[tag] = append(r[tag].([]interface{}), reduceTagKeys(v))
+				r[tag] = append(r[tag].([]interface{}),
+					reduceTagKeys(v, singleName))
 			} else {
-				r[tag] = reduceTagKeys(v)
+				r[tag] = reduceTagKeys(v, singleName)
 			}
 		}
 
@@ -72,7 +82,7 @@ func reduceTagKeys(m interface{}) interface{} {
 		delete(n, "tag")
 
 		if nodes, ok := n["nodes"]; ok {
-			return reduceTagKeys(nodes)
+			return reduceTagKeys(nodes, singleName)
 		} else {
 			// If it's only a value we can remove the object wrapper.
 			// TODO: This does not check if there is a pointer.

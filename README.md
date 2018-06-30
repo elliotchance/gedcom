@@ -76,6 +76,8 @@ Usage of gedcom2json:
     	Pretty print JSON.
   -pretty-tags
     	Output tags with their descriptive name instead of their raw tag value. For example, "BIRT" would be output as "Birth".
+  -single-name
+    	When there are multiple names for an individual this will return the first of the name nodes only.
   -string-name
     	Convert NAME tags to a string (instead of the object parts).
   -tag-keys
