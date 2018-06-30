@@ -70,6 +70,8 @@ Usage of gedcom2json:
     	Do not include Pointer values ("ptr" attribute) in the output JSON. This is useful to activate when comparing GEDCOM files that have had pointers generated from different sources.
   -only-official-tags
     	Only include tags from the GEDCOM standard in the output.
+  -only-tags string
+    	Only include these tags in the output.
   -pretty-json
     	Pretty print JSON.
   -pretty-tags

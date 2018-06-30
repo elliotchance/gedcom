@@ -18,6 +18,7 @@ var (
 	optionStringName       bool
 	optionExcludeTags      string
 	optionOnlyOfficialTags bool
+	optionOnlyTags         string
 )
 
 func main() {
@@ -38,6 +39,8 @@ func main() {
 		`Comma-separated list of tags to ignore.`)
 	flag.BoolVar(&optionOnlyOfficialTags, "only-official-tags", false,
 		`Only include tags from the GEDCOM standard in the output.`)
+	flag.StringVar(&optionOnlyTags, "only-tags", "",
+		`Only include these tags in the output.`)
 	flag.Parse()
 
 	file, err := os.Open(optionGedcomFile)
@@ -56,8 +59,9 @@ func main() {
 		NoPointers:       optionNoPointers,
 		TagKeys:          optionTagKeys,
 		StringName:       optionStringName,
-		ExcludeTags:      excludeTags(),
+		ExcludeTags:      splitTags(optionExcludeTags),
 		OnlyOfficialTags: optionOnlyOfficialTags,
+		OnlyTags:         splitTags(optionOnlyTags),
 	}
 
 	var bytes []byte
@@ -76,13 +80,13 @@ func main() {
 	os.Stdout.Write([]byte{'\n'})
 }
 
-func excludeTags() []gedcom.Tag {
-	if optionExcludeTags == "" {
+func splitTags(s string) []gedcom.Tag {
+	if s == "" {
 		return []gedcom.Tag{}
 	}
 
 	tags := []gedcom.Tag{}
-	for _, t := range strings.Split(optionExcludeTags, ",") {
+	for _, t := range strings.Split(s, ",") {
 		tags = append(tags, gedcom.Tag(t))
 	}
 

@@ -24,6 +24,9 @@ type TransformOptions struct {
 
 	// When true only official GEDCOM tags will be included in the output.
 	OnlyOfficialTags bool
+
+	// Only output these provided tags. Leave empty to act as no filter.
+	OnlyTags []Tag
 }
 
 func Transform(doc *Document, options TransformOptions) []interface{} {
@@ -96,7 +99,21 @@ func transformNodes(nodes []Node, options TransformOptions) []interface{} {
 }
 
 func transformNode(node Node, options TransformOptions) map[string]interface{} {
-	// Check excludes
+	// Check only.
+	if len(options.OnlyTags) > 0 {
+		found := false
+		for _, t := range options.OnlyTags {
+			if node.Tag() == Tag(t) {
+				found = true
+			}
+		}
+
+		if !found {
+			return nil
+		}
+	}
+
+	// Check excludes.
 	for _, t := range options.ExcludeTags {
 		if node.Tag() == Tag(t) {
 			return nil
