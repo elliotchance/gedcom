@@ -143,10 +143,13 @@ func parseLine(line string) (Node, int) {
 	}
 
 	switch tag {
-	case Individual:
+	case TagFamily:
+		return NewFamilyNode(pointer, []Node{}), indent
+
+	case TagIndividual:
 		return NewIndividualNode(value, pointer, []Node{}), indent
 
-	case Name:
+	case TagName:
 		return NewNameNode(value, pointer, []Node{}), indent
 
 	default:

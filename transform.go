@@ -156,7 +156,7 @@ func transformNode(node Node, options TransformOptions) map[string]interface{} {
 		m["ptr"] = node.Pointer()
 	}
 
-	if node.Tag() == Name && options.StringName {
+	if node.Tag() == TagName && options.StringName {
 		m["val"] = node.String()
 	} else {
 		if node.Value() != "" {

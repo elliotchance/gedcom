@@ -222,6 +222,14 @@ var tests = map[string]*gedcom.Document{
 			}),
 		},
 	},
+	"0 @F1@ FAM\n1 HUSB @P2@\n1 WIFE @P3@": {
+		Nodes: []gedcom.Node{
+			gedcom.NewFamilyNode("F1", []gedcom.Node{
+				gedcom.NewSimpleNode("HUSB", "@P2@", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode("WIFE", "@P3@", "", []gedcom.Node{}),
+			}),
+		},
+	},
 }
 
 func TestDecoder_Decode(t *testing.T) {

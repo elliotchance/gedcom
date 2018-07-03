@@ -37,7 +37,7 @@ var documentTests = []struct {
 				gedcom.NewIndividualNode("", "P1", []gedcom.Node{
 					gedcom.NewNameNode("Joe /Bloggs/", "", []gedcom.Node{}),
 				}),
-				gedcom.NewSimpleNode(gedcom.Version, "", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode(gedcom.TagVersion, "", "", []gedcom.Node{}),
 				gedcom.NewIndividualNode("", "P2", []gedcom.Node{
 					gedcom.NewNameNode("John /Doe/", "", []gedcom.Node{}),
 				}),

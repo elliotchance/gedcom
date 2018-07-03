@@ -83,3 +83,36 @@ Usage of gedcom2json:
   -tag-keys
     	Use tags (pretty or raw) as object keys rather than arrays.
 ```
+
+gedcom2text
+===========
+
+`gedcom2text` is a subpackage and binary that converts a GEDCOM file to a simple
+text output (or split into individual files) that is ideal for easily reading
+(by a person) and designed to be as friendly as possible when using diff tools.
+
+```
+Usage of gedcom2text:
+  -gedcom string
+    	Input GEDCOM file.
+  -no-sources
+    	Do not include sources.
+  -only-official-tags
+    	Only output official GEDCOM tags.
+  -split-dir string
+    	Split the individuals into separate files in this directory.
+```
+
+Comparing GEDCOM Files
+----------------------
+
+Here is an example to compare two large GEDCOM files:
+
+```bash
+gedcom2text -gedcom file1.ged -no-sources -only-official-tags -split-dir out1
+gedcom2text -gedcom file2.ged -no-sources -only-official-tags -split-dir out2
+diff -bur out1/ out2/
+```
+
+You can (and probably should) also use
+[more pretty diffing tools](https://en.wikipedia.org/wiki/Comparison_of_file_comparison_tools).
