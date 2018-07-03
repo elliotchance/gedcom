@@ -44,33 +44,44 @@ func Transform(doc *Document, options TransformOptions) []interface{} {
 	}
 
 	if options.TagKeys {
-		r = []interface{}{reduceTagKeys(r, options.SingleName)}
+		r = []interface{}{reduceTagKeys(r, options)}
 	}
 
 	return r
 }
 
-func reduceTagKeys(m interface{}, singleName bool) interface{} {
+func reduceTagKeys(m interface{}, options TransformOptions) interface{} {
 	switch n := m.(type) {
 	case []interface{}:
 		r := map[string]interface{}{}
 
 		for _, v := range n {
 			tag := v.(map[string]interface{})["tag"].(string)
+
+			if (tag == "Individual" || tag == "INDI") && !options.NoPointers {
+				if r[tag] == nil {
+					r[tag] = map[string]interface{}{}
+				}
+
+				ptr := v.(map[string]interface{})["ptr"].(string)
+				r[tag].(map[string]interface{})[ptr] = reduceTagKeys(v, options)
+				continue
+			}
+
 			if _, ok := r[tag]; ok {
 				// It already exists, we may need to convert it to an array.
 				if _, ok := r[tag].([]interface{}); !ok {
 					// Single name.
-					if tag == "Name" || tag == "NAME" && singleName {
+					if tag == "Name" || tag == "NAME" && options.SingleName {
 						continue
 					}
 
 					r[tag] = []interface{}{r[tag]}
 				}
 				r[tag] = append(r[tag].([]interface{}),
-					reduceTagKeys(v, singleName))
+					reduceTagKeys(v, options))
 			} else {
-				r[tag] = reduceTagKeys(v, singleName)
+				r[tag] = reduceTagKeys(v, options)
 			}
 		}
 
@@ -82,10 +93,9 @@ func reduceTagKeys(m interface{}, singleName bool) interface{} {
 		delete(n, "tag")
 
 		if nodes, ok := n["nodes"]; ok {
-			return reduceTagKeys(nodes, singleName)
+			return reduceTagKeys(nodes, options)
 		} else {
-			// If it's only a value we can remove the object wrapper.
-			// TODO: This does not check if there is a pointer.
+			// Remove the object wrapper.
 			return n["val"]
 		}
 
