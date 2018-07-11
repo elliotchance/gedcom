@@ -14,6 +14,7 @@ var (
 	optionNoSources        bool
 	optionOnlyOfficialTags bool
 	optionSplitDir         string
+	optionSingleName       bool
 )
 
 var outFile *os.File
@@ -26,6 +27,8 @@ func main() {
 		"Only output official GEDCOM tags.")
 	flag.StringVar(&optionSplitDir, "split-dir", "",
 		"Split the individuals into separate files in this directory.")
+	flag.BoolVar(&optionSingleName, "single-name", false,
+		"Only output the primary name.")
 	flag.Parse()
 
 	file, err := os.Open(optionGedcomFile)
@@ -47,17 +50,14 @@ func main() {
 
 	outFile = os.Stdout
 	for _, individual := range individuals {
-		// The first name of the individual is important
-
 		if optionSplitDir != "" {
-			names := individual.Names()
-			if len(names) == 0 {
+			outputFile := outputFileName(individual)
+			if outputFile == "" {
 				// TODO: Should probably print out an error message here.
 				continue
 			}
 
-			// TODO: Need to sanitise the name so it is safe for a file name.
-			outFile, err = os.Create(optionSplitDir + "/" + names[0].String() + ".txt")
+			outFile, err = os.Create(outputFile)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -68,19 +68,59 @@ func main() {
 
 		for _, name := range individual.Names() {
 			printLine(fmt.Sprintf("  Name: %s", name.String()))
+
+			if optionSingleName {
+				break
+			}
 		}
 		printLine(fmt.Sprintf("  Sex: %s", individual.Sex()))
 
-		printNodes(individual, gedcom.Birth)
-		printNodes(individual, gedcom.Death)
+		printNodes(individual, gedcom.TagBirth)
+		printNodes(individual, gedcom.TagDeath)
+
+		printLine(fmt.Sprintf("  Spouses:"))
+		for _, spouse := range individual.Spouses(document) {
+			for _, name := range spouse.Names() {
+				printLine(fmt.Sprintf("    Name: %s", name.String()))
+
+				if optionSingleName {
+					break
+				}
+			}
+		}
 	}
+}
+
+func outputFileName(individual *gedcom.IndividualNode) string {
+	names := individual.Names()
+	if len(names) == 0 {
+		return ""
+	}
+
+	// Include the birth/death information to make the name more unique.
+	birth := ""
+	if node := individual.FirstNodeWithTag(gedcom.TagBirth); node != nil {
+		if node2 := node.FirstNodeWithTag(gedcom.TagDate); node2 != nil {
+			birth = node2.Value()
+		}
+	}
+
+	death := ""
+	if node := individual.FirstNodeWithTag(gedcom.TagDeath); node != nil {
+		if node2 := node.FirstNodeWithTag(gedcom.TagDate); node2 != nil {
+			death = node2.Value()
+		}
+	}
+
+	// TODO: Need to sanitise the name so it is safe for a file name.
+	return fmt.Sprintf("%s/%s (%s - %s).txt", optionSplitDir, names[0].String(), birth, death)
 }
 
 func printNodes(parent gedcom.Node, tag gedcom.Tag) {
 	for _, node := range parent.NodesWithTag(tag) {
 		printLine(fmt.Sprintf("  %s:", tag.String()))
 		for _, n := range node.Nodes() {
-			if n.Tag() == gedcom.Source && optionNoSources {
+			if n.Tag() == gedcom.TagSource && optionNoSources {
 				continue
 			}
 
