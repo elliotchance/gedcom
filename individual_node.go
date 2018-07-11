@@ -36,3 +36,29 @@ func (node *IndividualNode) Sex() string {
 
 	return sex[0].Value()
 }
+
+// TODO: needs tests
+func (node *IndividualNode) Spouses(doc *Document) []*IndividualNode {
+	spouses := []*IndividualNode{}
+
+	for _, family := range doc.Families() {
+		husband := family.Husband(doc)
+		wife := family.Wife(doc)
+
+		// We only care about families that have both parties (otherwise there
+		// is no spouse to add).
+		if husband == nil || wife == nil {
+			continue
+		}
+
+		if husband.Pointer() == node.Pointer() {
+			spouses = append(spouses, wife)
+		}
+
+		if wife.Pointer() == node.Pointer() {
+			spouses = append(spouses, husband)
+		}
+	}
+
+	return spouses
+}

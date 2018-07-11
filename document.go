@@ -43,3 +43,15 @@ func (doc *Document) NodeByPointer(ptr string) Node {
 
 	return nil
 }
+
+func (doc *Document) Families() []*FamilyNode {
+	families := []*FamilyNode{}
+
+	for _, node := range doc.Nodes {
+		if n, ok := node.(*FamilyNode); ok {
+			families = append(families, n)
+		}
+	}
+
+	return families
+}

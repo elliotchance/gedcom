@@ -78,3 +78,13 @@ func (node *SimpleNode) NodesWithTag(tag Tag) []Node {
 
 	return nodes
 }
+
+func (node *SimpleNode) FirstNodeWithTag(tag Tag) Node {
+	for _, node := range node.Nodes() {
+		if node.Tag() == tag {
+			return node
+		}
+	}
+
+	return nil
+}

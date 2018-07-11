@@ -14,6 +14,7 @@ type Node interface {
 	Nodes() []Node
 	AddNode(node Node)
 	NodesWithTag(tag Tag) []Node
+	FirstNodeWithTag(tag Tag) Node
 
 	// gedcomLine is for rendering the GEDCOM lines.
 	gedcomLine() string

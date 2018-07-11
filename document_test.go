@@ -4,17 +4,20 @@ import (
 	"testing"
 	"github.com/stretchr/testify/assert"
 	"github.com/elliotchance/gedcom"
+	"fmt"
 )
 
 var documentTests = []struct {
 	doc         *gedcom.Document
 	individuals []*gedcom.IndividualNode
+	families    []*gedcom.FamilyNode
 	p2          gedcom.Node
 }{
 	{
 		doc:         &gedcom.Document{},
 		individuals: []*gedcom.IndividualNode{},
 		p2:          nil,
+		families:    []*gedcom.FamilyNode{},
 	},
 	{
 		doc: &gedcom.Document{
@@ -29,7 +32,8 @@ var documentTests = []struct {
 				gedcom.NewNameNode("Joe /Bloggs/", "", []gedcom.Node{}),
 			}),
 		},
-		p2: nil,
+		p2:       nil,
+		families: []*gedcom.FamilyNode{},
 	},
 	{
 		doc: &gedcom.Document{
@@ -54,6 +58,45 @@ var documentTests = []struct {
 		p2: gedcom.NewIndividualNode("", "P2", []gedcom.Node{
 			gedcom.NewNameNode("John /Doe/", "", []gedcom.Node{}),
 		}),
+		families: []*gedcom.FamilyNode{},
+	},
+	{
+		doc: &gedcom.Document{
+			Nodes: []gedcom.Node{
+				gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+					gedcom.NewNameNode("Joe /Bloggs/", "", []gedcom.Node{}),
+				}),
+				gedcom.NewFamilyNode("F1", []gedcom.Node{}),
+			},
+		},
+		individuals: []*gedcom.IndividualNode{
+			gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewNameNode("Joe /Bloggs/", "", []gedcom.Node{}),
+			}),
+		},
+		p2: nil,
+		families: []*gedcom.FamilyNode{
+			gedcom.NewFamilyNode("F1", []gedcom.Node{}),
+		},
+	},
+	{
+		doc: &gedcom.Document{
+			Nodes: []gedcom.Node{
+				gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+					gedcom.NewNameNode("Joe /Bloggs/", "", []gedcom.Node{}),
+				}),
+				gedcom.NewFamilyNode("F3", []gedcom.Node{}),
+			},
+		},
+		individuals: []*gedcom.IndividualNode{
+			gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewNameNode("Joe /Bloggs/", "", []gedcom.Node{}),
+			}),
+		},
+		p2: nil,
+		families: []*gedcom.FamilyNode{
+			gedcom.NewFamilyNode("F3", []gedcom.Node{}),
+		},
 	},
 }
 
@@ -68,7 +111,16 @@ func TestDocument_Individuals(t *testing.T) {
 func TestDocument_NodeByPointer(t *testing.T) {
 	for _, test := range documentTests {
 		t.Run("", func(t *testing.T) {
-			assert.Equal(t, test.doc.NodeByPointer("P2"), test.p2)
+			assert.Equal(t, test.doc.NodeByPointer("P2"), test.p2,
+				fmt.Sprintf("%+#v", test))
+		})
+	}
+}
+
+func TestDocument_Families(t *testing.T) {
+	for _, test := range documentTests {
+		t.Run("", func(t *testing.T) {
+			assert.Equal(t, test.doc.Families(), test.families)
 		})
 	}
 }

@@ -33,3 +33,15 @@ func (node *FamilyNode) partner(document *Document, tag Tag) *IndividualNode {
 
 	return individual.(*IndividualNode)
 }
+
+// TODO: Needs tests
+func (node *FamilyNode) Children(document *Document) []*IndividualNode {
+	children := []*IndividualNode{}
+
+	for _, n := range node.NodesWithTag(TagChild) {
+		child := document.NodeByPointer(n.Pointer()).(*IndividualNode)
+		children = append(children, child)
+	}
+
+	return children
+}
