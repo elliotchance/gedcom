@@ -1,11 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"github.com/elliotchance/gedcom"
-	"os"
 	"log"
-	"encoding/json"
+	"os"
 	"strings"
 )
 

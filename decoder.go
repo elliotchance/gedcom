@@ -1,11 +1,11 @@
 package gedcom
 
 import (
-	"io"
 	"bufio"
-	"strconv"
-	"regexp"
 	"bytes"
+	"io"
+	"regexp"
+	"strconv"
 )
 
 // Decoder represents a GEDCOM decoder.

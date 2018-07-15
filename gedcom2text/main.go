@@ -2,10 +2,10 @@ package main
 
 import (
 	"flag"
-	"github.com/elliotchance/gedcom"
-	"os"
-	"log"
 	"fmt"
+	"github.com/elliotchance/gedcom"
+	"log"
+	"os"
 	"sort"
 )
 

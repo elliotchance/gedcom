@@ -1,9 +1,9 @@
 package gedcom_test
 
 import (
-	"testing"
-	"github.com/stretchr/testify/assert"
 	"github.com/elliotchance/gedcom"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 var individualTests = []struct {
@@ -47,7 +47,7 @@ var individualTests = []struct {
 			gedcom.NewSimpleNode(gedcom.TagSex, "M", "", []gedcom.Node{}),
 		}),
 		names: []*gedcom.NameNode{},
-		sex: gedcom.SexMale,
+		sex:   gedcom.SexMale,
 	},
 	{
 		node: gedcom.NewIndividualNode("", "P2", []gedcom.Node{

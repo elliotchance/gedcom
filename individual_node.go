@@ -1,11 +1,5 @@
 package gedcom
 
-const (
-	SexMale = "M"
-	SexFemale = "F"
-	SexUnknown = "U"
-)
-
 // IndividualNode represents a person.
 type IndividualNode struct {
 	*SimpleNode
@@ -28,13 +22,13 @@ func (node *IndividualNode) Names() []*NameNode {
 	return names
 }
 
-func (node *IndividualNode) Sex() string {
+func (node *IndividualNode) Sex() Sex {
 	sex := node.NodesWithTag(TagSex)
 	if len(sex) == 0 {
 		return SexUnknown
 	}
 
-	return sex[0].Value()
+	return Sex(sex[0].Value())
 }
 
 // TODO: needs tests
@@ -61,4 +55,41 @@ func (node *IndividualNode) Spouses(doc *Document) []*IndividualNode {
 	}
 
 	return spouses
+}
+
+// TODO: needs tests
+func (node *IndividualNode) Families(doc *Document) []*FamilyNode {
+	families := []*FamilyNode{}
+
+	for _, family := range doc.Families() {
+		if family.HasChild(doc, node) || family.Husband(doc).Is(node) || family.Wife(doc).Is(node) {
+			families = append(families, family)
+		}
+	}
+
+	return families
+}
+
+// TODO: needs tests
+func (node *IndividualNode) Is(individual *IndividualNode) bool {
+	return node != nil && individual != nil && node.Pointer() == individual.Pointer()
+}
+
+// TODO: needs tests
+func (node *IndividualNode) FamilyWithSpouse(doc *Document, spouse *IndividualNode) *FamilyNode {
+	for _, family := range doc.Families() {
+		a := family.Husband(doc).Is(node) && family.Wife(doc).Is(spouse)
+		b := family.Wife(doc).Is(node) && family.Husband(doc).Is(spouse)
+
+		if a || b {
+			return family
+		}
+	}
+
+	return nil
+}
+
+// TODO: needs tests
+func (node *IndividualNode) IsLiving() bool {
+	return node.FirstNodeWithTag(TagDeath) == nil
 }

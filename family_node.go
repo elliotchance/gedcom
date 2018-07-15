@@ -39,9 +39,21 @@ func (node *FamilyNode) Children(document *Document) []*IndividualNode {
 	children := []*IndividualNode{}
 
 	for _, n := range node.NodesWithTag(TagChild) {
-		child := document.NodeByPointer(n.Pointer()).(*IndividualNode)
+		pointer := document.NodeByPointer(valueToPointer(n.Value()))
+		child := pointer.(*IndividualNode)
 		children = append(children, child)
 	}
 
 	return children
+}
+
+// TODO: Needs tests
+func (node *FamilyNode) HasChild(document *Document, individual *IndividualNode) bool {
+	for _, n := range node.NodesWithTag(TagChild) {
+		if n.Value() == "@"+individual.Pointer()+"@" {
+			return true
+		}
+	}
+
+	return false
 }

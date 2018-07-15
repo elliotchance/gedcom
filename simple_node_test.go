@@ -1,9 +1,9 @@
 package gedcom_test
 
 import (
-	"testing"
 	"github.com/elliotchance/gedcom"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestSimpleNode_ChildNodes(t *testing.T) {

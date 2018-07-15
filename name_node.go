@@ -1,9 +1,9 @@
 package gedcom
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
-	"fmt"
 )
 
 // NameNode represents all the parts that make up a single name. An individual
@@ -115,4 +115,13 @@ func (node *NameNode) String() string {
 	return node.trimSpaces(fmt.Sprintf("%s %s %s %s %s %s", node.Title(),
 		node.Prefix(), node.GivenName(), node.SurnamePrefix(), node.Surname(),
 		node.Suffix()))
+}
+
+func (node *NameNode) Type() NameType {
+	if nameType := node.FirstNodeWithTag(TagType); nameType != nil {
+		return NameType(nameType.Value())
+	}
+
+	// Otherwise return nothing.
+	return ""
 }

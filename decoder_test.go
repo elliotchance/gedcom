@@ -1,10 +1,10 @@
 package gedcom_test
 
 import (
-	"testing"
-	"github.com/stretchr/testify/assert"
 	"github.com/elliotchance/gedcom"
+	"github.com/stretchr/testify/assert"
 	"strings"
+	"testing"
 )
 
 var tests = map[string]*gedcom.Document{

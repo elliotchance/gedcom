@@ -1,8 +1,8 @@
 package gedcom
 
 import (
-	"fmt"
 	"bytes"
+	"fmt"
 )
 
 // SimpleNode is used as the default node type when there is no more appropriate

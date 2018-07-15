@@ -1,8 +1,8 @@
 package gedcom
 
 import (
-	"io"
 	"fmt"
+	"io"
 )
 
 // Encoder represents a GEDCOM encoder.

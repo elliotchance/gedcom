@@ -6,7 +6,8 @@ import "bytes"
 // Document to contain zero Nodes, this means the GEDCOM file was empty. It
 // may also (and usually) contain several Nodes.
 type Document struct {
-	Nodes []Node
+	Nodes        []Node
+	pointerCache map[string]Node
 }
 
 // String will render the entire GEDCOM document.
@@ -35,13 +36,18 @@ func (doc *Document) Individuals() []*IndividualNode {
 }
 
 func (doc *Document) NodeByPointer(ptr string) Node {
-	for _, node := range doc.Nodes {
-		if node.Pointer() == ptr {
-			return node
+	// Build the cache once.
+	if doc.pointerCache == nil {
+		doc.pointerCache = map[string]Node{}
+
+		for _, node := range doc.Nodes {
+			if node.Pointer() != "" {
+				doc.pointerCache[node.Pointer()] = node
+			}
 		}
 	}
 
-	return nil
+	return doc.pointerCache[ptr]
 }
 
 func (doc *Document) Families() []*FamilyNode {

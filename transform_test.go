@@ -2,8 +2,8 @@ package gedcom_test
 
 import (
 	"github.com/elliotchance/gedcom"
-	"testing"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 var transformTests = []struct {

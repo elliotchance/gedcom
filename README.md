@@ -1,6 +1,8 @@
 github.com/elliotchance/gedcom
 ==============================
 
+[![GoDoc](https://godoc.org/github.com/elliotchance/gedcom?status.svg)](https://godoc.org/github.com/elliotchance/gedcom)
+
 `gedcom` provides a Go-style encoder and decoder for GEDCOM files.
 
 The goals of this project are:
@@ -52,6 +54,19 @@ err := encoder.Encode()
 if err != nil {
 	panic(err)
 }
+```
+
+gedcom2html
+===========
+
+`gedcom2html` converts a GEDCOM file to a directory of HTML files.
+
+```txt
+Usage of gedcom2html:
+  -gedcom string
+    	Input GEDCOM file.
+  -output-dir string
+    	Output directory. It will use the current directory if output-dir is not provided. Output files will only be added or replaced. Existing files will not be deleted. (default ".")
 ```
 
 gedcom2json
