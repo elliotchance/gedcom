@@ -110,10 +110,18 @@ text output (or split into individual files) that is ideal for easily reading
 Usage of gedcom2text:
   -gedcom string
     	Input GEDCOM file.
+  -no-change-times
+    	Do not change timestamps.
+  -no-empty-deaths
+    	Do not include Death node if there are no visible details.
+  -no-places
+    	Do not include places.
   -no-sources
     	Do not include sources.
   -only-official-tags
     	Only output official GEDCOM tags.
+  -single-name
+    	Only output the primary name.
   -split-dir string
     	Split the individuals into separate files in this directory.
 ```
