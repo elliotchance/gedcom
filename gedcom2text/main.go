@@ -87,6 +87,21 @@ func main() {
 		printNodes(individual, gedcom.TagBirth)
 		printNodes(individual, gedcom.TagDeath)
 
+		printLine(fmt.Sprintf("  Families:"))
+		for _, family := range individual.Families(document) {
+			if !family.HasChild(document, individual) {
+				continue
+			}
+
+			printLine("    -")
+			if father := family.Husband(document); father != nil {
+				printLine(fmt.Sprintf("      Father: %s", father.Name()))
+			}
+			if mother := family.Wife(document); mother != nil {
+				printLine(fmt.Sprintf("      Mother: %s", mother.Name()))
+			}
+		}
+
 		printLine(fmt.Sprintf("  Spouses:"))
 		spouses := individual.Spouses(document)
 
@@ -98,39 +113,28 @@ func main() {
 
 		for _, spouse := range spouses {
 			for _, name := range spouse.Names() {
-				printLine(fmt.Sprintf("    Name: %s", name.String()))
+				// Only use the primary name for the spouse here as it needs to
+				// be the key. If they have enabled multiple names then the
+				// extra names will appear on the individual page.
+				printLine(fmt.Sprintf("    - Name: %s", name.String()))
+				break
+			}
 
-				if optionSingleName {
-					break
+			// Children of the spouse.
+			children := individual.FamilyWithSpouse(document, spouse).Children(document)
+			sort.SliceStable(children, func(i, j int) bool {
+				return children[i].Names()[0].String() < children[j].Names()[0].String()
+			})
+			printLine("      Children:")
+			for _, child := range children {
+				n := "Unknown"
+				if n2 := child.Name(); n2 != nil {
+					n = n2.String()
 				}
+				printLine(fmt.Sprintf("        - Name: %s", n))
 			}
 		}
 	}
-}
-
-func outputFileName(individual *gedcom.IndividualNode) string {
-	names := individual.Names()
-	if len(names) == 0 {
-		return ""
-	}
-
-	// Include the birth/death information to make the name more unique.
-	birth := ""
-	if node := individual.FirstNodeWithTag(gedcom.TagBirth); node != nil {
-		if node2 := node.FirstNodeWithTag(gedcom.TagDate); node2 != nil {
-			birth = node2.Value()
-		}
-	}
-
-	death := ""
-	if node := individual.FirstNodeWithTag(gedcom.TagDeath); node != nil {
-		if node2 := node.FirstNodeWithTag(gedcom.TagDate); node2 != nil {
-			death = node2.Value()
-		}
-	}
-
-	// TODO: Need to sanitise the name so it is safe for a file name.
-	return fmt.Sprintf("%s/%s (%s - %s).txt", optionSplitDir, names[0].String(), birth, death)
 }
 
 func tagShouldBeExcluded(tag gedcom.Tag) bool {

@@ -11,6 +11,16 @@ func NewIndividualNode(value, pointer string, children []Node) *IndividualNode {
 	}
 }
 
+// TODO: Needs tests
+func (node *IndividualNode) Name() *NameNode {
+	nameTag := node.FirstNodeWithTag(TagName)
+	if nameTag != nil {
+		return nameTag.(*NameNode)
+	}
+
+	return nil
+}
+
 func (node *IndividualNode) Names() []*NameNode {
 	nameTags := node.NodesWithTag(TagName)
 	names := make([]*NameNode, len(nameTags))
