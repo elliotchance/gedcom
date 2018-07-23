@@ -35,13 +35,20 @@ func main() {
 	// Create the pages.
 	createFile(pageIndividuals(), newIndividualListPage(document))
 
-	for _, individual := range document.Individuals() {
+	for _, individual := range getIndividuals(document) {
 		if individual.IsLiving() {
 			continue
 		}
 
 		page := newIndividualPage(document, individual)
-		createFile(pageIndividual(individual), page)
+		createFile(pageIndividual(document, individual), page)
+	}
+
+	createFile(pagePlaces(), newPlaceListPage(document))
+
+	for key, place := range getPlaces(document) {
+		page := newPlacePage(document, key)
+		createFile(pagePlace(document, place.prettyName), page)
 	}
 }
 

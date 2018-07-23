@@ -94,7 +94,7 @@ var tests = map[string]*gedcom.Document{
 		Nodes: []gedcom.Node{
 			gedcom.NewSimpleNode("HEAD", "", "", []gedcom.Node{
 				gedcom.NewSimpleNode("BIRT", "", "", []gedcom.Node{
-					gedcom.NewSimpleNode("PLAC", "Camperdown, Nsw, Australia", "", []gedcom.Node{}),
+					gedcom.NewPlaceNode("Camperdown, Nsw, Australia", "", []gedcom.Node{}),
 				}),
 			}),
 		},
@@ -131,7 +131,7 @@ var tests = map[string]*gedcom.Document{
 		Nodes: []gedcom.Node{
 			gedcom.NewSimpleNode("HEAD", "", "", []gedcom.Node{
 				gedcom.NewSimpleNode("BIRT", "", "", []gedcom.Node{
-					gedcom.NewSimpleNode("PLAC", "Camperdown, Nsw, Australia", "", []gedcom.Node{}),
+					gedcom.NewPlaceNode("Camperdown, Nsw, Australia", "", []gedcom.Node{}),
 				}),
 				gedcom.NewSimpleNode("SEX", "M", "", []gedcom.Node{}),
 			}),

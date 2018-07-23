@@ -61,3 +61,26 @@ func (doc *Document) Families() []*FamilyNode {
 
 	return families
 }
+
+// TODO: needs tests
+func (doc *Document) Places() map[*PlaceNode]Node {
+	places := map[*PlaceNode]Node{}
+
+	for _, node := range doc.Nodes {
+		extractPlaces(node, places)
+	}
+
+	return places
+}
+
+func extractPlaces(n Node, dest map[*PlaceNode]Node) {
+	for _, node := range n.Nodes() {
+		if place, ok := node.(*PlaceNode); ok {
+			// The place points to the parent node which is the thing that the
+			// place is describing.
+			dest[place] = n
+		} else {
+			extractPlaces(node, dest)
+		}
+	}
+}

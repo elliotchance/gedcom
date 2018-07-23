@@ -49,6 +49,30 @@ func pageIndividuals() string {
 	return "individuals.html"
 }
 
-func pageIndividual(individual *gedcom.IndividualNode) string {
-	return fmt.Sprintf("%s.html", individual.Pointer())
+func pageIndividual(document *gedcom.Document, individual *gedcom.IndividualNode) string {
+	individuals := getIndividuals(document)
+
+	for key, value := range individuals {
+		if value.Is(individual) {
+			return fmt.Sprintf("%s.html", key)
+		}
+	}
+
+	panic(fmt.Sprintf("cannot find %s", individual.Pointer()))
+}
+
+func pagePlaces() string {
+	return "places.html"
+}
+
+func pagePlace(document *gedcom.Document, place string) string {
+	places := getPlaces(document)
+
+	for key, value := range places {
+		if value.prettyName == place {
+			return fmt.Sprintf("%s.html", key)
+		}
+	}
+
+	return "#"
 }

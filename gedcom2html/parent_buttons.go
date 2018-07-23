@@ -33,8 +33,8 @@ func (c *parentButtons) String() string {
 		   </div>
 		</div>
 		%s`,
-		newIndividualButton(c.family.Husband(c.document)),
+		newIndividualButton(c.document, c.family.Husband(c.document)),
 		newPlusSVG(false, true, true, true),
-		newIndividualButton(c.family.Wife(c.document)),
+		newIndividualButton(c.document, c.family.Wife(c.document)),
 		newSpace())
 }

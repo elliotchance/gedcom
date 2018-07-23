@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/elliotchance/gedcom"
-	"strings"
 )
 
 func colorForIndividual(individual *gedcom.IndividualNode) string {
@@ -80,12 +79,4 @@ func getDeath(individual *gedcom.IndividualNode) (deathDate string, deathPlace s
 	}
 
 	return
-}
-
-func prettyPlaceName(s string) string {
-	s = strings.Replace(s, ",,", ",", -1)
-	s = strings.Replace(s, ",,", ",", -1)
-	s = strings.Replace(s, ",", ", ", -1)
-
-	return s
 }

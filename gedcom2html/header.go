@@ -5,8 +5,9 @@ import (
 )
 
 const (
-	selectedPeopleTab = "people"
-	selectedExtraTab  = "extra"
+	selectedIndividualsTab = "individuals"
+	selectedPlacesTab      = "places"
+	selectedExtraTab       = "extra"
 )
 
 // header is the tabbed section at the top of each page. The header will be the
@@ -28,8 +29,13 @@ func (c *header) String() string {
 	items := []*navItem{
 		newNavItem(
 			"People "+newCountBadge(len(c.document.Individuals())).String(),
-			c.selectedTab == selectedPeopleTab,
+			c.selectedTab == selectedIndividualsTab,
 			pageIndividuals(),
+		),
+		newNavItem(
+			"Places "+newCountBadge(len(c.document.Places())).String(),
+			c.selectedTab == selectedPlacesTab,
+			pagePlaces(),
 		),
 	}
 

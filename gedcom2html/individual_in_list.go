@@ -9,11 +9,13 @@ import (
 // page.
 type individualInList struct {
 	individual *gedcom.IndividualNode
+	document   *gedcom.Document
 }
 
-func newIndividualInList(individual *gedcom.IndividualNode) *individualInList {
+func newIndividualInList(document *gedcom.Document, individual *gedcom.IndividualNode) *individualInList {
 	return &individualInList{
 		individual: individual,
+		document:   document,
 	}
 }
 
@@ -32,6 +34,6 @@ func (c *individualInList) String() string {
 			<td nowrap="nowrap">%s</td>
 			<td>%s</td>
 		</tr>`,
-		newIndividualLink(c.individual),
+		newIndividualLink(c.document, c.individual),
 		birthDate, birthPlace, deathDate, deathPlace))
 }

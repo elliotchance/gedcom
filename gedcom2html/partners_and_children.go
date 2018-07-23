@@ -31,7 +31,7 @@ func (c *partnersAndChildren) String() string {
 		rows = append(rows, newHorizontalRuleRow())
 
 		columns := []*column{
-			newColumn(quarterRow, newIndividualButton(spouse)),
+			newColumn(quarterRow, newIndividualButton(c.document, spouse)),
 		}
 
 		family := c.individual.FamilyWithSpouse(c.document, spouse)
@@ -56,7 +56,7 @@ func (c *partnersAndChildren) String() string {
 		rows = append(rows, newHorizontalRuleRow())
 
 		columns := []*column{
-			newColumn(quarterRow, newIndividualButton(nil)),
+			newColumn(quarterRow, newIndividualButton(c.document, nil)),
 		}
 
 		columns, rows = partnerSection(family, c, columns, rows)
@@ -95,7 +95,7 @@ func partnerSection(family *gedcom.FamilyNode, c *partnersAndChildren, columns [
 
 		button := newComponents(
 			svg,
-			newIndividualButton(child),
+			newIndividualButton(c.document, child),
 		)
 		columns = append(columns, newColumn(3, button))
 

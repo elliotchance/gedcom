@@ -46,7 +46,7 @@ func (c *individualEvents) String() string {
 			description = "<em>Unknown</em>"
 
 			if wife := family.Wife(c.document); wife != nil {
-				description = newIndividualLink(wife).String()
+				description = newIndividualLink(c.document, wife).String()
 			}
 		}
 
@@ -54,7 +54,7 @@ func (c *individualEvents) String() string {
 			description = "<em>Unknown</em>"
 
 			if husband := family.Husband(c.document); husband != nil {
-				description = newIndividualLink(husband).String()
+				description = newIndividualLink(c.document, husband).String()
 			}
 		}
 

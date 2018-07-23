@@ -88,3 +88,26 @@ func (node *SimpleNode) FirstNodeWithTag(tag Tag) Node {
 
 	return nil
 }
+
+func (node *SimpleNode) HasNestedChild(n Node) bool {
+	for _, node := range node.Nodes() {
+		if node == n || node.HasNestedChild(n) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (node *SimpleNode) FirstNodeWithTagPath(tagPath ...Tag) Node {
+	if len(tagPath) == 0 {
+		return node
+	}
+
+	next := node.FirstNodeWithTag(tagPath[0])
+	if next != nil {
+		return next.FirstNodeWithTagPath(tagPath[1:]...)
+	}
+
+	return nil
+}

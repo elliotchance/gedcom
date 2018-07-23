@@ -9,11 +9,13 @@ import (
 // coloured dot to represent their sex and their full name.
 type individualLink struct {
 	individual *gedcom.IndividualNode
+	document   *gedcom.Document
 }
 
-func newIndividualLink(individual *gedcom.IndividualNode) *individualLink {
+func newIndividualLink(document *gedcom.Document, individual *gedcom.IndividualNode) *individualLink {
 	return &individualLink{
 		individual: individual,
+		document:   document,
 	}
 }
 
@@ -22,5 +24,5 @@ func (c *individualLink) String() string {
 		<span class="octicon octicon-primitive-dot" style="color: %s; font-size: 18px"></span>
 		<a href="%s">%s</a>`,
 		colorForIndividual(c.individual),
-		pageIndividual(c.individual), newIndividualName(c.individual))
+		pageIndividual(c.document, c.individual), newIndividualName(c.individual))
 }

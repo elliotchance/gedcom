@@ -28,11 +28,11 @@ func (c *individualListPage) String() string {
 			continue
 		}
 
-		table = append(table, newIndividualInList(i))
+		table = append(table, newIndividualInList(c.document, i))
 	}
 
 	return newPage("People", newComponents(
-		newHeader(c.document, "", "people"),
+		newHeader(c.document, "", selectedIndividualsTab),
 		newRow(
 			newColumn(entireRow, newText(fmt.Sprintf(
 				"%d individuals are hidden because they are living.",

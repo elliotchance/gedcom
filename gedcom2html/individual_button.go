@@ -10,11 +10,13 @@ import (
 // represent unknown or missing individuals.
 type individualButton struct {
 	individual *gedcom.IndividualNode
+	document   *gedcom.Document
 }
 
-func newIndividualButton(individual *gedcom.IndividualNode) *individualButton {
+func newIndividualButton(document *gedcom.Document, individual *gedcom.IndividualNode) *individualButton {
 	return &individualButton{
 		individual: individual,
+		document:   document,
 	}
 }
 
@@ -26,7 +28,7 @@ func (c *individualButton) String() string {
 	onclick := ""
 	if c.individual != nil {
 		onclick = fmt.Sprintf(`onclick="location.href='%s'"`,
-			pageIndividual(c.individual))
+			pageIndividual(c.document, c.individual))
 	}
 
 	eventDates := newEventDates([]*eventDate{

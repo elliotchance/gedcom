@@ -26,7 +26,7 @@ func (c *individualPage) String() string {
 		newComponents(
 			newHeader(c.document, name.String(), selectedExtraTab),
 			newAllParentButtons(c.document, c.individual),
-			newBigIndividualName(c.individual),
+			newBigName(newIndividualName(c.individual).String()),
 			newHorizontalRuleRow(),
 			newRow(
 				newColumn(halfRow, newIndividualNameAndSex(c.individual)),
