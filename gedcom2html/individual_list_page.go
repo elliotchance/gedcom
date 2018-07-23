@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
+	"sort"
 )
 
 // individualListPage is the page that lists of all the individuals.
@@ -18,11 +19,17 @@ func newIndividualListPage(document *gedcom.Document) *individualListPage {
 
 func (c *individualListPage) String() string {
 	table := []fmt.Stringer{
-		newTableHead("Name", "Date of Birth", "Place of Birth", "Date of Death", "Place of Death"),
+		newTableHead("Name", "Birth", "Death"),
 	}
 
+	// Sort individuals by name.
+	individuals := c.document.Individuals()
+	sort.Slice(individuals, func(i, j int) bool {
+		return individuals[i].Name().String() < individuals[j].Name().String()
+	})
+
 	livingCount := 0
-	for _, i := range c.document.Individuals() {
+	for _, i := range individuals {
 		if i.IsLiving() {
 			livingCount += 1
 			continue
@@ -31,7 +38,7 @@ func (c *individualListPage) String() string {
 		table = append(table, newIndividualInList(c.document, i))
 	}
 
-	return newPage("People", newComponents(
+	return newPage("Individuals", newComponents(
 		newHeader(c.document, "", selectedIndividualsTab),
 		newRow(
 			newColumn(entireRow, newText(fmt.Sprintf(

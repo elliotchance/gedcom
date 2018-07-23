@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/elliotchance/gedcom"
+	"fmt"
 )
 
 func colorForIndividual(individual *gedcom.IndividualNode) string {
@@ -79,4 +80,29 @@ func getDeath(individual *gedcom.IndividualNode) (deathDate string, deathPlace s
 	}
 
 	return
+}
+
+func getUniqueKey(s string) string {
+	i := -1
+	for {
+		i += 1
+
+		testString := s
+		if i > 0 {
+			testString = fmt.Sprintf("%s-%d", s, i)
+		}
+
+		if _, ok := individualMap[testString]; ok {
+			continue
+		}
+
+		if _, ok := placesMap[testString]; ok {
+			continue
+		}
+
+		return testString
+	}
+
+	// This should not be possible
+	panic(s)
 }

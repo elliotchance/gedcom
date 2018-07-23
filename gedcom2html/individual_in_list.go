@@ -26,14 +26,21 @@ func (c *individualInList) String() string {
 	birthPlace = prettyPlaceName(birthPlace)
 	deathPlace = prettyPlaceName(deathPlace)
 
+	if birthDate == "" {
+		birthDate = "-"
+	}
+
+	if deathDate == "" {
+		deathDate = "-"
+	}
+
 	return fmt.Sprintf(fmt.Sprintf(`
 		<tr>
 			<td nowrap="nowrap">%s</td>
-			<td nowrap="nowrap">%s</td>
-			<td>%s</td>
-			<td nowrap="nowrap">%s</td>
-			<td>%s</td>
+			<td>%s<br/>%s</td>
+			<td>%s<br/>%s</td>
 		</tr>`,
 		newIndividualLink(c.document, c.individual),
-		birthDate, birthPlace, deathDate, deathPlace))
+		birthDate, newPlaceLink(c.document, birthPlace),
+		deathDate, newPlaceLink(c.document, deathPlace)))
 }

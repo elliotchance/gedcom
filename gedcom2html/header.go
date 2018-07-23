@@ -28,12 +28,12 @@ func newHeader(document *gedcom.Document, extraTab string, selectedTab string) *
 func (c *header) String() string {
 	items := []*navItem{
 		newNavItem(
-			"People "+newCountBadge(len(c.document.Individuals())).String(),
+			"Individuals "+newCountBadge(len(c.document.Individuals())).String(),
 			c.selectedTab == selectedIndividualsTab,
 			pageIndividuals(),
 		),
 		newNavItem(
-			"Places "+newCountBadge(len(c.document.Places())).String(),
+			"Places "+newCountBadge(len(getPlaces(c.document))).String(),
 			c.selectedTab == selectedPlacesTab,
 			pagePlaces(),
 		),
