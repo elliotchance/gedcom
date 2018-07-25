@@ -37,7 +37,7 @@ var tests = map[string]*gedcom.Document{
 		Nodes: []gedcom.Node{
 			gedcom.NewSimpleNode("HEAD", "", "", []gedcom.Node{
 				gedcom.NewSimpleNode("CHAR", "UTF-8", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode("SOUR", "Ancestry.com Family Trees", "", []gedcom.Node{}),
+				gedcom.NewSourceNode("Ancestry.com Family Trees", "", []gedcom.Node{}),
 			}),
 		},
 	},
@@ -52,7 +52,7 @@ var tests = map[string]*gedcom.Document{
 	"0 HEAD\n1 SOUR Ancestry.com Family Trees": {
 		Nodes: []gedcom.Node{
 			gedcom.NewSimpleNode("HEAD", "", "", []gedcom.Node{
-				gedcom.NewSimpleNode("SOUR", "Ancestry.com Family Trees", "", []gedcom.Node{}),
+				gedcom.NewSourceNode("Ancestry.com Family Trees", "", []gedcom.Node{}),
 			}),
 		},
 	},

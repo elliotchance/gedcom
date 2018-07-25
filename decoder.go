@@ -155,6 +155,9 @@ func parseLine(line string) (Node, int) {
 	case TagPlace:
 		return NewPlaceNode(value, pointer, []Node{}), indent
 
+	case TagSource:
+		return NewSourceNode(value, pointer, []Node{}), indent
+
 	default:
 		return NewSimpleNode(tag, value, pointer, []Node{}), indent
 	}

@@ -52,6 +52,13 @@ func main() {
 	}
 
 	createFile(pageFamilies(), newFamilyListPage(document))
+
+	createFile(pageSources(), newSourceListPage(document))
+
+	for _, source := range document.Sources() {
+		page := newSourcePage(document, source)
+		createFile(pageSource(source), page)
+	}
 }
 
 func createFile(name string, contents fmt.Stringer) {

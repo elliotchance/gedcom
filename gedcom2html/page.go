@@ -80,3 +80,11 @@ func pagePlace(document *gedcom.Document, place string) string {
 func pageFamilies() string {
 	return "families.html"
 }
+
+func pageSources() string {
+	return "sources.html"
+}
+
+func pageSource(source *gedcom.SourceNode) string {
+	return fmt.Sprintf("%s.html", source.Pointer())
+}

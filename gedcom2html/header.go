@@ -8,6 +8,7 @@ const (
 	selectedIndividualsTab = "individuals"
 	selectedPlacesTab      = "places"
 	selectedFamiliesTab    = "families"
+	selectedSourcesTab     = "sources"
 	selectedExtraTab       = "extra"
 )
 
@@ -43,6 +44,11 @@ func (c *header) String() string {
 			"Families "+newCountBadge(len(c.document.Families())).String(),
 			c.selectedTab == selectedFamiliesTab,
 			pageFamilies(),
+		),
+		newNavItem(
+			"Sources "+newCountBadge(len(c.document.Sources())).String(),
+			c.selectedTab == selectedSourcesTab,
+			pageSources(),
 		),
 	}
 

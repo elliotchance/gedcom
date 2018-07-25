@@ -84,3 +84,16 @@ func extractPlaces(n Node, dest map[*PlaceNode]Node) {
 		}
 	}
 }
+
+// TODO: Needs tests
+func (doc *Document) Sources() []*SourceNode {
+	sources := []*SourceNode{}
+
+	for _, node := range doc.Nodes {
+		if n, ok := node.(*SourceNode); ok {
+			sources = append(sources, n)
+		}
+	}
+
+	return sources
+}
