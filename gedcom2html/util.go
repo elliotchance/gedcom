@@ -6,6 +6,10 @@ import (
 )
 
 func colorForIndividual(individual *gedcom.IndividualNode) string {
+	if individual == nil {
+		return "black"
+	}
+
 	switch individual.Sex() {
 	case gedcom.SexMale:
 		return maleColor
@@ -13,7 +17,7 @@ func colorForIndividual(individual *gedcom.IndividualNode) string {
 		return femaleColor
 	}
 
-	return "white"
+	return "black"
 }
 
 func colorClassForSex(sex gedcom.Sex) string {

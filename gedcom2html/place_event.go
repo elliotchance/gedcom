@@ -27,6 +27,10 @@ func (c *placeEvent) String() string {
 	}
 
 	for _, individual := range c.document.Individuals() {
+		if individual.IsLiving() {
+			return ""
+		}
+
 		if individual.HasNestedChild(c.node) {
 			person = newIndividualLink(c.document, individual).String()
 		}

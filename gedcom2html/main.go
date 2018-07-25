@@ -50,6 +50,8 @@ func main() {
 		page := newPlacePage(document, key)
 		createFile(pagePlace(document, place.prettyName), page)
 	}
+
+	createFile(pageFamilies(), newFamilyListPage(document))
 }
 
 func createFile(name string, contents fmt.Stringer) {

@@ -7,14 +7,16 @@ import (
 const (
 	selectedIndividualsTab = "individuals"
 	selectedPlacesTab      = "places"
+	selectedFamiliesTab    = "families"
 	selectedExtraTab       = "extra"
 )
 
 // header is the tabbed section at the top of each page. The header will be the
 // same on all pages except that some pages will use an extra tab for that page.
 type header struct {
-	document              *gedcom.Document
-	extraTab, selectedTab string
+	document    *gedcom.Document
+	extraTab    string
+	selectedTab string
 }
 
 func newHeader(document *gedcom.Document, extraTab string, selectedTab string) *header {
@@ -36,6 +38,11 @@ func (c *header) String() string {
 			"Places "+newCountBadge(len(getPlaces(c.document))).String(),
 			c.selectedTab == selectedPlacesTab,
 			pagePlaces(),
+		),
+		newNavItem(
+			"Families "+newCountBadge(len(c.document.Families())).String(),
+			c.selectedTab == selectedFamiliesTab,
+			pageFamilies(),
 		),
 	}
 

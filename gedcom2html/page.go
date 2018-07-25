@@ -58,7 +58,7 @@ func pageIndividual(document *gedcom.Document, individual *gedcom.IndividualNode
 		}
 	}
 
-	panic(fmt.Sprintf("cannot find %s", individual.Pointer()))
+	return "#"
 }
 
 func pagePlaces() string {
@@ -75,4 +75,8 @@ func pagePlace(document *gedcom.Document, place string) string {
 	}
 
 	return "#"
+}
+
+func pageFamilies() string {
+	return "families.html"
 }

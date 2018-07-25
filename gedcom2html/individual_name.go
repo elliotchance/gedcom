@@ -23,6 +23,10 @@ func (c *individualName) String() string {
 		return "<em>Unknown</em>"
 	}
 
+	if c.individual.IsLiving() {
+		return "<em>Hidden</em>"
+	}
+
 	names := c.individual.Names()
 	if len(names) == 0 {
 		return "<em>Unknown</em>"
