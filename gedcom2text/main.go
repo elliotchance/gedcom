@@ -120,8 +120,14 @@ func main() {
 				break
 			}
 
+			// Marriage events.
+			withSpouse := individual.FamilyWithSpouse(document, spouse)
+			if m := withSpouse.FirstNodeWithTagPath(gedcom.TagMarriage, gedcom.TagDate); m != nil {
+				printLine(fmt.Sprintf("      Marriage: %s", m.Value()))
+			}
+
 			// Children of the spouse.
-			children := individual.FamilyWithSpouse(document, spouse).Children(document)
+			children := withSpouse.Children(document)
 			sort.SliceStable(children, func(i, j int) bool {
 				return children[i].Names()[0].String() < children[j].Names()[0].String()
 			})
