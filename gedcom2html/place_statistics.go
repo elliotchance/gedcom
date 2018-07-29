@@ -6,12 +6,12 @@ import (
 )
 
 type placeStatistics struct {
-	document   *gedcom.Document
+	document *gedcom.Document
 }
 
 func newPlaceStatistics(document *gedcom.Document) *placeStatistics {
 	return &placeStatistics{
-		document:   document,
+		document: document,
 	}
 }
 

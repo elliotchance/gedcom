@@ -1,9 +1,9 @@
 package main
 
 import (
-	"strings"
 	"github.com/elliotchance/gedcom"
 	"regexp"
+	"strings"
 )
 
 var placesMap map[string]*place

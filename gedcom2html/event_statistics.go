@@ -6,12 +6,12 @@ import (
 )
 
 type eventStatistics struct {
-	document   *gedcom.Document
+	document *gedcom.Document
 }
 
 func newEventStatistics(document *gedcom.Document) *eventStatistics {
 	return &eventStatistics{
-		document:   document,
+		document: document,
 	}
 }
 
@@ -40,7 +40,7 @@ func (c *eventStatistics) String() string {
 	}
 
 	s := newComponents(
-		newKeyedTableRow("Total", strconv.Itoa(births + christenings + deaths + burials), true),
+		newKeyedTableRow("Total", strconv.Itoa(births+christenings+deaths+burials), true),
 		newKeyedTableRow("Births", strconv.Itoa(births), true),
 		newKeyedTableRow("Christenings", strconv.Itoa(christenings), true),
 		newKeyedTableRow("Deaths", strconv.Itoa(deaths), true),

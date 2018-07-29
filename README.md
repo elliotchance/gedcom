@@ -1,6 +1,7 @@
 github.com/elliotchance/gedcom
 ==============================
 
+[![Build Status](https://travis-ci.org/elliotchance/gedcom.svg?branch=master)](https://travis-ci.org/elliotchance/gedcom)
 [![GoDoc](https://godoc.org/github.com/elliotchance/gedcom?status.svg)](https://godoc.org/github.com/elliotchance/gedcom)
 
 `gedcom` provides a Go-style encoder and decoder for GEDCOM files.

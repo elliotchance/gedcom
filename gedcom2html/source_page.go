@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/elliotchance/gedcom"
 	"fmt"
+	"github.com/elliotchance/gedcom"
 )
 
 type sourcePage struct {

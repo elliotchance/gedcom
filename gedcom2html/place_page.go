@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/elliotchance/gedcom"
 	"fmt"
+	"github.com/elliotchance/gedcom"
 )
 
 type placePage struct {
@@ -12,7 +12,7 @@ type placePage struct {
 
 func newPlacePage(document *gedcom.Document, placeKey string) *placePage {
 	return &placePage{
-		document:   document,
+		document: document,
 		placeKey: placeKey,
 	}
 }
