@@ -1,0 +1,35 @@
+# This is a weird way of telling Travis to use the fast container-based test
+# runner instead of the slow VM-based runner.
+sudo: false
+
+language: go
+
+go:
+  - 1.8.x
+  - 1.9.x
+  - 1.10.x
+
+env:
+  global:
+    - GOOS=linux
+    - DEP_VERSION="0.4.1"
+
+# Only clone the most recent commit.
+git:
+  depth: 1
+
+before_install:
+  # Download the binary to bin folder in $GOPATH
+  - curl -L -s https://github.com/golang/dep/releases/download/v${DEP_VERSION}/dep-linux-amd64 -o $GOPATH/bin/dep
+  # Make the binary executable
+  - chmod +x $GOPATH/bin/dep
+
+install:
+  - dep ensure
+
+script:
+  # Check that all files are Go formatted.
+  - $(exit $(go fmt ./... | wc -l))
+
+  # Run all the tests with the race detector enabled
+  - go test -v -race ./...
