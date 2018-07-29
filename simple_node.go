@@ -58,7 +58,7 @@ func (node *SimpleNode) gedcomLine() string {
 		buf.WriteString(fmt.Sprintf("@%s@ ", node.pointer))
 	}
 
-	buf.WriteString(string(node.tag))
+	buf.WriteString(node.tag.Tag())
 
 	if node.value != "" {
 		buf.WriteByte(' ')

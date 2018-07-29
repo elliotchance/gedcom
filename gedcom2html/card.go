@@ -5,6 +5,10 @@ import (
 	"strconv"
 )
 
+const (
+	noBadgeCount = -1
+)
+
 // card is a simple box with a header and body section.
 type card struct {
 	title string
@@ -22,7 +26,7 @@ func newCard(title string, count int, body fmt.Stringer) *card {
 
 func (c *card) String() string {
 	var count fmt.Stringer = newEmpty()
-	if c.count >= 0 {
+	if c.count != noBadgeCount {
 		count = newBadgePill("secondary", "float-right", strconv.Itoa(c.count))
 	}
 

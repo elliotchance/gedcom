@@ -9,7 +9,7 @@ import (
 var individualTests = []struct {
 	node  *gedcom.IndividualNode
 	names []*gedcom.NameNode
-	sex   string
+	sex   gedcom.Sex
 }{
 	{
 		node:  gedcom.NewIndividualNode("", "P1", nil),

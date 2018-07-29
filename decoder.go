@@ -132,9 +132,9 @@ func parseLine(line string) (Node, int) {
 		pointer = parts[2][1 : len(parts[2])-2]
 	}
 
-	tag := Tag("")
+	tag := Tag{}
 	if len(parts) > 3 {
-		tag = Tag(parts[3])
+		tag = TagFromString(parts[3])
 	}
 
 	value := ""

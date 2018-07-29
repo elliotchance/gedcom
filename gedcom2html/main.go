@@ -59,6 +59,8 @@ func main() {
 		page := newSourcePage(document, source)
 		createFile(pageSource(source), page)
 	}
+
+	createFile(pageStatistics(), newStatisticsPage(document))
 }
 
 func createFile(name string, contents fmt.Stringer) {

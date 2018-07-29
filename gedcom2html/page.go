@@ -88,3 +88,7 @@ func pageSources() string {
 func pageSource(source *gedcom.SourceNode) string {
 	return fmt.Sprintf("%s.html", source.Pointer())
 }
+
+func pageStatistics() string {
+	return "statistics.html"
+}

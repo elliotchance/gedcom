@@ -149,7 +149,7 @@ func transformNode(node Node, options TransformOptions) map[string]interface{} {
 	if options.PrettyTags {
 		m["tag"] = node.Tag().String()
 	} else {
-		m["tag"] = string(node.Tag())
+		m["tag"] = node.Tag().Tag()
 	}
 
 	if node.Pointer() != "" && !options.NoPointers {

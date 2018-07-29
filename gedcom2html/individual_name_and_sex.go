@@ -29,5 +29,5 @@ func (c *individualNameAndSex) String() string {
 		newKeyedTableRow("Sex", newSexBadge(c.individual.Sex()).String(), true),
 	)
 
-	return newCard("Name & Sex", -1, newTable("", s)).String()
+	return newCard("Name & Sex", noBadgeCount, newTable("", s)).String()
 }
