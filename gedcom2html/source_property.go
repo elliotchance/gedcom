@@ -10,10 +10,10 @@ type sourceProperty struct {
 	node     gedcom.Node
 }
 
-func newSourceProperty(document *gedcom.Document, node     gedcom.Node) *sourceProperty {
+func newSourceProperty(document *gedcom.Document, node gedcom.Node) *sourceProperty {
 	return &sourceProperty{
 		document: document,
-		node:   node,
+		node:     node,
 	}
 }
 

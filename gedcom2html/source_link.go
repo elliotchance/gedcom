@@ -6,12 +6,12 @@ import (
 )
 
 type sourceLink struct {
-	source   *gedcom.SourceNode
+	source *gedcom.SourceNode
 }
 
 func newSourceLink(source *gedcom.SourceNode) *sourceLink {
 	return &sourceLink{
-		source:   source,
+		source: source,
 	}
 }
 

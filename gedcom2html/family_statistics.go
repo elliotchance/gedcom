@@ -6,12 +6,12 @@ import (
 )
 
 type familyStatistics struct {
-	document   *gedcom.Document
+	document *gedcom.Document
 }
 
 func newFamilyStatistics(document *gedcom.Document) *familyStatistics {
 	return &familyStatistics{
-		document:   document,
+		document: document,
 	}
 }
 

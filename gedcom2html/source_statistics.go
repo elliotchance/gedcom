@@ -6,12 +6,12 @@ import (
 )
 
 type sourceStatistics struct {
-	document   *gedcom.Document
+	document *gedcom.Document
 }
 
 func newSourceStatistics(document *gedcom.Document) *sourceStatistics {
 	return &sourceStatistics{
-		document:   document,
+		document: document,
 	}
 }
 

@@ -12,8 +12,8 @@ type familyInList struct {
 
 func newFamilyInList(document *gedcom.Document, family *gedcom.FamilyNode) *familyInList {
 	return &familyInList{
-		document:   document,
-		family: family,
+		document: document,
+		family:   family,
 	}
 }
 

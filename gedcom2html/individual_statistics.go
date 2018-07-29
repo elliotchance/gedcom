@@ -6,12 +6,12 @@ import (
 )
 
 type individualStatistics struct {
-	document   *gedcom.Document
+	document *gedcom.Document
 }
 
 func newIndividualStatistics(document *gedcom.Document) *individualStatistics {
 	return &individualStatistics{
-		document:   document,
+		document: document,
 	}
 }
 
@@ -30,7 +30,7 @@ func (c *individualStatistics) String() string {
 	s := newComponents(
 		newKeyedTableRow("Total", strconv.Itoa(total), true),
 		newKeyedTableRow("Living", strconv.Itoa(living), true),
-		newKeyedTableRow("Dead", strconv.Itoa(total - living), true),
+		newKeyedTableRow("Dead", strconv.Itoa(total-living), true),
 	)
 
 	return newCard("Individuals", noBadgeCount, newTable("", s)).String()

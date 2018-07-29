@@ -92,7 +92,7 @@ func splitTags(s string) []gedcom.Tag {
 
 	tags := []gedcom.Tag{}
 	for _, t := range strings.Split(s, ",") {
-		tags = append(tags, gedcom.Tag(t))
+		tags = append(tags, gedcom.TagFromString(t))
 	}
 
 	return tags
