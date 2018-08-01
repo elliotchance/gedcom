@@ -13,6 +13,8 @@ var (
 	optionOutputDir  string
 )
 
+const symbolLetter = '#'
+
 func main() {
 	flag.StringVar(&optionGedcomFile, "gedcom", "", "Input GEDCOM file.")
 	flag.StringVar(&optionOutputDir, "output-dir", ".", "Output directory. It"+
@@ -33,7 +35,10 @@ func main() {
 	}
 
 	// Create the pages.
-	createFile(pageIndividuals(), newIndividualListPage(document))
+	for _, letter := range getIndexLetters(document) {
+		createFile(pageIndividuals(letter),
+			newIndividualListPage(document, letter))
+	}
 
 	for _, individual := range getIndividuals(document) {
 		if individual.IsLiving() {

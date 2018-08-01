@@ -45,8 +45,12 @@ func (c *page) String() string {
 	`, c.title, c.body, newFooter())
 }
 
-func pageIndividuals() string {
-	return "individuals.html"
+func pageIndividuals(firstLetter rune) string {
+	if firstLetter == symbolLetter {
+		return "individuals-symbol.html"
+	}
+
+	return fmt.Sprintf("individuals-%c.html", firstLetter)
 }
 
 func pageIndividual(document *gedcom.Document, individual *gedcom.IndividualNode) string {
