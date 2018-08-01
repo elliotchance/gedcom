@@ -1,4 +1,4 @@
-package gedcom
+package main
 
 // TransformOptions provides extra options to the Transform function. Many of
 // these options are also available through CLI options on the gedcom2json

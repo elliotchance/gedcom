@@ -1,4 +1,4 @@
-package gedcom_test
+package main
 
 import (
 	"github.com/elliotchance/gedcom"
