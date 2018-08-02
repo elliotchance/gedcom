@@ -160,3 +160,71 @@ func (date Date) Is(date2 Date) bool {
 	return date.Day == date2.Day && date.Month == date2.Month &&
 		date.Year == date2.Year && date.Constraint == date2.Constraint
 }
+
+// Years returns the number of years of a date as a floating-point. It can be
+// used as an approximation to get a general idea of how far apart dates are but
+// should not be treated as an accurate representation of time.
+//
+// The smallest date unit in a GEDCOM is a day. For specific dates it is
+// calculated as the number of days that have past, divided by the number of
+// days in that year (to correct for leap years). For example "10 Oct 2009"
+// would return 2009.860274.
+//
+// Since some date components can be missing (like the day or month) Years
+// compensates by returning the midpoint (average) of the maximum and minimum
+// value in days. For example the date "Mar 1945" is the equivalent to the
+// average Years value of "1 Mar 1945" and "31 Mar 1945", returning 1945.205479.
+//
+// When only a year is provided 0.5 will be added to the year. For example,
+// "1845" returns 1845.5. This is not the exact midpoint of the year but will be
+// close enough for general calculations. You should not rely on 0.5 being
+// returned (as part of a check) as this may change in the future.
+//
+// The value returned from Years is not effected by any other component of the
+// date. Such as if the date is approximate ("Abt.", etc) or directional
+// ("Bef.", "Aft.", etc). If this property is important to you will need to take
+// it into account in an appropriate way.
+func (date Date) Years() float64 {
+	if date.Day != 0 && date.Month != 0 && date.Year != 0 {
+		// Calculate the total number of days in this year so we can take into
+		// account leap years. The easiest way to do this is by going to the
+		// first day of the next year then moving back one day.
+		//
+		// We must add one day to make sure the last day of the year is less
+		// than 1.0.
+		t := date.Time()
+		daysInYear := time.Date(t.Year() + 1, 1, 1, 0, 0, 0, 0, time.UTC).
+			AddDate(0, 0, -1).YearDay() + 1
+
+		fractional := float64(t.YearDay()) / float64(daysInYear)
+
+		return float64(t.Year()) + fractional
+	}
+
+	if date.Month != 0 && date.Year != 0 {
+		start := Date{
+			Day: 1,
+			Month: date.Month,
+			Year: date.Year,
+		}.Years()
+
+		// Find the last day of the month. Using the same method as above.
+		t := date.Time()
+		lastDay := time.Date(t.Year(), t.Month() + 1, 1, 0, 0, 0, 0, time.UTC).
+			AddDate(0, 0, -1).Day()
+
+		end := Date{
+			Day: lastDay,
+			Month: date.Month,
+			Year: date.Year,
+		}.Years()
+
+		return (start + end) / 2
+	}
+
+	if date.Year != 0 {
+		return float64(date.Year) + 0.5
+	}
+
+	return 0
+}
