@@ -3,6 +3,7 @@ package gedcom
 import (
 	"errors"
 	"fmt"
+	"math"
 	"regexp"
 	"strings"
 	"time"
@@ -276,4 +277,37 @@ func (node *DateNode) Years() float64 {
 	start, end := node.DateRange()
 
 	return (start.Years() + end.Years()) / 2.0
+}
+
+// Similarity returns a value from 0.0 to 1.0 to identify how similar two dates
+// (or date ranges) are to each other. 1.0 would mean that the dates are exactly
+// the same, whereas 0.0 would mean that they are not similar at all.
+//
+// The returned value is calculated on a parabola that awards higher values to
+// dates that are proportionally closer to each other. That is, dates that are
+// twice as close will have more than twice the score. This attempts to satisfy
+// a usable comparison values for close specific dates as well as more relaxed
+// values (such as those that one provide an approximate year).
+//
+// Only the difference between dates is used in the calculation so it is not
+// affected by time lines. That is to say that the difference between the years
+// 500 and 502 would return the same similarity as the years 2000 to 2002.
+//
+// The maxYears allows the error margin to be adjusted. Dates that are further
+// apart (in any direction) than maxYears will always return 0.0.
+//
+// A greater maxYears can be used when dates are less exact (such as ancient
+// dates that could be commonly off by 10 years or more) or a smaller value when
+// dealing with recent dates that are provided in a more exact form.
+//
+// A sensible value for maxYears is 10.0.
+func (node *DateNode) Similarity(node2 *DateNode, maxYears float64) float64 {
+	similarity := math.Pow((node.Years()-node2.Years())/maxYears, 2)
+
+	// When one date is invalid the similarity will go asymptotic.
+	if similarity > 1 {
+		return 0
+	}
+
+	return 1 - similarity
 }

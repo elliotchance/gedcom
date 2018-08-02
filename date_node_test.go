@@ -541,3 +541,149 @@ func TestDateNode_Years(t *testing.T) {
 		})
 	}
 }
+
+func TestDateNode_Similarity(t *testing.T) {
+	tests := []struct {
+		date1    *gedcom.DateNode
+		date2    *gedcom.DateNode
+		expected float64
+	}{
+		// Two unknown dates will be equal to each other.
+		{
+			gedcom.NewDateNode("", "", nil),
+			gedcom.NewDateNode("", "", nil),
+			1,
+		},
+
+		// The difference will be same regardless of time line so the two next
+		// tests must return the same similarity.
+		{
+			gedcom.NewDateNode("500", "", nil),
+			gedcom.NewDateNode("502", "", nil),
+			0.96,
+		},
+		{
+			gedcom.NewDateNode("2000", "", nil),
+			gedcom.NewDateNode("2002", "", nil),
+			0.96,
+		},
+
+		// A higher score is awarded to values that are closer to each other.
+		{
+			gedcom.NewDateNode("1900", "", nil),
+			gedcom.NewDateNode("1901", "", nil),
+			0.99,
+		},
+		{
+			gedcom.NewDateNode("1900", "", nil),
+			gedcom.NewDateNode("1904", "", nil),
+			0.84,
+		},
+
+		// Months
+		{
+			gedcom.NewDateNode("Feb 2000", "", nil),
+			gedcom.NewDateNode("Mar 2000", "", nil),
+			0.9999331793984663,
+		},
+		{
+			gedcom.NewDateNode("Feb 2000", "", nil),
+			gedcom.NewDateNode("Feb 2001", "", nil),
+			0.9900204627124954,
+		},
+
+		// Days
+		{
+			gedcom.NewDateNode("13 Feb 2000", "", nil),
+			gedcom.NewDateNode("14 Feb 2000", "", nil),
+			0.9999999257548872,
+		},
+		{
+			gedcom.NewDateNode("13 Feb 2000", "", nil),
+			gedcom.NewDateNode("13 Apr 2000", "", nil),
+			0.9997327175938642,
+		},
+
+		// Exact matches
+		{
+			gedcom.NewDateNode("2000", "", nil),
+			gedcom.NewDateNode("2000", "", nil),
+			1,
+		},
+		{
+			gedcom.NewDateNode("Mar 2000", "", nil),
+			gedcom.NewDateNode("Mar 2000", "", nil),
+			1,
+		},
+		{
+			gedcom.NewDateNode("13 Mar 2000", "", nil),
+			gedcom.NewDateNode("13 Mar 2000", "", nil),
+			1,
+		},
+		{
+			gedcom.NewDateNode("Bet. 2000 and 2003", "", nil),
+			gedcom.NewDateNode("Between 2000 and 2003", "", nil),
+			1,
+		},
+		{
+			gedcom.NewDateNode("Bet. Mar 2000 and Oct 2000", "", nil),
+			gedcom.NewDateNode("Bet. Mar 2000 and Oct 2000", "", nil),
+			1,
+		},
+		{
+			gedcom.NewDateNode("bet. 13 Mar 2000 and 17 March 2000", "", nil),
+			gedcom.NewDateNode("Between 13 Mar 2000 and 17 March 2000", "", nil),
+			1,
+		},
+
+		// These ranges are inverse so they have the same difference.
+		{
+			gedcom.NewDateNode("Bet. 2000 and 2003", "", nil),
+			gedcom.NewDateNode("Between 2001 and 2003", "", nil),
+			0.9975,
+		},
+		{
+			gedcom.NewDateNode("Bet. 2001 and 2003", "", nil),
+			gedcom.NewDateNode("Between 2000 and 2003", "", nil),
+			0.9975,
+		},
+
+		// Range has the same difference but over different time periods.
+		{
+			gedcom.NewDateNode("Bet. 2000 and 2003", "", nil),
+			gedcom.NewDateNode("Between 1997 and 2000", "", nil),
+			0.91,
+		},
+
+		// Other ranges.
+		{
+			gedcom.NewDateNode("Bet. Mar 2000 and Oct 2000", "", nil),
+			gedcom.NewDateNode("Bet. Feb 2000 and Oct 2000", "", nil),
+			0.9999832948496166,
+		},
+		{
+			gedcom.NewDateNode("bet. 15 Mar 2000 and 23 March 2000", "", nil),
+			gedcom.NewDateNode("Between 15 Mar 2000 and 25 March 2000", "", nil),
+			0.9999999257548872,
+		},
+
+		// Invalid
+		{
+			gedcom.NewDateNode("Foo", "", nil),
+			gedcom.NewDateNode("13 Mar 2000", "", nil),
+			0,
+		},
+		{
+			gedcom.NewDateNode("13 Mar 2000", "", nil),
+			gedcom.NewDateNode("Bar", "", nil),
+			0,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.date1.Value(), func(t *testing.T) {
+			similarity := test.date1.Similarity(test.date2, 10)
+			assert.Equal(t, test.expected, similarity)
+		})
+	}
+}
