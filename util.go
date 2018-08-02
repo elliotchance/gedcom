@@ -51,3 +51,16 @@ func CleanSpace(s string) string {
 
 	return s
 }
+
+// Coalesce returns the first non-nil item. If there are no items provided or
+// all items are nil then nil will be returned, otherwise the first non-nil
+// item.
+func Coalesce(items ...interface{}) interface{} {
+	for _, item := range items {
+		if item != nil {
+			return item
+		}
+	}
+
+	return nil
+}

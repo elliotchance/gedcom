@@ -1,8 +1,9 @@
-package gedcom
+package gedcom_test
 
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"github.com/elliotchance/gedcom"
 )
 
 func TestAtoi(t *testing.T) {
@@ -24,7 +25,7 @@ func TestAtoi(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.s, func(t *testing.T) {
-			assert.Equal(t, test.want, Atoi(test.s))
+			assert.Equal(t, test.want, gedcom.Atoi(test.s))
 		})
 	}
 }
@@ -45,7 +46,29 @@ func TestCleanSpace(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.s, func(t *testing.T) {
-			assert.Equal(t, test.want, CleanSpace(test.s))
+			assert.Equal(t, test.want, gedcom.CleanSpace(test.s))
+		})
+	}
+}
+
+func TestCoalesce(t *testing.T) {
+	tests := []struct {
+		items []interface{}
+		want  interface{}
+	}{
+		{[]interface{}{}, nil},
+		{[]interface{}{nil}, nil},
+		{[]interface{}{"A"}, "A"},
+		{[]interface{}{"A", "B"}, "A"},
+		{[]interface{}{nil, "B"}, "B"},
+		{[]interface{}{nil, nil, "C"}, "C"},
+		{[]interface{}{nil, "C", nil, "D"}, "C"},
+		{[]interface{}{nil, nil, nil, nil}, nil},
+	}
+
+	for _, test := range tests {
+		t.Run("", func(t *testing.T) {
+			assert.Equal(t, test.want, gedcom.Coalesce(test.items...))
 		})
 	}
 }
