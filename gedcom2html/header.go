@@ -34,7 +34,7 @@ func (c *header) String() string {
 		newNavItem(
 			"Individuals "+newCountBadge(len(c.document.Individuals())).String(),
 			c.selectedTab == selectedIndividualsTab,
-			pageIndividuals(),
+			pageIndividuals(symbolLetter),
 		),
 		newNavItem(
 			"Places "+newCountBadge(len(getPlaces(c.document))).String(),
