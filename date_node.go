@@ -260,3 +260,20 @@ func (node *DateNode) String() string {
 
 	return fmt.Sprintf("Bet. %s and %s", startDate.String(), endDate.String())
 }
+
+// Years works in a similar way to Date.Years() but also takes into
+// consideration the StartDate() and EndDate() values of a whole date range,
+// like "Bet. 1943 and 1945". It does this by averaging out the Years() value of
+// the StartDate() and EndDate() values.
+//
+// If the DateNode has a single date, like "Mar 1937" then Years will return the
+// same value as the Years on the start or end date (no average will be used.)
+//
+// You can read the specific conversion rules in Date.Years() but be aware that
+// the returned value is an approximation and should not be used in date
+// calculations.
+func (node *DateNode) Years() float64 {
+	start, end := node.DateRange()
+
+	return (start.Years() + end.Years()) / 2.0
+}

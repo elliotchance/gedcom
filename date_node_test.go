@@ -464,7 +464,6 @@ var dateTests = map[string]struct {
 func TestDateNode_StartDate(t *testing.T) {
 	for date, test := range dateTests {
 		t.Run(date, func(t *testing.T) {
-			//date := "29 AUg 1640"
 			node := gedcom.NewDateNode(date, "", nil)
 
 			assert.Equal(t, node.StartDate(), test.startDate)
@@ -488,6 +487,57 @@ func TestDateNode_String(t *testing.T) {
 			node := gedcom.NewDateNode(date, "", nil)
 
 			assert.Equalf(t, test.str, node.String(), "%#+v", date)
+		})
+	}
+}
+
+func TestDateNode_Years(t *testing.T) {
+	tests := []struct {
+		date     *gedcom.DateNode
+		expected float64
+	}{
+		// Zero
+		{gedcom.NewDateNode("", "", nil), 0.0},
+
+		// Year
+		{gedcom.NewDateNode("750", "", nil), 750.5},
+		{gedcom.NewDateNode("1845", "", nil), 1845.5},
+
+		// Months
+		{gedcom.NewDateNode("Jan 1845", "", nil), 1845.0437158469945},
+		{gedcom.NewDateNode("Mar 1999", "", nil), 1999.204918032787},
+		{gedcom.NewDateNode("Dec 1832", "", nil), 1832.956403269755},
+
+		// Days
+		{gedcom.NewDateNode("1 Jan 1789", "", nil), 1789.0027322404371},
+		{gedcom.NewDateNode("31 Jan 1435", "", nil), 1435.0846994535518},
+		{gedcom.NewDateNode("1 Feb 1601", "", nil), 1601.0874316939892},
+		{gedcom.NewDateNode("1 Mar 845", "", nil), 845.1639344262295},
+		{gedcom.NewDateNode("31 Dec 2010", "", nil), 2010.9972677595629},
+
+		// Ranges
+		{
+			gedcom.NewDateNode("Bet. 1 Jan 1789 and 1 Mar 1789", "", nil),
+			1789.0833333333335,
+		},
+		{
+			gedcom.NewDateNode("Bet. 1 Jan 1789 and 1 Jan 1789", "", nil),
+			// Same as "1 Jan 1789"
+			1789.0027322404371,
+		},
+		{
+			gedcom.NewDateNode("Bet. 1430 and 1435", "", nil),
+			// From the start of 1430 to the end of 1435 is actually 6 years.
+			1433,
+		},
+
+		// Invalid
+		{gedcom.NewDateNode("Foo", "", nil), 0},
+	}
+
+	for _, test := range tests {
+		t.Run(test.date.Value(), func(t *testing.T) {
+			assert.Equal(t, test.expected, test.date.Years())
 		})
 	}
 }
