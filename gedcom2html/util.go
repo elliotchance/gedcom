@@ -49,14 +49,14 @@ func getBirth(individual *gedcom.IndividualNode) (birthDate string, birthPlace s
 		return
 	}
 
-	birthNode := individual.FirstNodeWithTag(gedcom.TagBirth)
+	birthNode := gedcom.First(gedcom.NodesWithTag(individual, gedcom.TagBirth))
 	if birthNode != nil {
-		birthDateNode := birthNode.FirstNodeWithTag(gedcom.TagDate)
+		birthDateNode := gedcom.First(gedcom.NodesWithTag(birthNode, gedcom.TagDate))
 		if birthDateNode != nil {
 			birthDate = birthDateNode.Value()
 		}
 
-		birthPlaceNode := birthNode.FirstNodeWithTag(gedcom.TagPlace)
+		birthPlaceNode := gedcom.First(gedcom.NodesWithTag(birthNode, gedcom.TagPlace))
 		if birthPlaceNode != nil {
 			birthPlace = birthPlaceNode.Value()
 		}
@@ -70,14 +70,14 @@ func getDeath(individual *gedcom.IndividualNode) (deathDate string, deathPlace s
 		return
 	}
 
-	deathNode := individual.FirstNodeWithTag(gedcom.TagDeath)
+	deathNode := gedcom.First(gedcom.NodesWithTag(individual, gedcom.TagDeath))
 	if deathNode != nil {
-		deathDateNode := deathNode.FirstNodeWithTag(gedcom.TagDate)
+		deathDateNode := gedcom.First(gedcom.NodesWithTag(deathNode, gedcom.TagDate))
 		if deathDateNode != nil {
 			deathDate = deathDateNode.Value()
 		}
 
-		deathPlaceNode := deathNode.FirstNodeWithTag(gedcom.TagPlace)
+		deathPlaceNode := gedcom.First(gedcom.NodesWithTag(deathNode, gedcom.TagPlace))
 		if deathPlaceNode != nil {
 			deathPlace = deathPlaceNode.Value()
 		}

@@ -170,3 +170,82 @@ func TestNodesWithTagPath(t *testing.T) {
 		})
 	}
 }
+
+func TestHasNestedNode(t *testing.T) {
+	surname := gedcom.NewSimpleNode(gedcom.TagSurname, "", "", nil)
+	givenName := gedcom.NewSimpleNode(gedcom.TagGivenName, "", "", nil)
+
+	tests := []struct {
+		node       gedcom.Node
+		lookingFor gedcom.Node
+		want       bool
+	}{
+		// Nil parameters.
+		{
+			nil,
+			nil,
+			false,
+		},
+		{
+			nil,
+			surname,
+			false,
+		},
+		{
+			surname,
+			nil,
+			false,
+		},
+
+		// No children.
+		{
+			gedcom.NewNameNode("", "", nil),
+			surname,
+			false,
+		},
+		{
+			gedcom.NewNameNode("", "", []gedcom.Node{}),
+			surname,
+			false,
+		},
+
+		// Other cases.
+		{
+			gedcom.NewNameNode("", "", []gedcom.Node{
+				surname,
+			}),
+			surname,
+			true,
+		},
+		{
+			gedcom.NewNameNode("", "", []gedcom.Node{
+				surname,
+			}),
+			gedcom.NewSimpleNode(gedcom.TagSurname, "", "", nil),
+			false,
+		},
+		{
+			gedcom.NewNameNode("", "", []gedcom.Node{
+				givenName,
+			}),
+			surname,
+			false,
+		},
+		{
+			gedcom.NewNameNode("", "", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagGivenName, "", "", []gedcom.Node{
+					givenName,
+				}),
+			}),
+			givenName,
+			true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run("", func(t *testing.T) {
+			result := gedcom.HasNestedNode(test.node, test.lookingFor)
+			assert.Equal(t, test.want, result)
+		})
+	}
+}

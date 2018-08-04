@@ -26,18 +26,18 @@ func (c *individualEvents) String() string {
 	events = append(events, newIndividualEvent("Birth", birthDate, birthPlace, ""))
 
 	for _, family := range c.individual.Families(c.document) {
-		marriage := family.FirstNodeWithTag(gedcom.TagMarriage)
+		marriage := gedcom.First(gedcom.NodesWithTag(family, gedcom.TagMarriage))
 		if marriage == nil {
 			continue
 		}
 
-		date := marriage.FirstNodeWithTag(gedcom.TagDate)
+		date := gedcom.First(gedcom.NodesWithTag(marriage, gedcom.TagDate))
 		if date == nil {
 			continue
 		}
 
 		place := ""
-		if p := marriage.FirstNodeWithTag(gedcom.TagPlace); p != nil {
+		if p := gedcom.First(gedcom.NodesWithTag(marriage, gedcom.TagPlace)); p != nil {
 			place = p.Value()
 		}
 

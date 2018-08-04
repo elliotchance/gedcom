@@ -13,7 +13,6 @@ type Node interface {
 	// Child nodes.
 	Nodes() []Node
 	AddNode(node Node)
-	HasNestedChild(node Node) bool
 
 	// gedcomLine is for rendering the GEDCOM lines.
 	gedcomLine() string

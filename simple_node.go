@@ -67,13 +67,3 @@ func (node *SimpleNode) gedcomLine() string {
 
 	return buf.String()
 }
-
-func (node *SimpleNode) HasNestedChild(n Node) bool {
-	for _, node := range node.Nodes() {
-		if node == n || node.HasNestedChild(n) {
-			return true
-		}
-	}
-
-	return false
-}

@@ -43,3 +43,23 @@ func nodesWithTagPath(node Node, tagPath ...Tag) []Node {
 
 	return matches
 }
+
+// HasNestedNode checks if node contains lookingFor at any depth. If node and
+// lookingFor are the same false is returned. If either node or lookingFor is
+// nil then false is always returned.
+//
+// Nodes are matched by reference, not value so nodes that represent exactly the
+// same value will not be considered equal.
+func HasNestedNode(node Node, lookingFor Node) bool {
+	if node == nil || lookingFor == nil {
+		return false
+	}
+
+	for _, node := range node.Nodes() {
+		if node == lookingFor || HasNestedNode(node, lookingFor) {
+			return true
+		}
+	}
+
+	return false
+}

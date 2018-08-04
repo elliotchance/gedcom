@@ -22,7 +22,7 @@ func (c *placeEvent) String() string {
 	description := c.node.Tag().String()
 	person := ""
 
-	if d := c.node.FirstNodeWithTag(gedcom.TagDate); d != nil {
+	if d := gedcom.First(gedcom.NodesWithTag(c.node, gedcom.TagDate)); d != nil {
 		date = d.Value()
 	}
 
@@ -31,7 +31,7 @@ func (c *placeEvent) String() string {
 			return ""
 		}
 
-		if individual.HasNestedChild(c.node) {
+		if gedcom.HasNestedNode(individual, c.node) {
 			person = newIndividualLink(c.document, individual).String()
 		}
 	}
