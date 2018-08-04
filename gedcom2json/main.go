@@ -58,7 +58,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	options := gedcom.TransformOptions{
+	options := TransformOptions{
 		ExcludeTags:      splitTags(optionExcludeTags),
 		NoPointers:       optionNoPointers,
 		OnlyOfficialTags: optionOnlyOfficialTags,
@@ -70,7 +70,7 @@ func main() {
 	}
 
 	var bytes []byte
-	transformedDocument := gedcom.Transform(document, options)
+	transformedDocument := Transform(document, options)
 
 	if optionPrettyJSON {
 		bytes, err = json.MarshalIndent(transformedDocument, "", "  ")

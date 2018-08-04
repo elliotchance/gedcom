@@ -1,4 +1,4 @@
-package gedcom_test
+package main
 
 import (
 	"github.com/elliotchance/gedcom"
@@ -53,8 +53,8 @@ var transformTests = []struct {
 func TestTransform(t *testing.T) {
 	for _, test := range transformTests {
 		t.Run("", func(t *testing.T) {
-			options := gedcom.TransformOptions{}
-			assert.Equal(t, gedcom.Transform(test.doc, options), test.expected)
+			options := TransformOptions{}
+			assert.Equal(t, Transform(test.doc, options), test.expected)
 		})
 	}
 }

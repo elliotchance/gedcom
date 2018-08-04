@@ -1,4 +1,6 @@
-package gedcom
+package main
+
+import "github.com/elliotchance/gedcom"
 
 // TransformOptions provides extra options to the Transform function. Many of
 // these options are also available through CLI options on the gedcom2json
@@ -20,20 +22,20 @@ type TransformOptions struct {
 	StringName bool
 
 	// A list of tags to exclude from the output.
-	ExcludeTags []Tag
+	ExcludeTags []gedcom.Tag
 
 	// When true only official GEDCOM tags will be included in the output.
 	OnlyOfficialTags bool
 
 	// Only output these provided tags. Leave empty to act as no filter.
-	OnlyTags []Tag
+	OnlyTags []gedcom.Tag
 
 	// When there are multiple names for an individual this will return the
 	// first of the name nodes only.
 	SingleName bool
 }
 
-func Transform(doc *Document, options TransformOptions) []interface{} {
+func Transform(doc *gedcom.Document, options TransformOptions) []interface{} {
 	r := []interface{}{}
 
 	for _, node := range doc.Nodes {
@@ -105,7 +107,7 @@ func reduceTagKeys(m interface{}, options TransformOptions) interface{} {
 	return m
 }
 
-func transformNodes(nodes []Node, options TransformOptions) []interface{} {
+func transformNodes(nodes []gedcom.Node, options TransformOptions) []interface{} {
 	ns := []interface{}{}
 
 	for _, n := range nodes {
@@ -118,12 +120,12 @@ func transformNodes(nodes []Node, options TransformOptions) []interface{} {
 	return ns
 }
 
-func transformNode(node Node, options TransformOptions) map[string]interface{} {
+func transformNode(node gedcom.Node, options TransformOptions) map[string]interface{} {
 	// Check only.
 	if len(options.OnlyTags) > 0 {
 		found := false
 		for _, t := range options.OnlyTags {
-			if node.Tag() == Tag(t) {
+			if node.Tag().Is(t) {
 				found = true
 			}
 		}
@@ -135,7 +137,7 @@ func transformNode(node Node, options TransformOptions) map[string]interface{} {
 
 	// Check excludes.
 	for _, t := range options.ExcludeTags {
-		if node.Tag() == Tag(t) {
+		if node.Tag().Is(t) {
 			return nil
 		}
 	}
@@ -156,7 +158,7 @@ func transformNode(node Node, options TransformOptions) map[string]interface{} {
 		m["ptr"] = node.Pointer()
 	}
 
-	if node.Tag() == TagName && options.StringName {
+	if node.Tag().Is(gedcom.TagName) && options.StringName {
 		m["val"] = node.String()
 	} else {
 		if node.Value() != "" {
