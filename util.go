@@ -81,3 +81,13 @@ func Last(nodes []Node) Node {
 
 	return nodes[len(nodes)-1]
 }
+
+// Value is a safe way to fetch the Value() from a node. If the node is nil then
+// an empty string will be returned.
+func Value(node Node) string {
+	if node == nil {
+		return ""
+	}
+
+	return node.Value()
+}
