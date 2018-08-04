@@ -76,3 +76,53 @@ func TestIndividualNode_Sex(t *testing.T) {
 		})
 	}
 }
+
+func TestIndividualNode_Births(t *testing.T) {
+	var tests = []struct {
+		node   *gedcom.IndividualNode
+		births []gedcom.Node
+	}{
+		{
+			node:   gedcom.NewIndividualNode("", "P1", nil),
+			births: []gedcom.Node{},
+		},
+		{
+			node:  gedcom.NewIndividualNode("", "P1", []gedcom.Node{}),
+			births: []gedcom.Node{},
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBirth, "", "", []gedcom.Node{}),
+			}),
+			births: []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBirth, "", "", []gedcom.Node{}),
+			},
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBirth, "", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode(gedcom.TagDeath, "", "", []gedcom.Node{}),
+			}),
+			births: []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBirth, "", "", []gedcom.Node{}),
+			},
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBirth, "foo", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode(gedcom.TagDeath, "", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode(gedcom.TagBirth, "bar", "", []gedcom.Node{}),
+			}),
+			births: []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBirth, "foo", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode(gedcom.TagBirth, "bar", "", []gedcom.Node{}),
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run("", func(t *testing.T) {
+			assert.Equal(t, test.node.Births(), test.births)
+		})
+	}
+}

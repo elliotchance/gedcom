@@ -103,3 +103,8 @@ func (node *IndividualNode) FamilyWithSpouse(doc *Document, spouse *IndividualNo
 func (node *IndividualNode) IsLiving() bool {
 	return len(NodesWithTag(node, TagDeath)) == 0
 }
+
+// Births returns zero or more birth events for the individual.
+func (node *IndividualNode) Births() []Node {
+	return NodesWithTag(node, TagBirth)
+}
