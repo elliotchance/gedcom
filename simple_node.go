@@ -68,16 +68,6 @@ func (node *SimpleNode) gedcomLine() string {
 	return buf.String()
 }
 
-func (node *SimpleNode) FirstNodeWithTag(tag Tag) Node {
-	for _, node := range node.Nodes() {
-		if node.Tag() == tag {
-			return node
-		}
-	}
-
-	return nil
-}
-
 func (node *SimpleNode) HasNestedChild(n Node) bool {
 	for _, node := range node.Nodes() {
 		if node == n || node.HasNestedChild(n) {
@@ -93,7 +83,7 @@ func (node *SimpleNode) FirstNodeWithTagPath(tagPath ...Tag) Node {
 		return node
 	}
 
-	next := node.FirstNodeWithTag(tagPath[0])
+	next := First(NodesWithTag(node, tagPath[0]))
 	if next != nil {
 		return next.FirstNodeWithTagPath(tagPath[1:]...)
 	}

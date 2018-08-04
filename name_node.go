@@ -118,7 +118,7 @@ func (node *NameNode) String() string {
 }
 
 func (node *NameNode) Type() NameType {
-	if nameType := node.FirstNodeWithTag(TagType); nameType != nil {
+	if nameType := First(NodesWithTag(node, TagType)); nameType != nil {
 		return NameType(nameType.Value())
 	}
 

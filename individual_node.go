@@ -13,7 +13,7 @@ func NewIndividualNode(value, pointer string, children []Node) *IndividualNode {
 
 // TODO: Needs tests
 func (node *IndividualNode) Name() *NameNode {
-	nameTag := node.FirstNodeWithTag(TagName)
+	nameTag := First(NodesWithTag(node, TagName))
 	if nameTag != nil {
 		return nameTag.(*NameNode)
 	}
@@ -101,5 +101,5 @@ func (node *IndividualNode) FamilyWithSpouse(doc *Document, spouse *IndividualNo
 
 // TODO: needs tests
 func (node *IndividualNode) IsLiving() bool {
-	return node.FirstNodeWithTag(TagDeath) == nil
+	return len(NodesWithTag(node, TagDeath)) == 0
 }

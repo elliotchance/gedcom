@@ -1,9 +1,9 @@
 package gedcom_test
 
 import (
+	"github.com/elliotchance/gedcom"
 	"github.com/stretchr/testify/assert"
 	"testing"
-	"github.com/elliotchance/gedcom"
 )
 
 func TestNodesWithTag(t *testing.T) {
