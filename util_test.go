@@ -1,6 +1,7 @@
-package gedcom
+package gedcom_test
 
 import (
+	"github.com/elliotchance/gedcom"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -24,7 +25,7 @@ func TestAtoi(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.s, func(t *testing.T) {
-			assert.Equal(t, test.want, Atoi(test.s))
+			assert.Equal(t, test.want, gedcom.Atoi(test.s))
 		})
 	}
 }
@@ -45,7 +46,41 @@ func TestCleanSpace(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.s, func(t *testing.T) {
-			assert.Equal(t, test.want, CleanSpace(test.s))
+			assert.Equal(t, test.want, gedcom.CleanSpace(test.s))
+		})
+	}
+}
+
+var firtLastTests = []struct {
+	nodes       []gedcom.Node
+	first, last gedcom.Node
+}{
+	{[]gedcom.Node{}, nil, nil},
+	{[]gedcom.Node{nil}, nil, nil},
+	{
+		[]gedcom.Node{gedcom.NewNameNode("a", "", nil)},
+		gedcom.NewNameNode("a", "", nil),
+		gedcom.NewNameNode("a", "", nil),
+	},
+	{
+		[]gedcom.Node{nil, gedcom.NewNameNode("a", "", nil)},
+		nil,
+		gedcom.NewNameNode("a", "", nil),
+	},
+}
+
+func TestFirst(t *testing.T) {
+	for _, test := range firtLastTests {
+		t.Run("", func(t *testing.T) {
+			assert.Equal(t, test.first, gedcom.First(test.nodes))
+		})
+	}
+}
+
+func TestLast(t *testing.T) {
+	for _, test := range firtLastTests {
+		t.Run("", func(t *testing.T) {
+			assert.Equal(t, test.last, gedcom.Last(test.nodes))
 		})
 	}
 }
