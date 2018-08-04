@@ -15,3 +15,31 @@ func NodesWithTag(node Node, tag Tag) []Node {
 
 	return nodes
 }
+
+// NodesWithTagPath return all of the nodes that have an exact tag path. The
+// number of nodes returned can be zero and tag must match the tag path
+// completely and exactly.
+//
+//   birthPlaces := NodesWithTagPath(individual, TagBirth, TagPlace)
+//
+func NodesWithTagPath(node Node, tagPath ...Tag) []Node {
+	if len(tagPath) == 0 {
+		return []Node{}
+	}
+
+	return nodesWithTagPath(node, tagPath...)
+}
+
+func nodesWithTagPath(node Node, tagPath ...Tag) []Node {
+	if len(tagPath) == 0 {
+		return []Node{node}
+	}
+
+	matches := []Node{}
+
+	for _, next := range NodesWithTag(node, tagPath[0]) {
+		matches = append(matches, nodesWithTagPath(next, tagPath[1:]...)...)
+	}
+
+	return matches
+}

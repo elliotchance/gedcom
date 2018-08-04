@@ -77,16 +77,3 @@ func (node *SimpleNode) HasNestedChild(n Node) bool {
 
 	return false
 }
-
-func (node *SimpleNode) FirstNodeWithTagPath(tagPath ...Tag) Node {
-	if len(tagPath) == 0 {
-		return node
-	}
-
-	next := First(NodesWithTag(node, tagPath[0]))
-	if next != nil {
-		return next.FirstNodeWithTagPath(tagPath[1:]...)
-	}
-
-	return nil
-}
