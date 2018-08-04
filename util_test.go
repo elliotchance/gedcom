@@ -84,3 +84,20 @@ func TestLast(t *testing.T) {
 		})
 	}
 }
+
+func TestValue(t *testing.T) {
+	tests := []struct {
+		node gedcom.Node
+		want string
+	}{
+		{nil, ""},
+		{gedcom.NewSimpleNode(gedcom.TagVersion, "foo", "", nil), "foo"},
+		{gedcom.NewNameNode("foo bar", "", nil), "foo bar"},
+	}
+
+	for _, test := range tests {
+		t.Run("", func(t *testing.T) {
+			assert.Equal(t, test.want, gedcom.Value(test.node))
+		})
+	}
+}
