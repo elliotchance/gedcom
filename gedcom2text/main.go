@@ -122,7 +122,9 @@ func main() {
 
 			// Marriage events.
 			withSpouse := individual.FamilyWithSpouse(document, spouse)
-			if m := withSpouse.FirstNodeWithTagPath(gedcom.TagMarriage, gedcom.TagDate); m != nil {
+			m := gedcom.First(gedcom.NodesWithTagPath(withSpouse,
+				gedcom.TagMarriage, gedcom.TagDate))
+			if m != nil {
 				printLine(fmt.Sprintf("      Marriage: %s", m.Value()))
 			}
 
@@ -164,7 +166,7 @@ func tagShouldBeExcluded(tag gedcom.Tag) bool {
 }
 
 func printNodes(parent gedcom.Node, tag gedcom.Tag) {
-	for _, node := range parent.NodesWithTag(tag) {
+	for _, node := range gedcom.NodesWithTag(parent, tag) {
 		// Death is a special case because it's common to have a Death node with
 		// no details to signify that the person is not living.
 		//

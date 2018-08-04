@@ -21,11 +21,11 @@ func (c *familyStatistics) String() string {
 	divorceEvents := 0
 
 	for _, family := range c.document.Families() {
-		if n := family.FirstNodeWithTagPath(gedcom.TagMarriage); n != nil {
+		if n := gedcom.First(gedcom.NodesWithTagPath(family, gedcom.TagMarriage)); n != nil {
 			marriageEvents += 1
 		}
 
-		if n := family.FirstNodeWithTagPath(gedcom.TagDivorce); n != nil {
+		if n := gedcom.First(gedcom.NodesWithTagPath(family, gedcom.TagDivorce)); n != nil {
 			divorceEvents += 1
 		}
 	}

@@ -13,17 +13,18 @@ func outputFileName(individual *gedcom.IndividualNode) string {
 		return ""
 	}
 
-	// Include the birth/death information to make the name more unique.
+	// Include the birth/death information to make the name more unique. The
+	// following code can be cleaned up a lot more when issue #33 is complete.
 	birth := ""
-	if node := individual.FirstNodeWithTag(gedcom.TagBirth); node != nil {
-		if node2 := node.FirstNodeWithTag(gedcom.TagDate); node2 != nil {
+	if node := gedcom.First(gedcom.NodesWithTag(individual, gedcom.TagBirth)); node != nil {
+		if node2 := gedcom.First(gedcom.NodesWithTag(node, gedcom.TagDate)); node2 != nil {
 			birth = node2.Value()
 		}
 	}
 
 	death := ""
-	if node := individual.FirstNodeWithTag(gedcom.TagDeath); node != nil {
-		if node2 := node.FirstNodeWithTag(gedcom.TagDate); node2 != nil {
+	if node := gedcom.First(gedcom.NodesWithTag(individual, gedcom.TagDeath)); node != nil {
+		if node2 := gedcom.First(gedcom.NodesWithTag(node, gedcom.TagDate)); node2 != nil {
 			death = node2.Value()
 		}
 	}

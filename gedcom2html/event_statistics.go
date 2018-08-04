@@ -30,11 +30,11 @@ func (c *eventStatistics) String() string {
 			deaths += 1
 		}
 
-		if n := individual.FirstNodeWithTagPath(gedcom.TagChristening); n != nil {
+		if n := gedcom.First(gedcom.NodesWithTagPath(individual, gedcom.TagChristening)); n != nil {
 			christenings += 1
 		}
 
-		if n := individual.FirstNodeWithTagPath(gedcom.TagBurial); n != nil {
+		if n := gedcom.First(gedcom.NodesWithTagPath(individual, gedcom.TagBurial)); n != nil {
 			burials += 1
 		}
 	}

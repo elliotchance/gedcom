@@ -12,7 +12,7 @@ func NewSourceNode(value, pointer string, children []Node) *SourceNode {
 }
 
 func (node *SourceNode) Title() string {
-	if n := node.FirstNodeWithTag(TagTitle); n != nil {
+	if n := First(NodesWithTag(node, TagTitle)); n != nil {
 		return n.Value()
 	}
 
