@@ -20,7 +20,7 @@ func (node *FamilyNode) Wife(document *Document) *IndividualNode {
 }
 
 func (node *FamilyNode) partner(document *Document, tag Tag) *IndividualNode {
-	tags := node.NodesWithTag(tag)
+	tags := NodesWithTag(node, tag)
 	if len(tags) == 0 {
 		return nil
 	}
@@ -38,7 +38,7 @@ func (node *FamilyNode) partner(document *Document, tag Tag) *IndividualNode {
 func (node *FamilyNode) Children(document *Document) []*IndividualNode {
 	children := []*IndividualNode{}
 
-	for _, n := range node.NodesWithTag(TagChild) {
+	for _, n := range NodesWithTag(node, TagChild) {
 		pointer := document.NodeByPointer(valueToPointer(n.Value()))
 		child := pointer.(*IndividualNode)
 		children = append(children, child)
@@ -49,7 +49,7 @@ func (node *FamilyNode) Children(document *Document) []*IndividualNode {
 
 // TODO: Needs tests
 func (node *FamilyNode) HasChild(document *Document, individual *IndividualNode) bool {
-	for _, n := range node.NodesWithTag(TagChild) {
+	for _, n := range NodesWithTag(node, TagChild) {
 		if n.Value() == "@"+individual.Pointer()+"@" {
 			return true
 		}

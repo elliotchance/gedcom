@@ -68,17 +68,6 @@ func (node *SimpleNode) gedcomLine() string {
 	return buf.String()
 }
 
-func (node *SimpleNode) NodesWithTag(tag Tag) []Node {
-	nodes := []Node{}
-	for _, node := range node.Nodes() {
-		if node.Tag() == tag {
-			nodes = append(nodes, node)
-		}
-	}
-
-	return nodes
-}
-
 func (node *SimpleNode) FirstNodeWithTag(tag Tag) Node {
 	for _, node := range node.Nodes() {
 		if node.Tag() == tag {

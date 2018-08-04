@@ -13,7 +13,6 @@ type Node interface {
 	// Child nodes.
 	Nodes() []Node
 	AddNode(node Node)
-	NodesWithTag(tag Tag) []Node
 	FirstNodeWithTag(tag Tag) Node
 	FirstNodeWithTagPath(tagPath ...Tag) Node
 	HasNestedChild(node Node) bool

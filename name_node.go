@@ -40,7 +40,7 @@ func (node *NameNode) trimSpaces(s string) string {
 // person. It is also commonly known as the "first name".
 func (node *NameNode) GivenName() string {
 	// GivenName is the proper first name.
-	givenNames := node.NodesWithTag(TagGivenName)
+	givenNames := NodesWithTag(node, TagGivenName)
 	if len(givenNames) > 0 {
 		return node.trimSpaces(givenNames[0].Value())
 	}
@@ -52,7 +52,7 @@ func (node *NameNode) GivenName() string {
 // Surname is a family name passed on or used by members of a family.
 func (node *NameNode) Surname() string {
 	// Surname is the proper last name.
-	surnames := node.NodesWithTag(TagSurname)
+	surnames := NodesWithTag(node, TagSurname)
 	if len(surnames) > 0 {
 		return node.trimSpaces(surnames[0].Value())
 	}
@@ -70,7 +70,7 @@ func (node *NameNode) Surname() string {
 func (node *NameNode) Prefix() string {
 	// NamePrefix is the proper name prefix. If it is not provided then no
 	// prefix should be returned.
-	namePrefixes := node.NodesWithTag(TagNamePrefix)
+	namePrefixes := NodesWithTag(node, TagNamePrefix)
 	if len(namePrefixes) > 0 {
 		return node.trimSpaces(namePrefixes[0].Value())
 	}
@@ -80,7 +80,7 @@ func (node *NameNode) Prefix() string {
 
 func (node *NameNode) Suffix() string {
 	// NameSuffix is the proper name suffix.
-	nameSuffixes := node.NodesWithTag(TagNameSuffix)
+	nameSuffixes := NodesWithTag(node, TagNameSuffix)
 	if len(nameSuffixes) > 0 {
 		return node.trimSpaces(nameSuffixes[0].Value())
 	}
@@ -91,7 +91,7 @@ func (node *NameNode) Suffix() string {
 
 func (node *NameNode) SurnamePrefix() string {
 	// SurnameSuffix is the proper surname prefix.
-	surnamePrefixes := node.NodesWithTag(TagSurnamePrefix)
+	surnamePrefixes := NodesWithTag(node, TagSurnamePrefix)
 	if len(surnamePrefixes) > 0 {
 		return node.trimSpaces(surnamePrefixes[0].Value())
 	}
@@ -102,7 +102,7 @@ func (node *NameNode) SurnamePrefix() string {
 
 func (node *NameNode) Title() string {
 	// Title is the proper individual title.
-	titles := node.NodesWithTag(TagTitle)
+	titles := NodesWithTag(node, TagTitle)
 	if len(titles) > 0 {
 		return node.trimSpaces(titles[0].Value())
 	}

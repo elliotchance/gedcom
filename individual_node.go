@@ -22,7 +22,7 @@ func (node *IndividualNode) Name() *NameNode {
 }
 
 func (node *IndividualNode) Names() []*NameNode {
-	nameTags := node.NodesWithTag(TagName)
+	nameTags := NodesWithTag(node, TagName)
 	names := make([]*NameNode, len(nameTags))
 
 	for i, name := range nameTags {
@@ -33,7 +33,7 @@ func (node *IndividualNode) Names() []*NameNode {
 }
 
 func (node *IndividualNode) Sex() Sex {
-	sex := node.NodesWithTag(TagSex)
+	sex := NodesWithTag(node, TagSex)
 	if len(sex) == 0 {
 		return SexUnknown
 	}
