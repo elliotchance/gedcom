@@ -51,3 +51,33 @@ func CleanSpace(s string) string {
 
 	return s
 }
+
+// First returns the first node of nodes. If the length of nodes is zero then
+// nil is returned. If the first node is nil then nil is also returned.
+//
+// First is useful in combination with other functions like:
+//
+//   birth := First(individual.Births())
+//
+func First(nodes []Node) Node {
+	if len(nodes) == 0 {
+		return nil
+	}
+
+	return nodes[0]
+}
+
+// Last returns the last node of nodes. If the length of nodes is zero then
+// nil is returned. If the last node is nil then nil is also returned.
+//
+// Last is useful in combination with other functions like:
+//
+//   death := Last(individual.Deaths())
+//
+func Last(nodes []Node) Node {
+	if len(nodes) == 0 {
+		return nil
+	}
+
+	return nodes[len(nodes)-1]
+}
