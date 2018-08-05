@@ -114,3 +114,10 @@ func (node *IndividualNode) Births() []Node {
 func (node *IndividualNode) Baptisms() []Node {
 	return NodesWithTag(node, TagBaptism)
 }
+
+// Deaths returns zero or more death events for the individual. It is common for
+// individuals to not have a death event if the death date is not known. If you
+// need to check if an individual is living you should use IsLiving().
+func (node *IndividualNode) Deaths() []Node {
+	return NodesWithTag(node, TagDeath)
+}
