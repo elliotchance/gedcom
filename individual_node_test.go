@@ -359,7 +359,7 @@ func TestIndividualNode_Descent(t *testing.T) {
 			descent: &gedcom.Descent{
 				Parents:    []*gedcom.FamilyNode{},
 				Individual: p1,
-				SpouseChildren: map[*gedcom.IndividualNode][]*gedcom.IndividualNode{
+				SpouseChildren: map[*gedcom.IndividualNode]gedcom.IndividualNodes{
 					p3: {p4, p5},
 					p2: {p6},
 				},
@@ -370,7 +370,7 @@ func TestIndividualNode_Descent(t *testing.T) {
 			descent: &gedcom.Descent{
 				Parents:    []*gedcom.FamilyNode{},
 				Individual: p2,
-				SpouseChildren: map[*gedcom.IndividualNode][]*gedcom.IndividualNode{
+				SpouseChildren: map[*gedcom.IndividualNode]gedcom.IndividualNodes{
 					p1: {p6},
 				},
 			},
@@ -380,7 +380,7 @@ func TestIndividualNode_Descent(t *testing.T) {
 			descent: &gedcom.Descent{
 				Parents:    []*gedcom.FamilyNode{},
 				Individual: p3,
-				SpouseChildren: map[*gedcom.IndividualNode][]*gedcom.IndividualNode{
+				SpouseChildren: map[*gedcom.IndividualNode]gedcom.IndividualNodes{
 					p1:  {p4, p5},
 					nil: {p6},
 				},
@@ -391,7 +391,7 @@ func TestIndividualNode_Descent(t *testing.T) {
 			descent: &gedcom.Descent{
 				Parents:        []*gedcom.FamilyNode{f1},
 				Individual:     p4,
-				SpouseChildren: map[*gedcom.IndividualNode][]*gedcom.IndividualNode{},
+				SpouseChildren: map[*gedcom.IndividualNode]gedcom.IndividualNodes{},
 			},
 		},
 		{
@@ -399,7 +399,7 @@ func TestIndividualNode_Descent(t *testing.T) {
 			descent: &gedcom.Descent{
 				Parents:        []*gedcom.FamilyNode{f1},
 				Individual:     p5,
-				SpouseChildren: map[*gedcom.IndividualNode][]*gedcom.IndividualNode{},
+				SpouseChildren: map[*gedcom.IndividualNode]gedcom.IndividualNodes{},
 			},
 		},
 		{
@@ -407,7 +407,7 @@ func TestIndividualNode_Descent(t *testing.T) {
 			descent: &gedcom.Descent{
 				Parents:    []*gedcom.FamilyNode{f2, f4},
 				Individual: p6,
-				SpouseChildren: map[*gedcom.IndividualNode][]*gedcom.IndividualNode{
+				SpouseChildren: map[*gedcom.IndividualNode]gedcom.IndividualNodes{
 					nil: {p7},
 				},
 			},
@@ -417,7 +417,7 @@ func TestIndividualNode_Descent(t *testing.T) {
 			descent: &gedcom.Descent{
 				Parents:        []*gedcom.FamilyNode{f3},
 				Individual:     p7,
-				SpouseChildren: map[*gedcom.IndividualNode][]*gedcom.IndividualNode{},
+				SpouseChildren: map[*gedcom.IndividualNode]gedcom.IndividualNodes{},
 			},
 		},
 		{
@@ -425,7 +425,7 @@ func TestIndividualNode_Descent(t *testing.T) {
 			descent: &gedcom.Descent{
 				Parents:        []*gedcom.FamilyNode{},
 				Individual:     p8,
-				SpouseChildren: map[*gedcom.IndividualNode][]*gedcom.IndividualNode{},
+				SpouseChildren: map[*gedcom.IndividualNode]gedcom.IndividualNodes{},
 			},
 		},
 	}

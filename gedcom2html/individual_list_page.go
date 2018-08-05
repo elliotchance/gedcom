@@ -25,7 +25,7 @@ func (c *individualListPage) String() string {
 		newTableHead("Name", "Birth", "Death"),
 	}
 
-	individuals := []*gedcom.IndividualNode{}
+	individuals := gedcom.IndividualNodes{}
 
 	for _, individual := range c.document.Individuals() {
 		name := strings.ToLower(individual.Name().String())

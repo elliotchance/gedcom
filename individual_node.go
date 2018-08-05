@@ -42,8 +42,8 @@ func (node *IndividualNode) Sex() Sex {
 }
 
 // TODO: needs tests
-func (node *IndividualNode) Spouses(doc *Document) []*IndividualNode {
-	spouses := []*IndividualNode{}
+func (node *IndividualNode) Spouses(doc *Document) IndividualNodes {
+	spouses := IndividualNodes{}
 
 	for _, family := range doc.Families() {
 		husband := family.Husband(doc)
@@ -146,7 +146,7 @@ func (node *IndividualNode) Descent(doc *Document) *Descent {
 	descent := &Descent{
 		Parents:        []*FamilyNode{},
 		Individual:     node,
-		SpouseChildren: map[*IndividualNode][]*IndividualNode{},
+		SpouseChildren: map[*IndividualNode]IndividualNodes{},
 	}
 
 	for _, family := range node.Families(doc) {
@@ -162,7 +162,7 @@ func (node *IndividualNode) Descent(doc *Document) *Descent {
 			}
 
 			familyWithSpouse := node.FamilyWithSpouse(doc, spouse)
-			var children []*IndividualNode
+			var children IndividualNodes
 			if familyWithSpouse != nil {
 				children = familyWithSpouse.Children(doc)
 			}
