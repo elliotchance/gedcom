@@ -9,13 +9,13 @@ import (
 
 var documentTests = []struct {
 	doc         *gedcom.Document
-	individuals []*gedcom.IndividualNode
+	individuals gedcom.IndividualNodes
 	families    []*gedcom.FamilyNode
 	p2          gedcom.Node
 }{
 	{
 		doc:         &gedcom.Document{},
-		individuals: []*gedcom.IndividualNode{},
+		individuals: gedcom.IndividualNodes{},
 		p2:          nil,
 		families:    []*gedcom.FamilyNode{},
 	},
@@ -27,7 +27,7 @@ var documentTests = []struct {
 				}),
 			},
 		},
-		individuals: []*gedcom.IndividualNode{
+		individuals: gedcom.IndividualNodes{
 			gedcom.NewIndividualNode("", "P1", []gedcom.Node{
 				gedcom.NewNameNode("Joe /Bloggs/", "", []gedcom.Node{}),
 			}),
@@ -47,7 +47,7 @@ var documentTests = []struct {
 				}),
 			},
 		},
-		individuals: []*gedcom.IndividualNode{
+		individuals: gedcom.IndividualNodes{
 			gedcom.NewIndividualNode("", "P1", []gedcom.Node{
 				gedcom.NewNameNode("Joe /Bloggs/", "", []gedcom.Node{}),
 			}),
@@ -69,7 +69,7 @@ var documentTests = []struct {
 				gedcom.NewFamilyNode("F1", []gedcom.Node{}),
 			},
 		},
-		individuals: []*gedcom.IndividualNode{
+		individuals: gedcom.IndividualNodes{
 			gedcom.NewIndividualNode("", "P1", []gedcom.Node{
 				gedcom.NewNameNode("Joe /Bloggs/", "", []gedcom.Node{}),
 			}),
@@ -88,7 +88,7 @@ var documentTests = []struct {
 				gedcom.NewFamilyNode("F3", []gedcom.Node{}),
 			},
 		},
-		individuals: []*gedcom.IndividualNode{
+		individuals: gedcom.IndividualNodes{
 			gedcom.NewIndividualNode("", "P1", []gedcom.Node{
 				gedcom.NewNameNode("Joe /Bloggs/", "", []gedcom.Node{}),
 			}),

@@ -23,8 +23,8 @@ func (doc *Document) String() string {
 	return buf.String()
 }
 
-func (doc *Document) Individuals() []*IndividualNode {
-	individuals := []*IndividualNode{}
+func (doc *Document) Individuals() IndividualNodes {
+	individuals := IndividualNodes{}
 
 	for _, node := range doc.Nodes {
 		if n, ok := node.(*IndividualNode); ok {

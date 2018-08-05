@@ -13,5 +13,5 @@ type Descent struct {
 	// SpouseChildren maps the known spouses to their children. The spouse will
 	// be nil if the other parent is not known. Children can appear under
 	// multiple spouses.
-	SpouseChildren map[*IndividualNode][]*IndividualNode
+	SpouseChildren map[*IndividualNode]IndividualNodes
 }
