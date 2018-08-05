@@ -121,3 +121,8 @@ func (node *IndividualNode) Baptisms() []Node {
 func (node *IndividualNode) Deaths() []Node {
 	return NodesWithTag(node, TagDeath)
 }
+
+// Burials returns zero or more burial events for the individual.
+func (node *IndividualNode) Burials() []Node {
+	return NodesWithTag(node, TagBurial)
+}

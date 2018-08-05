@@ -232,3 +232,53 @@ func TestIndividualNode_Deaths(t *testing.T) {
 		})
 	}
 }
+
+func TestIndividualNode_Burials(t *testing.T) {
+	var tests = []struct {
+		node    *gedcom.IndividualNode
+		burials []gedcom.Node
+	}{
+		{
+			node:    gedcom.NewIndividualNode("", "P1", nil),
+			burials: []gedcom.Node{},
+		},
+		{
+			node:    gedcom.NewIndividualNode("", "P1", []gedcom.Node{}),
+			burials: []gedcom.Node{},
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBurial, "", "", []gedcom.Node{}),
+			}),
+			burials: []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBurial, "", "", []gedcom.Node{}),
+			},
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBurial, "", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode(gedcom.TagBirth, "", "", []gedcom.Node{}),
+			}),
+			burials: []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBurial, "", "", []gedcom.Node{}),
+			},
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBurial, "foo", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode(gedcom.TagBaptism, "", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode(gedcom.TagBurial, "bar", "", []gedcom.Node{}),
+			}),
+			burials: []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBurial, "foo", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode(gedcom.TagBurial, "bar", "", []gedcom.Node{}),
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run("", func(t *testing.T) {
+			assert.Equal(t, test.node.Burials(), test.burials)
+		})
+	}
+}
