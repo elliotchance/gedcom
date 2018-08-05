@@ -888,6 +888,19 @@ func TestIndividualNode_Similarity(t *testing.T) {
 			}),
 			expected: 0.633010752688172,
 		},
+
+		// These ones are way off.
+		{
+			a: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Jane /Doe/"),
+				born("Sep 1845"),
+			}),
+			b: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Bob /Jones/"),
+				born("1627"),
+			}),
+			expected: 0.3194444444444444,
+		},
 	}
 
 	for _, test := range tests {
