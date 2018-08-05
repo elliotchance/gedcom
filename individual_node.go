@@ -103,3 +103,26 @@ func (node *IndividualNode) FamilyWithSpouse(doc *Document, spouse *IndividualNo
 func (node *IndividualNode) IsLiving() bool {
 	return len(NodesWithTag(node, TagDeath)) == 0
 }
+
+// Births returns zero or more birth events for the individual.
+func (node *IndividualNode) Births() []Node {
+	return NodesWithTag(node, TagBirth)
+}
+
+// Baptisms returns zero or more baptism events for the individual. The baptisms
+// do not include LDS baptisms.
+func (node *IndividualNode) Baptisms() []Node {
+	return NodesWithTag(node, TagBaptism)
+}
+
+// Deaths returns zero or more death events for the individual. It is common for
+// individuals to not have a death event if the death date is not known. If you
+// need to check if an individual is living you should use IsLiving().
+func (node *IndividualNode) Deaths() []Node {
+	return NodesWithTag(node, TagDeath)
+}
+
+// Burials returns zero or more burial events for the individual.
+func (node *IndividualNode) Burials() []Node {
+	return NodesWithTag(node, TagBurial)
+}
