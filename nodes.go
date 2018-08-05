@@ -7,7 +7,7 @@ func NodesWithTag(node Node, tag Tag) []Node {
 
 	if node != nil {
 		for _, node := range node.Nodes() {
-			if node.Tag() == tag {
+			if node.Tag().Is(tag) {
 				nodes = append(nodes, node)
 			}
 		}

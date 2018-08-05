@@ -120,7 +120,7 @@ type DateNode struct {
 func NewDateNode(value, pointer string, children []Node) *DateNode {
 	return &DateNode{
 		&SimpleNode{
-			tag:      TagName,
+			tag:      TagDate,
 			value:    value,
 			pointer:  pointer,
 			children: children,

@@ -436,3 +436,245 @@ func TestIndividualNode_Descent(t *testing.T) {
 		})
 	}
 }
+
+func TestIndividualNode_LDSBaptisms(t *testing.T) {
+	var tests = []struct {
+		node     *gedcom.IndividualNode
+		baptisms []gedcom.Node
+	}{
+		{
+			node:     gedcom.NewIndividualNode("", "P1", nil),
+			baptisms: []gedcom.Node{},
+		},
+		{
+			node:     gedcom.NewIndividualNode("", "P1", []gedcom.Node{}),
+			baptisms: []gedcom.Node{},
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagLDSBaptism, "", "", []gedcom.Node{}),
+			}),
+			baptisms: []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagLDSBaptism, "", "", []gedcom.Node{}),
+			},
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBaptism, "", "", []gedcom.Node{}),
+			}),
+			baptisms: []gedcom.Node{},
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagLDSBaptism, "", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode(gedcom.TagDeath, "", "", []gedcom.Node{}),
+			}),
+			baptisms: []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagLDSBaptism, "", "", []gedcom.Node{}),
+			},
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagLDSBaptism, "foo", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode(gedcom.TagDeath, "", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode(gedcom.TagLDSBaptism, "bar", "", []gedcom.Node{}),
+			}),
+			baptisms: []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagLDSBaptism, "foo", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode(gedcom.TagLDSBaptism, "bar", "", []gedcom.Node{}),
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run("", func(t *testing.T) {
+			assert.Equal(t, test.node.LDSBaptisms(), test.baptisms)
+		})
+	}
+}
+
+func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
+	var tests = []struct {
+		node     *gedcom.IndividualNode
+		expected *gedcom.DateNode
+	}{
+		// No dates
+		{
+			node:     gedcom.NewIndividualNode("", "P1", nil),
+			expected: nil,
+		},
+		{
+			node:     gedcom.NewIndividualNode("", "P1", []gedcom.Node{}),
+			expected: nil,
+		},
+
+		// A single date.
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBirth, "", "", []gedcom.Node{
+					gedcom.NewDateNode("1 Aug 1980", "", nil),
+				}),
+			}),
+			expected: gedcom.NewDateNode("1 Aug 1980", "", nil),
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBaptism, "", "", []gedcom.Node{
+					gedcom.NewDateNode("Abt. Dec 1980", "", nil),
+				}),
+			}),
+			expected: gedcom.NewDateNode("Abt. Dec 1980", "", nil),
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagLDSBaptism, "", "", []gedcom.Node{
+					gedcom.NewDateNode("Abt. Nov 1980", "", nil),
+				}),
+			}),
+			expected: gedcom.NewDateNode("Abt. Nov 1980", "", nil),
+		},
+
+		// Multiple dates and other cases.
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBirth, "", "", []gedcom.Node{
+					gedcom.NewDateNode("1 Aug 1980", "", nil),
+				}),
+				gedcom.NewSimpleNode(gedcom.TagBaptism, "", "", []gedcom.Node{
+					gedcom.NewDateNode("Abt. Jan 1980", "", nil),
+				}),
+			}),
+			expected: gedcom.NewDateNode("Abt. Jan 1980", "", nil),
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBirth, "", "", []gedcom.Node{
+					gedcom.NewDateNode("1 Aug 1980", "", nil),
+					gedcom.NewDateNode("23 Mar 1979", "", nil),
+				}),
+			}),
+			expected: gedcom.NewDateNode("23 Mar 1979", "", nil),
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBirth, "", "", []gedcom.Node{
+					gedcom.NewDateNode("1 Aug 1980", "", nil),
+				}),
+				gedcom.NewSimpleNode(gedcom.TagLDSBaptism, "", "", []gedcom.Node{
+					gedcom.NewDateNode("23 Mar 1979", "", nil),
+				}),
+			}),
+			expected: gedcom.NewDateNode("23 Mar 1979", "", nil),
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBirth, "", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode(gedcom.TagLDSBaptism, "", "", []gedcom.Node{}),
+			}),
+			expected: nil,
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBirth, "", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode(gedcom.TagLDSBaptism, "", "", []gedcom.Node{
+					gedcom.NewDateNode("1 Aug 1980", "", nil),
+				}),
+			}),
+			expected: gedcom.NewDateNode("1 Aug 1980", "", nil),
+		},
+	}
+
+	for _, test := range tests {
+		t.Run("", func(t *testing.T) {
+			assert.Equal(t, test.node.EstimatedBirthDate(), test.expected)
+		})
+	}
+}
+
+func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
+	var tests = []struct {
+		node     *gedcom.IndividualNode
+		expected *gedcom.DateNode
+	}{
+		// No dates
+		{
+			node:     gedcom.NewIndividualNode("", "P1", nil),
+			expected: nil,
+		},
+		{
+			node:     gedcom.NewIndividualNode("", "P1", []gedcom.Node{}),
+			expected: nil,
+		},
+
+		// A single date.
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagDeath, "", "", []gedcom.Node{
+					gedcom.NewDateNode("1 Aug 1980", "", nil),
+				}),
+			}),
+			expected: gedcom.NewDateNode("1 Aug 1980", "", nil),
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBurial, "", "", []gedcom.Node{
+					gedcom.NewDateNode("Abt. Dec 1980", "", nil),
+				}),
+			}),
+			expected: gedcom.NewDateNode("Abt. Dec 1980", "", nil),
+		},
+
+		// Multiple dates and other cases.
+		{
+			// Multiple death dates always returns the earliest.
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagDeath, "", "", []gedcom.Node{
+					gedcom.NewDateNode("1 Aug 1980", "", nil),
+					gedcom.NewDateNode("Mar 1980", "", nil),
+					gedcom.NewDateNode("Jun 1980", "", nil),
+				}),
+			}),
+			expected: gedcom.NewDateNode("Mar 1980", "", nil),
+		},
+		{
+			// Multiple burial dates always returns the earliest.
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBurial, "", "", []gedcom.Node{
+					gedcom.NewDateNode("3 Aug 1980", "", nil),
+					gedcom.NewDateNode("Apr 1980", "", nil),
+				}),
+			}),
+			expected: gedcom.NewDateNode("Apr 1980", "", nil),
+		},
+		{
+			// Death is before burial.
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagDeath, "", "", []gedcom.Node{
+					gedcom.NewDateNode("1 Aug 1980", "", nil),
+				}),
+				gedcom.NewSimpleNode(gedcom.TagBurial, "", "", []gedcom.Node{
+					gedcom.NewDateNode("3 Aug 1980", "", nil),
+				}),
+			}),
+			expected: gedcom.NewDateNode("1 Aug 1980", "", nil),
+		},
+		{
+			// Burial is before death.
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagDeath, "", "", []gedcom.Node{
+					gedcom.NewDateNode("3 Aug 1980", "", nil),
+				}),
+				gedcom.NewSimpleNode(gedcom.TagBurial, "", "", []gedcom.Node{
+					gedcom.NewDateNode("1 Aug 1980", "", nil),
+				}),
+			}),
+			expected: gedcom.NewDateNode("3 Aug 1980", "", nil),
+		},
+	}
+
+	for _, test := range tests {
+		t.Run("", func(t *testing.T) {
+			assert.Equal(t, test.node.EstimatedDeathDate(), test.expected)
+		})
+	}
+}
