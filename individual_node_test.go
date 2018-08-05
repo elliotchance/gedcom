@@ -87,7 +87,7 @@ func TestIndividualNode_Births(t *testing.T) {
 			births: []gedcom.Node{},
 		},
 		{
-			node:  gedcom.NewIndividualNode("", "P1", []gedcom.Node{}),
+			node:   gedcom.NewIndividualNode("", "P1", []gedcom.Node{}),
 			births: []gedcom.Node{},
 		},
 		{
@@ -123,6 +123,62 @@ func TestIndividualNode_Births(t *testing.T) {
 	for _, test := range tests {
 		t.Run("", func(t *testing.T) {
 			assert.Equal(t, test.node.Births(), test.births)
+		})
+	}
+}
+
+func TestIndividualNode_Baptisms(t *testing.T) {
+	var tests = []struct {
+		node     *gedcom.IndividualNode
+		baptisms []gedcom.Node
+	}{
+		{
+			node:     gedcom.NewIndividualNode("", "P1", nil),
+			baptisms: []gedcom.Node{},
+		},
+		{
+			node:     gedcom.NewIndividualNode("", "P1", []gedcom.Node{}),
+			baptisms: []gedcom.Node{},
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBaptism, "", "", []gedcom.Node{}),
+			}),
+			baptisms: []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBaptism, "", "", []gedcom.Node{}),
+			},
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagLDSBaptism, "", "", []gedcom.Node{}),
+			}),
+			baptisms: []gedcom.Node{},
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBaptism, "", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode(gedcom.TagDeath, "", "", []gedcom.Node{}),
+			}),
+			baptisms: []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBaptism, "", "", []gedcom.Node{}),
+			},
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBaptism, "foo", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode(gedcom.TagDeath, "", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode(gedcom.TagBaptism, "bar", "", []gedcom.Node{}),
+			}),
+			baptisms: []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBaptism, "foo", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode(gedcom.TagBaptism, "bar", "", []gedcom.Node{}),
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run("", func(t *testing.T) {
+			assert.Equal(t, test.node.Baptisms(), test.baptisms)
 		})
 	}
 }

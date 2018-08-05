@@ -108,3 +108,9 @@ func (node *IndividualNode) IsLiving() bool {
 func (node *IndividualNode) Births() []Node {
 	return NodesWithTag(node, TagBirth)
 }
+
+// Baptisms returns zero or more baptism events for the individual. The baptisms
+// do not include LDS baptisms.
+func (node *IndividualNode) Baptisms() []Node {
+	return NodesWithTag(node, TagBaptism)
+}
