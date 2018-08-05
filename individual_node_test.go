@@ -12,7 +12,7 @@ var individualTests = []struct {
 	sex   gedcom.Sex
 }{
 	{
-		node:  gedcom.NewIndividualNode("", "P1", nil),
+		node:  individual("P1", "", "", ""),
 		names: []*gedcom.NameNode{},
 		sex:   gedcom.SexUnknown,
 	},
@@ -83,7 +83,7 @@ func TestIndividualNode_Births(t *testing.T) {
 		births []gedcom.Node
 	}{
 		{
-			node:   gedcom.NewIndividualNode("", "P1", nil),
+			node:   individual("P1", "", "", ""),
 			births: []gedcom.Node{},
 		},
 		{
@@ -133,7 +133,7 @@ func TestIndividualNode_Baptisms(t *testing.T) {
 		baptisms []gedcom.Node
 	}{
 		{
-			node:     gedcom.NewIndividualNode("", "P1", nil),
+			node:     individual("P1", "", "", ""),
 			baptisms: []gedcom.Node{},
 		},
 		{
@@ -189,7 +189,7 @@ func TestIndividualNode_Deaths(t *testing.T) {
 		deaths []gedcom.Node
 	}{
 		{
-			node:   gedcom.NewIndividualNode("", "P1", nil),
+			node:   individual("P1", "", "", ""),
 			deaths: []gedcom.Node{},
 		},
 		{
@@ -239,7 +239,7 @@ func TestIndividualNode_Burials(t *testing.T) {
 		burials []gedcom.Node
 	}{
 		{
-			node:    gedcom.NewIndividualNode("", "P1", nil),
+			node:    individual("P1", "", "", ""),
 			burials: []gedcom.Node{},
 		},
 		{
@@ -298,8 +298,8 @@ func getDocument() *gedcom.Document {
 	// - P8 does not connect to anything.
 	// - P3 is the alternate mother of P6.
 
-	p1 := gedcom.NewIndividualNode("", "P1", nil)
-	p2 := gedcom.NewIndividualNode("", "P2", nil)
+	p1 := individual("P1", "", "", "")
+	p2 := individual("P2", "", "", "")
 	p3 := gedcom.NewIndividualNode("", "P3", nil)
 	p4 := gedcom.NewIndividualNode("", "P4", nil)
 	p5 := gedcom.NewIndividualNode("", "P5", nil)
@@ -477,7 +477,7 @@ func TestIndividualNode_LDSBaptisms(t *testing.T) {
 		baptisms []gedcom.Node
 	}{
 		{
-			node:     gedcom.NewIndividualNode("", "P1", nil),
+			node:     individual("P1", "", "", ""),
 			baptisms: []gedcom.Node{},
 		},
 		{
@@ -534,7 +534,7 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 	}{
 		// No dates
 		{
-			node:     gedcom.NewIndividualNode("", "P1", nil),
+			node:     individual("P1", "", "", ""),
 			expected: nil,
 		},
 		{
@@ -632,7 +632,7 @@ func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 	}{
 		// No dates
 		{
-			node:     gedcom.NewIndividualNode("", "P1", nil),
+			node:     individual("P1", "", "", ""),
 			expected: nil,
 		},
 		{
@@ -754,17 +754,17 @@ func TestIndividualNode_Similarity(t *testing.T) {
 		},
 		{
 			a:        nil,
-			b:        gedcom.NewIndividualNode("", "P1", nil),
+			b:        individual("P1", "", "", ""),
 			expected: 0.5,
 		},
 		{
-			a:        gedcom.NewIndividualNode("", "P1", nil),
+			a:        individual("P1", "", "", ""),
 			b:        nil,
 			expected: 0.5,
 		},
 		{
-			a:        gedcom.NewIndividualNode("", "P1", nil),
-			b:        gedcom.NewIndividualNode("", "P1", nil),
+			a:        individual("P1", "", "", ""),
+			b:        individual("P1", "", "", ""),
 			expected: 0.3333333333333333,
 		},
 		{
@@ -956,5 +956,227 @@ func TestIndividualNode_Similarity(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			assert.Equal(t, test.a.Similarity(test.b), test.expected)
 		})
+	}
+}
+
+func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
+	var tests = []struct {
+		doc      *gedcom.Document
+		expected gedcom.SurroundingSimilarity
+	}{
+		// Empty individuals.
+		{
+			doc: document(
+				individual("P1", "", "", ""),
+				individual("P2", "", "", ""),
+			),
+			expected: gedcom.SurroundingSimilarity{
+				ParentsSimilarity:    0.5,
+				IndividualSimilarity: 0.3333333333333333,
+				SpousesSimilarity:    1.0,
+				ChildrenSimilarity:   1.0,
+			},
+		},
+
+		// Only matching individuals, but they are exact matches.
+		{
+			doc: document(
+				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
+				individual("P2", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
+			),
+			expected: gedcom.SurroundingSimilarity{
+				ParentsSimilarity:    0.5,
+				IndividualSimilarity: 1.0,
+				SpousesSimilarity:    1.0,
+				ChildrenSimilarity:   1.0,
+			},
+		},
+
+		// Only matching individuals, but they are similar matches.
+		{
+			doc: document(
+				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
+				individual("P2", "Elliot /Chance/", "Abt. 1843", "Abt. 1910"),
+			),
+			expected: gedcom.SurroundingSimilarity{
+				ParentsSimilarity:    0.5,
+				IndividualSimilarity: 0.9630708093204747,
+				SpousesSimilarity:    1.0,
+				ChildrenSimilarity:   1.0,
+			},
+		},
+
+		// Only matching individuals and they are way off.
+		{
+			doc: document(
+				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
+				individual("P2", "Joe /Bloggs/", "1945", "2000"),
+			),
+			expected: gedcom.SurroundingSimilarity{
+				ParentsSimilarity:    0.5,
+				IndividualSimilarity: 0.1341880341880342,
+				SpousesSimilarity:    1.0,
+				ChildrenSimilarity:   1.0,
+			},
+		},
+
+		// Parents and individuals match exactly.
+		{
+			doc: document(
+				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
+				individual("P2", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
+				individual("P3", "John /Smith/", "4 Jan 1803", "17 Mar 1877"),
+				individual("P4", "Jane /Doe/", "3 Mar 1803", "14 June 1877"),
+				individual("P5", "John /Smith/", "4 Jan 1803", "17 Mar 1877"),
+				individual("P6", "Jane /Doe/", "3 Mar 1803", "14 June 1877"),
+				family("F1", "P3", "P4", "P1"),
+				family("F2", "P5", "P6", "P2"),
+			),
+			expected: gedcom.SurroundingSimilarity{
+				ParentsSimilarity:    1.0,
+				IndividualSimilarity: 1.0,
+				SpousesSimilarity:    1.0,
+				ChildrenSimilarity:   1.0,
+			},
+		},
+
+		// Parents and individuals are very similar.
+		{
+			doc: document(
+				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
+				individual("P2", "Elliot /Chaunce/", "4 Jan 1843", "17 Mar 1907"),
+				individual("P3", "John /Smith/", "4 Jan 1803", "17 Mar 1877"),
+				individual("P4", "Jane /Doey/", "3 Mar 1803", "14 June 1877"),
+				individual("P5", "John /Smith/", "4 Jan 1803", "17 Mar 1877"),
+				individual("P6", "Jane /Doe/", "3 Mar 1803", "14 June 1877"),
+				family("F1", "P3", "P4", "P1"),
+				family("F2", "P5", "P6", "P2"),
+			),
+			expected: gedcom.SurroundingSimilarity{
+				ParentsSimilarity:    0.9962962962962962,
+				IndividualSimilarity: 0.9901098901098901,
+				SpousesSimilarity:    1.0,
+				ChildrenSimilarity:   1.0,
+			},
+		},
+
+		// One parent is missing, otherwise exactly the same.
+		{
+			doc: document(
+				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
+				individual("P2", "Elliot /Chaunce/", "4 Jan 1843", "17 Mar 1907"),
+				individual("P3", "John /Smith/", "4 Jan 1803", "17 Mar 1877"),
+				individual("P4", "Jane /Doey/", "3 Mar 1803", "14 June 1877"),
+				individual("P5", "John /Smith/", "4 Jan 1803", "17 Mar 1877"),
+				individual("P6", "Jane /Doe/", "3 Mar 1803", "14 June 1877"),
+				family("F1", "P3", "", "P1"),
+				family("F2", "P5", "P6", "P2"),
+			),
+			expected: gedcom.SurroundingSimilarity{
+				ParentsSimilarity:    0.75,
+				IndividualSimilarity: 0.9901098901098901,
+				SpousesSimilarity:    1.0,
+				ChildrenSimilarity:   1.0,
+			},
+		},
+
+		// Both parents are missing on one side, otherwise exactly the same.
+		{
+			doc: document(
+				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
+				individual("P2", "Elliot /Chaunce/", "4 Jan 1843", "17 Mar 1907"),
+				individual("P3", "John /Smith/", "4 Jan 1803", "17 Mar 1877"),
+				individual("P4", "Jane /Doey/", "3 Mar 1803", "14 June 1877"),
+				individual("P5", "John /Smith/", "4 Jan 1803", "17 Mar 1877"),
+				individual("P6", "Jane /Doe/", "3 Mar 1803", "14 June 1877"),
+				family("F1", "", "", "P1"),
+				family("F2", "P5", "P6", "P2"),
+			),
+			expected: gedcom.SurroundingSimilarity{
+				ParentsSimilarity:    0.5,
+				IndividualSimilarity: 0.9901098901098901,
+				SpousesSimilarity:    1.0,
+				ChildrenSimilarity:   1.0,
+			},
+		},
+
+		// Parents, individual and spouses match exactly.
+		{
+			doc: document(
+				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
+				individual("P2", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
+				individual("P3", "John /Smith/", "4 Jan 1803", "17 Mar 1877"),
+				individual("P4", "Jane /Doe/", "3 Mar 1803", "14 June 1877"),
+				individual("P5", "John /Smith/", "4 Jan 1803", "17 Mar 1877"),
+				individual("P6", "Jane /Doe/", "3 Mar 1803", "14 June 1877"),
+				individual("P7", "Jane /Bloggs/", "8 Mar 1803", "14 June 1877"),
+				individual("P8", "Jane /Bloggs/", "8 Mar 1803", "14 June 1877"),
+				family("F1", "P3", "P4", "P1"),
+				family("F2", "P5", "P6", "P2"),
+				family("F3", "P1", "P7"),
+				family("F4", "P2", "P8"),
+			),
+			expected: gedcom.SurroundingSimilarity{
+				ParentsSimilarity:    1.0,
+				IndividualSimilarity: 1.0,
+				SpousesSimilarity:    1.0,
+				ChildrenSimilarity:   1.0,
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run("", func(t *testing.T) {
+			a := test.doc.Individuals()[0]
+			b := test.doc.Individuals()[1]
+			s := a.SurroundingSimilarity(test.doc, b)
+
+			assert.Equal(t, test.expected, s)
+		})
+	}
+}
+
+func individual(pointer, fullName, birth, death string) *gedcom.IndividualNode {
+	nodes := []gedcom.Node{}
+
+	if fullName != "" {
+		nodes = append(nodes, name(fullName))
+	}
+
+	if birth != "" {
+		nodes = append(nodes, born(birth))
+	}
+
+	if death != "" {
+		nodes = append(nodes, died(death))
+	}
+
+	return gedcom.NewIndividualNode("", pointer, nodes)
+}
+
+func family(pointer, husband, wife string, children ...string) *gedcom.FamilyNode {
+	nodes := []gedcom.Node{}
+
+	if husband != "" {
+		nodes = append(nodes, gedcom.NewSimpleNode(
+			gedcom.TagHusband, "@"+husband+"@", "", nil))
+	}
+
+	if wife != "" {
+		nodes = append(nodes, gedcom.NewSimpleNode(
+			gedcom.TagWife, "@"+wife+"@", "", nil))
+	}
+
+	for _, child := range children {
+		nodes = append(nodes, gedcom.NewSimpleNode(
+			gedcom.TagChild, "@"+child+"@", "", nil))
+	}
+
+	return gedcom.NewFamilyNode(pointer, nodes)
+}
+
+func document(nodes ...gedcom.Node) *gedcom.Document {
+	return &gedcom.Document{
+		Nodes: nodes,
 	}
 }
