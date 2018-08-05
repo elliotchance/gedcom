@@ -1,6 +1,7 @@
 package gedcom
 
 import (
+	"reflect"
 	"strconv"
 	"strings"
 )
@@ -90,4 +91,42 @@ func Value(node Node) string {
 	}
 
 	return node.Value()
+}
+
+// Compound is a easier way to join a collection of nodes. The input type is
+// flexible to allow the following types:
+//
+//   nil
+//   Node
+//   []Node
+//
+// If any of the inputs are not one of the above types then a panic is raised.
+//
+// Using nil as a Node or including nil as one of the elements for []Node will
+// be ignored, so you should not receive any nil values in the output.
+func Compound(nodes ...interface{}) []Node {
+	result := []Node{}
+
+	for _, n := range nodes {
+		switch i := n.(type) {
+		case nil:
+			// Ignore
+
+		case Node:
+			result = append(result, i)
+
+		case []Node:
+			// Should this be replaced with a function that removes nil items?
+			for _, item := range i {
+				if item != nil {
+					result = append(result, item)
+				}
+			}
+
+		default:
+			panic("cannot compound type: " + reflect.TypeOf(i).Name())
+		}
+	}
+
+	return result
 }

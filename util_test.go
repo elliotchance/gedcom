@@ -101,3 +101,29 @@ func TestValue(t *testing.T) {
 		})
 	}
 }
+
+func TestCompound(t *testing.T) {
+	n1 := gedcom.NewNameNode("Joe /Bloggs/", "", []gedcom.Node{})
+	n2 := gedcom.NewNameNode("Jane /Doe/", "", []gedcom.Node{})
+	n3 := gedcom.NewNameNode("John /Smith/", "", []gedcom.Node{})
+
+	tests := []struct {
+		inputs []interface{}
+		want   []gedcom.Node
+	}{
+		{[]interface{}{}, []gedcom.Node{}},
+		{[]interface{}{nil}, []gedcom.Node{}},
+		{[]interface{}{n1}, []gedcom.Node{n1}},
+		{[]interface{}{n1, n1}, []gedcom.Node{n1, n1}},
+		{[]interface{}{n1, nil, n2}, []gedcom.Node{n1, n2}},
+		{[]interface{}{[]gedcom.Node{n1, n2}}, []gedcom.Node{n1, n2}},
+		{[]interface{}{[]gedcom.Node{n1, n2}, n3}, []gedcom.Node{n1, n2, n3}},
+		{[]interface{}{[]gedcom.Node{nil, n2}, n3}, []gedcom.Node{n2, n3}},
+	}
+
+	for _, test := range tests {
+		t.Run("", func(t *testing.T) {
+			assert.Equal(t, test.want, gedcom.Compound(test.inputs...))
+		})
+	}
+}
