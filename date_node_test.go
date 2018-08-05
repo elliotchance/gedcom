@@ -678,10 +678,27 @@ func TestDateNode_Similarity(t *testing.T) {
 			gedcom.NewDateNode("Bar", "", nil),
 			0,
 		},
+
+		// Nil cases
+		{
+			nil,
+			gedcom.NewDateNode("Jan 1845", "", nil),
+			0.5,
+		},
+		{
+			gedcom.NewDateNode("Jan 1845", "", nil),
+			nil,
+			0.5,
+		},
+		{
+			nil,
+			nil,
+			0.5,
+		},
 	}
 
 	for _, test := range tests {
-		t.Run(test.date1.Value(), func(t *testing.T) {
+		t.Run("", func(t *testing.T) {
 			similarity := test.date1.Similarity(test.date2, 10)
 			assert.Equal(t, test.expected, similarity)
 		})

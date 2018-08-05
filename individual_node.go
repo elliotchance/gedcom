@@ -272,3 +272,54 @@ func (node *IndividualNode) EstimatedDeathDate() *DateNode {
 	// bestMatch will be nil if there were no date nodes found.
 	return bestMatch
 }
+
+// Similarity calculates how similar two individuals are. The returned value
+// will be between 0.0 and 1.0 where 1.0 means an exact match.
+//
+// The similarity is based off three equally weighted components, the
+// individuals name, estimated birth and estimated death date and is calculated
+// as follows:
+//
+//   similarity = (nameSimilarity + birthSimilarity + deathSimilarity) / 3
+//
+// Individual names are compared with the StringSimilarity function that does
+// not consider the punctuation and extra spacing.
+//
+// An individual may have more than one name, if this is the case then each name
+// is checked and the highest matching combination is used.
+//
+// The birth and death dates use the EstimatedBirthDate and EstimatedDeathDate
+// functions respectively. These functions are allowed to make some estimates
+// when critical information like the birth date does not exist so there is more
+// data to include in the comparison.
+//
+// Both dates are compared with the DateNode.Similarity function, which also
+// returns a value of 0.0 to 1.0. To put simply the dates must existing within
+// an error margin (for example, 10 years in either direction). Higher scores
+// are awarded to dates that are more relatively closer to each other on a
+// parabola. See DateNode.Similarity for a full explanation of how it deals with
+// approximate dates and date ranges.
+func (node *IndividualNode) Similarity(other *IndividualNode) float64 {
+	// Compare the matrix of names.
+	nameSimilarity := 0.0
+
+	for _, name1 := range node.Names() {
+		for _, name2 := range other.Names() {
+			similarity := StringSimilarity(name1.String(), name2.String())
+
+			if similarity > nameSimilarity {
+				nameSimilarity = similarity
+			}
+		}
+	}
+
+	// Compare the dates.
+	birthSimilarity := node.EstimatedBirthDate().
+		Similarity(other.EstimatedBirthDate(), DefaultMaxYearsForSimilarity)
+
+	deathSimilarity := node.EstimatedDeathDate().
+		Similarity(other.EstimatedDeathDate(), DefaultMaxYearsForSimilarity)
+
+	// Final calculation.
+	return (nameSimilarity + birthSimilarity + deathSimilarity) / 3.0
+}

@@ -9,6 +9,16 @@ import (
 	"time"
 )
 
+// DefaultMaxYearsForSimilarity is a sensible default for the Similarity
+// function (maxYears) when comparing dates. The importance of maxYears is
+// explained in DateNode.Similarity.
+//
+// Unless you need to ensure similarity values are retained correctly through
+// versions you should use this constant instead of specifying a raw value to
+// DateNode.Simialrity. This value may change in time if a more accurate default
+// is found.
+const DefaultMaxYearsForSimilarity = float64(10)
+
 // DateNode represents a DATE node.
 //
 // A date in GEDCOM always represents a range contained between the StartDate()
@@ -283,6 +293,12 @@ func (node *DateNode) Years() float64 {
 // (or date ranges) are to each other. 1.0 would mean that the dates are exactly
 // the same, whereas 0.0 would mean that they are not similar at all.
 //
+// Similarity is safe to use when either date is nil. If either side is nil then
+// 0.5 is returned. Not because they are similar but because there is not enough
+// information to make the distinction either way. This is important when using
+// date comparisons in combination or part of larger calculations where missing
+// data on both sides does not lead to very low scores unnecessarily.
+//
 // The returned value is calculated on a parabola that awards higher values to
 // dates that are proportionally closer to each other. That is, dates that are
 // twice as close will have more than twice the score. This attempts to satisfy
@@ -300,8 +316,14 @@ func (node *DateNode) Years() float64 {
 // dates that could be commonly off by 10 years or more) or a smaller value when
 // dealing with recent dates that are provided in a more exact form.
 //
-// A sensible value for maxYears is 10.0.
+// A sensible default value for maxYears is provided with
+// DefaultMaxYearsForSimilarity. You should use this if you are unsure. There is
+// also more explanation on the constant.
 func (node *DateNode) Similarity(node2 *DateNode, maxYears float64) float64 {
+	if node == nil || node2 == nil {
+		return 0.5
+	}
+
 	similarity := math.Pow((node.Years()-node2.Years())/maxYears, 2)
 
 	// When one date is invalid the similarity will go asymptotic.

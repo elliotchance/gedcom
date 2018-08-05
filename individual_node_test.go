@@ -678,3 +678,221 @@ func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 		})
 	}
 }
+
+func born(value string) gedcom.Node {
+	return gedcom.NewSimpleNode(gedcom.TagBirth, "", "", []gedcom.Node{
+		gedcom.NewDateNode(value, "", []gedcom.Node{}),
+	})
+}
+
+func died(value string) gedcom.Node {
+	return gedcom.NewSimpleNode(gedcom.TagDeath, "", "", []gedcom.Node{
+		gedcom.NewDateNode(value, "", []gedcom.Node{}),
+	})
+}
+
+func name(value string) gedcom.Node {
+	return gedcom.NewNameNode(value, "", nil)
+}
+
+func baptised(value string) gedcom.Node {
+	return gedcom.NewSimpleNode(gedcom.TagBaptism, "", "", []gedcom.Node{
+		gedcom.NewDateNode(value, "", []gedcom.Node{}),
+	})
+}
+
+func buried(value string) gedcom.Node {
+	return gedcom.NewSimpleNode(gedcom.TagBurial, "", "", []gedcom.Node{
+		gedcom.NewDateNode(value, "", []gedcom.Node{}),
+	})
+}
+
+func TestIndividualNode_Similarity(t *testing.T) {
+	var tests = []struct {
+		a, b     *gedcom.IndividualNode
+		expected float64
+	}{
+		// Empty cases.
+		{
+			a:        gedcom.NewIndividualNode("", "P1", nil),
+			b:        gedcom.NewIndividualNode("", "P1", nil),
+			expected: 0.3333333333333333,
+		},
+		{
+			a:        gedcom.NewIndividualNode("", "P1", []gedcom.Node{}),
+			b:        gedcom.NewIndividualNode("", "P1", []gedcom.Node{}),
+			expected: 0.3333333333333333,
+		},
+
+		// Perfect cases.
+		{
+			// All details match exactly.
+			a: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Elliot Rupert de Peyster /Chance/"),
+				born("4 Jan 1843"),
+				died("17 Mar 1907"),
+			}),
+			b: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Elliot Rupert de Peyster /Chance/"),
+				born("4 Jan 1843"),
+				died("17 Mar 1907"),
+			}),
+			expected: 1.0,
+		},
+		{
+			// Extra names, but one name is still a perfect match.
+			a: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Elliot Rupert de Peyster /Chance/"),
+				name("Elliot Rupert /Chance/"),
+				born("4 Jan 1843"),
+				died("17 Mar 1907"),
+			}),
+			b: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Elliot R d P /Chance/"),
+				name("Elliot Rupert de Peyster /Chance/"),
+				born("4 Jan 1843"),
+				died("17 Mar 1907"),
+			}),
+			expected: 1.0,
+		},
+		{
+			// Name are not senstive to case or whitespace.
+			a: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Elliot /Chance/"),
+				born("4 Jan 1843"),
+				died("17 Mar 1907"),
+			}),
+			b: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("elliot /CHANCE/"),
+				born("4 Jan 1843"),
+				died("17 Mar 1907"),
+			}),
+			expected: 1.0,
+		},
+
+		// Almost perfect matches.
+		{
+			// Name is more/less complete.
+			a: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Elliot Rupert de Peyster /Chance/"),
+				born("4 Jan 1843"),
+				died("17 Mar 1907"),
+			}),
+			b: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Elliot Rupert /Chance/"),
+				born("4 Jan 1843"),
+				died("17 Mar 1907"),
+			}),
+			expected: 0.9663440860215053,
+		},
+		{
+			// Last name is similar.
+			a: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Elliot Rupert de Peyster /Chance/"),
+				born("4 Jan 1843"),
+				died("17 Mar 1907"),
+			}),
+			b: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Elliot Rupert de Peyster /Chaunce/"),
+				born("4 Jan 1843"),
+				died("17 Mar 1907"),
+			}),
+			expected: 0.995766129032258,
+		},
+		{
+			// Birth date is less specific.
+			a: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Elliot Rupert de Peyster /Chance/"),
+				born("4 Jan 1843"),
+				died("17 Mar 1907"),
+			}),
+			b: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Elliot Rupert de Peyster /Chance/"),
+				born("Jan 1843"),
+				died("17 Mar 1907"),
+			}),
+			expected: 0.999996416733853,
+		},
+		{
+			// Death date is less specific.
+			a: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Elliot Rupert de Peyster /Chance/"),
+				born("4 Jan 1843"),
+				died("17 Mar 1907"),
+			}),
+			b: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Elliot Rupert de Peyster /Chance/"),
+				born("4 Jan 1843"),
+				died("Mar 1907"),
+			}),
+			expected: 0.9999999751162073,
+		},
+
+		// Estimated birth/death.
+		{
+			a: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Elliot Rupert de Peyster /Chance/"),
+				baptised("Abt. 1843"),
+				died("17 Mar 1907"),
+			}),
+			b: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Elliot Rupert de Peyster /Chance/"),
+				born("4 Jan 1843"),
+				died("Mar 1907"),
+			}),
+			expected: 0.9992026735146867,
+		},
+		{
+			a: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Elliot Rupert de Peyster /Chance/"),
+				baptised("Abt. 1843"),
+				died("17 Mar 1907"),
+			}),
+			b: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Elliot Rupert de Peyster /Chance/"),
+				born("4 Jan 1843"),
+				buried("Aft. 20 Mar 1907"),
+			}),
+			expected: 0.9992024744443452,
+		},
+
+		// Missing dates.
+		{
+			a: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Elliot Rupert de Peyster /Chance/"),
+				died("Abt. 1907"),
+			}),
+			b: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Elliot Rupert /Chance/"),
+				died("1909"),
+			}),
+			expected: 0.7863440860215053,
+		},
+		{
+			a: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Elliot Rupert de Peyster /Chance/"),
+				baptised("after Sep 1823"),
+			}),
+			b: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Elliot Rupert /Chance/"),
+				born("Between 1822 and 1823"),
+			}),
+			expected: 0.7980146283388829,
+		},
+		{
+			a: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Elliot Rupert de Peyster /Chance/"),
+			}),
+			b: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				name("Elliot Rupert /Chance/"),
+			}),
+			expected: 0.633010752688172,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run("", func(t *testing.T) {
+			assert.Equal(t, test.a.Similarity(test.b), test.expected)
+		})
+	}
+}
