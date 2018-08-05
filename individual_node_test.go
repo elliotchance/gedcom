@@ -436,3 +436,59 @@ func TestIndividualNode_Descent(t *testing.T) {
 		})
 	}
 }
+
+func TestIndividualNode_LDSBaptisms(t *testing.T) {
+	var tests = []struct {
+		node     *gedcom.IndividualNode
+		baptisms []gedcom.Node
+	}{
+		{
+			node:     gedcom.NewIndividualNode("", "P1", nil),
+			baptisms: []gedcom.Node{},
+		},
+		{
+			node:     gedcom.NewIndividualNode("", "P1", []gedcom.Node{}),
+			baptisms: []gedcom.Node{},
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagLDSBaptism, "", "", []gedcom.Node{}),
+			}),
+			baptisms: []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagLDSBaptism, "", "", []gedcom.Node{}),
+			},
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagBaptism, "", "", []gedcom.Node{}),
+			}),
+			baptisms: []gedcom.Node{},
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagLDSBaptism, "", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode(gedcom.TagDeath, "", "", []gedcom.Node{}),
+			}),
+			baptisms: []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagLDSBaptism, "", "", []gedcom.Node{}),
+			},
+		},
+		{
+			node: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagLDSBaptism, "foo", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode(gedcom.TagDeath, "", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode(gedcom.TagLDSBaptism, "bar", "", []gedcom.Node{}),
+			}),
+			baptisms: []gedcom.Node{
+				gedcom.NewSimpleNode(gedcom.TagLDSBaptism, "foo", "", []gedcom.Node{}),
+				gedcom.NewSimpleNode(gedcom.TagLDSBaptism, "bar", "", []gedcom.Node{}),
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run("", func(t *testing.T) {
+			assert.Equal(t, test.node.LDSBaptisms(), test.baptisms)
+		})
+	}
+}

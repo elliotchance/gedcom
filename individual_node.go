@@ -178,3 +178,9 @@ func (node *IndividualNode) Descent(doc *Document) *Descent {
 
 	return descent
 }
+
+// LDSBaptisms returns zero or more LDS baptism events for the individual. These
+// are not to be confused with Baptisms().
+func (node *IndividualNode) LDSBaptisms() []Node {
+	return NodesWithTag(node, TagLDSBaptism)
+}
