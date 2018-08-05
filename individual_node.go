@@ -5,6 +5,16 @@ type IndividualNode struct {
 	*SimpleNode
 }
 
+// SpouseChildren connects a single spouse to a set of children. The children
+// may appear under multiple spouses. This is only useful when in combination
+// with an individual (that would be the other spouse).
+//
+// The spouse can be nil, indicating that the spouse it not known for the
+// assigned children. You should not assume that you can also recover the other
+// spouse from one of the keys in this map as the map is valid to be empty or to
+// only contain a nil key.
+type SpouseChildren map[*IndividualNode]IndividualNodes
+
 func NewIndividualNode(value, pointer string, children []Node) *IndividualNode {
 	return &IndividualNode{
 		NewSimpleNode(TagIndividual, value, pointer, children),
@@ -141,18 +151,34 @@ func (node *IndividualNode) Burials() []Node {
 	return NodesWithTag(node, TagBurial)
 }
 
-// Descent collects the immediate relationships of an individual.
-func (node *IndividualNode) Descent(doc *Document) *Descent {
-	descent := &Descent{
-		Parents:        []*FamilyNode{},
-		Individual:     node,
-		SpouseChildren: map[*IndividualNode]IndividualNodes{},
-	}
+// Parents returns the families for which this individual is a child. There may
+// be zero or more parents for an individual. The families returned will all
+// reference this individual as child. However the father, mother or both may
+// not exist.
+//
+// It is also possible to have duplicate families. That is, families that have
+// the same husband and wife combinations if these families are defined in the
+// GEDCOM file.
+func (node *IndividualNode) Parents(doc *Document) []*FamilyNode {
+	parents := []*FamilyNode{}
 
 	for _, family := range node.Families(doc) {
 		if family.HasChild(doc, node) {
-			descent.Parents = append(descent.Parents, family)
-		} else {
+			parents = append(parents, family)
+		}
+	}
+
+	return parents
+}
+
+// SpouseChildren maps the known spouses to their children. The spouse will be
+// nil if the other parent is not known for some or all of the children.
+// Children can appear under multiple spouses.
+func (node *IndividualNode) SpouseChildren(doc *Document) SpouseChildren {
+	spouseChildren := map[*IndividualNode]IndividualNodes{}
+
+	for _, family := range node.Families(doc) {
+		if !family.HasChild(doc, node) {
 			var spouse *IndividualNode
 
 			if family.Husband(doc).Is(node) {
@@ -166,17 +192,17 @@ func (node *IndividualNode) Descent(doc *Document) *Descent {
 			if familyWithSpouse != nil {
 				children = familyWithSpouse.Children(doc)
 			}
-			descent.SpouseChildren[spouse] = children
+			spouseChildren[spouse] = children
 
 			// Find children with unknown spouse.
 			unknownSpouseFamily := node.FamilyWithUnknownSpouse(doc)
 			if unknownSpouseFamily != nil {
-				descent.SpouseChildren[nil] = unknownSpouseFamily.Children(doc)
+				spouseChildren[nil] = unknownSpouseFamily.Children(doc)
 			}
 		}
 	}
 
-	return descent
+	return spouseChildren
 }
 
 // LDSBaptisms returns zero or more LDS baptism events for the individual. These

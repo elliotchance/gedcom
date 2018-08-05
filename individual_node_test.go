@@ -283,7 +283,7 @@ func TestIndividualNode_Burials(t *testing.T) {
 	}
 }
 
-func TestIndividualNode_Descent(t *testing.T) {
+func getDocument() *gedcom.Document {
 	// The following document has this tree:
 	//
 	//      ?  --- P3
@@ -343,96 +343,130 @@ func TestIndividualNode_Descent(t *testing.T) {
 		gedcom.NewSimpleNode(gedcom.TagChild, "@P6@", "", nil),
 	})
 
-	doc := &gedcom.Document{
+	return &gedcom.Document{
 		Nodes: []gedcom.Node{
 			p1, p2, p3, p4, p5, p6, p7, p8,
 			f1, f2, f3, f4,
 		},
 	}
+}
+
+func TestIndividualNode_Parents(t *testing.T) {
+	doc := getDocument()
 
 	var tests = []struct {
 		node    *gedcom.IndividualNode
-		descent *gedcom.Descent
+		parents []*gedcom.FamilyNode
 	}{
 		{
-			node: p1,
-			descent: &gedcom.Descent{
-				Parents:    []*gedcom.FamilyNode{},
-				Individual: p1,
-				SpouseChildren: map[*gedcom.IndividualNode]gedcom.IndividualNodes{
-					p3: {p4, p5},
-					p2: {p6},
-				},
-			},
+			node:    doc.Individuals()[0],
+			parents: []*gedcom.FamilyNode{},
 		},
 		{
-			node: p2,
-			descent: &gedcom.Descent{
-				Parents:    []*gedcom.FamilyNode{},
-				Individual: p2,
-				SpouseChildren: map[*gedcom.IndividualNode]gedcom.IndividualNodes{
-					p1: {p6},
-				},
-			},
+			node:    doc.Individuals()[1],
+			parents: []*gedcom.FamilyNode{},
 		},
 		{
-			node: p3,
-			descent: &gedcom.Descent{
-				Parents:    []*gedcom.FamilyNode{},
-				Individual: p3,
-				SpouseChildren: map[*gedcom.IndividualNode]gedcom.IndividualNodes{
-					p1:  {p4, p5},
-					nil: {p6},
-				},
-			},
+			node:    doc.Individuals()[2],
+			parents: []*gedcom.FamilyNode{},
 		},
 		{
-			node: p4,
-			descent: &gedcom.Descent{
-				Parents:        []*gedcom.FamilyNode{f1},
-				Individual:     p4,
-				SpouseChildren: map[*gedcom.IndividualNode]gedcom.IndividualNodes{},
-			},
+			node:    doc.Individuals()[3],
+			parents: []*gedcom.FamilyNode{doc.Families()[0]},
 		},
 		{
-			node: p5,
-			descent: &gedcom.Descent{
-				Parents:        []*gedcom.FamilyNode{f1},
-				Individual:     p5,
-				SpouseChildren: map[*gedcom.IndividualNode]gedcom.IndividualNodes{},
-			},
+			node:    doc.Individuals()[4],
+			parents: []*gedcom.FamilyNode{doc.Families()[0]},
 		},
 		{
-			node: p6,
-			descent: &gedcom.Descent{
-				Parents:    []*gedcom.FamilyNode{f2, f4},
-				Individual: p6,
-				SpouseChildren: map[*gedcom.IndividualNode]gedcom.IndividualNodes{
-					nil: {p7},
-				},
-			},
+			node:    doc.Individuals()[5],
+			parents: []*gedcom.FamilyNode{doc.Families()[1], doc.Families()[3]},
 		},
 		{
-			node: p7,
-			descent: &gedcom.Descent{
-				Parents:        []*gedcom.FamilyNode{f3},
-				Individual:     p7,
-				SpouseChildren: map[*gedcom.IndividualNode]gedcom.IndividualNodes{},
-			},
+			node:    doc.Individuals()[6],
+			parents: []*gedcom.FamilyNode{doc.Families()[2]},
 		},
 		{
-			node: p8,
-			descent: &gedcom.Descent{
-				Parents:        []*gedcom.FamilyNode{},
-				Individual:     p8,
-				SpouseChildren: map[*gedcom.IndividualNode]gedcom.IndividualNodes{},
-			},
+			node:    doc.Individuals()[7],
+			parents: []*gedcom.FamilyNode{},
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.node.Pointer(), func(t *testing.T) {
-			assert.Equal(t, test.node.Descent(doc), test.descent)
+			assert.Equal(t, test.node.Parents(doc), test.parents)
+		})
+	}
+}
+
+func TestIndividualNode_SpouseChildren(t *testing.T) {
+	doc := getDocument()
+
+	var tests = []struct {
+		node     *gedcom.IndividualNode
+		expected gedcom.SpouseChildren
+	}{
+		{
+			node: doc.Individuals()[0],
+			expected: gedcom.SpouseChildren{
+				doc.Individuals()[2]: {
+					doc.Individuals()[3],
+					doc.Individuals()[4],
+				},
+				doc.Individuals()[1]: {
+					doc.Individuals()[5],
+				},
+			},
+		},
+		{
+			node: doc.Individuals()[1],
+			expected: gedcom.SpouseChildren{
+				doc.Individuals()[0]: {
+					doc.Individuals()[5],
+				},
+			},
+		},
+		{
+			node: doc.Individuals()[2],
+			expected: gedcom.SpouseChildren{
+				doc.Individuals()[0]: {
+					doc.Individuals()[3],
+					doc.Individuals()[4],
+				},
+				nil: {
+					doc.Individuals()[5],
+				},
+			},
+		},
+		{
+			node:     doc.Individuals()[3],
+			expected: gedcom.SpouseChildren{},
+		},
+		{
+			node:     doc.Individuals()[4],
+			expected: gedcom.SpouseChildren{},
+		},
+		{
+			node: doc.Individuals()[5],
+			expected: gedcom.SpouseChildren{
+				nil: {
+					doc.Individuals()[6],
+				},
+			},
+		},
+		{
+			node:     doc.Individuals()[6],
+			expected: gedcom.SpouseChildren{},
+		},
+		{
+			node:     doc.Individuals()[7],
+			expected: gedcom.SpouseChildren{},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.node.Pointer(), func(t *testing.T) {
+			assert.Equal(t, test.expected, test.node.SpouseChildren(doc))
 		})
 	}
 }
