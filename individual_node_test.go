@@ -282,3 +282,157 @@ func TestIndividualNode_Burials(t *testing.T) {
 		})
 	}
 }
+
+func TestIndividualNode_Descent(t *testing.T) {
+	// The following document has this tree:
+	//
+	//      ?  --- P3
+	// P3 - P1 --- P2    P8
+	//    |     |
+	//  -----   |
+	// P4   P5  P6 -- ?
+	//              |
+	//              P7
+	//
+	// - P3 and P2 are two wives of P1.
+	// - P8 does not connect to anything.
+	// - P3 is the alternate mother of P6.
+
+	p1 := gedcom.NewIndividualNode("", "P1", nil)
+	p2 := gedcom.NewIndividualNode("", "P2", nil)
+	p3 := gedcom.NewIndividualNode("", "P3", nil)
+	p4 := gedcom.NewIndividualNode("", "P4", nil)
+	p5 := gedcom.NewIndividualNode("", "P5", nil)
+	p6 := gedcom.NewIndividualNode("", "P6", nil)
+	p7 := gedcom.NewIndividualNode("", "P7", nil)
+	p8 := gedcom.NewIndividualNode("", "P8", nil)
+
+	// P1 - P3
+	//    |
+	//  -----
+	// P4   P5
+	f1 := gedcom.NewFamilyNode("F1", []gedcom.Node{
+		gedcom.NewSimpleNode(gedcom.TagHusband, "@P1@", "", nil),
+		gedcom.NewSimpleNode(gedcom.TagWife, "@P3@", "", nil),
+		gedcom.NewSimpleNode(gedcom.TagChild, "@P4@", "", nil),
+		gedcom.NewSimpleNode(gedcom.TagChild, "@P5@", "", nil),
+	})
+
+	// P1 - P2
+	//    |
+	//   P6
+	f2 := gedcom.NewFamilyNode("F2", []gedcom.Node{
+		gedcom.NewSimpleNode(gedcom.TagHusband, "@P1@", "", nil),
+		gedcom.NewSimpleNode(gedcom.TagWife, "@P2@", "", nil),
+		gedcom.NewSimpleNode(gedcom.TagChild, "@P6@", "", nil),
+	})
+
+	// P6 - ?
+	//    |
+	//   P7
+	f3 := gedcom.NewFamilyNode("F3", []gedcom.Node{
+		gedcom.NewSimpleNode(gedcom.TagHusband, "@P6@", "", nil),
+		gedcom.NewSimpleNode(gedcom.TagChild, "@P7@", "", nil),
+	})
+
+	// ? - P3
+	//   |
+	//   P6
+	f4 := gedcom.NewFamilyNode("F4", []gedcom.Node{
+		gedcom.NewSimpleNode(gedcom.TagWife, "@P3@", "", nil),
+		gedcom.NewSimpleNode(gedcom.TagChild, "@P6@", "", nil),
+	})
+
+	doc := &gedcom.Document{
+		Nodes: []gedcom.Node{
+			p1, p2, p3, p4, p5, p6, p7, p8,
+			f1, f2, f3, f4,
+		},
+	}
+
+	var tests = []struct {
+		node    *gedcom.IndividualNode
+		descent *gedcom.Descent
+	}{
+		{
+			node: p1,
+			descent: &gedcom.Descent{
+				Parents:    []*gedcom.FamilyNode{},
+				Individual: p1,
+				SpouseChildren: map[*gedcom.IndividualNode][]*gedcom.IndividualNode{
+					p3: {p4, p5},
+					p2: {p6},
+				},
+			},
+		},
+		{
+			node: p2,
+			descent: &gedcom.Descent{
+				Parents:    []*gedcom.FamilyNode{},
+				Individual: p2,
+				SpouseChildren: map[*gedcom.IndividualNode][]*gedcom.IndividualNode{
+					p1: {p6},
+				},
+			},
+		},
+		{
+			node: p3,
+			descent: &gedcom.Descent{
+				Parents:    []*gedcom.FamilyNode{},
+				Individual: p3,
+				SpouseChildren: map[*gedcom.IndividualNode][]*gedcom.IndividualNode{
+					p1:  {p4, p5},
+					nil: {p6},
+				},
+			},
+		},
+		{
+			node: p4,
+			descent: &gedcom.Descent{
+				Parents:        []*gedcom.FamilyNode{f1},
+				Individual:     p4,
+				SpouseChildren: map[*gedcom.IndividualNode][]*gedcom.IndividualNode{},
+			},
+		},
+		{
+			node: p5,
+			descent: &gedcom.Descent{
+				Parents:        []*gedcom.FamilyNode{f1},
+				Individual:     p5,
+				SpouseChildren: map[*gedcom.IndividualNode][]*gedcom.IndividualNode{},
+			},
+		},
+		{
+			node: p6,
+			descent: &gedcom.Descent{
+				Parents:    []*gedcom.FamilyNode{f2, f4},
+				Individual: p6,
+				SpouseChildren: map[*gedcom.IndividualNode][]*gedcom.IndividualNode{
+					nil: {p7},
+				},
+			},
+		},
+		{
+			node: p7,
+			descent: &gedcom.Descent{
+				Parents:        []*gedcom.FamilyNode{f3},
+				Individual:     p7,
+				SpouseChildren: map[*gedcom.IndividualNode][]*gedcom.IndividualNode{},
+			},
+		},
+		{
+			node: p8,
+			descent: &gedcom.Descent{
+				Parents:        []*gedcom.FamilyNode{},
+				Individual:     p8,
+				SpouseChildren: map[*gedcom.IndividualNode][]*gedcom.IndividualNode{},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.node.Pointer(), func(t *testing.T) {
+			assert.Equal(t, test.node.Descent(doc), test.descent)
+		})
+	}
+}

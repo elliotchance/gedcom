@@ -100,6 +100,20 @@ func (node *IndividualNode) FamilyWithSpouse(doc *Document, spouse *IndividualNo
 }
 
 // TODO: needs tests
+func (node *IndividualNode) FamilyWithUnknownSpouse(doc *Document) *FamilyNode {
+	for _, family := range doc.Families() {
+		a := family.Husband(doc).Is(node) && family.Wife(doc) == nil
+		b := family.Wife(doc).Is(node) && family.Husband(doc) == nil
+
+		if a || b {
+			return family
+		}
+	}
+
+	return nil
+}
+
+// TODO: needs tests
 func (node *IndividualNode) IsLiving() bool {
 	return len(NodesWithTag(node, TagDeath)) == 0
 }
@@ -125,4 +139,42 @@ func (node *IndividualNode) Deaths() []Node {
 // Burials returns zero or more burial events for the individual.
 func (node *IndividualNode) Burials() []Node {
 	return NodesWithTag(node, TagBurial)
+}
+
+// Descent collects the immediate relationships of an individual.
+func (node *IndividualNode) Descent(doc *Document) *Descent {
+	descent := &Descent{
+		Parents:        []*FamilyNode{},
+		Individual:     node,
+		SpouseChildren: map[*IndividualNode][]*IndividualNode{},
+	}
+
+	for _, family := range node.Families(doc) {
+		if family.HasChild(doc, node) {
+			descent.Parents = append(descent.Parents, family)
+		} else {
+			var spouse *IndividualNode
+
+			if family.Husband(doc).Is(node) {
+				spouse = family.Wife(doc)
+			} else {
+				spouse = family.Husband(doc)
+			}
+
+			familyWithSpouse := node.FamilyWithSpouse(doc, spouse)
+			var children []*IndividualNode
+			if familyWithSpouse != nil {
+				children = familyWithSpouse.Children(doc)
+			}
+			descent.SpouseChildren[spouse] = children
+
+			// Find children with unknown spouse.
+			unknownSpouseFamily := node.FamilyWithUnknownSpouse(doc)
+			if unknownSpouseFamily != nil {
+				descent.SpouseChildren[nil] = unknownSpouseFamily.Children(doc)
+			}
+		}
+	}
+
+	return descent
 }
