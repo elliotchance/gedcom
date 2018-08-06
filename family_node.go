@@ -57,3 +57,21 @@ func (node *FamilyNode) HasChild(document *Document, individual *IndividualNode)
 
 	return false
 }
+
+// Similarity calculates the similarity between two families.
+//
+// The depth controls how many generations should be compared. A depth of 0 will
+// only compare the husband/wife and not take into account any children. At the
+// moment only a depth of 0 is supported. Any other depth will raise panic.
+func (node *FamilyNode) Similarity(document *Document, other *FamilyNode, depth int) float64 {
+	if depth != 0 {
+		panic("depth can only be 0")
+	}
+
+	// It does not matter if any of the partners are nil, Similarity will handle
+	// these gracefully.
+	husband := node.Husband(document).Similarity(other.Husband(document))
+	wife := node.Wife(document).Similarity(other.Wife(document))
+
+	return (husband + wife) / 2
+}
