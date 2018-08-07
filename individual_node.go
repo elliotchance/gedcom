@@ -302,6 +302,9 @@ func (node *IndividualNode) EstimatedDeathDate() *DateNode {
 // Similarity calculates how similar two individuals are. The returned value
 // will be between 0.0 and 1.0 where 1.0 means an exact match.
 //
+// You should prefer SurroundingSimilarity, a more advanced checker that uses
+// this function as part of it's ultimate analysis.
+//
 // The similarity is based off three equally weighted components, the
 // individuals name, estimated birth and estimated death date and is calculated
 // as follows:
@@ -358,4 +361,80 @@ func (node *IndividualNode) Similarity(other *IndividualNode) float64 {
 
 	// Final calculation.
 	return (nameSimilarity + birthSimilarity + deathSimilarity) / 3.0
+}
+
+// SurroundingSimilarity is a more advanced version of Similarity.
+// SurroundingSimilarity also takes into account the immediate surrounding
+// family. That is the parents, spouses and children have separate metrics
+// calculated so they can be interpreted differently or together.
+//
+// Checking for surrounding family is critical for calculating the similarity of
+// individuals that would otherwise be considered the same because of similar
+// names and dates in large family trees.
+//
+// SurroundingSimilarity returns a structure of the same name, but really it
+// calculates four discreet similarities:
+//
+// 1. IndividualSimilarity: This is the same as Individual.Similarity().
+//
+// 2. ParentsSimilarity: The similarity of the fathers and mothers of the
+// individual. Each missing parent will be given 0.5. If both parents are
+// missing the parent similarity will also be 0.5.
+//
+// An individual can have zero or more pairs of parents, but only a single
+// ParentsSimilarity is returned. The ParentsSimilarity is the highest value
+// when each of the parents are compared with the other parents of the other
+// individual.
+//
+// 3. SpousesSimilarity: The similarity of the spouses is compared with
+// IndividualNodes.Similarity() which is designed to compare several individuals
+// at once. It also handles comparing a different number of individuals on
+// either side.
+//
+// 4. ChildrenSimilarity: Children are also compared with
+// IndividualNodes.Similarity() but without respect to their parents (which in
+// this case would be the current individual and likely one of their spouses).
+// It is done this way as to not skew the results if any particular parent is
+// unknown or the child is connected to a different spouse.
+func (node *IndividualNode) SurroundingSimilarity(doc *Document, other *IndividualNode) (s SurroundingSimilarity) {
+	// Individual, spouse and children similarity only needs to be calculated
+	// once. The parents similarity will be calculated from the matrix below.
+	s.IndividualSimilarity = node.Similarity(other)
+	s.SpousesSimilarity = node.Spouses(doc).
+		Similarity(other.Spouses(doc), DefaultMinimumSimilarity)
+	s.ChildrenSimilarity = node.Children(doc).
+		Similarity(other.Children(doc), DefaultMinimumSimilarity)
+
+	didFindParents := false
+	for _, parents1 := range node.Parents(doc) {
+		for _, parents2 := range other.Parents(doc) {
+			didFindParents = true
+
+			// depth of 0 means only the wife/husband is compared.
+			similarity := parents1.Similarity(doc, parents2, 0)
+
+			if similarity > s.ParentsSimilarity {
+				s.ParentsSimilarity = similarity
+			}
+		}
+	}
+
+	if !didFindParents {
+		s.ParentsSimilarity = 0.5
+	}
+
+	return
+}
+
+// TODO: Needs tests
+func (node *IndividualNode) Children(doc *Document) IndividualNodes {
+	children := IndividualNodes{}
+
+	for _, family := range node.Families(doc) {
+		if !family.HasChild(doc, node) {
+			children = append(children, family.Children(doc)...)
+		}
+	}
+
+	return children
 }
