@@ -306,7 +306,7 @@ func (node *IndividualNode) EstimatedDeathDate() *DateNode {
 // individuals name, estimated birth and estimated death date and is calculated
 // as follows:
 //
-//   similarity = (nameSimilarity + birthSimilarity + deathSimilarity) / 3
+//   similarity = (nameSimilarity + birthSimilarity + deathSimilarity) / 3.0
 //
 // Individual names are compared with the StringSimilarity function that does
 // not consider the punctuation and extra spacing.
@@ -325,7 +325,17 @@ func (node *IndividualNode) EstimatedDeathDate() *DateNode {
 // are awarded to dates that are more relatively closer to each other on a
 // parabola. See DateNode.Similarity for a full explanation of how it deals with
 // approximate dates and date ranges.
+//
+// It is safe to use Similarity when one or both of the individuals are nil.
+// This will always result in a 0.5. It is a 0.5 not because it is a partial
+// match but that a positive or negative match cannot be determined. This is
+// important when Similarity is used is more extensive similarity calculations
+// as to not unnecessarily skew the results.
 func (node *IndividualNode) Similarity(other *IndividualNode) float64 {
+	if node == nil || other == nil {
+		return 0.5
+	}
+
 	// Compare the matrix of names.
 	nameSimilarity := 0.0
 

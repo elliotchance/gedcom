@@ -748,6 +748,21 @@ func TestIndividualNode_Similarity(t *testing.T) {
 	}{
 		// Empty cases.
 		{
+			a:        nil,
+			b:        nil,
+			expected: 0.5,
+		},
+		{
+			a:        nil,
+			b:        gedcom.NewIndividualNode("", "P1", nil),
+			expected: 0.5,
+		},
+		{
+			a:        gedcom.NewIndividualNode("", "P1", nil),
+			b:        nil,
+			expected: 0.5,
+		},
+		{
 			a:        gedcom.NewIndividualNode("", "P1", nil),
 			b:        gedcom.NewIndividualNode("", "P1", nil),
 			expected: 0.3333333333333333,
