@@ -8,6 +8,12 @@
   version = "v1.1.0"
 
 [[projects]]
+  name = "github.com/elliotchance/tf"
+  packages = ["."]
+  revision = "19eddf732266e5c6534eb45b6e1b5a1d17ccd717"
+  version = "v1.0.0"
+
+[[projects]]
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
@@ -41,6 +47,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "77e5a9e59f358930cda509347948a3fb91d24cc5bc986f09445f8c0303063b9a"
+  inputs-digest = "b7063d5a720f50e1eaa8e62c829eabab1e14d5fc51c45cb1a8e43be82bfb50b8"
   solver-name = "gps-cdcl"
   solver-version = 1
