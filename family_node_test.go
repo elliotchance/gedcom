@@ -202,7 +202,9 @@ func TestFamilyNode_Similarity(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			family1 := test.doc.Families()[0]
 			family2 := test.doc.Families()[1]
-			assert.Equal(t, test.expected, family1.Similarity(test.doc, family2, 0))
+			got := family1.Similarity(test.doc, test.doc, family2, 0)
+
+			assert.Equal(t, test.expected, got)
 		})
 	}
 }

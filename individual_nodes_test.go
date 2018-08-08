@@ -1,9 +1,10 @@
 package gedcom_test
 
 import (
+	"testing"
+
 	"github.com/elliotchance/gedcom"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestIndividualNodes_Similarity(t *testing.T) {
@@ -329,6 +330,102 @@ func TestIndividualNodes_Similarity(t *testing.T) {
 	for _, test := range tests {
 		t.Run("", func(t *testing.T) {
 			assert.Equal(t, test.a.Similarity(test.b, test.minSimilarity), test.expected)
+		})
+	}
+}
+
+func TestIndividualNodes_Compare(t *testing.T) {
+	elliot := individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907")
+	john := individual("P2", "John /Smith/", "4 Jan 1803", "17 Mar 1877")
+	jane := individual("P3", "Jane /Doe/", "3 Mar 1803", "14 June 1877")
+	bob := individual("P4", "Bob /Jones/", "1749", "1810")
+
+	tests := []struct {
+		doc1, doc2 *gedcom.Document
+		min        float64
+		want       []gedcom.IndividualComparison
+	}{
+		{
+			doc1: document(),
+			doc2: document(),
+			min:  0.0,
+			want: []gedcom.IndividualComparison{},
+		},
+		{
+			doc1: document(elliot),
+			doc2: document(),
+			min:  0.0,
+			want: []gedcom.IndividualComparison{
+				{elliot, nil, gedcom.SurroundingSimilarity{}},
+			},
+		},
+		{
+			doc1: document(),
+			doc2: document(elliot),
+			min:  0.0,
+			want: []gedcom.IndividualComparison{
+				{nil, elliot, gedcom.SurroundingSimilarity{}},
+			},
+		},
+		{
+			doc1: document(elliot),
+			doc2: document(elliot),
+			min:  0.0,
+			want: []gedcom.IndividualComparison{
+				{elliot, elliot, gedcom.SurroundingSimilarity{0.5, 1.0, 1.0, 1.0}},
+			},
+		},
+		{
+			doc1: document(elliot, john, jane),
+			doc2: document(jane, elliot, john),
+			min:  0.0,
+			want: []gedcom.IndividualComparison{
+				{elliot, elliot, gedcom.SurroundingSimilarity{0.5, 1.0, 1.0, 1.0}},
+				{john, john, gedcom.SurroundingSimilarity{0.5, 1.0, 1.0, 1.0}},
+				{jane, jane, gedcom.SurroundingSimilarity{0.5, 1.0, 1.0, 1.0}},
+			},
+		},
+		{
+			doc1: document(elliot, jane),
+			doc2: document(jane, john),
+			min:  0.0,
+			want: []gedcom.IndividualComparison{
+				// elliot and john match because the minimumSimilarity is so
+				// low.
+				{elliot, john, gedcom.SurroundingSimilarity{0.5, 0.16495726495726495, 1.0, 1.0}},
+				{jane, jane, gedcom.SurroundingSimilarity{0.5, 1.0, 1.0, 1.0}},
+			},
+		},
+		{
+			doc1: document(elliot, jane),
+			doc2: document(jane, john),
+			min:  0.75,
+			want: []gedcom.IndividualComparison{
+				{elliot, nil, gedcom.SurroundingSimilarity{}},
+				{jane, jane, gedcom.SurroundingSimilarity{0.5, 1.0, 1.0, 1.0}},
+				{nil, john, gedcom.SurroundingSimilarity{}},
+			},
+		},
+		{
+			doc1: document(elliot, jane),
+			doc2: document(bob, john),
+			min:  0.9,
+			want: []gedcom.IndividualComparison{
+				{elliot, nil, gedcom.SurroundingSimilarity{}},
+				{jane, nil, gedcom.SurroundingSimilarity{}},
+				{nil, bob, gedcom.SurroundingSimilarity{}},
+				{nil, john, gedcom.SurroundingSimilarity{}},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run("", func(t *testing.T) {
+			individuals1 := test.doc1.Individuals()
+			individuals2 := test.doc2.Individuals()
+			got := individuals1.Compare(test.doc1, test.doc2, individuals2, test.min)
+
+			assert.Equal(t, test.want, got)
 		})
 	}
 }

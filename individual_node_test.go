@@ -1129,7 +1129,7 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			a := test.doc.Individuals()[0]
 			b := test.doc.Individuals()[1]
-			s := a.SurroundingSimilarity(test.doc, b)
+			s := a.SurroundingSimilarity(test.doc, test.doc, b)
 
 			assert.Equal(t, test.expected, s)
 		})
