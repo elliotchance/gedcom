@@ -30,3 +30,16 @@ type SurroundingSimilarity struct {
 	// is unknown or the child is connected to a different spouse.
 	ChildrenSimilarity float64
 }
+
+// WeightedSimilarity calculates a single similarity from all of the similarity
+// metrics with following weights:
+//
+//   IndividualSimilarity: 50%
+//   ParentsSimilarity: ~17%
+//   SpousesSimilarity: ~17%
+//   ChildrenSimilarity: ~17%
+//
+func (s SurroundingSimilarity) WeightedSimilarity() float64 {
+	return s.IndividualSimilarity/2.0 +
+		(s.ParentsSimilarity+s.SpousesSimilarity+s.ChildrenSimilarity)/6.0
+}
