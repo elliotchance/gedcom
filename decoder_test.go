@@ -214,10 +214,10 @@ var tests = map[string]*gedcom.Document{
 		Nodes: []gedcom.Node{
 			gedcom.NewIndividualNode("", "P221", []gedcom.Node{
 				gedcom.NewSimpleNode(gedcom.TagBirth, "", "", []gedcom.Node{
-					gedcom.NewSimpleNode(gedcom.TagDate, "1851", "", []gedcom.Node{}),
+					gedcom.NewDateNode("1851", "", []gedcom.Node{}),
 				}),
 				gedcom.NewSimpleNode(gedcom.TagDeath, "", "", []gedcom.Node{
-					gedcom.NewSimpleNode(gedcom.TagDate, "1856", "", []gedcom.Node{}),
+					gedcom.NewDateNode("1856", "", []gedcom.Node{}),
 				}),
 			}),
 		},
@@ -228,6 +228,11 @@ var tests = map[string]*gedcom.Document{
 				gedcom.NewSimpleNode(gedcom.TagHusband, "@P2@", "", []gedcom.Node{}),
 				gedcom.NewSimpleNode(gedcom.TagWife, "@P3@", "", []gedcom.Node{}),
 			}),
+		},
+	},
+	"0 DATE 1856": {
+		Nodes: []gedcom.Node{
+			gedcom.NewDateNode("1856", "", []gedcom.Node{}),
 		},
 	},
 }

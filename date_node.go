@@ -15,9 +15,13 @@ import (
 //
 // Unless you need to ensure similarity values are retained correctly through
 // versions you should use this constant instead of specifying a raw value to
-// DateNode.Simialrity. This value may change in time if a more accurate default
+// DateNode.Similarity. This value may change in time if a more accurate default
 // is found.
-const DefaultMaxYearsForSimilarity = float64(10)
+//
+// The gedcomtune tool was used to find an ideal value for this. Generally
+// speaking 2 - 3 years yielded much the same result. Any further in either
+// direction led to a drop in accuracy for matching individuals.
+const DefaultMaxYearsForSimilarity = float64(3)
 
 // DateNode represents a DATE node.
 //
@@ -125,6 +129,9 @@ const DefaultMaxYearsForSimilarity = float64(10)
 // The year 89 is treated as the year 89, not 1989, for example.
 type DateNode struct {
 	*SimpleNode
+	didParseDate    bool
+	parsedStartDate Date
+	parsedEndDate   Date
 }
 
 func NewDateNode(value, pointer string, children []Node) *DateNode {
@@ -135,6 +142,7 @@ func NewDateNode(value, pointer string, children []Node) *DateNode {
 			pointer:  pointer,
 			children: children,
 		},
+		false, Date{}, Date{},
 	}
 }
 
@@ -188,10 +196,12 @@ func parseMonthName(parts []string, monthPos int) (string, error) {
 	return CleanSpace(strings.ToLower(parts[monthPos])), nil
 }
 
+var dateRegexp = regexp.MustCompile(
+	fmt.Sprintf(`(?i)^(%s|%s|%s)? ?(\d+ )?(\w+ )?(\d+)$`,
+		DateWordsAbout, DateWordsBefore, DateWordsAfter))
+
 func parseDateParts(dateString string, isEndOfRange bool) Date {
-	dateRegexp := fmt.Sprintf(`(?i)^(%s|%s|%s)? ?(\d+ )?(\w+ )?(\d+)$`,
-		DateWordsAbout, DateWordsBefore, DateWordsAfter)
-	parts := regexp.MustCompile(dateRegexp).FindStringSubmatch(dateString)
+	parts := dateRegexp.FindStringSubmatch(dateString)
 
 	// Place holders for the locations of each regexp group.
 	constraintPos, dayPos, monthPos, yearPos := 1, 2, 3, 4
@@ -227,13 +237,25 @@ func parseDateParts(dateString string, isEndOfRange bool) Date {
 	}
 }
 
-func (node *DateNode) DateRange() (Date, Date) {
+var rangeRegexp = regexp.MustCompile(fmt.Sprintf(`(?i)^(%s) (.+) (%s) (.+)$`,
+	DateWordsBetween, DateWordsAnd))
+
+func (node *DateNode) DateRange() (startDate Date, endDate Date) {
+	// Parsing dates is very expensive. Cache them.
+	if node.didParseDate {
+		return node.parsedStartDate, node.parsedEndDate
+	}
+
+	defer func(node *DateNode) {
+		node.parsedStartDate = startDate
+		node.parsedEndDate = endDate
+		node.didParseDate = true
+	}(node)
+
 	dateString := CleanSpace(node.Value())
 
 	// Try to match a range first.
-	rangeRegexp := fmt.Sprintf(`(?i)^(%s) (.+) (%s) (.+)$`,
-		DateWordsBetween, DateWordsAnd)
-	parts := regexp.MustCompile(rangeRegexp).FindStringSubmatch(dateString)
+	parts := rangeRegexp.FindStringSubmatch(dateString)
 	if len(parts) > 0 {
 		return parseDateParts(parts[2], false), parseDateParts(parts[4], true)
 	}

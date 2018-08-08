@@ -1,8 +1,26 @@
 package gedcom
 
+// nodeCache is used by NodesWithTag. Even though the lookup of child tags are
+// fairly inexpensive it happens a lot and its common for the same paths to be
+// looked up many time. Especially when doing larger task like comparing GEDCOM
+// files.
+var nodeCache = map[Node]map[Tag][]Node{}
+
 // NodesWithTag returns the zero or more nodes that have a specific GEDCOM tag.
 // If the provided node is nil then an empty slice will always be returned.
-func NodesWithTag(node Node, tag Tag) []Node {
+func NodesWithTag(node Node, tag Tag) (result []Node) {
+	if v, ok := nodeCache[node][tag]; ok {
+		return v
+	}
+
+	defer func() {
+		if _, ok := nodeCache[node]; !ok {
+			nodeCache[node] = map[Tag][]Node{}
+		}
+
+		nodeCache[node][tag] = result
+	}()
+
 	nodes := []Node{}
 
 	if node != nil {

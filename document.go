@@ -1,6 +1,9 @@
 package gedcom
 
-import "bytes"
+import (
+	"bytes"
+	"os"
+)
 
 // Document represents a whole GEDCOM document. It is possible for a
 // Document to contain zero Nodes, this means the GEDCOM file was empty. It
@@ -8,6 +11,7 @@ import "bytes"
 type Document struct {
 	Nodes        []Node
 	pointerCache map[string]Node
+	families     []*FamilyNode
 }
 
 // String will render the entire GEDCOM document.
@@ -50,8 +54,16 @@ func (doc *Document) NodeByPointer(ptr string) Node {
 	return doc.pointerCache[ptr]
 }
 
-func (doc *Document) Families() []*FamilyNode {
-	families := []*FamilyNode{}
+func (doc *Document) Families() (families []*FamilyNode) {
+	if doc.families != nil {
+		return doc.families
+	}
+
+	defer func() {
+		doc.families = families
+	}()
+
+	families = []*FamilyNode{}
 
 	for _, node := range doc.Nodes {
 		if n, ok := node.(*FamilyNode); ok {
@@ -96,4 +108,18 @@ func (doc *Document) Sources() []*SourceNode {
 	}
 
 	return sources
+}
+
+// NewDocumentFromGEDCOMFile returns a decoded Document from the provided file.
+//
+// If the file does not exist, be read or parse then an error is returned and
+// the document will be nil.
+func NewDocumentFromGEDCOMFile(path string) (*Document, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+
+	decoder := NewDecoder(file)
+	return decoder.Decode()
 }

@@ -84,7 +84,7 @@ func TestIndividualNodes_Similarity(t *testing.T) {
 				}),
 			},
 			minSimilarity: gedcom.DefaultMinimumSimilarity,
-			expected:      0.8333333333333334,
+			expected:      0.875,
 		},
 		{
 			a: gedcom.IndividualNodes{
@@ -98,7 +98,7 @@ func TestIndividualNodes_Similarity(t *testing.T) {
 				}),
 			},
 			minSimilarity: gedcom.DefaultMinimumSimilarity,
-			expected:      0.5,
+			expected:      0.75,
 		},
 
 		// Similar matches but the same sized slice on both sides.
@@ -134,7 +134,7 @@ func TestIndividualNodes_Similarity(t *testing.T) {
 				}),
 			},
 			minSimilarity: gedcom.DefaultMinimumSimilarity,
-			expected:      0.8464260797907109,
+			expected:      0.872532146404072,
 		},
 
 		// The slices are different lengths. The same score should be returned
@@ -167,7 +167,7 @@ func TestIndividualNodes_Similarity(t *testing.T) {
 				}),
 			},
 			minSimilarity: gedcom.DefaultMinimumSimilarity,
-			expected:      0.7758258827110728,
+			expected:      0.7754008744441251,
 		},
 		{
 			a: gedcom.IndividualNodes{
@@ -197,7 +197,7 @@ func TestIndividualNodes_Similarity(t *testing.T) {
 				}),
 			},
 			minSimilarity: gedcom.DefaultMinimumSimilarity,
-			expected:      0.7758258827110728,
+			expected:      0.7754008744441251,
 		},
 
 		// Whenever one slice is empty the result will always be 0.5.
@@ -323,13 +323,17 @@ func TestIndividualNodes_Similarity(t *testing.T) {
 				}),
 			},
 			minSimilarity: 0.0,
-			expected:      0.4219135802469136,
+			expected:      0.45708333333333334,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run("", func(t *testing.T) {
-			assert.Equal(t, test.a.Similarity(test.b, test.minSimilarity), test.expected)
+			options := gedcom.NewSimilarityOptions()
+			options.MinimumSimilarity = test.minSimilarity
+			got := test.a.Similarity(test.b, options)
+
+			assert.Equal(t, test.expected, got)
 		})
 	}
 }
@@ -392,8 +396,8 @@ func TestIndividualNodes_Compare(t *testing.T) {
 			want: []gedcom.IndividualComparison{
 				// elliot and john match because the minimumSimilarity is so
 				// low.
-				{elliot, john, gedcom.SurroundingSimilarity{0.5, 0.16495726495726495, 1.0, 1.0}},
-				{jane, jane, gedcom.SurroundingSimilarity{0.5, 1.0, 1.0, 1.0}},
+				{jane, jane, gedcom.SurroundingSimilarity{0.5, 1, 1.0, 1.0}},
+				{elliot, john, gedcom.SurroundingSimilarity{0.5, 0.24743589743589745, 1.0, 1.0}},
 			},
 		},
 		{
@@ -401,8 +405,8 @@ func TestIndividualNodes_Compare(t *testing.T) {
 			doc2: document(jane, john),
 			min:  0.75,
 			want: []gedcom.IndividualComparison{
-				{elliot, nil, gedcom.SurroundingSimilarity{}},
 				{jane, jane, gedcom.SurroundingSimilarity{0.5, 1.0, 1.0, 1.0}},
+				{elliot, nil, gedcom.SurroundingSimilarity{}},
 				{nil, john, gedcom.SurroundingSimilarity{}},
 			},
 		},
@@ -421,9 +425,12 @@ func TestIndividualNodes_Compare(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run("", func(t *testing.T) {
+			options := gedcom.NewSimilarityOptions()
+			options.MinimumWeightedSimilarity = test.min
+
 			individuals1 := test.doc1.Individuals()
 			individuals2 := test.doc2.Individuals()
-			got := individuals1.Compare(test.doc1, test.doc2, individuals2, test.min)
+			got := individuals1.Compare(test.doc1, test.doc2, individuals2, options)
 
 			assert.Equal(t, test.want, got)
 		})

@@ -1,6 +1,8 @@
 package gedcom
 
-import "sort"
+import (
+	"sort"
+)
 
 // DefaultMinimumSimilarity is a sensible value to provide to the
 // minimumSimilarity parameter of IndividualNodes.Similarity.
@@ -8,7 +10,10 @@ import "sort"
 // It is quite possible that this value will change in the future if a more
 // accurate figure is found or the algorithm is generally tuned with different
 // weightings.
-const DefaultMinimumSimilarity = 0.7
+//
+// The value was chosen by running comparison experiments with gedcomtune, a
+// tool to try and find ideal values for constants like this.
+const DefaultMinimumSimilarity = 0.735
 
 // IndividualNodes is a collection of individuals.
 type IndividualNodes []*IndividualNode
@@ -130,7 +135,10 @@ type individualSimilarity struct {
 // This is designed this way on purpose as to not so eagerly match individuals
 // with incomplete information. Otherwise these would take a higher score for
 // matches of individuals that have a slightly different birth date.
-func (nodes IndividualNodes) Similarity(other IndividualNodes, minimumSimilarity float64) float64 {
+//
+// The options.MaxYears allows the error margin on dates to be adjusted. See
+// DefaultMaxYearsForSimilarity for more information.
+func (nodes IndividualNodes) Similarity(other IndividualNodes, options *SimilarityOptions) float64 {
 	// We have to catch this because otherwise it would lead to a divide-by-zero
 	// at the end.
 	if len(nodes) == 0 && len(other) == 0 {
@@ -151,7 +159,7 @@ func (nodes IndividualNodes) Similarity(other IndividualNodes, minimumSimilarity
 			similarities = append(similarities, &individualSimilarity{
 				a:          a,
 				b:          b,
-				similarity: a.Similarity(b),
+				similarity: a.Similarity(b, options),
 			})
 		}
 	}
@@ -166,7 +174,7 @@ func (nodes IndividualNodes) Similarity(other IndividualNodes, minimumSimilarity
 	winners := []*individualSimilarity{}
 	for _, s := range similarities {
 		// Once we have gone below the acceptable similarity we can bail out.
-		if s.similarity < minimumSimilarity {
+		if s.similarity < options.MinimumSimilarity {
 			break
 		}
 
@@ -220,43 +228,63 @@ type IndividualComparison struct {
 // guarantee that all the Left's are unique and belong to the current nodes.
 // Likewise all Right's will be unique and only belong to the other set.
 //
-// The minimumSimilarity sets a threshold of WeightedSimilarity(). Any matches
-// below minimumSimilarity will not be used.
-func (nodes IndividualNodes) Compare(doc1, doc2 *Document, other IndividualNodes, minimumSimilarity float64) []IndividualComparison {
-	comparisons := []IndividualComparison{}
+// The options.MinimumCompareSimilarity sets a threshold of
+// WeightedSimilarity(). Any matches below minimumSimilarity will not be used.
+func (nodes IndividualNodes) Compare(doc1, doc2 *Document, other IndividualNodes, options *SimilarityOptions) []IndividualComparison {
+	// Calculate all the similarities of the matrix.
+	similarities := []IndividualComparison{}
 
-	// Tracks individuals that already part of a match.
-	matched := map[*IndividualNode]bool{}
-
-	for _, left := range nodes {
-		comparison := IndividualComparison{
-			Left: left,
+	for _, a := range nodes {
+		for _, b := range other {
+			similarities = append(similarities, IndividualComparison{
+				Left:       a,
+				Right:      b,
+				Similarity: a.SurroundingSimilarity(doc1, doc2, b, options),
+			})
 		}
-
-		for _, right := range other {
-			s := left.SurroundingSimilarity(doc1, doc2, right)
-			weighted := s.WeightedSimilarity()
-			if weighted >= minimumSimilarity &&
-				weighted >= comparison.Similarity.WeightedSimilarity() {
-				comparison.Right = right
-				comparison.Similarity = s
-
-				matched[right] = true
-			}
-		}
-
-		comparisons = append(comparisons, comparison)
 	}
 
-	// All of the remaining right side need to be added.
+	// Sort by similarity.
+	sort.SliceStable(similarities, func(i, j int) bool {
+		return similarities[i].Similarity.WeightedSimilarity(options) >
+			similarities[j].Similarity.WeightedSimilarity(options)
+	})
+
+	// Find the winners.
+	found := map[*IndividualNode]bool{}
+	winners := []IndividualComparison{}
+	for _, s := range similarities {
+		// Once we have gone below the acceptable similarity we can bail out.
+		if s.Similarity.WeightedSimilarity(options) < options.MinimumWeightedSimilarity {
+			break
+		}
+
+		// We can only proceed with a match if both sides are unmatched.
+		if found[s.Left] == true || found[s.Right] == true {
+			continue
+		}
+
+		winners = append(winners, s)
+		found[s.Left] = true
+		found[s.Right] = true
+	}
+
+	// All of the remaining need to be added.
+	for _, left := range nodes {
+		if !found[left] {
+			winners = append(winners, IndividualComparison{
+				Left: left,
+			})
+		}
+	}
+
 	for _, right := range other {
-		if !matched[right] {
-			comparisons = append(comparisons, IndividualComparison{
-				// Left and Similarity will be nil.
+		if !found[right] {
+			winners = append(winners, IndividualComparison{
 				Right: right,
 			})
 		}
 	}
 
-	return comparisons
+	return winners
 }

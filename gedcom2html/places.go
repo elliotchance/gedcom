@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/elliotchance/gedcom"
-	"regexp"
 	"strings"
 )
 
@@ -33,7 +32,7 @@ func getPlaces(document *gedcom.Document) map[string]*place {
 				continue
 			}
 
-			key := regexp.MustCompile("[^a-z_0-9-]+").
+			key := alnumOrDashRegexp.
 				ReplaceAllString(strings.ToLower(prettyName), "-")
 
 			if _, ok := placesMap[key]; !ok {

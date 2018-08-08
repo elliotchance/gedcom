@@ -34,12 +34,14 @@ type SurroundingSimilarity struct {
 // WeightedSimilarity calculates a single similarity from all of the similarity
 // metrics with following weights:
 //
-//   IndividualSimilarity: 50%
-//   ParentsSimilarity: ~17%
-//   SpousesSimilarity: ~17%
-//   ChildrenSimilarity: ~17%
+//   IndividualSimilarity: 80%
+//   ParentsSimilarity: ~6.7%
+//   SpousesSimilarity: ~6.7%
+//   ChildrenSimilarity: ~6.7%
 //
-func (s SurroundingSimilarity) WeightedSimilarity() float64 {
-	return s.IndividualSimilarity/2.0 +
-		(s.ParentsSimilarity+s.SpousesSimilarity+s.ChildrenSimilarity)/6.0
+func (s SurroundingSimilarity) WeightedSimilarity(options *SimilarityOptions) float64 {
+	return (s.IndividualSimilarity * options.IndividualWeight) +
+		(s.ParentsSimilarity * options.ParentsWeight) +
+		(s.SpousesSimilarity * options.SpousesWeight) +
+		(s.ChildrenSimilarity * options.ChildrenWeight)
 }
