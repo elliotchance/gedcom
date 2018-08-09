@@ -195,3 +195,68 @@ func (nodes IndividualNodes) Similarity(other IndividualNodes, minimumSimilarity
 
 	return total / float64(wantedLength)
 }
+
+// IndividualComparison is the result of two compared individuals.
+type IndividualComparison struct {
+	// Left or Right may be nil, but never both.
+	Left, Right *IndividualNode
+
+	// Similarity will only contain a usable value if Left and Right are not
+	// nil. Otherwise, Similarity may contain any unexpected value.
+	Similarity SurroundingSimilarity
+}
+
+// Compare returns the matching individuals from two lists.
+//
+// It is expected that all of the individuals in a single slice come from the
+// same document. doc1 and doc2 are used as the Documents for the current and
+// other nodes respectively. If both sets of individuals come from the same
+// Document you must specify the same Document for both values.
+//
+// The length of the result slice will be no larger than the largest slice
+// provided and no smaller than the smallest slice provided.
+//
+// Individuals can only be matched once on their respective side so you can
+// guarantee that all the Left's are unique and belong to the current nodes.
+// Likewise all Right's will be unique and only belong to the other set.
+//
+// The minimumSimilarity sets a threshold of WeightedSimilarity(). Any matches
+// below minimumSimilarity will not be used.
+func (nodes IndividualNodes) Compare(doc1, doc2 *Document, other IndividualNodes, minimumSimilarity float64) []IndividualComparison {
+	comparisons := []IndividualComparison{}
+
+	// Tracks individuals that already part of a match.
+	matched := map[*IndividualNode]bool{}
+
+	for _, left := range nodes {
+		comparison := IndividualComparison{
+			Left: left,
+		}
+
+		for _, right := range other {
+			s := left.SurroundingSimilarity(doc1, doc2, right)
+			weighted := s.WeightedSimilarity()
+			if weighted >= minimumSimilarity &&
+				weighted >= comparison.Similarity.WeightedSimilarity() {
+				comparison.Right = right
+				comparison.Similarity = s
+
+				matched[right] = true
+			}
+		}
+
+		comparisons = append(comparisons, comparison)
+	}
+
+	// All of the remaining right side need to be added.
+	for _, right := range other {
+		if !matched[right] {
+			comparisons = append(comparisons, IndividualComparison{
+				// Left and Similarity will be nil.
+				Right: right,
+			})
+		}
+	}
+
+	return comparisons
+}

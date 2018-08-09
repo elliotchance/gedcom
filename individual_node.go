@@ -396,22 +396,26 @@ func (node *IndividualNode) Similarity(other *IndividualNode) float64 {
 // this case would be the current individual and likely one of their spouses).
 // It is done this way as to not skew the results if any particular parent is
 // unknown or the child is connected to a different spouse.
-func (node *IndividualNode) SurroundingSimilarity(doc *Document, other *IndividualNode) (s SurroundingSimilarity) {
+//
+// doc1 and doc2 are used as the Documents for the current and other node
+// respectively. If the two IndividualNodes come from the same Document you must
+// specify the same Document for both values.
+func (node *IndividualNode) SurroundingSimilarity(doc1, doc2 *Document, other *IndividualNode) (s SurroundingSimilarity) {
 	// Individual, spouse and children similarity only needs to be calculated
 	// once. The parents similarity will be calculated from the matrix below.
 	s.IndividualSimilarity = node.Similarity(other)
-	s.SpousesSimilarity = node.Spouses(doc).
-		Similarity(other.Spouses(doc), DefaultMinimumSimilarity)
-	s.ChildrenSimilarity = node.Children(doc).
-		Similarity(other.Children(doc), DefaultMinimumSimilarity)
+	s.SpousesSimilarity = node.Spouses(doc1).
+		Similarity(other.Spouses(doc2), DefaultMinimumSimilarity)
+	s.ChildrenSimilarity = node.Children(doc1).
+		Similarity(other.Children(doc2), DefaultMinimumSimilarity)
 
 	didFindParents := false
-	for _, parents1 := range node.Parents(doc) {
-		for _, parents2 := range other.Parents(doc) {
+	for _, parents1 := range node.Parents(doc1) {
+		for _, parents2 := range other.Parents(doc2) {
 			didFindParents = true
 
 			// depth of 0 means only the wife/husband is compared.
-			similarity := parents1.Similarity(doc, parents2, 0)
+			similarity := parents1.Similarity(doc1, doc2, parents2, 0)
 
 			if similarity > s.ParentsSimilarity {
 				s.ParentsSimilarity = similarity
