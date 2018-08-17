@@ -117,10 +117,10 @@ func (dec *Decoder) readLine() (string, error) {
 	return string(buf.Bytes()), nil
 }
 
+var lineRegexp = regexp.MustCompile(`^(\d) (@\w+@ )?(\w+)( .*)?$`)
+
 func parseLine(line string) (Node, int) {
-	parts := regexp.
-		MustCompile(`^(\d) (@\w+@ )?(\w+)( .*)?$`).
-		FindStringSubmatch(line)
+	parts := lineRegexp.FindStringSubmatch(line)
 
 	indent := 0
 	if len(parts) > 1 {
@@ -143,6 +143,9 @@ func parseLine(line string) (Node, int) {
 	}
 
 	switch tag {
+	case TagDate:
+		return NewDateNode(value, pointer, []Node{}), indent
+
 	case TagFamily:
 		return NewFamilyNode(pointer, []Node{}), indent
 

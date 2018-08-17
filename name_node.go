@@ -23,9 +23,10 @@ func NewNameNode(value, pointer string, children []Node) *NameNode {
 	}
 }
 
+var nameRegexp = regexp.MustCompile("([^/]*)(/[^/]*/)?(.*)")
+
 func (node *NameNode) parts() []string {
-	return regexp.MustCompile("([^/]*)(/[^/]*/)?(.*)").
-		FindStringSubmatch(node.value)
+	return nameRegexp.FindStringSubmatch(node.value)
 }
 
 func (node *NameNode) trimSpaces(s string) string {

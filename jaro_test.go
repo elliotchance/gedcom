@@ -49,7 +49,7 @@ var stringTests = []struct {
 func TestJaroWinkler(t *testing.T) {
 	for _, test := range stringTests {
 		t.Run(test.a+"_"+test.b, func(t *testing.T) {
-			assert.Equal(t, test.jaro, gedcom.JaroWinkler(test.a, test.b))
+			assert.Equal(t, test.jaro, gedcom.JaroWinkler(test.a, test.b, 0.7, 4))
 		})
 	}
 }
@@ -57,7 +57,7 @@ func TestJaroWinkler(t *testing.T) {
 func TestStringSimilarity(t *testing.T) {
 	for _, test := range stringTests {
 		t.Run(test.a+"_"+test.b, func(t *testing.T) {
-			assert.Equal(t, test.str, gedcom.StringSimilarity(test.a, test.b))
+			assert.Equal(t, test.str, gedcom.StringSimilarity(test.a, test.b, 0.7, 4))
 		})
 	}
 }

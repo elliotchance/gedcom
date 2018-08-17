@@ -620,7 +620,13 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run("", func(t *testing.T) {
-			assert.Equal(t, test.node.EstimatedBirthDate(), test.expected)
+			got := test.node.EstimatedBirthDate()
+
+			if got == nil {
+				assert.Nil(t, test.expected)
+			} else {
+				assert.Equal(t, got.SimpleNode, test.expected.SimpleNode)
+			}
 		})
 	}
 }
@@ -708,7 +714,13 @@ func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run("", func(t *testing.T) {
-			assert.Equal(t, test.node.EstimatedDeathDate(), test.expected)
+			got := test.node.EstimatedDeathDate()
+
+			if got == nil {
+				assert.Nil(t, test.expected)
+			} else {
+				assert.Equal(t, got.SimpleNode, test.expected.SimpleNode)
+			}
 		})
 	}
 }
@@ -765,12 +777,12 @@ func TestIndividualNode_Similarity(t *testing.T) {
 		{
 			a:        individual("P1", "", "", ""),
 			b:        individual("P1", "", "", ""),
-			expected: 0.3333333333333333,
+			expected: 0.25,
 		},
 		{
 			a:        gedcom.NewIndividualNode("", "P1", []gedcom.Node{}),
 			b:        gedcom.NewIndividualNode("", "P1", []gedcom.Node{}),
-			expected: 0.3333333333333333,
+			expected: 0.25,
 		},
 
 		// Perfect cases.
@@ -832,7 +844,7 @@ func TestIndividualNode_Similarity(t *testing.T) {
 				born("4 Jan 1843"),
 				died("17 Mar 1907"),
 			}),
-			expected: 0.9663440860215053,
+			expected: 0.9831720430107527,
 		},
 		{
 			// Last name is similar.
@@ -846,7 +858,7 @@ func TestIndividualNode_Similarity(t *testing.T) {
 				born("4 Jan 1843"),
 				died("17 Mar 1907"),
 			}),
-			expected: 0.995766129032258,
+			expected: 0.997883064516129,
 		},
 		{
 			// Birth date is less specific.
@@ -860,7 +872,7 @@ func TestIndividualNode_Similarity(t *testing.T) {
 				born("Jan 1843"),
 				died("17 Mar 1907"),
 			}),
-			expected: 0.999996416733853,
+			expected: 0.9999701394487746,
 		},
 		{
 			// Death date is less specific.
@@ -874,7 +886,7 @@ func TestIndividualNode_Similarity(t *testing.T) {
 				born("4 Jan 1843"),
 				died("Mar 1907"),
 			}),
-			expected: 0.9999999751162073,
+			expected: 0.999999792635061,
 		},
 
 		// Estimated birth/death.
@@ -889,7 +901,7 @@ func TestIndividualNode_Similarity(t *testing.T) {
 				born("4 Jan 1843"),
 				died("Mar 1907"),
 			}),
-			expected: 0.9992026735146867,
+			expected: 0.9933556126223895,
 		},
 		{
 			a: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
@@ -902,7 +914,7 @@ func TestIndividualNode_Similarity(t *testing.T) {
 				born("4 Jan 1843"),
 				buried("Aft. 20 Mar 1907"),
 			}),
-			expected: 0.9992024744443452,
+			expected: 0.9933539537028769,
 		},
 
 		// Missing dates.
@@ -915,7 +927,7 @@ func TestIndividualNode_Similarity(t *testing.T) {
 				name("Elliot Rupert /Chance/"),
 				died("1909"),
 			}),
-			expected: 0.7863440860215053,
+			expected: 0.7470609318996415,
 		},
 		{
 			a: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
@@ -926,7 +938,7 @@ func TestIndividualNode_Similarity(t *testing.T) {
 				name("Elliot Rupert /Chance/"),
 				born("Between 1822 and 1823"),
 			}),
-			expected: 0.7980146283388829,
+			expected: 0.8443154512111212,
 		},
 		{
 			a: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
@@ -935,7 +947,7 @@ func TestIndividualNode_Similarity(t *testing.T) {
 			b: gedcom.NewIndividualNode("", "P1", []gedcom.Node{
 				name("Elliot Rupert /Chance/"),
 			}),
-			expected: 0.633010752688172,
+			expected: 0.7331720430107527,
 		},
 
 		// These ones are way off.
@@ -948,13 +960,16 @@ func TestIndividualNode_Similarity(t *testing.T) {
 				name("Bob /Jones/"),
 				born("1627"),
 			}),
-			expected: 0.3194444444444444,
+			expected: 0.38125,
 		},
 	}
 
+	options := gedcom.NewSimilarityOptions()
 	for _, test := range tests {
 		t.Run("", func(t *testing.T) {
-			assert.Equal(t, test.a.Similarity(test.b), test.expected)
+			got := test.a.Similarity(test.b, options)
+
+			assert.Equal(t, test.expected, got)
 		})
 	}
 }
@@ -972,7 +987,7 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 			),
 			expected: gedcom.SurroundingSimilarity{
 				ParentsSimilarity:    0.5,
-				IndividualSimilarity: 0.3333333333333333,
+				IndividualSimilarity: 0.25,
 				SpousesSimilarity:    1.0,
 				ChildrenSimilarity:   1.0,
 			},
@@ -1000,7 +1015,7 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 			),
 			expected: gedcom.SurroundingSimilarity{
 				ParentsSimilarity:    0.5,
-				IndividualSimilarity: 0.9630708093204747,
+				IndividualSimilarity: 0.7433558199873285,
 				SpousesSimilarity:    1.0,
 				ChildrenSimilarity:   1.0,
 			},
@@ -1014,7 +1029,7 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 			),
 			expected: gedcom.SurroundingSimilarity{
 				ParentsSimilarity:    0.5,
-				IndividualSimilarity: 0.1341880341880342,
+				IndividualSimilarity: 0.20128205128205132,
 				SpousesSimilarity:    1.0,
 				ChildrenSimilarity:   1.0,
 			},
@@ -1053,8 +1068,8 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 				family("F2", "P5", "P6", "P2"),
 			),
 			expected: gedcom.SurroundingSimilarity{
-				ParentsSimilarity:    0.9962962962962962,
-				IndividualSimilarity: 0.9901098901098901,
+				ParentsSimilarity:    0.9981481481481481,
+				IndividualSimilarity: 0.9950549450549451,
 				SpousesSimilarity:    1.0,
 				ChildrenSimilarity:   1.0,
 			},
@@ -1074,7 +1089,7 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 			),
 			expected: gedcom.SurroundingSimilarity{
 				ParentsSimilarity:    0.75,
-				IndividualSimilarity: 0.9901098901098901,
+				IndividualSimilarity: 0.9950549450549451,
 				SpousesSimilarity:    1.0,
 				ChildrenSimilarity:   1.0,
 			},
@@ -1094,7 +1109,7 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 			),
 			expected: gedcom.SurroundingSimilarity{
 				ParentsSimilarity:    0.5,
-				IndividualSimilarity: 0.9901098901098901,
+				IndividualSimilarity: 0.9950549450549451,
 				SpousesSimilarity:    1.0,
 				ChildrenSimilarity:   1.0,
 			},
@@ -1125,11 +1140,12 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 		},
 	}
 
+	options := gedcom.NewSimilarityOptions()
 	for _, test := range tests {
 		t.Run("", func(t *testing.T) {
 			a := test.doc.Individuals()[0]
 			b := test.doc.Individuals()[1]
-			s := a.SurroundingSimilarity(test.doc, test.doc, b)
+			s := a.SurroundingSimilarity(test.doc, test.doc, b, options)
 
 			assert.Equal(t, test.expected, s)
 		})

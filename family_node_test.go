@@ -160,7 +160,7 @@ func TestFamilyNode_Similarity(t *testing.T) {
 					}),
 				},
 			},
-			expected: 0.8347467653467052,
+			expected: 0.8904318416381887,
 		},
 
 		// These ones are way off.
@@ -194,15 +194,16 @@ func TestFamilyNode_Similarity(t *testing.T) {
 					}),
 				},
 			},
-			expected: 0.36400720887980753,
+			expected: 0.37700025152486955,
 		},
 	}
 
+	options := gedcom.NewSimilarityOptions()
 	for _, test := range tests {
 		t.Run("", func(t *testing.T) {
 			family1 := test.doc.Families()[0]
 			family2 := test.doc.Families()[1]
-			got := family1.Similarity(test.doc, test.doc, family2, 0)
+			got := family1.Similarity(test.doc, test.doc, family2, 0, options)
 
 			assert.Equal(t, test.expected, got)
 		})

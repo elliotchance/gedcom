@@ -3,6 +3,9 @@ package gedcom
 // IndividualNode represents a person.
 type IndividualNode struct {
 	*SimpleNode
+	cachedFamilies, cachedSpouses bool
+	families                      []*FamilyNode
+	spouses                       []*IndividualNode
 }
 
 // SpouseChildren connects a single spouse to a set of children. The children
@@ -18,6 +21,7 @@ type SpouseChildren map[*IndividualNode]IndividualNodes
 func NewIndividualNode(value, pointer string, children []Node) *IndividualNode {
 	return &IndividualNode{
 		NewSimpleNode(TagIndividual, value, pointer, children),
+		false, false, nil, nil,
 	}
 }
 
@@ -52,8 +56,17 @@ func (node *IndividualNode) Sex() Sex {
 }
 
 // TODO: needs tests
-func (node *IndividualNode) Spouses(doc *Document) IndividualNodes {
-	spouses := IndividualNodes{}
+func (node *IndividualNode) Spouses(doc *Document) (spouses IndividualNodes) {
+	if node.cachedSpouses {
+		return node.spouses
+	}
+
+	defer func() {
+		node.spouses = spouses
+		node.cachedSpouses = true
+	}()
+
+	spouses = IndividualNodes{}
 
 	for _, family := range doc.Families() {
 		husband := family.Husband(doc)
@@ -78,8 +91,17 @@ func (node *IndividualNode) Spouses(doc *Document) IndividualNodes {
 }
 
 // TODO: needs tests
-func (node *IndividualNode) Families(doc *Document) []*FamilyNode {
-	families := []*FamilyNode{}
+func (node *IndividualNode) Families(doc *Document) (families []*FamilyNode) {
+	if node.cachedFamilies {
+		return node.families
+	}
+
+	defer func() {
+		node.families = families
+		node.cachedFamilies = true
+	}()
+
+	families = []*FamilyNode{}
 
 	for _, family := range doc.Families() {
 		if family.HasChild(doc, node) || family.Husband(doc).Is(node) || family.Wife(doc).Is(node) {
@@ -334,7 +356,10 @@ func (node *IndividualNode) EstimatedDeathDate() *DateNode {
 // match but that a positive or negative match cannot be determined. This is
 // important when Similarity is used is more extensive similarity calculations
 // as to not unnecessarily skew the results.
-func (node *IndividualNode) Similarity(other *IndividualNode) float64 {
+//
+// The options.MaxYears allows the error margin on dates to be adjusted. See
+// DefaultMaxYearsForSimilarity for more information.
+func (node *IndividualNode) Similarity(other *IndividualNode, options *SimilarityOptions) float64 {
 	if node == nil || other == nil {
 		return 0.5
 	}
@@ -344,7 +369,8 @@ func (node *IndividualNode) Similarity(other *IndividualNode) float64 {
 
 	for _, name1 := range node.Names() {
 		for _, name2 := range other.Names() {
-			similarity := StringSimilarity(name1.String(), name2.String())
+			similarity := StringSimilarity(name1.String(), name2.String(),
+				options.JaroBoostThreshold, options.JaroPrefixSize)
 
 			if similarity > nameSimilarity {
 				nameSimilarity = similarity
@@ -354,13 +380,14 @@ func (node *IndividualNode) Similarity(other *IndividualNode) float64 {
 
 	// Compare the dates.
 	birthSimilarity := node.EstimatedBirthDate().
-		Similarity(other.EstimatedBirthDate(), DefaultMaxYearsForSimilarity)
+		Similarity(other.EstimatedBirthDate(), options.MaxYears)
 
 	deathSimilarity := node.EstimatedDeathDate().
-		Similarity(other.EstimatedDeathDate(), DefaultMaxYearsForSimilarity)
+		Similarity(other.EstimatedDeathDate(), options.MaxYears)
 
 	// Final calculation.
-	return (nameSimilarity + birthSimilarity + deathSimilarity) / 3.0
+	return nameSimilarity*options.NameToDateRatio +
+		((birthSimilarity+deathSimilarity)/2.0)*(1.0-options.NameToDateRatio)
 }
 
 // SurroundingSimilarity is a more advanced version of Similarity.
@@ -400,14 +427,21 @@ func (node *IndividualNode) Similarity(other *IndividualNode) float64 {
 // doc1 and doc2 are used as the Documents for the current and other node
 // respectively. If the two IndividualNodes come from the same Document you must
 // specify the same Document for both values.
-func (node *IndividualNode) SurroundingSimilarity(doc1, doc2 *Document, other *IndividualNode) (s SurroundingSimilarity) {
+//
+// The options.MaxYears allows the error margin on dates to be adjusted. See
+// DefaultMaxYearsForSimilarity for more information.
+//
+// The options.MinimumSimilarity is used when comparing slices of individuals.
+// In this case that means for the spouses and children. A higher value makes
+// the matching more strict. See DefaultMinimumSimilarity for more information.
+func (node *IndividualNode) SurroundingSimilarity(doc1, doc2 *Document, other *IndividualNode, options *SimilarityOptions) (s SurroundingSimilarity) {
 	// Individual, spouse and children similarity only needs to be calculated
 	// once. The parents similarity will be calculated from the matrix below.
-	s.IndividualSimilarity = node.Similarity(other)
+	s.IndividualSimilarity = node.Similarity(other, options)
 	s.SpousesSimilarity = node.Spouses(doc1).
-		Similarity(other.Spouses(doc2), DefaultMinimumSimilarity)
+		Similarity(other.Spouses(doc2), options)
 	s.ChildrenSimilarity = node.Children(doc1).
-		Similarity(other.Children(doc2), DefaultMinimumSimilarity)
+		Similarity(other.Children(doc2), options)
 
 	didFindParents := false
 	for _, parents1 := range node.Parents(doc1) {
@@ -415,7 +449,7 @@ func (node *IndividualNode) SurroundingSimilarity(doc1, doc2 *Document, other *I
 			didFindParents = true
 
 			// depth of 0 means only the wife/husband is compared.
-			similarity := parents1.Similarity(doc1, doc2, parents2, 0)
+			similarity := parents1.Similarity(doc1, doc2, parents2, 0, options)
 
 			if similarity > s.ParentsSimilarity {
 				s.ParentsSimilarity = similarity

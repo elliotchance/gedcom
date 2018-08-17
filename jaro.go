@@ -6,6 +6,13 @@ import (
 	"strings"
 )
 
+// Theses constants are used with JaroWinkler. They have been calculated using
+// the gedcomtune command.
+const (
+	DefaultJaroWinklerBoostThreshold = 0.0
+	DefaultJaroWinklerPrefixSize     = 8
+)
+
 // JaroWinkler distance. JaroWinkler returns a number between 0 and 1 where 1
 // means perfectly equal and 0 means completely different. It is commonly used
 // on Record Linkage stuff, thus it tries to be accurate for real names and
@@ -22,7 +29,9 @@ import (
 // boosting the score of exact matches at the beginning of the strings. By doing
 // this, Winkler says that typos are less common to happen at the beginning. For
 // this to happen, it introduces two more parameters: the boostThreshold and the
-// prefixSize. These are commonly set to 0.7 and 4, respectively.
+// prefixSize. These are commonly set to 0.7 and 4, respectively. However, you
+// should use DefaultJaroWinklerBoostThreshold and DefaultJaroWinklerPrefixSize
+// as they have been calcuated by the gedcomtune command.
 //
 // The code and comment above has been copied from:
 //
@@ -31,10 +40,7 @@ import (
 // A big thanks to Felipe (@xrash) for the explanation and code. It you read
 // this, I copied the code to avoid the need to have a dependency manager for
 // this project.
-func JaroWinkler(a, b string) float64 {
-	boostThreshold := 0.7
-	prefixSize := 4
-
+func JaroWinkler(a, b string, boostThreshold float64, prefixSize int) float64 {
 	j := jaro(a, b)
 
 	if j <= boostThreshold {
@@ -93,14 +99,15 @@ func jaro(a, b string) float64 {
 	return ((matches / la) + (matches / lb) + (matches-transposes)/matches) / 3.0
 }
 
+var alnumRegexp = regexp.MustCompile("[^a-z0-9 ]")
+
 // StringSimilarity is a less sensitive version of a JaroWinkler string
 // comparison. It is the ideal choice to compare strings that represent
 // individual names, places, etc as it does not take into account
 // capitalization, punctuation and extra spaces.
-func StringSimilarity(a, b string) float64 {
-	re := regexp.MustCompile("[^a-z0-9 ]")
-	a = re.ReplaceAllString(strings.ToLower(a), "")
-	b = re.ReplaceAllString(strings.ToLower(b), "")
+func StringSimilarity(a, b string, boostThreshold float64, prefixSize int) float64 {
+	a = alnumRegexp.ReplaceAllString(strings.ToLower(a), "")
+	b = alnumRegexp.ReplaceAllString(strings.ToLower(b), "")
 
-	return JaroWinkler(CleanSpace(a), CleanSpace(b))
+	return JaroWinkler(CleanSpace(a), CleanSpace(b), boostThreshold, prefixSize)
 }

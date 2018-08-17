@@ -3,19 +3,40 @@ package gedcom
 // FamilyNode represents a family.
 type FamilyNode struct {
 	*SimpleNode
+	cachedHusband, cachedWife bool
+	husband, wife             *IndividualNode
 }
 
 func NewFamilyNode(pointer string, children []Node) *FamilyNode {
 	return &FamilyNode{
 		NewSimpleNode(TagFamily, "", pointer, children),
+		false, false, nil, nil,
 	}
 }
 
-func (node *FamilyNode) Husband(document *Document) *IndividualNode {
+func (node *FamilyNode) Husband(document *Document) (husband *IndividualNode) {
+	if node.cachedHusband {
+		return node.husband
+	}
+
+	defer func() {
+		node.husband = husband
+		node.cachedHusband = true
+	}()
+
 	return node.partner(document, TagHusband)
 }
 
-func (node *FamilyNode) Wife(document *Document) *IndividualNode {
+func (node *FamilyNode) Wife(document *Document) (wife *IndividualNode) {
+	if node.cachedWife {
+		return node.wife
+	}
+
+	defer func() {
+		node.wife = wife
+		node.cachedWife = true
+	}()
+
 	return node.partner(document, TagWife)
 }
 
@@ -67,15 +88,18 @@ func (node *FamilyNode) HasChild(document *Document, individual *IndividualNode)
 // doc1 and doc2 are used as the Documents for the current and other node
 // respectively. If the two FamilyNodes come from the same Document you must
 // specify the same Document for both values.
-func (node *FamilyNode) Similarity(doc1, doc2 *Document, other *FamilyNode, depth int) float64 {
+//
+// The options.MaxYears allows the error margin on dates to be adjusted. See
+// DefaultMaxYearsForSimilarity for more information.
+func (node *FamilyNode) Similarity(doc1, doc2 *Document, other *FamilyNode, depth int, options *SimilarityOptions) float64 {
 	if depth != 0 {
 		panic("depth can only be 0")
 	}
 
 	// It does not matter if any of the partners are nil, Similarity will handle
 	// these gracefully.
-	husband := node.Husband(doc1).Similarity(other.Husband(doc2))
-	wife := node.Wife(doc1).Similarity(other.Wife(doc2))
+	husband := node.Husband(doc1).Similarity(other.Husband(doc2), options)
+	wife := node.Wife(doc1).Similarity(other.Wife(doc2), options)
 
 	return (husband + wife) / 2
 }
