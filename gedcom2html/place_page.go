@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 )
 
 type placePage struct {
@@ -21,21 +22,21 @@ func (c *placePage) String() string {
 	place := getPlaces(c.document)[c.placeKey]
 
 	table := []fmt.Stringer{
-		newTableHead("Date", "Event", "Individual"),
+		html.NewTableHead("Date", "Event", "Individual"),
 	}
 
 	for _, node := range place.nodes {
 		table = append(table, newPlaceEvent(c.document, node))
 	}
 
-	return newPage(
+	return html.NewPage(
 		place.prettyName,
-		newComponents(
+		html.NewComponents(
 			newHeader(c.document, place.prettyName, selectedExtraTab),
-			newBigName(place.prettyName),
-			newSpace(),
-			newRow(
-				newColumn(entireRow, newTable("", table...)),
+			html.NewBigTitle(place.prettyName),
+			html.NewSpace(),
+			html.NewRow(
+				html.NewColumn(html.EntireRow, html.NewTable("", table...)),
 			),
 		),
 	).String()

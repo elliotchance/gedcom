@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/elliotchance/gedcom"
 	"strings"
+	"github.com/elliotchance/gedcom/html"
 )
 
 type individualIndexHeader struct {
@@ -55,7 +56,7 @@ func (c *individualIndexHeader) String() string {
 
 	s += `</ul>`
 
-	return newRow(
-		newColumn(entireRow, newText(s)),
+	return html.NewRow(
+		html.NewColumn(html.EntireRow, html.NewText(s)),
 	).String()
 }

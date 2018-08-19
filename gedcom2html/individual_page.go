@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 )
 
 // individualPage is the page that shows detailed information about an
@@ -21,20 +22,20 @@ func newIndividualPage(document *gedcom.Document, individual *gedcom.IndividualN
 func (c *individualPage) String() string {
 	name := c.individual.Names()[0]
 
-	return newPage(
+	return html.NewPage(
 		name.String(),
-		newComponents(
+		html.NewComponents(
 			newHeader(c.document, name.String(), selectedExtraTab),
 			newAllParentButtons(c.document, c.individual),
-			newBigName(newIndividualName(c.individual).String()),
-			newHorizontalRuleRow(),
-			newRow(
-				newColumn(halfRow, newIndividualNameAndSex(c.individual)),
-				newColumn(halfRow, newIndividualAdditionalNames(c.individual)),
+			html.NewBigTitle(html.NewIndividualName(c.individual, false, html.UnknownEmphasis).String()),
+			html.NewHorizontalRuleRow(),
+			html.NewRow(
+				html.NewColumn(html.HalfRow, newIndividualNameAndSex(c.individual)),
+				html.NewColumn(html.HalfRow, newIndividualAdditionalNames(c.individual)),
 			),
-			newSpace(),
+			html.NewSpace(),
 			newIndividualEvents(c.document, c.individual),
-			newSpace(),
+			html.NewSpace(),
 			newPartnersAndChildren(c.document, c.individual),
 		),
 	).String()

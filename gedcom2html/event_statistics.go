@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/elliotchance/gedcom"
 	"strconv"
+	"github.com/elliotchance/gedcom/html"
 )
 
 type eventStatistics struct {
@@ -22,11 +23,11 @@ func (c *eventStatistics) String() string {
 	burials := 0
 
 	for _, individual := range c.document.Individuals() {
-		if date, _ := getBirth(individual); date != "" {
+		if date, _ := html.GetBirth(individual); date != "" {
 			births += 1
 		}
 
-		if date, _ := getDeath(individual); date != "" {
+		if date, _ := html.GetDeath(individual); date != "" {
 			deaths += 1
 		}
 
@@ -39,7 +40,7 @@ func (c *eventStatistics) String() string {
 		}
 	}
 
-	s := newComponents(
+	s := html.NewComponents(
 		newKeyedTableRow("Total", strconv.Itoa(births+christenings+deaths+burials), true),
 		newKeyedTableRow("Births", strconv.Itoa(births), true),
 		newKeyedTableRow("Christenings", strconv.Itoa(christenings), true),
@@ -47,5 +48,5 @@ func (c *eventStatistics) String() string {
 		newKeyedTableRow("Burials", strconv.Itoa(burials), true),
 	)
 
-	return newCard("Events", noBadgeCount, newTable("", s)).String()
+	return newCard("Events", noBadgeCount, html.NewTable("", s)).String()
 }

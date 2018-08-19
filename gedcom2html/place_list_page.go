@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
 	"sort"
+	"github.com/elliotchance/gedcom/html"
 )
 
 // placeListPage lists all places.
@@ -19,7 +20,7 @@ func newPlaceListPage(document *gedcom.Document) *placeListPage {
 
 func (c *placeListPage) String() string {
 	table := []fmt.Stringer{
-		newTableHead("Name"),
+		html.NewTableHead("Name"),
 	}
 
 	places := getPlaces(c.document)
@@ -37,10 +38,10 @@ func (c *placeListPage) String() string {
 		table = append(table, newPlaceInList(c.document, place))
 	}
 
-	return newPage("Places", newComponents(
+	return html.NewPage("Places", html.NewComponents(
 		newHeader(c.document, "", selectedPlacesTab),
-		newRow(
-			newColumn(entireRow, newTable("", table...)),
+		html.NewRow(
+			html.NewColumn(html.EntireRow, html.NewTable("", table...)),
 		),
 	)).String()
 }

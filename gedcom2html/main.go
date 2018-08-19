@@ -13,8 +13,6 @@ var (
 	optionOutputDir  string
 )
 
-const symbolLetter = '#'
-
 func main() {
 	flag.StringVar(&optionGedcomFile, "gedcom", "", "Input GEDCOM file.")
 	flag.StringVar(&optionOutputDir, "output-dir", ".", "Output directory. It"+
