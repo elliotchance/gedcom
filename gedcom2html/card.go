@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/elliotchance/gedcom/html"
 	"strconv"
 )
 
@@ -30,8 +31,8 @@ func (c *card) String() string {
 		count = newBadgePill("secondary", "float-right", strconv.Itoa(c.count))
 	}
 
-	return newDiv("card", newComponents(
-		newHeading(5, "card-header", c.title+count.String()),
+	return html.NewDiv("card", html.NewComponents(
+		html.NewHeading(5, "card-header", c.title+count.String()),
 		c.body,
 	)).String()
 }

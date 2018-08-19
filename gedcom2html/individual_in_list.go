@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 )
 
 // individualInList is a single row in the table of individuals on the list
@@ -20,8 +21,8 @@ func newIndividualInList(document *gedcom.Document, individual *gedcom.Individua
 }
 
 func (c *individualInList) String() string {
-	birthDate, birthPlace := getBirth(c.individual)
-	deathDate, deathPlace := getBirth(c.individual)
+	birthDate, birthPlace := html.GetBirth(c.individual)
+	deathDate, deathPlace := html.GetDeath(c.individual)
 
 	birthPlace = prettyPlaceName(birthPlace)
 	deathPlace = prettyPlaceName(deathPlace)

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 )
 
 type sourcePage struct {
@@ -19,21 +20,21 @@ func newSourcePage(document *gedcom.Document, source *gedcom.SourceNode) *source
 
 func (c *sourcePage) String() string {
 	table := []fmt.Stringer{
-		newTableHead("Key", "Value"),
+		html.NewTableHead("Key", "Value"),
 	}
 
 	for _, node := range c.source.Nodes() {
 		table = append(table, newSourceProperty(c.document, node))
 	}
 
-	return newPage(
+	return html.NewPage(
 		c.source.Title(),
-		newComponents(
+		html.NewComponents(
 			newHeader(c.document, "Source", selectedExtraTab),
-			newBigName(c.source.Title()),
-			newSpace(),
-			newRow(
-				newColumn(entireRow, newTable("", table...)),
+			html.NewBigTitle(c.source.Title()),
+			html.NewSpace(),
+			html.NewRow(
+				html.NewColumn(html.EntireRow, html.NewTable("", table...)),
 			),
 		),
 	).String()

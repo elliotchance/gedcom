@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 )
 
 // individualAdditionalNames is shown on the individual page. It shows all of
@@ -26,5 +27,5 @@ func (c *individualAdditionalNames) String() string {
 	}
 
 	return newCard("Additional Names", len(names)-1,
-		newTable("", rows...)).String()
+		html.NewTable("", rows...)).String()
 }

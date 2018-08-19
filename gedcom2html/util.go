@@ -44,48 +44,6 @@ func colorClassForIndividual(individual *gedcom.IndividualNode) string {
 	return colorClassForSex(individual.Sex())
 }
 
-func getBirth(individual *gedcom.IndividualNode) (birthDate string, birthPlace string) {
-	if individual == nil {
-		return
-	}
-
-	birthNode := gedcom.First(gedcom.NodesWithTag(individual, gedcom.TagBirth))
-	if birthNode != nil {
-		birthDateNode := gedcom.First(gedcom.NodesWithTag(birthNode, gedcom.TagDate))
-		if birthDateNode != nil {
-			birthDate = birthDateNode.Value()
-		}
-
-		birthPlaceNode := gedcom.First(gedcom.NodesWithTag(birthNode, gedcom.TagPlace))
-		if birthPlaceNode != nil {
-			birthPlace = birthPlaceNode.Value()
-		}
-	}
-
-	return
-}
-
-func getDeath(individual *gedcom.IndividualNode) (deathDate string, deathPlace string) {
-	if individual == nil {
-		return
-	}
-
-	deathNode := gedcom.First(gedcom.NodesWithTag(individual, gedcom.TagDeath))
-	if deathNode != nil {
-		deathDateNode := gedcom.First(gedcom.NodesWithTag(deathNode, gedcom.TagDate))
-		if deathDateNode != nil {
-			deathDate = deathDateNode.Value()
-		}
-
-		deathPlaceNode := gedcom.First(gedcom.NodesWithTag(deathNode, gedcom.TagPlace))
-		if deathPlaceNode != nil {
-			deathPlace = deathPlaceNode.Value()
-		}
-	}
-
-	return
-}
-
 func getUniqueKey(s string) string {
 	i := -1
 	for {

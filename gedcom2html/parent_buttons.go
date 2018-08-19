@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 )
 
 // parentButtons show two buttons separated by a "T" to be placed above the
@@ -36,5 +37,5 @@ func (c *parentButtons) String() string {
 		newIndividualButton(c.document, c.family.Husband(c.document)),
 		newPlusSVG(false, true, true, true),
 		newIndividualButton(c.document, c.family.Wife(c.document)),
-		newSpace())
+		html.NewSpace())
 }

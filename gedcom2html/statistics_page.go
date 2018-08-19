@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 )
 
 type statisticsPage struct {
@@ -15,25 +16,25 @@ func newStatisticsPage(document *gedcom.Document) *statisticsPage {
 }
 
 func (c *statisticsPage) String() string {
-	return newPage(
+	return html.NewPage(
 		"Statistics",
-		newComponents(
+		html.NewComponents(
 			newHeader(c.document, "", selectedStatisticsTab),
-			newBigName("Statistics"),
-			newSpace(),
-			newRow(
-				newColumn(halfRow, newIndividualStatistics(c.document)),
-				newColumn(halfRow, newEventStatistics(c.document)),
+			html.NewBigTitle("Statistics"),
+			html.NewSpace(),
+			html.NewRow(
+				html.NewColumn(html.HalfRow, newIndividualStatistics(c.document)),
+				html.NewColumn(html.HalfRow, newEventStatistics(c.document)),
 			),
-			newSpace(),
-			newRow(
-				newColumn(halfRow, newFamilyStatistics(c.document)),
-				newColumn(halfRow, newSourceStatistics(c.document)),
+			html.NewSpace(),
+			html.NewRow(
+				html.NewColumn(html.HalfRow, newFamilyStatistics(c.document)),
+				html.NewColumn(html.HalfRow, newSourceStatistics(c.document)),
 			),
-			newSpace(),
-			newRow(
-				newColumn(halfRow, newPlaceStatistics(c.document)),
-				newColumn(halfRow, newEmpty()),
+			html.NewSpace(),
+			html.NewRow(
+				html.NewColumn(html.HalfRow, newPlaceStatistics(c.document)),
+				html.NewColumn(html.HalfRow, newEmpty()),
 			),
 		),
 	).String()
