@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 )
 
 // individualButton is a large coloured button that links to an individuals
@@ -21,9 +22,7 @@ func newIndividualButton(document *gedcom.Document, individual *gedcom.Individua
 }
 
 func (c *individualButton) String() string {
-	name := newIndividualName(c.individual).String()
-	birthDate, _ := getBirth(c.individual)
-	deathDate, _ := getDeath(c.individual)
+	name := html.NewIndividualName(c.individual, false, html.UnknownEmphasis).String()
 
 	onclick := ""
 	if c.individual != nil {
@@ -31,16 +30,12 @@ func (c *individualButton) String() string {
 			pageIndividual(c.document, c.individual))
 	}
 
-	eventDates := newEventDates([]*eventDate{
-		newEventDate("b.", birthDate),
-		newEventDate("d.", deathDate),
-	}).String()
+	eventDates := html.NewIndividualDates(c.individual, false)
 
 	// If the individual is living we need to hide all their information.
 	if c.individual != nil && c.individual.IsLiving() {
 		name = "<em>Hidden</em>"
 		onclick = ""
-		eventDates = "living"
 	}
 
 	return fmt.Sprintf(`

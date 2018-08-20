@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 )
 
 type familyListPage struct {
@@ -17,17 +18,17 @@ func newFamilyListPage(document *gedcom.Document) *familyListPage {
 
 func (c *familyListPage) String() string {
 	table := []fmt.Stringer{
-		newTableHead("Husband", "Date", "Wife"),
+		html.NewTableHead("Husband", "Date", "Wife"),
 	}
 
 	for _, family := range c.document.Families() {
 		table = append(table, newFamilyInList(c.document, family))
 	}
 
-	return newPage("Families", newComponents(
+	return html.NewPage("Families", html.NewComponents(
 		newHeader(c.document, "", selectedFamiliesTab),
-		newRow(
-			newColumn(entireRow, newTable("", table...)),
+		html.NewRow(
+			html.NewColumn(html.EntireRow, html.NewTable("", table...)),
 		),
 	)).String()
 }

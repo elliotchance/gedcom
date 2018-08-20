@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 )
 
 type sourceListPage struct {
@@ -17,17 +18,17 @@ func newSourceListPage(document *gedcom.Document) *sourceListPage {
 
 func (c *sourceListPage) String() string {
 	table := []fmt.Stringer{
-		newTableHead("Name"),
+		html.NewTableHead("Name"),
 	}
 
 	for _, source := range c.document.Sources() {
 		table = append(table, newSourceInList(c.document, source))
 	}
 
-	return newPage("Sources", newComponents(
+	return html.NewPage("Sources", html.NewComponents(
 		newHeader(c.document, "", selectedSourcesTab),
-		newRow(
-			newColumn(entireRow, newTable("", table...)),
+		html.NewRow(
+			html.NewColumn(html.EntireRow, html.NewTable("", table...)),
 		),
 	)).String()
 }

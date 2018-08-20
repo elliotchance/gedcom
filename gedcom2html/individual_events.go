@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 )
 
 // individualEvents is the table of events show in the "Events" section of the
@@ -22,7 +23,7 @@ func newIndividualEvents(document *gedcom.Document, individual *gedcom.Individua
 func (c *individualEvents) String() string {
 	events := []fmt.Stringer{}
 
-	birthDate, birthPlace := getBirth(c.individual)
+	birthDate, birthPlace := html.GetBirth(c.individual)
 	events = append(events, newIndividualEvent("Birth", birthDate, birthPlace, ""))
 
 	for _, family := range c.individual.Families(c.document) {
@@ -66,14 +67,14 @@ func (c *individualEvents) String() string {
 		}
 	}
 
-	deathDate, deathPlace := getDeath(c.individual)
+	deathDate, deathPlace := html.GetDeath(c.individual)
 	events = append(events, newIndividualEvent("Death", deathDate, deathPlace, ""))
 
-	s := newTable("text-center",
-		newTableHead("Type", "Date", "Place", "Description"),
-		newComponents(events...))
+	s := html.NewTable("text-center",
+		html.NewTableHead("Type", "Date", "Place", "Description"),
+		html.NewComponents(events...))
 
-	return newRow(newColumn(entireRow,
+	return html.NewRow(html.NewColumn(html.EntireRow,
 		newCard("Events", len(events), s),
 	)).String()
 }

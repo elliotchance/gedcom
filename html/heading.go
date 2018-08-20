@@ -1,24 +1,24 @@
-package main
+package html
 
 import (
 	"fmt"
 )
 
-// heading is larger text.
-type heading struct {
+// Heading is larger text.
+type Heading struct {
 	text, class string
 	number      int
 }
 
-func newHeading(number int, class, text string) *heading {
-	return &heading{
+func NewHeading(number int, class, text string) *Heading {
+	return &Heading{
 		text:   text,
 		number: number,
 		class:  class,
 	}
 }
 
-func (c *heading) String() string {
+func (c *Heading) String() string {
 	return fmt.Sprintf(`<h%d class="%s">%s</h%d>`,
 		c.number, c.class, c.text, c.number)
 }

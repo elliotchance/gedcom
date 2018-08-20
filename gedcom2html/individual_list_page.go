@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 	"sort"
 	"strings"
 )
@@ -22,7 +23,7 @@ func newIndividualListPage(document *gedcom.Document, selectedLetter rune) *indi
 
 func (c *individualListPage) String() string {
 	table := []fmt.Stringer{
-		newTableHead("Name", "Birth", "Death"),
+		html.NewTableHead("Name", "Birth", "Death"),
 	}
 
 	individuals := gedcom.IndividualNodes{}
@@ -53,19 +54,19 @@ func (c *individualListPage) String() string {
 		table = append(table, newIndividualInList(c.document, i))
 	}
 
-	return newPage("Individuals", newComponents(
+	return html.NewPage("Individuals", html.NewComponents(
 		newHeader(c.document, "", selectedIndividualsTab),
-		newRow(
-			newColumn(entireRow, newText(fmt.Sprintf(
+		html.NewRow(
+			html.NewColumn(html.EntireRow, html.NewText(fmt.Sprintf(
 				"%d individuals are hidden because they are living.",
 				livingCount,
 			))),
 		),
-		newSpace(),
+		html.NewSpace(),
 		newIndividualIndexHeader(c.document, c.selectedLetter),
-		newSpace(),
-		newRow(
-			newColumn(entireRow, newTable("", table...)),
+		html.NewSpace(),
+		html.NewRow(
+			html.NewColumn(html.EntireRow, html.NewTable("", table...)),
 		),
 	)).String()
 }

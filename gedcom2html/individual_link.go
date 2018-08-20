@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 )
 
 // individualLink is a hyperlink to an individuals page. The link contains a
@@ -24,5 +25,6 @@ func (c *individualLink) String() string {
 		<span class="octicon octicon-primitive-dot" style="color: %s; font-size: 18px"></span>
 		<a href="%s">%s</a>`,
 		colorForIndividual(c.individual),
-		pageIndividual(c.document, c.individual), newIndividualName(c.individual))
+		pageIndividual(c.document, c.individual),
+		html.NewIndividualName(c.individual, false, html.UnknownEmphasis))
 }

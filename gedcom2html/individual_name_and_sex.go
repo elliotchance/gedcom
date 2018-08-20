@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 )
 
 // individualNameAndSex shows the name parts and sex of an individual in the
@@ -19,7 +20,7 @@ func newIndividualNameAndSex(individual *gedcom.IndividualNode) *individualNameA
 func (c *individualNameAndSex) String() string {
 	primaryName := c.individual.Names()[0]
 
-	s := newComponents(
+	s := html.NewComponents(
 		newKeyedTableRow("Title", primaryName.Title(), primaryName.Title() != ""),
 		newKeyedTableRow("Prefix", primaryName.Prefix(), primaryName.Prefix() != ""),
 		newKeyedTableRow("Given Name", primaryName.GivenName(), primaryName.GivenName() != ""),
@@ -29,5 +30,5 @@ func (c *individualNameAndSex) String() string {
 		newKeyedTableRow("Sex", newSexBadge(c.individual.Sex()).String(), true),
 	)
 
-	return newCard("Name & Sex", noBadgeCount, newTable("", s)).String()
+	return newCard("Name & Sex", noBadgeCount, html.NewTable("", s)).String()
 }

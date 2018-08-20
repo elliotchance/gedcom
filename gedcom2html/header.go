@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 )
 
 const (
@@ -66,9 +67,9 @@ func (c *header) String() string {
 		))
 	}
 
-	return newComponents(
-		newSpace(),
+	return html.NewComponents(
+		html.NewSpace(),
 		newNavTabs(items),
-		newSpace(),
+		html.NewSpace(),
 	).String()
 }
