@@ -29,7 +29,7 @@ func (c *familyInList) String() string {
 			<td nowrap="nowrap" class="text-center">%s</td>
 			<td>%s</td>
 		</tr>`,
-		newIndividualLink(c.document, c.family.Husband(c.document)),
+		newIndividualLink(c.document, c.family.Husband()),
 		date,
-		newIndividualLink(c.document, c.family.Wife(c.document))))
+		newIndividualLink(c.document, c.family.Wife())))
 }

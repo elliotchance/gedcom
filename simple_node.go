@@ -8,14 +8,16 @@ import (
 // SimpleNode is used as the default node type when there is no more appropriate
 // or specific type to use.
 type SimpleNode struct {
+	document *Document
 	tag      Tag
 	value    string
 	pointer  string
 	children []Node
 }
 
-func NewSimpleNode(tag Tag, value, pointer string, children []Node) *SimpleNode {
+func NewSimpleNode(document *Document, tag Tag, value, pointer string, children []Node) *SimpleNode {
 	return &SimpleNode{
+		document: document,
 		tag:      tag,
 		value:    value,
 		pointer:  pointer,
@@ -33,6 +35,18 @@ func (node *SimpleNode) Value() string {
 
 func (node *SimpleNode) Pointer() string {
 	return node.pointer
+}
+
+func (node *SimpleNode) Document() *Document {
+	return node.document
+}
+
+func (node *SimpleNode) SetDocument(document *Document) {
+	node.document = document
+
+	for _, child := range node.children {
+		child.SetDocument(document)
+	}
 }
 
 func (node *SimpleNode) Nodes() []Node {

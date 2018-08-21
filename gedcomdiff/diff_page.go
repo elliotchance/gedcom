@@ -10,17 +10,14 @@ import (
 type diffPage struct {
 	comparisons   []gedcom.IndividualComparison
 	options       *gedcom.SimilarityOptions
-	doc1, doc2    *gedcom.Document
 	includePlaces bool
 	hideSame      bool
 }
 
-func newDiffPage(comparisons []gedcom.IndividualComparison, options *gedcom.SimilarityOptions, doc1, doc2 *gedcom.Document, includePlaces, hideSame bool) *diffPage {
+func newDiffPage(comparisons []gedcom.IndividualComparison, options *gedcom.SimilarityOptions, includePlaces, hideSame bool) *diffPage {
 	return &diffPage{
 		comparisons:   comparisons,
 		options:       options,
-		doc1:          doc1,
-		doc2:          doc2,
 		includePlaces: includePlaces,
 		hideSame:      hideSame,
 	}
@@ -78,7 +75,7 @@ func (c *diffPage) String() string {
 	}
 	for _, comparison := range c.comparisons {
 		components = append(components,
-			newIndividualCompare(comparison, c.doc1, c.doc2, c.includePlaces, c.hideSame))
+			newIndividualCompare(comparison, c.includePlaces, c.hideSame))
 	}
 
 	return html.NewPage(

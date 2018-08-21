@@ -23,8 +23,17 @@ accessing/formatting names, standardising dates, etc.
 be ingested and processed more easily in other applications. The bundled
 `gedcom2json` program does this (and offers several options).
 
-Decoding GEDCOM
-===============
+   * [Decoding and Encoding](#decoding-and-encoding)
+   * [Traversing a Document](#traversing-a-document)
+   * [Working With Dates](#working-with-dates)
+   * [Rendering as HTML](#rendering-as-html)
+   * [Converting to JSON](#converting-to-json)
+   * [Converting to Text](#converting-to-text)
+
+Decoding and Encoding
+=====================
+
+Decoding a GEDCOM stream:
 
 ```go
 ged := "0 HEAD\n1 CHAR UTF-8"
@@ -36,17 +45,16 @@ if err != nil {
 }
 ```
 
-Encoding GEDCOM
-===============
-
-If you have already decoded a GEDCOM into a `Document` (in the previous example)
-then you can simply encode it back to a GEDCOM string with:
+If you are reading from a file you can use `NewDocumentFromGEDCOMFile`:
 
 ```go
-document.String()
+document, err := gedcom.NewDocumentFromGEDCOMFile("family.ged")
+if err != nil {
+    panic(err)
+}
 ```
 
-This is really just a shorthand for using the proper encoder:
+Encoding works like this:
 
 ```go
 buf := bytes.NewBufferString("")
@@ -58,10 +66,57 @@ if err != nil {
 }
 ```
 
-gedcom2html
-===========
+If you need the GEDCOM data as a string you can simply using `fmt.Stringer`:
 
-`gedcom2html` converts a GEDCOM file to a directory of HTML files.
+```go
+data := document.String()
+```
+
+Traversing a Document
+=====================
+
+On top of the raw document is a powerful API that takes care of the complex
+traversing of the Document. Here is a simple example:
+
+```go
+for _, individual := range document.Individuals() {
+    fmt.Println(individual.Name().String())
+}
+```
+
+Some of the nodes in a GEDCOM file have been replaced with more function rich
+types, such as names, dates, families and more. See
+[godoc](https://godoc.org/github.com/elliotchance/gedcom) for a complete list of
+API methods.
+
+Working With Dates
+==================
+
+Dates in GEDCOM files can be very complex as they can cater for many scenarios:
+
+1. Incomplete, like "Dec 1943"
+2. Anchored, like "Aft. 3 Sep 2003" or "Before 1923"
+3. Ranges, like "Bet. 4 Apr 1823 and 8 Apr 1823"
+
+This package provides a very rich API for dealing with all kind of dates in a
+meaningful and sensible way. Some notable features include:
+
+1. All dates, even though that specify an specific day have a minimum and
+maximum value that are their true bounds. This is especially important for
+larger date ranges like the whole month of "Jun 1945".
+2. Upper and lower bounds of dates can be converted to the native Go `time.Time`
+object.
+3. There is a `Years` function that provides a convenient way to normalise a
+date range into a number for easier distance and comparison measurements.
+4. Algorithms for calculating the similarity of dates on a configurable
+parabola.
+
+Rendering as HTML
+=================
+
+`gedcom2html` converts a GEDCOM file to a directory of HTML files. This produces
+a pretty output that looks like this:
+[http://dechauncy.family](http://dechauncy.family)
 
 ```txt
 Usage of gedcom2html:
@@ -71,8 +126,8 @@ Usage of gedcom2html:
     	Output directory. It will use the current directory if output-dir is not provided. Output files will only be added or replaced. Existing files will not be deleted. (default ".")
 ```
 
-gedcom2json
-===========
+Converting to JSON
+==================
 
 `gedcom2json` is a subpackage and binary that converts a GEDCOM file to a JSON
 structure. It offers several options for the output:
@@ -101,8 +156,8 @@ Usage of gedcom2json:
     	Use tags (pretty or raw) as object keys rather than arrays.
 ```
 
-gedcom2text
-===========
+Converting to Text
+==================
 
 `gedcom2text` is a subpackage and binary that converts a GEDCOM file to a simple
 text output (or split into individual files) that is ideal for easily reading
@@ -128,8 +183,8 @@ Usage of gedcom2text:
     	Split the individuals into separate files in this directory.
 ```
 
-Comparing GEDCOM Files
-----------------------
+Comparing Output
+----------------
 
 Here is an example to compare two large GEDCOM files:
 

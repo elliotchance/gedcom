@@ -27,7 +27,7 @@ func (c *partnersAndChildren) String() string {
 	}
 
 	// Find children of known spouses.
-	spouses := c.individual.Spouses(c.document)
+	spouses := c.individual.Spouses()
 
 	for _, spouse := range spouses {
 		rows = append(rows, html.NewHorizontalRuleRow())
@@ -36,7 +36,7 @@ func (c *partnersAndChildren) String() string {
 			html.NewColumn(html.QuarterRow, newIndividualButton(c.document, spouse)),
 		}
 
-		family := c.individual.FamilyWithSpouse(c.document, spouse)
+		family := c.individual.FamilyWithSpouse(spouse)
 		if family != nil {
 			columns, rows = partnerSection(family, c, columns, rows)
 		}
@@ -47,11 +47,11 @@ func (c *partnersAndChildren) String() string {
 	}
 
 	// Find children belonging to families with an unknown spouse.
-	for _, family := range c.individual.Families(c.document) {
+	for _, family := range c.individual.Families() {
 		// Ignore families with this individual as a child or where spouse is
 		// present (since they have been handled above).
-		if family.HasChild(c.document, c.individual) ||
-			(family.Husband(c.document) != nil && family.Wife(c.document) != nil) {
+		if family.HasChild(c.individual) ||
+			(family.Husband() != nil && family.Wife() != nil) {
 			continue
 		}
 
@@ -80,7 +80,7 @@ func (c *partnersAndChildren) String() string {
 }
 
 func partnerSection(family *gedcom.FamilyNode, c *partnersAndChildren, columns []*html.Column, rows []fmt.Stringer) ([]*html.Column, []fmt.Stringer) {
-	children := family.Children(c.document)
+	children := family.Children()
 	numberOfChildren := len(children)
 	for i, child := range children {
 		svg := newPlusSVG(false, true, true, true)

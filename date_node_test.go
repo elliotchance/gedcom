@@ -464,7 +464,7 @@ var dateTests = map[string]struct {
 func TestDateNode_StartDate(t *testing.T) {
 	for date, test := range dateTests {
 		t.Run(date, func(t *testing.T) {
-			node := gedcom.NewDateNode(date, "", nil)
+			node := gedcom.NewDateNode(nil, date, "", nil)
 
 			assert.Equal(t, node.StartDate(), test.startDate)
 		})
@@ -474,7 +474,7 @@ func TestDateNode_StartDate(t *testing.T) {
 func TestDateNode_EndDate(t *testing.T) {
 	for date, test := range dateTests {
 		t.Run(date, func(t *testing.T) {
-			node := gedcom.NewDateNode(date, "", nil)
+			node := gedcom.NewDateNode(nil, date, "", nil)
 
 			assert.Equal(t, node.EndDate(), test.endDate)
 		})
@@ -484,7 +484,7 @@ func TestDateNode_EndDate(t *testing.T) {
 func TestDateNode_String(t *testing.T) {
 	for date, test := range dateTests {
 		t.Run(date, func(t *testing.T) {
-			node := gedcom.NewDateNode(date, "", nil)
+			node := gedcom.NewDateNode(nil, date, "", nil)
 
 			assert.Equalf(t, test.str, node.String(), "%#+v", date)
 		})
@@ -497,42 +497,42 @@ func TestDateNode_Years(t *testing.T) {
 		expected float64
 	}{
 		// Zero
-		{gedcom.NewDateNode("", "", nil), 0.0},
+		{gedcom.NewDateNode(nil, "", "", nil), 0.0},
 
 		// Year
-		{gedcom.NewDateNode("750", "", nil), 750.5},
-		{gedcom.NewDateNode("1845", "", nil), 1845.5},
+		{gedcom.NewDateNode(nil, "750", "", nil), 750.5},
+		{gedcom.NewDateNode(nil, "1845", "", nil), 1845.5},
 
 		// Months
-		{gedcom.NewDateNode("Jan 1845", "", nil), 1845.0437158469945},
-		{gedcom.NewDateNode("Mar 1999", "", nil), 1999.204918032787},
-		{gedcom.NewDateNode("Dec 1832", "", nil), 1832.956403269755},
+		{gedcom.NewDateNode(nil, "Jan 1845", "", nil), 1845.0437158469945},
+		{gedcom.NewDateNode(nil, "Mar 1999", "", nil), 1999.204918032787},
+		{gedcom.NewDateNode(nil, "Dec 1832", "", nil), 1832.956403269755},
 
 		// Days
-		{gedcom.NewDateNode("1 Jan 1789", "", nil), 1789.0027322404371},
-		{gedcom.NewDateNode("31 Jan 1435", "", nil), 1435.0846994535518},
-		{gedcom.NewDateNode("1 Feb 1601", "", nil), 1601.0874316939892},
-		{gedcom.NewDateNode("1 Mar 845", "", nil), 845.1639344262295},
-		{gedcom.NewDateNode("31 Dec 2010", "", nil), 2010.9972677595629},
+		{gedcom.NewDateNode(nil, "1 Jan 1789", "", nil), 1789.0027322404371},
+		{gedcom.NewDateNode(nil, "31 Jan 1435", "", nil), 1435.0846994535518},
+		{gedcom.NewDateNode(nil, "1 Feb 1601", "", nil), 1601.0874316939892},
+		{gedcom.NewDateNode(nil, "1 Mar 845", "", nil), 845.1639344262295},
+		{gedcom.NewDateNode(nil, "31 Dec 2010", "", nil), 2010.9972677595629},
 
 		// Ranges
 		{
-			gedcom.NewDateNode("Bet. 1 Jan 1789 and 1 Mar 1789", "", nil),
+			gedcom.NewDateNode(nil, "Bet. 1 Jan 1789 and 1 Mar 1789", "", nil),
 			1789.0833333333335,
 		},
 		{
-			gedcom.NewDateNode("Bet. 1 Jan 1789 and 1 Jan 1789", "", nil),
+			gedcom.NewDateNode(nil, "Bet. 1 Jan 1789 and 1 Jan 1789", "", nil),
 			// Same as "1 Jan 1789"
 			1789.0027322404371,
 		},
 		{
-			gedcom.NewDateNode("Bet. 1430 and 1435", "", nil),
+			gedcom.NewDateNode(nil, "Bet. 1430 and 1435", "", nil),
 			// From the start of 1430 to the end of 1435 is actually 6 years.
 			1433,
 		},
 
 		// Invalid
-		{gedcom.NewDateNode("Foo", "", nil), 0},
+		{gedcom.NewDateNode(nil, "Foo", "", nil), 0},
 	}
 
 	for _, test := range tests {
@@ -550,143 +550,143 @@ func TestDateNode_Similarity(t *testing.T) {
 	}{
 		// Two unknown dates will be equal to each other.
 		{
-			gedcom.NewDateNode("", "", nil),
-			gedcom.NewDateNode("", "", nil),
+			gedcom.NewDateNode(nil, "", "", nil),
+			gedcom.NewDateNode(nil, "", "", nil),
 			1,
 		},
 
 		// The difference will be same regardless of time line so the two next
 		// tests must return the same similarity.
 		{
-			gedcom.NewDateNode("500", "", nil),
-			gedcom.NewDateNode("502", "", nil),
+			gedcom.NewDateNode(nil, "500", "", nil),
+			gedcom.NewDateNode(nil, "502", "", nil),
 			0.96,
 		},
 		{
-			gedcom.NewDateNode("2000", "", nil),
-			gedcom.NewDateNode("2002", "", nil),
+			gedcom.NewDateNode(nil, "2000", "", nil),
+			gedcom.NewDateNode(nil, "2002", "", nil),
 			0.96,
 		},
 
 		// A higher score is awarded to values that are closer to each other.
 		{
-			gedcom.NewDateNode("1900", "", nil),
-			gedcom.NewDateNode("1901", "", nil),
+			gedcom.NewDateNode(nil, "1900", "", nil),
+			gedcom.NewDateNode(nil, "1901", "", nil),
 			0.99,
 		},
 		{
-			gedcom.NewDateNode("1900", "", nil),
-			gedcom.NewDateNode("1904", "", nil),
+			gedcom.NewDateNode(nil, "1900", "", nil),
+			gedcom.NewDateNode(nil, "1904", "", nil),
 			0.84,
 		},
 
 		// Months
 		{
-			gedcom.NewDateNode("Feb 2000", "", nil),
-			gedcom.NewDateNode("Mar 2000", "", nil),
+			gedcom.NewDateNode(nil, "Feb 2000", "", nil),
+			gedcom.NewDateNode(nil, "Mar 2000", "", nil),
 			0.9999331793984663,
 		},
 		{
-			gedcom.NewDateNode("Feb 2000", "", nil),
-			gedcom.NewDateNode("Feb 2001", "", nil),
+			gedcom.NewDateNode(nil, "Feb 2000", "", nil),
+			gedcom.NewDateNode(nil, "Feb 2001", "", nil),
 			0.9900204627124954,
 		},
 
 		// Days
 		{
-			gedcom.NewDateNode("13 Feb 2000", "", nil),
-			gedcom.NewDateNode("14 Feb 2000", "", nil),
+			gedcom.NewDateNode(nil, "13 Feb 2000", "", nil),
+			gedcom.NewDateNode(nil, "14 Feb 2000", "", nil),
 			0.9999999257548872,
 		},
 		{
-			gedcom.NewDateNode("13 Feb 2000", "", nil),
-			gedcom.NewDateNode("13 Apr 2000", "", nil),
+			gedcom.NewDateNode(nil, "13 Feb 2000", "", nil),
+			gedcom.NewDateNode(nil, "13 Apr 2000", "", nil),
 			0.9997327175938642,
 		},
 
 		// Exact matches
 		{
-			gedcom.NewDateNode("2000", "", nil),
-			gedcom.NewDateNode("2000", "", nil),
+			gedcom.NewDateNode(nil, "2000", "", nil),
+			gedcom.NewDateNode(nil, "2000", "", nil),
 			1,
 		},
 		{
-			gedcom.NewDateNode("Mar 2000", "", nil),
-			gedcom.NewDateNode("Mar 2000", "", nil),
+			gedcom.NewDateNode(nil, "Mar 2000", "", nil),
+			gedcom.NewDateNode(nil, "Mar 2000", "", nil),
 			1,
 		},
 		{
-			gedcom.NewDateNode("13 Mar 2000", "", nil),
-			gedcom.NewDateNode("13 Mar 2000", "", nil),
+			gedcom.NewDateNode(nil, "13 Mar 2000", "", nil),
+			gedcom.NewDateNode(nil, "13 Mar 2000", "", nil),
 			1,
 		},
 		{
-			gedcom.NewDateNode("Bet. 2000 and 2003", "", nil),
-			gedcom.NewDateNode("Between 2000 and 2003", "", nil),
+			gedcom.NewDateNode(nil, "Bet. 2000 and 2003", "", nil),
+			gedcom.NewDateNode(nil, "Between 2000 and 2003", "", nil),
 			1,
 		},
 		{
-			gedcom.NewDateNode("Bet. Mar 2000 and Oct 2000", "", nil),
-			gedcom.NewDateNode("Bet. Mar 2000 and Oct 2000", "", nil),
+			gedcom.NewDateNode(nil, "Bet. Mar 2000 and Oct 2000", "", nil),
+			gedcom.NewDateNode(nil, "Bet. Mar 2000 and Oct 2000", "", nil),
 			1,
 		},
 		{
-			gedcom.NewDateNode("bet. 13 Mar 2000 and 17 March 2000", "", nil),
-			gedcom.NewDateNode("Between 13 Mar 2000 and 17 March 2000", "", nil),
+			gedcom.NewDateNode(nil, "bet. 13 Mar 2000 and 17 March 2000", "", nil),
+			gedcom.NewDateNode(nil, "Between 13 Mar 2000 and 17 March 2000", "", nil),
 			1,
 		},
 
 		// These ranges are inverse so they have the same difference.
 		{
-			gedcom.NewDateNode("Bet. 2000 and 2003", "", nil),
-			gedcom.NewDateNode("Between 2001 and 2003", "", nil),
+			gedcom.NewDateNode(nil, "Bet. 2000 and 2003", "", nil),
+			gedcom.NewDateNode(nil, "Between 2001 and 2003", "", nil),
 			0.9975,
 		},
 		{
-			gedcom.NewDateNode("Bet. 2001 and 2003", "", nil),
-			gedcom.NewDateNode("Between 2000 and 2003", "", nil),
+			gedcom.NewDateNode(nil, "Bet. 2001 and 2003", "", nil),
+			gedcom.NewDateNode(nil, "Between 2000 and 2003", "", nil),
 			0.9975,
 		},
 
 		// Range has the same difference but over different time periods.
 		{
-			gedcom.NewDateNode("Bet. 2000 and 2003", "", nil),
-			gedcom.NewDateNode("Between 1997 and 2000", "", nil),
+			gedcom.NewDateNode(nil, "Bet. 2000 and 2003", "", nil),
+			gedcom.NewDateNode(nil, "Between 1997 and 2000", "", nil),
 			0.91,
 		},
 
 		// Other ranges.
 		{
-			gedcom.NewDateNode("Bet. Mar 2000 and Oct 2000", "", nil),
-			gedcom.NewDateNode("Bet. Feb 2000 and Oct 2000", "", nil),
+			gedcom.NewDateNode(nil, "Bet. Mar 2000 and Oct 2000", "", nil),
+			gedcom.NewDateNode(nil, "Bet. Feb 2000 and Oct 2000", "", nil),
 			0.9999832948496166,
 		},
 		{
-			gedcom.NewDateNode("bet. 15 Mar 2000 and 23 March 2000", "", nil),
-			gedcom.NewDateNode("Between 15 Mar 2000 and 25 March 2000", "", nil),
+			gedcom.NewDateNode(nil, "bet. 15 Mar 2000 and 23 March 2000", "", nil),
+			gedcom.NewDateNode(nil, "Between 15 Mar 2000 and 25 March 2000", "", nil),
 			0.9999999257548872,
 		},
 
 		// Invalid
 		{
-			gedcom.NewDateNode("Foo", "", nil),
-			gedcom.NewDateNode("13 Mar 2000", "", nil),
+			gedcom.NewDateNode(nil, "Foo", "", nil),
+			gedcom.NewDateNode(nil, "13 Mar 2000", "", nil),
 			0,
 		},
 		{
-			gedcom.NewDateNode("13 Mar 2000", "", nil),
-			gedcom.NewDateNode("Bar", "", nil),
+			gedcom.NewDateNode(nil, "13 Mar 2000", "", nil),
+			gedcom.NewDateNode(nil, "Bar", "", nil),
 			0,
 		},
 
 		// Nil cases
 		{
 			nil,
-			gedcom.NewDateNode("Jan 1845", "", nil),
+			gedcom.NewDateNode(nil, "Jan 1845", "", nil),
 			0.5,
 		},
 		{
-			gedcom.NewDateNode("Jan 1845", "", nil),
+			gedcom.NewDateNode(nil, "Jan 1845", "", nil),
 			nil,
 			0.5,
 		},

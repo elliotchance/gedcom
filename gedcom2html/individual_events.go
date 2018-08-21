@@ -26,7 +26,7 @@ func (c *individualEvents) String() string {
 	birthDate, birthPlace := html.GetBirth(c.individual)
 	events = append(events, newIndividualEvent("Birth", birthDate, birthPlace, ""))
 
-	for _, family := range c.individual.Families(c.document) {
+	for _, family := range c.individual.Families() {
 		marriage := gedcom.First(gedcom.NodesWithTag(family, gedcom.TagMarriage))
 		if marriage == nil {
 			continue
@@ -43,18 +43,18 @@ func (c *individualEvents) String() string {
 		}
 
 		description := ""
-		if family.Husband(c.document).Is(c.individual) {
+		if family.Husband().Is(c.individual) {
 			description = "<em>Unknown</em>"
 
-			if wife := family.Wife(c.document); wife != nil {
+			if wife := family.Wife(); wife != nil {
 				description = newIndividualLink(c.document, wife).String()
 			}
 		}
 
-		if family.Wife(c.document).Is(c.individual) {
+		if family.Wife().Is(c.individual) {
 			description = "<em>Unknown</em>"
 
-			if husband := family.Husband(c.document); husband != nil {
+			if husband := family.Husband(); husband != nil {
 				description = newIndividualLink(c.document, husband).String()
 			}
 		}

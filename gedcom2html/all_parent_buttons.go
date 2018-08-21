@@ -20,11 +20,11 @@ func newAllParentButtons(document *gedcom.Document, individual *gedcom.Individua
 }
 
 func (c *allParentButtons) String() (s string) {
-	families := c.individual.Families(c.document)
+	families := c.individual.Families()
 
 	for _, family := range families {
-		if family.Husband(c.document).Is(c.individual) ||
-			family.Wife(c.document).Is(c.individual) {
+		if family.Husband().Is(c.individual) ||
+			family.Wife().Is(c.individual) {
 			continue
 		}
 
@@ -34,7 +34,8 @@ func (c *allParentButtons) String() (s string) {
 	// If there are no families we still want to show an empty family. We just
 	// create a dummy family that has no child nodes.
 	if s == "" {
-		s = newParentButtons(c.document, gedcom.NewFamilyNode("", nil)).String()
+		familyNode := gedcom.NewFamilyNode(nil, "", nil)
+		s = newParentButtons(c.document, familyNode).String()
 	}
 
 	return

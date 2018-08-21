@@ -230,7 +230,7 @@ type IndividualComparison struct {
 //
 // The options.MinimumCompareSimilarity sets a threshold of
 // WeightedSimilarity(). Any matches below minimumSimilarity will not be used.
-func (nodes IndividualNodes) Compare(doc1, doc2 *Document, other IndividualNodes, options *SimilarityOptions) []IndividualComparison {
+func (nodes IndividualNodes) Compare(other IndividualNodes, options *SimilarityOptions) []IndividualComparison {
 	// Calculate all the similarities of the matrix.
 	similarities := []IndividualComparison{}
 
@@ -239,7 +239,7 @@ func (nodes IndividualNodes) Compare(doc1, doc2 *Document, other IndividualNodes
 			similarities = append(similarities, IndividualComparison{
 				Left:       a,
 				Right:      b,
-				Similarity: a.SurroundingSimilarity(doc1, doc2, b, options),
+				Similarity: a.SurroundingSimilarity(b, options),
 			})
 		}
 	}

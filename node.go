@@ -9,6 +9,8 @@ type Node interface {
 	Tag() Tag
 	Value() string
 	Pointer() string
+	Document() *Document
+	SetDocument(document *Document)
 
 	// Child nodes.
 	Nodes() []Node

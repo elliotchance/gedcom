@@ -12,42 +12,42 @@ var nodesWithTagTests = []struct {
 	want []gedcom.Node
 }{
 	{nil, gedcom.TagHeader, []gedcom.Node{}},
-	{gedcom.NewNameNode("", "", nil), gedcom.TagHeader, []gedcom.Node{}},
+	{gedcom.NewNameNode(nil, "", "", nil), gedcom.TagHeader, []gedcom.Node{}},
 	{
-		gedcom.NewNameNode("", "", []gedcom.Node{
-			gedcom.NewSimpleNode(gedcom.TagSurname, "", "", nil),
+		gedcom.NewNameNode(nil, "", "", []gedcom.Node{
+			gedcom.NewSimpleNode(nil, gedcom.TagSurname, "", "", nil),
 		}),
 		gedcom.TagHeader,
 		[]gedcom.Node{},
 	},
 	{
-		gedcom.NewNameNode("", "", []gedcom.Node{
-			gedcom.NewSimpleNode(gedcom.TagSurname, "", "", nil),
+		gedcom.NewNameNode(nil, "", "", []gedcom.Node{
+			gedcom.NewSimpleNode(nil, gedcom.TagSurname, "", "", nil),
 		}),
 		gedcom.TagSurname,
 		[]gedcom.Node{
-			gedcom.NewSimpleNode(gedcom.TagSurname, "", "", nil),
+			gedcom.NewSimpleNode(nil, gedcom.TagSurname, "", "", nil),
 		},
 	},
 	{
-		gedcom.NewNameNode("", "", []gedcom.Node{
-			gedcom.NewSimpleNode(gedcom.TagHeader, "", "", nil),
-			gedcom.NewSimpleNode(gedcom.TagSurname, "", "", nil),
+		gedcom.NewNameNode(nil, "", "", []gedcom.Node{
+			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", nil),
+			gedcom.NewSimpleNode(nil, gedcom.TagSurname, "", "", nil),
 		}),
 		gedcom.TagSurname,
 		[]gedcom.Node{
-			gedcom.NewSimpleNode(gedcom.TagSurname, "", "", nil),
+			gedcom.NewSimpleNode(nil, gedcom.TagSurname, "", "", nil),
 		},
 	},
 	{
-		gedcom.NewNameNode("", "", []gedcom.Node{
-			gedcom.NewSimpleNode(gedcom.TagSurname, "", "", nil),
-			gedcom.NewSimpleNode(gedcom.TagSurname, "", "", nil),
+		gedcom.NewNameNode(nil, "", "", []gedcom.Node{
+			gedcom.NewSimpleNode(nil, gedcom.TagSurname, "", "", nil),
+			gedcom.NewSimpleNode(nil, gedcom.TagSurname, "", "", nil),
 		}),
 		gedcom.TagSurname,
 		[]gedcom.Node{
-			gedcom.NewSimpleNode(gedcom.TagSurname, "", "", nil),
-			gedcom.NewSimpleNode(gedcom.TagSurname, "", "", nil),
+			gedcom.NewSimpleNode(nil, gedcom.TagSurname, "", "", nil),
+			gedcom.NewSimpleNode(nil, gedcom.TagSurname, "", "", nil),
 		},
 	},
 }
@@ -67,86 +67,86 @@ func TestNodesWithTagPath(t *testing.T) {
 		want    []gedcom.Node
 	}{
 		{
-			gedcom.NewNameNode("", "", []gedcom.Node{
-				gedcom.NewSimpleNode(gedcom.TagSurname, "", "", nil),
+			gedcom.NewNameNode(nil, "", "", []gedcom.Node{
+				gedcom.NewSimpleNode(nil, gedcom.TagSurname, "", "", nil),
 			}),
 			[]gedcom.Tag{},
 			[]gedcom.Node{},
 		},
 		{
-			gedcom.NewNameNode("", "", []gedcom.Node{
-				gedcom.NewSimpleNode(gedcom.TagSurname, "", "", []gedcom.Node{
-					gedcom.NewSimpleNode(gedcom.TagText, "", "", nil),
+			gedcom.NewNameNode(nil, "", "", []gedcom.Node{
+				gedcom.NewSimpleNode(nil, gedcom.TagSurname, "", "", []gedcom.Node{
+					gedcom.NewSimpleNode(nil, gedcom.TagText, "", "", nil),
 				}),
 			}),
 			[]gedcom.Tag{gedcom.TagSurname},
 			[]gedcom.Node{
-				gedcom.NewSimpleNode(gedcom.TagSurname, "", "", []gedcom.Node{
-					gedcom.NewSimpleNode(gedcom.TagText, "", "", nil),
+				gedcom.NewSimpleNode(nil, gedcom.TagSurname, "", "", []gedcom.Node{
+					gedcom.NewSimpleNode(nil, gedcom.TagText, "", "", nil),
 				}),
 			},
 		},
 		{
-			gedcom.NewNameNode("", "", []gedcom.Node{
-				gedcom.NewSimpleNode(gedcom.TagSurname, "", "", []gedcom.Node{
-					gedcom.NewSimpleNode(gedcom.TagText, "", "", nil),
+			gedcom.NewNameNode(nil, "", "", []gedcom.Node{
+				gedcom.NewSimpleNode(nil, gedcom.TagSurname, "", "", []gedcom.Node{
+					gedcom.NewSimpleNode(nil, gedcom.TagText, "", "", nil),
 				}),
 			}),
 			[]gedcom.Tag{gedcom.TagSurname, gedcom.TagText},
 			[]gedcom.Node{
-				gedcom.NewSimpleNode(gedcom.TagText, "", "", nil),
+				gedcom.NewSimpleNode(nil, gedcom.TagText, "", "", nil),
 			},
 		},
 		{
-			gedcom.NewNameNode("", "", []gedcom.Node{
-				gedcom.NewSimpleNode(gedcom.TagSurname, "", "", []gedcom.Node{
-					gedcom.NewSimpleNode(gedcom.TagText, "", "1", nil),
+			gedcom.NewNameNode(nil, "", "", []gedcom.Node{
+				gedcom.NewSimpleNode(nil, gedcom.TagSurname, "", "", []gedcom.Node{
+					gedcom.NewSimpleNode(nil, gedcom.TagText, "", "1", nil),
 				}),
-				gedcom.NewSimpleNode(gedcom.TagSurname, "", "", []gedcom.Node{
-					gedcom.NewSimpleNode(gedcom.TagText, "", "2", nil),
-				}),
-			}),
-			[]gedcom.Tag{gedcom.TagSurname, gedcom.TagText},
-			[]gedcom.Node{
-				gedcom.NewSimpleNode(gedcom.TagText, "", "1", nil),
-				gedcom.NewSimpleNode(gedcom.TagText, "", "2", nil),
-			},
-		},
-		{
-			gedcom.NewNameNode("", "", []gedcom.Node{
-				gedcom.NewSimpleNode(gedcom.TagSurname, "", "", []gedcom.Node{
-					gedcom.NewSimpleNode(gedcom.TagText, "", "1", nil),
-					gedcom.NewSimpleNode(gedcom.TagText, "", "2", nil),
+				gedcom.NewSimpleNode(nil, gedcom.TagSurname, "", "", []gedcom.Node{
+					gedcom.NewSimpleNode(nil, gedcom.TagText, "", "2", nil),
 				}),
 			}),
 			[]gedcom.Tag{gedcom.TagSurname, gedcom.TagText},
 			[]gedcom.Node{
-				gedcom.NewSimpleNode(gedcom.TagText, "", "1", nil),
-				gedcom.NewSimpleNode(gedcom.TagText, "", "2", nil),
+				gedcom.NewSimpleNode(nil, gedcom.TagText, "", "1", nil),
+				gedcom.NewSimpleNode(nil, gedcom.TagText, "", "2", nil),
 			},
 		},
 		{
-			gedcom.NewNameNode("", "", []gedcom.Node{
-				gedcom.NewSimpleNode(gedcom.TagSurname, "", "", []gedcom.Node{
-					gedcom.NewSimpleNode(gedcom.TagText, "", "", nil),
+			gedcom.NewNameNode(nil, "", "", []gedcom.Node{
+				gedcom.NewSimpleNode(nil, gedcom.TagSurname, "", "", []gedcom.Node{
+					gedcom.NewSimpleNode(nil, gedcom.TagText, "", "1", nil),
+					gedcom.NewSimpleNode(nil, gedcom.TagText, "", "2", nil),
+				}),
+			}),
+			[]gedcom.Tag{gedcom.TagSurname, gedcom.TagText},
+			[]gedcom.Node{
+				gedcom.NewSimpleNode(nil, gedcom.TagText, "", "1", nil),
+				gedcom.NewSimpleNode(nil, gedcom.TagText, "", "2", nil),
+			},
+		},
+		{
+			gedcom.NewNameNode(nil, "", "", []gedcom.Node{
+				gedcom.NewSimpleNode(nil, gedcom.TagSurname, "", "", []gedcom.Node{
+					gedcom.NewSimpleNode(nil, gedcom.TagText, "", "", nil),
 				}),
 			}),
 			[]gedcom.Tag{gedcom.TagGivenName, gedcom.TagText},
 			[]gedcom.Node{},
 		},
 		{
-			gedcom.NewNameNode("", "", []gedcom.Node{
-				gedcom.NewSimpleNode(gedcom.TagSurname, "", "", []gedcom.Node{
-					gedcom.NewSimpleNode(gedcom.TagText, "", "", nil),
+			gedcom.NewNameNode(nil, "", "", []gedcom.Node{
+				gedcom.NewSimpleNode(nil, gedcom.TagSurname, "", "", []gedcom.Node{
+					gedcom.NewSimpleNode(nil, gedcom.TagText, "", "", nil),
 				}),
 			}),
 			[]gedcom.Tag{gedcom.TagSurname, gedcom.TagSurname},
 			[]gedcom.Node{},
 		},
 		{
-			gedcom.NewNameNode("", "", []gedcom.Node{
-				gedcom.NewSimpleNode(gedcom.TagSurname, "", "", []gedcom.Node{
-					gedcom.NewSimpleNode(gedcom.TagText, "", "", nil),
+			gedcom.NewNameNode(nil, "", "", []gedcom.Node{
+				gedcom.NewSimpleNode(nil, gedcom.TagSurname, "", "", []gedcom.Node{
+					gedcom.NewSimpleNode(nil, gedcom.TagText, "", "", nil),
 				}),
 			}),
 			[]gedcom.Tag{gedcom.TagSurname, gedcom.TagGivenName},
@@ -172,8 +172,8 @@ func TestNodesWithTagPath(t *testing.T) {
 }
 
 func TestHasNestedNode(t *testing.T) {
-	surname := gedcom.NewSimpleNode(gedcom.TagSurname, "", "", nil)
-	givenName := gedcom.NewSimpleNode(gedcom.TagGivenName, "", "", nil)
+	surname := gedcom.NewSimpleNode(nil, gedcom.TagSurname, "", "", nil)
+	givenName := gedcom.NewSimpleNode(nil, gedcom.TagGivenName, "", "", nil)
 
 	tests := []struct {
 		node       gedcom.Node
@@ -199,41 +199,41 @@ func TestHasNestedNode(t *testing.T) {
 
 		// No children.
 		{
-			gedcom.NewNameNode("", "", nil),
+			gedcom.NewNameNode(nil, "", "", nil),
 			surname,
 			false,
 		},
 		{
-			gedcom.NewNameNode("", "", []gedcom.Node{}),
+			gedcom.NewNameNode(nil, "", "", []gedcom.Node{}),
 			surname,
 			false,
 		},
 
 		// Other cases.
 		{
-			gedcom.NewNameNode("", "", []gedcom.Node{
+			gedcom.NewNameNode(nil, "", "", []gedcom.Node{
 				surname,
 			}),
 			surname,
 			true,
 		},
 		{
-			gedcom.NewNameNode("", "", []gedcom.Node{
+			gedcom.NewNameNode(nil, "", "", []gedcom.Node{
 				surname,
 			}),
-			gedcom.NewSimpleNode(gedcom.TagSurname, "", "", nil),
+			gedcom.NewSimpleNode(nil, gedcom.TagSurname, "", "", nil),
 			false,
 		},
 		{
-			gedcom.NewNameNode("", "", []gedcom.Node{
+			gedcom.NewNameNode(nil, "", "", []gedcom.Node{
 				givenName,
 			}),
 			surname,
 			false,
 		},
 		{
-			gedcom.NewNameNode("", "", []gedcom.Node{
-				gedcom.NewSimpleNode(gedcom.TagGivenName, "", "", []gedcom.Node{
+			gedcom.NewNameNode(nil, "", "", []gedcom.Node{
+				gedcom.NewSimpleNode(nil, gedcom.TagGivenName, "", "", []gedcom.Node{
 					givenName,
 				}),
 			}),

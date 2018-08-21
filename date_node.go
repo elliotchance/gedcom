@@ -134,14 +134,9 @@ type DateNode struct {
 	parsedEndDate   Date
 }
 
-func NewDateNode(value, pointer string, children []Node) *DateNode {
+func NewDateNode(document *Document, value, pointer string, children []Node) *DateNode {
 	return &DateNode{
-		&SimpleNode{
-			tag:      TagDate,
-			value:    value,
-			pointer:  pointer,
-			children: children,
-		},
+		NewSimpleNode(document, TagDate, value, pointer, children),
 		false, Date{}, Date{},
 	}
 }
