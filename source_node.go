@@ -5,9 +5,9 @@ type SourceNode struct {
 	*SimpleNode
 }
 
-func NewSourceNode(value, pointer string, children []Node) *SourceNode {
+func NewSourceNode(document *Document, value, pointer string, children []Node) *SourceNode {
 	return &SourceNode{
-		NewSimpleNode(TagSource, value, pointer, children),
+		NewSimpleNode(document, TagSource, value, pointer, children),
 	}
 }
 

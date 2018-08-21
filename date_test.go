@@ -10,7 +10,7 @@ func TestDate_Time(t *testing.T) {
 	t.Run("StartDate", func(t *testing.T) {
 		for date, test := range dateTests {
 			t.Run(date, func(t *testing.T) {
-				node := gedcom.NewDateNode(date, "", nil)
+				node := gedcom.NewDateNode(nil, date, "", nil)
 
 				assert.Equal(t, node.StartDate().Time(), test.startTime)
 			})
@@ -20,7 +20,7 @@ func TestDate_Time(t *testing.T) {
 	t.Run("EndDate", func(t *testing.T) {
 		for date, test := range dateTests {
 			t.Run(date, func(t *testing.T) {
-				node := gedcom.NewDateNode(date, "", nil)
+				node := gedcom.NewDateNode(nil, date, "", nil)
 
 				assert.Equal(t, node.EndDate().Time(), test.endTime)
 			})

@@ -48,7 +48,7 @@ func (dec *Decoder) Decode() (*Document, error) {
 			continue
 		}
 
-		node, indent := parseLine(line)
+		node, indent := parseLine(document, line)
 
 		// Add a root node to the document.
 		if indent == 0 {
@@ -119,7 +119,7 @@ func (dec *Decoder) readLine() (string, error) {
 
 var lineRegexp = regexp.MustCompile(`^(\d) (@\w+@ )?(\w+)( .*)?$`)
 
-func parseLine(line string) (Node, int) {
+func parseLine(document *Document, line string) (Node, int) {
 	parts := lineRegexp.FindStringSubmatch(line)
 
 	indent := 0
@@ -144,24 +144,24 @@ func parseLine(line string) (Node, int) {
 
 	switch tag {
 	case TagDate:
-		return NewDateNode(value, pointer, []Node{}), indent
+		return NewDateNode(document, value, pointer, []Node{}), indent
 
 	case TagFamily:
-		return NewFamilyNode(pointer, []Node{}), indent
+		return NewFamilyNode(document, pointer, []Node{}), indent
 
 	case TagIndividual:
-		return NewIndividualNode(value, pointer, []Node{}), indent
+		return NewIndividualNode(document, value, pointer, []Node{}), indent
 
 	case TagName:
-		return NewNameNode(value, pointer, []Node{}), indent
+		return NewNameNode(document, value, pointer, []Node{}), indent
 
 	case TagPlace:
-		return NewPlaceNode(value, pointer, []Node{}), indent
+		return NewPlaceNode(document, value, pointer, []Node{}), indent
 
 	case TagSource:
-		return NewSourceNode(value, pointer, []Node{}), indent
+		return NewSourceNode(document, value, pointer, []Node{}), indent
 
 	default:
-		return NewSimpleNode(tag, value, pointer, []Node{}), indent
+		return NewSimpleNode(document, tag, value, pointer, []Node{}), indent
 	}
 }

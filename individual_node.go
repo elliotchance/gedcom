@@ -18,9 +18,9 @@ type IndividualNode struct {
 // only contain a nil key.
 type SpouseChildren map[*IndividualNode]IndividualNodes
 
-func NewIndividualNode(value, pointer string, children []Node) *IndividualNode {
+func NewIndividualNode(document *Document, value, pointer string, children []Node) *IndividualNode {
 	return &IndividualNode{
-		NewSimpleNode(TagIndividual, value, pointer, children),
+		NewSimpleNode(document, TagIndividual, value, pointer, children),
 		false, false, nil, nil,
 	}
 }
@@ -56,7 +56,7 @@ func (node *IndividualNode) Sex() Sex {
 }
 
 // TODO: needs tests
-func (node *IndividualNode) Spouses(doc *Document) (spouses IndividualNodes) {
+func (node *IndividualNode) Spouses() (spouses IndividualNodes) {
 	if node.cachedSpouses {
 		return node.spouses
 	}
@@ -68,9 +68,9 @@ func (node *IndividualNode) Spouses(doc *Document) (spouses IndividualNodes) {
 
 	spouses = IndividualNodes{}
 
-	for _, family := range doc.Families() {
-		husband := family.Husband(doc)
-		wife := family.Wife(doc)
+	for _, family := range node.document.Families() {
+		husband := family.Husband()
+		wife := family.Wife()
 
 		// We only care about families that have both parties (otherwise there
 		// is no spouse to add).
@@ -91,7 +91,7 @@ func (node *IndividualNode) Spouses(doc *Document) (spouses IndividualNodes) {
 }
 
 // TODO: needs tests
-func (node *IndividualNode) Families(doc *Document) (families []*FamilyNode) {
+func (node *IndividualNode) Families() (families []*FamilyNode) {
 	if node.cachedFamilies {
 		return node.families
 	}
@@ -103,8 +103,8 @@ func (node *IndividualNode) Families(doc *Document) (families []*FamilyNode) {
 
 	families = []*FamilyNode{}
 
-	for _, family := range doc.Families() {
-		if family.HasChild(doc, node) || family.Husband(doc).Is(node) || family.Wife(doc).Is(node) {
+	for _, family := range node.document.Families() {
+		if family.HasChild(node) || family.Husband().Is(node) || family.Wife().Is(node) {
 			families = append(families, family)
 		}
 	}
@@ -118,10 +118,10 @@ func (node *IndividualNode) Is(individual *IndividualNode) bool {
 }
 
 // TODO: needs tests
-func (node *IndividualNode) FamilyWithSpouse(doc *Document, spouse *IndividualNode) *FamilyNode {
-	for _, family := range doc.Families() {
-		a := family.Husband(doc).Is(node) && family.Wife(doc).Is(spouse)
-		b := family.Wife(doc).Is(node) && family.Husband(doc).Is(spouse)
+func (node *IndividualNode) FamilyWithSpouse(spouse *IndividualNode) *FamilyNode {
+	for _, family := range node.document.Families() {
+		a := family.Husband().Is(node) && family.Wife().Is(spouse)
+		b := family.Wife().Is(node) && family.Husband().Is(spouse)
 
 		if a || b {
 			return family
@@ -132,10 +132,10 @@ func (node *IndividualNode) FamilyWithSpouse(doc *Document, spouse *IndividualNo
 }
 
 // TODO: needs tests
-func (node *IndividualNode) FamilyWithUnknownSpouse(doc *Document) *FamilyNode {
-	for _, family := range doc.Families() {
-		a := family.Husband(doc).Is(node) && family.Wife(doc) == nil
-		b := family.Wife(doc).Is(node) && family.Husband(doc) == nil
+func (node *IndividualNode) FamilyWithUnknownSpouse() *FamilyNode {
+	for _, family := range node.document.Families() {
+		a := family.Husband().Is(node) && family.Wife() == nil
+		b := family.Wife().Is(node) && family.Husband() == nil
 
 		if a || b {
 			return family
@@ -181,11 +181,11 @@ func (node *IndividualNode) Burials() []Node {
 // It is also possible to have duplicate families. That is, families that have
 // the same husband and wife combinations if these families are defined in the
 // GEDCOM file.
-func (node *IndividualNode) Parents(doc *Document) []*FamilyNode {
+func (node *IndividualNode) Parents() []*FamilyNode {
 	parents := []*FamilyNode{}
 
-	for _, family := range node.Families(doc) {
-		if family.HasChild(doc, node) {
+	for _, family := range node.Families() {
+		if family.HasChild(node) {
 			parents = append(parents, family)
 		}
 	}
@@ -196,30 +196,30 @@ func (node *IndividualNode) Parents(doc *Document) []*FamilyNode {
 // SpouseChildren maps the known spouses to their children. The spouse will be
 // nil if the other parent is not known for some or all of the children.
 // Children can appear under multiple spouses.
-func (node *IndividualNode) SpouseChildren(doc *Document) SpouseChildren {
+func (node *IndividualNode) SpouseChildren() SpouseChildren {
 	spouseChildren := map[*IndividualNode]IndividualNodes{}
 
-	for _, family := range node.Families(doc) {
-		if !family.HasChild(doc, node) {
+	for _, family := range node.Families() {
+		if !family.HasChild(node) {
 			var spouse *IndividualNode
 
-			if family.Husband(doc).Is(node) {
-				spouse = family.Wife(doc)
+			if family.Husband().Is(node) {
+				spouse = family.Wife()
 			} else {
-				spouse = family.Husband(doc)
+				spouse = family.Husband()
 			}
 
-			familyWithSpouse := node.FamilyWithSpouse(doc, spouse)
+			familyWithSpouse := node.FamilyWithSpouse(spouse)
 			var children IndividualNodes
 			if familyWithSpouse != nil {
-				children = familyWithSpouse.Children(doc)
+				children = familyWithSpouse.Children()
 			}
 			spouseChildren[spouse] = children
 
 			// Find children with unknown spouse.
-			unknownSpouseFamily := node.FamilyWithUnknownSpouse(doc)
+			unknownSpouseFamily := node.FamilyWithUnknownSpouse()
 			if unknownSpouseFamily != nil {
-				spouseChildren[nil] = unknownSpouseFamily.Children(doc)
+				spouseChildren[nil] = unknownSpouseFamily.Children()
 			}
 		}
 	}
@@ -434,22 +434,20 @@ func (node *IndividualNode) Similarity(other *IndividualNode, options *Similarit
 // The options.MinimumSimilarity is used when comparing slices of individuals.
 // In this case that means for the spouses and children. A higher value makes
 // the matching more strict. See DefaultMinimumSimilarity for more information.
-func (node *IndividualNode) SurroundingSimilarity(doc1, doc2 *Document, other *IndividualNode, options *SimilarityOptions) (s SurroundingSimilarity) {
+func (node *IndividualNode) SurroundingSimilarity(other *IndividualNode, options *SimilarityOptions) (s SurroundingSimilarity) {
 	// Individual, spouse and children similarity only needs to be calculated
 	// once. The parents similarity will be calculated from the matrix below.
 	s.IndividualSimilarity = node.Similarity(other, options)
-	s.SpousesSimilarity = node.Spouses(doc1).
-		Similarity(other.Spouses(doc2), options)
-	s.ChildrenSimilarity = node.Children(doc1).
-		Similarity(other.Children(doc2), options)
+	s.SpousesSimilarity = node.Spouses().Similarity(other.Spouses(), options)
+	s.ChildrenSimilarity = node.Children().Similarity(other.Children(), options)
 
 	didFindParents := false
-	for _, parents1 := range node.Parents(doc1) {
-		for _, parents2 := range other.Parents(doc2) {
+	for _, parents1 := range node.Parents() {
+		for _, parents2 := range other.Parents() {
 			didFindParents = true
 
 			// depth of 0 means only the wife/husband is compared.
-			similarity := parents1.Similarity(doc1, doc2, parents2, 0, options)
+			similarity := parents1.Similarity(parents2, 0, options)
 
 			if similarity > s.ParentsSimilarity {
 				s.ParentsSimilarity = similarity
@@ -465,12 +463,12 @@ func (node *IndividualNode) SurroundingSimilarity(doc1, doc2 *Document, other *I
 }
 
 // TODO: Needs tests
-func (node *IndividualNode) Children(doc *Document) IndividualNodes {
+func (node *IndividualNode) Children() IndividualNodes {
 	children := IndividualNodes{}
 
-	for _, family := range node.Families(doc) {
-		if !family.HasChild(doc, node) {
-			children = append(children, family.Children(doc)...)
+	for _, family := range node.Families() {
+		if !family.HasChild(node) {
+			children = append(children, family.Children()...)
 		}
 	}
 

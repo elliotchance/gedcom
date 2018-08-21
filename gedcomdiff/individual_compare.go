@@ -9,16 +9,13 @@ import (
 
 type individualCompare struct {
 	comparison    gedcom.IndividualComparison
-	doc1, doc2    *gedcom.Document
 	includePlaces bool
 	hideSame      bool
 }
 
-func newIndividualCompare(comparison gedcom.IndividualComparison, doc1, doc2 *gedcom.Document, includePlaces, hideSame bool) *individualCompare {
+func newIndividualCompare(comparison gedcom.IndividualComparison, includePlaces, hideSame bool) *individualCompare {
 	return &individualCompare{
 		comparison:    comparison,
-		doc1:          doc1,
-		doc2:          doc2,
 		includePlaces: includePlaces,
 		hideSame:      hideSame,
 	}
@@ -89,11 +86,11 @@ func (c *individualCompare) String() string {
 	fatherLeft := ""
 	motherLeft := ""
 	if c.comparison.Left != nil {
-		if p := c.comparison.Left.Parents(c.doc1); len(p) > 0 {
-			if n := p[0].Husband(c.doc1); n != nil && n.Name() != nil {
+		if p := c.comparison.Left.Parents(); len(p) > 0 {
+			if n := p[0].Husband(); n != nil && n.Name() != nil {
 				fatherLeft = n.Name().String()
 			}
-			if n := p[0].Wife(c.doc1); n != nil && n.Name() != nil {
+			if n := p[0].Wife(); n != nil && n.Name() != nil {
 				motherLeft = n.Name().String()
 			}
 		}
@@ -102,11 +99,11 @@ func (c *individualCompare) String() string {
 	fatherRight := ""
 	motherRight := ""
 	if c.comparison.Right != nil {
-		if p := c.comparison.Right.Parents(c.doc2); len(p) > 0 {
-			if n := p[0].Husband(c.doc2); n != nil && n.Name() != nil {
+		if p := c.comparison.Right.Parents(); len(p) > 0 {
+			if n := p[0].Husband(); n != nil && n.Name() != nil {
 				fatherRight = n.Name().String()
 			}
-			if n := p[0].Wife(c.doc2); n != nil && n.Name() != nil {
+			if n := p[0].Wife(); n != nil && n.Name() != nil {
 				motherRight = n.Name().String()
 			}
 		}

@@ -88,22 +88,22 @@ func main() {
 		printNodes(individual, gedcom.TagDeath)
 
 		printLine(fmt.Sprintf("  Families:"))
-		for _, family := range individual.Families(document) {
-			if !family.HasChild(document, individual) {
+		for _, family := range individual.Families() {
+			if !family.HasChild(individual) {
 				continue
 			}
 
 			printLine("    -")
-			if father := family.Husband(document); father != nil {
+			if father := family.Husband(); father != nil {
 				printLine(fmt.Sprintf("      Father: %s", father.Name()))
 			}
-			if mother := family.Wife(document); mother != nil {
+			if mother := family.Wife(); mother != nil {
 				printLine(fmt.Sprintf("      Mother: %s", mother.Name()))
 			}
 		}
 
 		printLine(fmt.Sprintf("  Spouses:"))
-		spouses := individual.Spouses(document)
+		spouses := individual.Spouses()
 
 		// Make sure the spouses are sorted as to not interfere with the
 		// diffing.
@@ -121,7 +121,7 @@ func main() {
 			}
 
 			// Marriage events.
-			withSpouse := individual.FamilyWithSpouse(document, spouse)
+			withSpouse := individual.FamilyWithSpouse(spouse)
 			m := gedcom.First(gedcom.NodesWithTagPath(withSpouse,
 				gedcom.TagMarriage, gedcom.TagDate))
 			if m != nil {
@@ -129,7 +129,7 @@ func main() {
 			}
 
 			// Children of the spouse.
-			children := withSpouse.Children(document)
+			children := withSpouse.Children()
 			sort.SliceStable(children, func(i, j int) bool {
 				return children[i].Names()[0].String() < children[j].Names()[0].String()
 			})

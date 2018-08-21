@@ -34,8 +34,8 @@ func (c *parentButtons) String() string {
 		   </div>
 		</div>
 		%s`,
-		newIndividualButton(c.document, c.family.Husband(c.document)),
+		newIndividualButton(c.document, c.family.Husband()),
 		newPlusSVG(false, true, true, true),
-		newIndividualButton(c.document, c.family.Wife(c.document)),
+		newIndividualButton(c.document, c.family.Wife()),
 		html.NewSpace())
 }

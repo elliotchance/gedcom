@@ -7,14 +7,14 @@ type FamilyNode struct {
 	husband, wife             *IndividualNode
 }
 
-func NewFamilyNode(pointer string, children []Node) *FamilyNode {
+func NewFamilyNode(document *Document, pointer string, children []Node) *FamilyNode {
 	return &FamilyNode{
-		NewSimpleNode(TagFamily, "", pointer, children),
+		NewSimpleNode(document, TagFamily, "", pointer, children),
 		false, false, nil, nil,
 	}
 }
 
-func (node *FamilyNode) Husband(document *Document) (husband *IndividualNode) {
+func (node *FamilyNode) Husband() (husband *IndividualNode) {
 	if node.cachedHusband {
 		return node.husband
 	}
@@ -24,10 +24,10 @@ func (node *FamilyNode) Husband(document *Document) (husband *IndividualNode) {
 		node.cachedHusband = true
 	}()
 
-	return node.partner(document, TagHusband)
+	return node.partner(TagHusband)
 }
 
-func (node *FamilyNode) Wife(document *Document) (wife *IndividualNode) {
+func (node *FamilyNode) Wife() (wife *IndividualNode) {
 	if node.cachedWife {
 		return node.wife
 	}
@@ -37,17 +37,17 @@ func (node *FamilyNode) Wife(document *Document) (wife *IndividualNode) {
 		node.cachedWife = true
 	}()
 
-	return node.partner(document, TagWife)
+	return node.partner(TagWife)
 }
 
-func (node *FamilyNode) partner(document *Document, tag Tag) *IndividualNode {
+func (node *FamilyNode) partner(tag Tag) *IndividualNode {
 	tags := NodesWithTag(node, tag)
 	if len(tags) == 0 {
 		return nil
 	}
 
 	pointer := valueToPointer(tags[0].Value())
-	individual := document.NodeByPointer(pointer)
+	individual := node.document.NodeByPointer(pointer)
 	if individual == nil {
 		return nil
 	}
@@ -56,11 +56,11 @@ func (node *FamilyNode) partner(document *Document, tag Tag) *IndividualNode {
 }
 
 // TODO: Needs tests
-func (node *FamilyNode) Children(document *Document) IndividualNodes {
+func (node *FamilyNode) Children() IndividualNodes {
 	children := IndividualNodes{}
 
 	for _, n := range NodesWithTag(node, TagChild) {
-		pointer := document.NodeByPointer(valueToPointer(n.Value()))
+		pointer := node.document.NodeByPointer(valueToPointer(n.Value()))
 		child := pointer.(*IndividualNode)
 		children = append(children, child)
 	}
@@ -69,7 +69,7 @@ func (node *FamilyNode) Children(document *Document) IndividualNodes {
 }
 
 // TODO: Needs tests
-func (node *FamilyNode) HasChild(document *Document, individual *IndividualNode) bool {
+func (node *FamilyNode) HasChild(individual *IndividualNode) bool {
 	for _, n := range NodesWithTag(node, TagChild) {
 		if n.Value() == "@"+individual.Pointer()+"@" {
 			return true
@@ -85,21 +85,17 @@ func (node *FamilyNode) HasChild(document *Document, individual *IndividualNode)
 // only compare the husband/wife and not take into account any children. At the
 // moment only a depth of 0 is supported. Any other depth will raise panic.
 //
-// doc1 and doc2 are used as the Documents for the current and other node
-// respectively. If the two FamilyNodes come from the same Document you must
-// specify the same Document for both values.
-//
 // The options.MaxYears allows the error margin on dates to be adjusted. See
 // DefaultMaxYearsForSimilarity for more information.
-func (node *FamilyNode) Similarity(doc1, doc2 *Document, other *FamilyNode, depth int, options *SimilarityOptions) float64 {
+func (node *FamilyNode) Similarity(other *FamilyNode, depth int, options *SimilarityOptions) float64 {
 	if depth != 0 {
 		panic("depth can only be 0")
 	}
 
 	// It does not matter if any of the partners are nil, Similarity will handle
 	// these gracefully.
-	husband := node.Husband(doc1).Similarity(other.Husband(doc2), options)
-	wife := node.Wife(doc1).Similarity(other.Wife(doc2), options)
+	husband := node.Husband().Similarity(other.Husband(), options)
+	wife := node.Wife().Similarity(other.Wife(), options)
 
 	return (husband + wife) / 2
 }

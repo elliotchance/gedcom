@@ -58,14 +58,14 @@ var firtLastTests = []struct {
 	{[]gedcom.Node{}, nil, nil},
 	{[]gedcom.Node{nil}, nil, nil},
 	{
-		[]gedcom.Node{gedcom.NewNameNode("a", "", nil)},
-		gedcom.NewNameNode("a", "", nil),
-		gedcom.NewNameNode("a", "", nil),
+		[]gedcom.Node{gedcom.NewNameNode(nil, "a", "", nil)},
+		gedcom.NewNameNode(nil, "a", "", nil),
+		gedcom.NewNameNode(nil, "a", "", nil),
 	},
 	{
-		[]gedcom.Node{nil, gedcom.NewNameNode("a", "", nil)},
+		[]gedcom.Node{nil, gedcom.NewNameNode(nil, "a", "", nil)},
 		nil,
-		gedcom.NewNameNode("a", "", nil),
+		gedcom.NewNameNode(nil, "a", "", nil),
 	},
 }
 
@@ -91,8 +91,8 @@ func TestValue(t *testing.T) {
 		want string
 	}{
 		{nil, ""},
-		{gedcom.NewSimpleNode(gedcom.TagVersion, "foo", "", nil), "foo"},
-		{gedcom.NewNameNode("foo bar", "", nil), "foo bar"},
+		{gedcom.NewSimpleNode(nil, gedcom.TagVersion, "foo", "", nil), "foo"},
+		{gedcom.NewNameNode(nil, "foo bar", "", nil), "foo bar"},
 	}
 
 	for _, test := range tests {
@@ -103,9 +103,9 @@ func TestValue(t *testing.T) {
 }
 
 func TestCompound(t *testing.T) {
-	n1 := gedcom.NewNameNode("Joe /Bloggs/", "", []gedcom.Node{})
-	n2 := gedcom.NewNameNode("Jane /Doe/", "", []gedcom.Node{})
-	n3 := gedcom.NewNameNode("John /Smith/", "", []gedcom.Node{})
+	n1 := gedcom.NewNameNode(nil, "Joe /Bloggs/", "", []gedcom.Node{})
+	n2 := gedcom.NewNameNode(nil, "Jane /Doe/", "", []gedcom.Node{})
+	n3 := gedcom.NewNameNode(nil, "John /Smith/", "", []gedcom.Node{})
 
 	tests := []struct {
 		inputs []interface{}

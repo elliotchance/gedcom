@@ -5,13 +5,8 @@ type PlaceNode struct {
 	*SimpleNode
 }
 
-func NewPlaceNode(value, pointer string, children []Node) *PlaceNode {
+func NewPlaceNode(document *Document, value, pointer string, children []Node) *PlaceNode {
 	return &PlaceNode{
-		&SimpleNode{
-			tag:      TagPlace,
-			value:    value,
-			pointer:  pointer,
-			children: children,
-		},
+		NewSimpleNode(document, TagPlace, value, pointer, children),
 	}
 }

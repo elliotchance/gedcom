@@ -40,9 +40,9 @@ func main() {
 	}
 
 	options := gedcom.NewSimilarityOptions()
-	comparisons := leftIndividuals.Compare(leftGedcom, rightGedcom, rightIndividuals, options)
+	comparisons := leftIndividuals.Compare(rightIndividuals, options)
 
-	out.Write([]byte(newDiffPage(comparisons, options, leftGedcom, rightGedcom, !optionNoPlaces, optionHideSame).String()))
+	out.Write([]byte(newDiffPage(comparisons, options, !optionNoPlaces, optionHideSame).String()))
 }
 
 func parseCLIFlags() {

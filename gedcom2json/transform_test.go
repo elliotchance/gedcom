@@ -17,7 +17,7 @@ var transformTests = []struct {
 	{
 		doc: &gedcom.Document{
 			Nodes: []gedcom.Node{
-				gedcom.NewSimpleNode(gedcom.TagVersion, "5.5", "", nil),
+				gedcom.NewSimpleNode(nil, gedcom.TagVersion, "5.5", "", nil),
 			},
 		},
 		expected: []interface{}{
@@ -30,8 +30,8 @@ var transformTests = []struct {
 	{
 		doc: &gedcom.Document{
 			Nodes: []gedcom.Node{
-				gedcom.NewIndividualNode("", "P1", []gedcom.Node{
-					gedcom.NewNameNode("Joe /Bloggs/", "", []gedcom.Node{}),
+				gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+					gedcom.NewNameNode(nil, "Joe /Bloggs/", "", []gedcom.Node{}),
 				}),
 			},
 		},
