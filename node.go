@@ -1,6 +1,9 @@
 package gedcom
 
-import "fmt"
+import (
+	"fmt"
+	"reflect"
+)
 
 type Node interface {
 	fmt.Stringer
@@ -16,6 +19,17 @@ type Node interface {
 	Nodes() []Node
 	AddNode(node Node)
 
-	// gedcomLine is for rendering the GEDCOM lines.
-	gedcomLine() string
+	// Comparison.
+	Equals(node2 Node) bool
+}
+
+// IsNil is the safe and reliable way to check if a node is nil. You should not
+// compare Node values with an untyped nil as it will lead to unexpected
+// results.
+//
+// As a side node IsNil cannot be part of the Node interface because more
+// specific node types (such as DateNode) use SimpleNode as an instance variable
+// and that would cause a nil pointer panic.
+func IsNil(node Node) bool {
+	return node == nil || reflect.ValueOf(node).IsNil()
 }

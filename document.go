@@ -3,6 +3,7 @@ package gedcom
 import (
 	"bytes"
 	"os"
+	"strings"
 )
 
 // Document represents a whole GEDCOM document. It is possible for a
@@ -121,5 +122,15 @@ func NewDocumentFromGEDCOMFile(path string) (*Document, error) {
 	}
 
 	decoder := NewDecoder(file)
+	return decoder.Decode()
+}
+
+// NewDocumentFromString creates a document from a string containing GEDCOM
+// data.
+//
+// An error is returned if a line cannot be parsed.
+func NewDocumentFromString(gedcom string) (*Document, error) {
+	decoder := NewDecoder(strings.NewReader(gedcom))
+
 	return decoder.Decode()
 }

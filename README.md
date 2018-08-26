@@ -5,33 +5,47 @@ github.com/elliotchance/gedcom
 [![GoDoc](https://godoc.org/github.com/elliotchance/gedcom?status.svg)](https://godoc.org/github.com/elliotchance/gedcom)
 [![codecov](https://codecov.io/gh/elliotchance/gedcom/branch/master/graph/badge.svg)](https://codecov.io/gh/elliotchance/gedcom)
 
-`gedcom` provides a Go-style encoder and decoder for GEDCOM files.
+`gedcom` is an advanced Go-style library for encoding, decoding, traversing,
+exporting and diffing GEDCOM files.
 
-The goals of this project are:
-
-1. **Support all GEDCOM files by supporting the encoding and not the GEDCOM
-standard itself.** Many GEDCOM libraries that try to follow the standard run
-into trouble when applications do not follow the same standards or the standard
-is interpreted differently. `gedcom` retains all tags and structure in the
-original GEDCOM file.
-
-2. **Build some structures/types that provide a nicer API for common
-operations.** For example iterating through individuals in a file,
-accessing/formatting names, standardising dates, etc.
-
-3. **Provide a program to convert GEDCOM to JSON**. So that any GEDCOM file can
-be ingested and processed more easily in other applications. The bundled
-`gedcom2json` program does this (and offers several options).
-
-   * [Decoding and Encoding](#decoding-and-encoding)
-   * [Traversing a Document](#traversing-a-document)
-   * [Working With Dates](#working-with-dates)
+   * [Project Goals](#project-goals)
+   * [GEDCOM Document](#gedcom-document)
+      * [Decoding](#decoding)
+      * [Encoding](#encoding)
+      * [Traversing a Document](#traversing-a-document)
+   * [Comparing &amp; Diffing](#comparing--diffing)
+      * [Nodes](#nodes)
+   * [Nodes](#nodes-1)
+      * [Dates](#dates)
    * [Rendering as HTML](#rendering-as-html)
    * [Converting to JSON](#converting-to-json)
    * [Converting to Text](#converting-to-text)
+      * [Comparing Output](#comparing-output)
 
-Decoding and Encoding
-=====================
+Project Goals
+=============
+
+1. Support all GEDCOM files by supporting the encoding and not the GEDCOM
+standard itself. Many GEDCOM libraries that try to follow the standard run into
+trouble when applications do not follow the same standards or the standard is
+interpreted differently. `gedcom` retains all tags and structure in the original
+GEDCOM file.
+
+2. Build structures and functions that provide a nicer API for common
+operations. For example iterating through individuals in a file, traversing
+through family connections, understanding dates, etc.
+
+3. Export to other file formats. Such as HTML, JSON, text, etc. So that
+information can be manipulated and ingested by other applications.
+
+4. Provide more advanced functionality to deal with comparing and diffing GEDCOM
+files.
+
+GEDCOM Document
+===============
+
+Decoding
+--------
 
 Decoding a GEDCOM stream:
 
@@ -54,7 +68,8 @@ if err != nil {
 }
 ```
 
-Encoding works like this:
+Encoding
+--------
 
 ```go
 buf := bytes.NewBufferString("")
@@ -73,7 +88,7 @@ data := document.String()
 ```
 
 Traversing a Document
-=====================
+---------------------
 
 On top of the raw document is a powerful API that takes care of the complex
 traversing of the Document. Here is a simple example:
@@ -89,8 +104,47 @@ types, such as names, dates, families and more. See
 [godoc](https://godoc.org/github.com/elliotchance/gedcom) for a complete list of
 API methods.
 
-Working With Dates
-==================
+Comparing & Diffing
+===================
+
+Nodes
+-----
+
+The [`CompareNodes`][1] recursively compares two nodes. For example:
+
+```
+0 INDI @P3@           |  0 INDI @P4@
+1 NAME John /Smith/   |  1 NAME J. /Smith/
+1 BIRT                |  1 BIRT
+2 DATE 3 SEP 1943     |  2 DATE Abt. Sep 1943
+1 DEAT                |  1 BIRT
+2 PLAC England        |  2 DATE 3 SEP 1943
+1 BIRT                |  1 DEAT
+2 DATE Abt. Oct 1943  |  2 DATE Aft. 2001
+                      |  2 PLAC Surry, England
+```
+
+Produces a [`*NodeDiff`][2] than can be rendered with the [`String`][3] method:
+
+```
+LR 0 INDI @P3@
+L  1 NAME John /Smith/
+LR 1 BIRT
+L  2 DATE Abt. Oct 1943
+LR 2 DATE 3 SEP 1943
+ R 2 DATE Abt. Sep 1943
+LR 1 DEAT
+L  2 PLAC England
+ R 2 DATE Aft. 2001
+ R 2 PLAC Surry, England
+ R 1 NAME J. /Smith/
+```
+
+Nodes
+=====
+
+Dates
+-----
 
 Dates in GEDCOM files can be very complex as they can cater for many scenarios:
 
@@ -196,3 +250,7 @@ diff -bur out1/ out2/
 
 You can (and probably should) also use
 [more pretty diffing tools](https://en.wikipedia.org/wiki/Comparison_of_file_comparison_tools).
+
+[1]: https://godoc.org/github.com/elliotchance/gedcom#CompareNodes
+[2]: https://godoc.org/github.com/elliotchance/gedcom#NodeDiff
+[3]: https://godoc.org/github.com/elliotchance/gedcom#NodeDiff.String

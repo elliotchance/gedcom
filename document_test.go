@@ -2,9 +2,11 @@ package gedcom_test
 
 import (
 	"fmt"
+	"testing"
+
+	"errors"
 	"github.com/elliotchance/gedcom"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 var documentTests = []struct {
@@ -121,6 +123,41 @@ func TestDocument_Families(t *testing.T) {
 	for _, test := range documentTests {
 		t.Run("", func(t *testing.T) {
 			assert.Equal(t, test.doc.Families(), test.families)
+		})
+	}
+}
+
+func TestNewDocumentFromString(t *testing.T) {
+	for _, test := range []struct {
+		ged      string
+		expected *gedcom.Document
+		err      error
+	}{
+		{
+			"",
+			&gedcom.Document{Nodes: []gedcom.Node{}},
+			nil,
+		},
+		{
+			"AAA",
+			nil,
+			errors.New("line 1: could not parse: AAA"),
+		},
+		{
+			"0 INDI\nAAB",
+			nil,
+			errors.New("line 2: could not parse: AAB"),
+		},
+		{
+			"0 INDI\n\nAAA",
+			nil,
+			errors.New("line 3: could not parse: AAA"),
+		},
+	} {
+		t.Run(test.ged, func(t *testing.T) {
+			result, err := gedcom.NewDocumentFromString(test.ged)
+			assert.Equal(t, err, test.err)
+			assert.Equal(t, test.expected, result)
 		})
 	}
 }
