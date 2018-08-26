@@ -121,7 +121,7 @@ func CompareNodes(left, right Node) *NodeDiff {
 }
 
 func (nd *NodeDiff) traverse(n Node, isLeft bool) {
-	if n == nil {
+	if IsNil(n) {
 		return
 	}
 
@@ -317,4 +317,12 @@ func (nd *NodeDiff) RightNode() Node {
 	}
 
 	return n
+}
+
+func (nd *NodeDiff) Tag() Tag {
+	if nd.Left != nil {
+		return nd.Left.Tag()
+	}
+
+	return nd.Right.Tag()
 }

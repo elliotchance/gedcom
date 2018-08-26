@@ -1,49 +1,59 @@
 package main
 
 import (
+	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html"
 )
 
 type diffRow struct {
-	left, right, name string
-	hideSame          bool
+	name     string
+	nd       *gedcom.NodeDiff
+	hideSame bool
 }
 
-func newDiffRow(name, left, right string, hideSame bool) *diffRow {
+func newDiffRow(name string, nd *gedcom.NodeDiff, hideSame bool) *diffRow {
 	return &diffRow{
 		name:     name,
-		left:     left,
-		right:    right,
+		nd:       nd,
 		hideSame: hideSame,
 	}
 }
 
 func (c *diffRow) String() string {
-	if c.left == c.right && c.hideSame {
+	if c.hideSame && c.nd.IsDeepEqual() {
 		return ""
 	}
 
 	leftClass := ""
 	rightClass := ""
 
-	switch {
-	case c.left == "" && c.right == "":
-		return ""
+	left := ""
+	right := ""
 
-	case c.left == "":
+	switch {
+	case gedcom.IsNil(c.nd.Left) && gedcom.IsNil(c.nd.Right):
+		// do nothing
+
+	case gedcom.IsNil(c.nd.Left):
+		right = c.nd.Right.Value()
 		rightClass = "bg-primary"
 
-	case c.right == "":
+	case gedcom.IsNil(c.nd.Right):
+		left = c.nd.Left.Value()
 		leftClass = "bg-warning"
 
-	case c.left != c.right:
-		leftClass = "bg-info"
-		rightClass = "bg-info"
+	default:
+		if !c.nd.IsDeepEqual() {
+			leftClass = "bg-info"
+			rightClass = "bg-info"
+		}
+		left = c.nd.Left.Value()
+		right = c.nd.Right.Value()
 	}
 
 	return html.NewTableRow(
 		html.NewStyledTableCell("", "", html.NewText(c.name)),
-		html.NewStyledTableCell("width: 40%", leftClass, html.NewText(c.left)),
-		html.NewStyledTableCell("width: 40%", rightClass, html.NewText(c.right)),
+		html.NewStyledTableCell("width: 40%", leftClass, html.NewText(left)),
+		html.NewStyledTableCell("width: 40%", rightClass, html.NewText(right)),
 	).String()
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/util"
 	"log"
 	"os"
 )
@@ -11,9 +12,9 @@ var (
 	optionLeftGedcomFile  string
 	optionRightGedcomFile string
 	optionOutputFile      string
-	optionNoPlaces        bool
-	optionHideSame        bool
 )
+
+var filterFlags = &util.FilterFlags{}
 
 func main() {
 	parseCLIFlags()
@@ -42,7 +43,7 @@ func main() {
 	options := gedcom.NewSimilarityOptions()
 	comparisons := leftIndividuals.Compare(rightIndividuals, options)
 
-	out.Write([]byte(newDiffPage(comparisons, options, !optionNoPlaces, optionHideSame).String()))
+	out.Write([]byte(newDiffPage(comparisons, options, filterFlags).String()))
 }
 
 func parseCLIFlags() {
@@ -50,8 +51,8 @@ func parseCLIFlags() {
 	flag.StringVar(&optionLeftGedcomFile, "left-gedcom", "", "Left GEDCOM file.")
 	flag.StringVar(&optionRightGedcomFile, "right-gedcom", "", "Right GEDCOM file.")
 	flag.StringVar(&optionOutputFile, "output", "", "Output file.")
-	flag.BoolVar(&optionNoPlaces, "no-places", false, "Do not include places.")
-	flag.BoolVar(&optionHideSame, "hide-same", false, "Hide equal values.")
+
+	filterFlags.SetupCLI()
 
 	flag.Parse()
 }

@@ -4,22 +4,21 @@ import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html"
+	"github.com/elliotchance/gedcom/util"
 	"sort"
 )
 
 type diffPage struct {
-	comparisons   []gedcom.IndividualComparison
-	options       *gedcom.SimilarityOptions
-	includePlaces bool
-	hideSame      bool
+	comparisons []gedcom.IndividualComparison
+	options     *gedcom.SimilarityOptions
+	filterFlags *util.FilterFlags
 }
 
-func newDiffPage(comparisons []gedcom.IndividualComparison, options *gedcom.SimilarityOptions, includePlaces, hideSame bool) *diffPage {
+func newDiffPage(comparisons []gedcom.IndividualComparison, options *gedcom.SimilarityOptions, filterFlags *util.FilterFlags) *diffPage {
 	return &diffPage{
-		comparisons:   comparisons,
-		options:       options,
-		includePlaces: includePlaces,
-		hideSame:      hideSame,
+		comparisons: comparisons,
+		options:     options,
+		filterFlags: filterFlags,
 	}
 }
 
@@ -75,7 +74,7 @@ func (c *diffPage) String() string {
 	}
 	for _, comparison := range c.comparisons {
 		components = append(components,
-			newIndividualCompare(comparison, c.includePlaces, c.hideSame))
+			newIndividualCompare(comparison, c.filterFlags))
 	}
 
 	return html.NewPage(
