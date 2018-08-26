@@ -1,6 +1,7 @@
 package gedcom
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 )
@@ -20,7 +21,7 @@ func NewEncoder(w io.Writer, document *Document) *Encoder {
 }
 
 func (enc *Encoder) renderNode(indent int, node Node) error {
-	_, err := enc.w.Write([]byte(fmt.Sprintf("%d %s\n", indent, node.gedcomLine())))
+	_, err := enc.w.Write([]byte(GedcomLine(indent, node) + "\n"))
 	if err != nil {
 		return err
 	}
@@ -45,4 +46,40 @@ func (enc *Encoder) Encode() error {
 	}
 
 	return nil
+}
+
+// GedcomLine converts a node into its single line GEDCOM value. It is used
+// several places including the actual Encoder.
+//
+// GedcomLine, as the name would suggest, does not handle children. You should
+// use the proper Encoder instead.
+//
+// GedcomLine will handle nil nodes gracefully by returning an empty string.
+//
+// The indent will only be included if it is at least 0. If you want to use
+// GedcomLine to compare the string values of nodes or exclude the indent you
+// should pass -1 as the indent.
+func GedcomLine(indent int, node Node) string {
+	if IsNil(node) {
+		return ""
+	}
+
+	buf := bytes.NewBufferString("")
+
+	if indent >= 0 {
+		buf.WriteString(fmt.Sprintf("%d ", indent))
+	}
+
+	if p := node.Pointer(); p != "" {
+		buf.WriteString(fmt.Sprintf("@%s@ ", p))
+	}
+
+	buf.WriteString(node.Tag().Tag())
+
+	if v := node.Value(); v != "" {
+		buf.WriteByte(' ')
+		buf.WriteString(v)
+	}
+
+	return buf.String()
 }

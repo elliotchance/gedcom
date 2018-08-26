@@ -1,10 +1,5 @@
 package gedcom
 
-import (
-	"bytes"
-	"fmt"
-)
-
 // SimpleNode is used as the default node type when there is no more appropriate
 // or specific type to use.
 type SimpleNode struct {
@@ -41,6 +36,25 @@ func (node *SimpleNode) Document() *Document {
 	return node.document
 }
 
+// Equals compares two nodes for value equality.
+//
+// 1. If either or both nodes are nil then false is always returned.
+// 2. Nodes are compared only by their root value (shallow) meaning any value
+// for the child nodes is ignored.
+// 3. The document the node belongs to is not taken into consideration to be
+// able to compare nodes by value across different documents.
+// 4. A node is considered to have the same value (and therefore be equal) is
+// both nodes share the all of the same tag, value and pointer.
+func (node *SimpleNode) Equals(node2 Node) bool {
+	if node == nil || IsNil(node2) {
+		return false
+	}
+
+	return node.tag == node2.Tag() &&
+		node.value == node2.Value() &&
+		node.pointer == node2.Pointer()
+}
+
 func (node *SimpleNode) SetDocument(document *Document) {
 	node.document = document
 
@@ -62,22 +76,5 @@ func (node *SimpleNode) AddNode(n Node) {
 }
 
 func (node *SimpleNode) String() string {
-	return node.gedcomLine()
-}
-
-func (node *SimpleNode) gedcomLine() string {
-	buf := bytes.NewBufferString("")
-
-	if node.pointer != "" {
-		buf.WriteString(fmt.Sprintf("@%s@ ", node.pointer))
-	}
-
-	buf.WriteString(node.tag.Tag())
-
-	if node.value != "" {
-		buf.WriteByte(' ')
-		buf.WriteString(node.value)
-	}
-
-	return buf.String()
+	return GedcomLine(0, node)
 }

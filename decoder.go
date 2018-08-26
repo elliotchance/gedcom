@@ -3,6 +3,7 @@ package gedcom
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"io"
 	"regexp"
 	"strconv"
@@ -33,7 +34,10 @@ func (dec *Decoder) Decode() (*Document, error) {
 	indents := []Node{}
 
 	finished := false
+	lineNumber := 0
 	for !finished {
+		lineNumber++
+
 		line, err := dec.readLine()
 		if err != nil {
 			if err != io.EOF {
@@ -48,7 +52,10 @@ func (dec *Decoder) Decode() (*Document, error) {
 			continue
 		}
 
-		node, indent := parseLine(document, line)
+		node, indent, err := parseLine(document, line)
+		if err != nil {
+			return nil, fmt.Errorf("line %d: %s", lineNumber, err)
+		}
 
 		// Add a root node to the document.
 		if indent == 0 {
@@ -117,51 +124,51 @@ func (dec *Decoder) readLine() (string, error) {
 	return string(buf.Bytes()), nil
 }
 
-var lineRegexp = regexp.MustCompile(`^(\d) (@\w+@ )?(\w+)( .*)?$`)
+var lineRegexp = regexp.MustCompile(`^(\d) (@\w+@ )?(\w+) ?(.*)?$`)
 
-func parseLine(document *Document, line string) (Node, int) {
+func parseLine(document *Document, line string) (Node, int, error) {
 	parts := lineRegexp.FindStringSubmatch(line)
 
-	indent := 0
-	if len(parts) > 1 {
-		indent, _ = strconv.Atoi(parts[1])
+	if len(parts) == 0 {
+		return nil, 0, fmt.Errorf("could not parse: %s", line)
 	}
 
+	// Indent (required).
+	indent, _ := strconv.Atoi(parts[1])
+
+	// Pointer (optional).
 	pointer := ""
-	if len(parts) > 2 && len(parts[2]) > 4 {
+	if parts[2] != "" {
+		// Trim off the surrounding '@'.
 		pointer = parts[2][1 : len(parts[2])-2]
 	}
 
-	tag := Tag{}
-	if len(parts) > 3 {
-		tag = TagFromString(parts[3])
-	}
+	// Tag (required).
+	tag := TagFromString(parts[3])
 
-	value := ""
-	if len(parts) > 4 && len(parts[4]) > 0 {
-		value = parts[4][1:]
-	}
+	// Value (optional).
+	value := parts[4]
 
+	// Check for more specific type.
 	switch tag {
 	case TagDate:
-		return NewDateNode(document, value, pointer, []Node{}), indent
+		return NewDateNode(document, value, pointer, []Node{}), indent, nil
 
 	case TagFamily:
-		return NewFamilyNode(document, pointer, []Node{}), indent
+		return NewFamilyNode(document, pointer, []Node{}), indent, nil
 
 	case TagIndividual:
-		return NewIndividualNode(document, value, pointer, []Node{}), indent
+		return NewIndividualNode(document, value, pointer, []Node{}), indent, nil
 
 	case TagName:
-		return NewNameNode(document, value, pointer, []Node{}), indent
+		return NewNameNode(document, value, pointer, []Node{}), indent, nil
 
 	case TagPlace:
-		return NewPlaceNode(document, value, pointer, []Node{}), indent
+		return NewPlaceNode(document, value, pointer, []Node{}), indent, nil
 
 	case TagSource:
-		return NewSourceNode(document, value, pointer, []Node{}), indent
-
-	default:
-		return NewSimpleNode(document, tag, value, pointer, []Node{}), indent
+		return NewSourceNode(document, value, pointer, []Node{}), indent, nil
 	}
+
+	return NewSimpleNode(document, tag, value, pointer, []Node{}), indent, nil
 }
