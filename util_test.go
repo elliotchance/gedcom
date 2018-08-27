@@ -1,9 +1,11 @@
 package gedcom_test
 
 import (
-	"github.com/elliotchance/gedcom"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/tf"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestAtoi(t *testing.T) {
@@ -126,4 +128,14 @@ func TestCompound(t *testing.T) {
 			assert.Equal(t, test.want, gedcom.Compound(test.inputs...))
 		})
 	}
+}
+
+func TestNodeCondition(t *testing.T) {
+	NodeCondition := tf.Function(t, gedcom.NodeCondition)
+
+	bob := gedcom.NewNameNode(nil, "Bob", "", nil)
+	sally := gedcom.NewNameNode(nil, "Sally", "", nil)
+
+	NodeCondition(true, bob, sally).Returns(bob)
+	NodeCondition(false, bob, sally).Returns(sally)
 }

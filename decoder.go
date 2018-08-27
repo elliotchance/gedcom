@@ -149,26 +149,34 @@ func parseLine(document *Document, line string) (Node, int, error) {
 	// Value (optional).
 	value := parts[4]
 
-	// Check for more specific type.
+	return NewNode(document, tag, value, pointer), indent, nil
+}
+
+// NewNode creates a node with no children. It is also the correct way to
+// create a shallow copy of a node.
+//
+// If the node tag is recognised as a more specific type, such as *DateNode then
+// that will be returned. Otherwise a *SimpleNode will be used.
+func NewNode(document *Document, tag Tag, value, pointer string) Node {
 	switch tag {
 	case TagDate:
-		return NewDateNode(document, value, pointer, []Node{}), indent, nil
+		return NewDateNode(document, value, pointer, nil)
 
 	case TagFamily:
-		return NewFamilyNode(document, pointer, []Node{}), indent, nil
+		return NewFamilyNode(document, pointer, nil)
 
 	case TagIndividual:
-		return NewIndividualNode(document, value, pointer, []Node{}), indent, nil
+		return NewIndividualNode(document, value, pointer, nil)
 
 	case TagName:
-		return NewNameNode(document, value, pointer, []Node{}), indent, nil
+		return NewNameNode(document, value, pointer, nil)
 
 	case TagPlace:
-		return NewPlaceNode(document, value, pointer, []Node{}), indent, nil
+		return NewPlaceNode(document, value, pointer, nil)
 
 	case TagSource:
-		return NewSourceNode(document, value, pointer, []Node{}), indent, nil
+		return NewSourceNode(document, value, pointer, nil)
 	}
 
-	return NewSimpleNode(document, tag, value, pointer, []Node{}), indent, nil
+	return NewSimpleNode(document, tag, value, pointer, nil)
 }
