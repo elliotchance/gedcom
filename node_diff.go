@@ -148,7 +148,7 @@ func CompareNodes(left, right Node) *NodeDiff {
 	//
 	// The extra conditional check is to make sure that a nil left does not
 	// break the right only traversing.
-	prefix := []string{GedcomLine(-1, nodeCondition(IsNil(left), right, left))}
+	prefix := []string{GedcomLine(-1, NodeCondition(IsNil(left), right, left))}
 	flatLeft := flattenNode(left, prefix)
 	flatRight := flattenNode(right, prefix)
 
@@ -161,15 +161,6 @@ func CompareNodes(left, right Node) *NodeDiff {
 	result.Right = right
 
 	return result
-}
-
-// nodeCondition is a convenience method for inline conditionals.
-func nodeCondition(condition bool, node1, node2 Node) Node {
-	if condition {
-		return node1
-	}
-
-	return node2
 }
 
 func (nd *NodeDiff) unflatten(flatNodes [][]string, assignRight bool) {
@@ -188,8 +179,8 @@ func (nd *NodeDiff) unflattenSingle(flatNode []string, assignRight bool) {
 		case nd.Left == nil && nd.Right == nil:
 			// This is the first (root) node.
 
-			nd.Left = nodeCondition(!assignRight, parsedLine, nd.Left)
-			nd.Right = nodeCondition(assignRight, parsedLine, nd.Right)
+			nd.Left = NodeCondition(!assignRight, parsedLine, nd.Left)
+			nd.Right = NodeCondition(assignRight, parsedLine, nd.Right)
 			i = nd
 
 		case GedcomLine(-1, i.Left) == line || GedcomLine(-1, i.Right) == line:
@@ -206,8 +197,8 @@ func (nd *NodeDiff) unflattenSingle(flatNode []string, assignRight bool) {
 			// is a match, otherwise add it to the end.
 
 			child := &NodeDiff{
-				Left:  nodeCondition(!assignRight, parsedLine, nil),
-				Right: nodeCondition(assignRight, parsedLine, nil),
+				Left:  NodeCondition(!assignRight, parsedLine, nil),
+				Right: NodeCondition(assignRight, parsedLine, nil),
 			}
 
 			found := false

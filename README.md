@@ -17,6 +17,7 @@ exporting and diffing GEDCOM files.
       * [Nodes](#nodes)
    * [Nodes](#nodes-1)
       * [Dates](#dates)
+      * [Filtering](#filtering)
    * [Rendering as HTML](#rendering-as-html)
    * [Converting to JSON](#converting-to-json)
    * [Converting to Text](#converting-to-text)
@@ -165,6 +166,33 @@ date range into a number for easier distance and comparison measurements.
 4. Algorithms for calculating the similarity of dates on a configurable
 parabola.
 
+Filtering
+---------
+
+The [`Filter`][4] function recursively removes or manipulates nodes with a
+[`FilterFunction`][5]:
+
+```go
+newNodes := gedcom.Filter(node, func (node gedcom.Node) (gedcom.Node, bool) {
+    if node.Tag().Is(gedcom.TagIndividual) {
+        // false means it will not traverse children, since an
+        // individual can never be inside of another individual.
+        return node, false
+    }
+
+    return nil, false
+})
+
+// Remove all tags that are not official.
+newNodes := gedcom.Filter(node, gedcom.OfficialTagFilter())
+```
+
+Filter functions:
+
+1. [`WhitelistTagFilter`][6]
+2. [`BlacklistTagFilter`][7]
+3. [`OfficialTagFilter`][8]
+
 Rendering as HTML
 =================
 
@@ -254,3 +282,8 @@ You can (and probably should) also use
 [1]: https://godoc.org/github.com/elliotchance/gedcom#CompareNodes
 [2]: https://godoc.org/github.com/elliotchance/gedcom#NodeDiff
 [3]: https://godoc.org/github.com/elliotchance/gedcom#NodeDiff.String
+[4]: https://godoc.org/github.com/elliotchance/gedcom#Filter
+[5]: https://godoc.org/github.com/elliotchance/gedcom#FilterFunction
+[6]: https://godoc.org/github.com/elliotchance/gedcom#WhitelistTagFilter
+[7]: https://godoc.org/github.com/elliotchance/gedcom#BlacklistTagFilter
+[8]: https://godoc.org/github.com/elliotchance/gedcom#OfficialTagFilter

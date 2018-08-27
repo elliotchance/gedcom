@@ -130,3 +130,12 @@ func Compound(nodes ...interface{}) []Node {
 
 	return result
 }
+
+// NodeCondition is a convenience method for inline conditionals.
+func NodeCondition(condition bool, node1, node2 Node) Node {
+	if condition {
+		return node1
+	}
+
+	return node2
+}

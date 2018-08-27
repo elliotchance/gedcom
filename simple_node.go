@@ -10,6 +10,11 @@ type SimpleNode struct {
 	children []Node
 }
 
+// NewSimpleNode creates a non-specific node.
+//
+// Note: You should not use this constructor for general use. Instead use
+// NewNode which will return a *SimpleNode if a more appropriate node type
+// exists for the tag.
 func NewSimpleNode(document *Document, tag Tag, value, pointer string, children []Node) *SimpleNode {
 	return &SimpleNode{
 		document: document,
@@ -64,10 +69,6 @@ func (node *SimpleNode) SetDocument(document *Document) {
 }
 
 func (node *SimpleNode) Nodes() []Node {
-	if node.children == nil {
-		return []Node{}
-	}
-
 	return node.children
 }
 

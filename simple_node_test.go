@@ -8,12 +8,9 @@ import (
 )
 
 func TestSimpleNode_ChildNodes(t *testing.T) {
-	t.Run("NilReturnsArray", func(t *testing.T) {
-		node := gedcom.NewSimpleNode(nil, gedcom.TagText, "", "", nil)
+	node := gedcom.NewSimpleNode(nil, gedcom.TagText, "", "", nil)
 
-		assert.NotNil(t, node.Nodes())
-		assert.Len(t, node.Nodes(), 0)
-	})
+	assert.Len(t, node.Nodes(), 0)
 }
 
 func TestIsNil(t *testing.T) {
