@@ -11,7 +11,7 @@ func TestNodeGedcom(t *testing.T) {
 
 	root := gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 		gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
-		gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", []gedcom.Node{
+		gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
 			gedcom.NewDateNode(nil, "6 MAY 1989", "", nil),
 		}),
 	})

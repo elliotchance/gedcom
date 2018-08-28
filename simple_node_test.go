@@ -17,7 +17,7 @@ func TestIsNil(t *testing.T) {
 	IsNil := tf.Function(t, gedcom.IsNil)
 
 	IsNil((*gedcom.SimpleNode)(nil)).Returns(true)
-	IsNil(gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", nil)).Returns(false)
+	IsNil(gedcom.NewBirthNode(nil, "", "", nil)).Returns(false)
 	IsNil((*gedcom.NameNode)(nil)).Returns(true)
 	IsNil(gedcom.NewNameNode(nil, "", "", nil)).Returns(false)
 

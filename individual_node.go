@@ -151,8 +151,12 @@ func (node *IndividualNode) IsLiving() bool {
 }
 
 // Births returns zero or more birth events for the individual.
-func (node *IndividualNode) Births() []Node {
-	return NodesWithTag(node, TagBirth)
+func (node *IndividualNode) Births() (nodes []*BirthNode) {
+	for _, n := range NodesWithTag(node, TagBirth) {
+		nodes = append(nodes, n.(*BirthNode))
+	}
+
+	return
 }
 
 // Baptisms returns zero or more baptism events for the individual. The baptisms

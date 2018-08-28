@@ -1,10 +1,10 @@
 package gedcom_test
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
-	"errors"
 	"github.com/elliotchance/gedcom"
 	"github.com/stretchr/testify/assert"
 )
@@ -160,4 +160,10 @@ func TestNewDocumentFromString(t *testing.T) {
 			assert.Equal(t, test.expected, result)
 		})
 	}
+}
+
+func TestNewDocument(t *testing.T) {
+	doc := gedcom.NewDocument()
+
+	assert.Len(t, doc.Nodes, 0)
 }

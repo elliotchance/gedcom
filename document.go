@@ -134,3 +134,8 @@ func NewDocumentFromString(gedcom string) (*Document, error) {
 
 	return decoder.Decode()
 }
+
+// NewDocument returns an empty document.
+func NewDocument() *Document {
+	return &Document{}
+}

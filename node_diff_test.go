@@ -121,6 +121,67 @@ func TestCompareNodes(t *testing.T) {
 			},
 		},
 
+		// Do not merge Residence (based on Equals).
+		{
+			left: parse(
+				"0 INDI @P3@",
+				"1 NAME John /Smith/",
+				"1 RESI",
+				"2 PLAC England",
+				"1 RESI",
+				"2 DATE Abt. Oct 1943",
+			)[0],
+			right: parse(
+				"0 INDI @P3@",
+				"1 NAME John /Smith/",
+				"1 RESI",
+				"2 DATE About Oct 1943",
+				"1 RESI",
+				"2 PLAC Yorkshire, England",
+			)[0],
+			expected: &gedcom.NodeDiff{
+				Left:  parse("0 INDI @P3@")[0],
+				Right: parse("0 INDI @P3@")[0],
+				Children: []*gedcom.NodeDiff{
+					{
+						Left:     parse("0 NAME John /Smith/")[0],
+						Right:    parse("0 NAME John /Smith/")[0],
+						Children: nil,
+					},
+					{
+						Left:  parse("0 RESI")[0],
+						Right: nil,
+						Children: []*gedcom.NodeDiff{
+							{
+								Left:  parse("0 PLAC England")[0],
+								Right: nil,
+							},
+						},
+					},
+					{
+						Left:  parse("0 RESI")[0],
+						Right: parse("0 RESI")[0],
+						Children: []*gedcom.NodeDiff{
+							{
+								Left:  parse("0 DATE Abt. Oct 1943")[0],
+								Right: parse("0 DATE About Oct 1943")[0],
+							},
+						},
+					},
+					{
+						Left:  nil,
+						Right: parse("0 RESI")[0],
+						Children: []*gedcom.NodeDiff{
+							{
+								Left:  nil,
+								Right: parse("0 PLAC Yorkshire, England")[0],
+							},
+						},
+					},
+				},
+			},
+		},
+
 		// Example from the docs.
 		{
 			left: parse(
@@ -134,7 +195,7 @@ func TestCompareNodes(t *testing.T) {
 				"2 DATE Abt. Oct 1943",
 			)[0],
 			right: parse(
-				"0 INDI @P4@",
+				"0 INDI @P3@",
 				"1 NAME J. /Smith/",
 				"1 BIRT",
 				"2 DATE Abt. Sep 1943",
@@ -146,7 +207,7 @@ func TestCompareNodes(t *testing.T) {
 			)[0],
 			expected: &gedcom.NodeDiff{
 				Left:  parse("0 INDI @P3@")[0],
-				Right: parse("0 INDI @P4@")[0],
+				Right: parse("0 INDI @P3@")[0],
 				Children: []*gedcom.NodeDiff{
 					{
 						Left:     parse("0 NAME John /Smith/")[0],
