@@ -22,38 +22,38 @@ func TestCompareNodes(t *testing.T) {
 		expected    *gedcom.NodeDiff
 	}{
 		// Nils
-		//{
-		//	left:     nil,
-		//	right:    nil,
-		//	expected: &gedcom.NodeDiff{},
-		//},
-		//{
-		//	left:  parse("0 @P1@ BIRT foo")[0],
-		//	right: nil,
-		//	expected: &gedcom.NodeDiff{
-		//		Left: parse("0 @P1@ BIRT foo")[0],
-		//	},
-		//},
-		//{
-		//	left:  nil,
-		//	right: parse("0 @P1@ BIRT foo")[0],
-		//	expected: &gedcom.NodeDiff{
-		//		Right: parse("0 @P1@ BIRT foo")[0],
-		//	},
-		//},
-		//{
-		//	left:  parse("0 INDI @P1@", "1 BIRT")[0],
-		//	right: nil,
-		//	expected: &gedcom.NodeDiff{
-		//		Left:  parse("0 INDI @P1@")[0],
-		//		Right: nil,
-		//		Children: []*gedcom.NodeDiff{
-		//			{
-		//				Left: parse("0 BIRT")[0],
-		//			},
-		//		},
-		//	},
-		//},
+		{
+			left:     nil,
+			right:    nil,
+			expected: &gedcom.NodeDiff{},
+		},
+		{
+			left:  parse("0 @P1@ BIRT foo")[0],
+			right: nil,
+			expected: &gedcom.NodeDiff{
+				Left: parse("0 @P1@ BIRT foo")[0],
+			},
+		},
+		{
+			left:  nil,
+			right: parse("0 @P1@ BIRT foo")[0],
+			expected: &gedcom.NodeDiff{
+				Right: parse("0 @P1@ BIRT foo")[0],
+			},
+		},
+		{
+			left:  parse("0 INDI @P1@", "1 BIRT")[0],
+			right: nil,
+			expected: &gedcom.NodeDiff{
+				Left:  parse("0 INDI @P1@")[0],
+				Right: nil,
+				Children: []*gedcom.NodeDiff{
+					{
+						Left: parse("0 BIRT")[0],
+					},
+				},
+			},
+		},
 		{
 			left:  nil,
 			right: parse("0 INDI @P1@", "1 DEAT")[0],

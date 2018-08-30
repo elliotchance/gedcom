@@ -350,3 +350,29 @@ func (node *DateNode) Similarity(node2 *DateNode, maxYears float64) float64 {
 
 	return 1 - similarity
 }
+
+// Equals compares the values of two dates taking into consideration the date
+// constraint.
+//
+// If either date is nil then false is always returned. Even if both dates are
+// nil.
+//
+// A DateNode is considered to be equal only when its StartDate() and EndDate()
+// both equal their respective values in the other DateNode.
+//
+// The comparisons of dates is quite complicated. See the documentation for
+// Date.Equals for a full explanation.
+func (node *DateNode) Equals(node2 Node) bool {
+	if IsNil(node) || IsNil(node2) {
+		return false
+	}
+
+	if date2, ok := node2.(*DateNode); ok {
+		matchStartDate := node.StartDate().Equals(date2.StartDate())
+		matchEndDate := node.EndDate().Equals(date2.EndDate())
+
+		return matchStartDate && matchEndDate
+	}
+
+	return false
+}

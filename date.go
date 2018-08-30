@@ -228,3 +228,78 @@ func (date Date) Years() float64 {
 
 	return 0
 }
+
+// IsZero returns true if the day, month and year are not provided. No other
+// attributes are taken into consideration.
+func (date Date) IsZero() bool {
+	return date.Day == 0 && date.Month == 0 && date.Year == 0
+}
+
+// Equals compares two dates.
+//
+// Unlike Is(), Equals() takes into what the date and its constraint represents,
+// rather than just its raw value.
+//
+// For example, "3 Sep 1943" == "Bef. Oct 1943" returns true because 3 Sep 1943
+// is before Oct 1943.
+//
+// If either date (including both) is IsZero then false is always returned.
+//
+// If Is() is true when comparing both dates then true is always returned.
+//
+// Otherwise the comparison used is selected from the following matrix:
+//
+//          ----------- Left ----------
+//          Exact  About  Before  After
+//   Exact    A      A      B       C
+//   About    A      A      D       D
+//  Before    C      D      C       D
+//   After    B      D      D       B
+//
+// A. A match if the day, month and year are all equal.
+//
+// B. Match if left.Years() > right.Years().
+//
+// C. Match if left.Years() < right.Years().
+//
+// D. Never a match.
+func (date Date) Equals(date2 Date) bool {
+	if date.IsZero() || date2.IsZero() {
+		return false
+	}
+
+	if date.Is(date2) {
+		return true
+	}
+
+	matchers := [][]func(d1, d2 Date) bool{
+		{Date.equalsA, Date.equalsA, Date.equalsB, Date.equalsC},
+		{Date.equalsA, Date.equalsA, Date.equalsD, Date.equalsD},
+		{Date.equalsC, Date.equalsD, Date.equalsC, Date.equalsD},
+		{Date.equalsB, Date.equalsD, Date.equalsD, Date.equalsB},
+	}
+
+	return matchers[date2.Constraint][date.Constraint](date, date2)
+}
+
+// See Equals.
+func (date Date) equalsA(date2 Date) bool {
+	return date.Day == date2.Day &&
+		date.Month == date2.Month &&
+		date.Year == date2.Year
+}
+
+// See Equals.
+func (date Date) equalsB(date2 Date) bool {
+	return date.Years() > date2.Years()
+}
+
+// See Equals.
+func (date Date) equalsC(date2 Date) bool {
+	return date.Years() < date2.Years()
+}
+
+// See Equals.
+func (date Date) equalsD(date2 Date) bool {
+	return false
+}

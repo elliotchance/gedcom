@@ -19,7 +19,29 @@ type Node interface {
 	Nodes() []Node
 	AddNode(node Node)
 
-	// Comparison.
+	// Equals performs a shallow comparison between two nodes.
+	//
+	// The implementation is different depending on the types of nodes being
+	// compared. You should see the specific documentation for the Node.
+	//
+	// That being said, as a general rule is fair to assume that in most cases
+	// the following things take place:
+	//
+	// 1. The default logic, if not overridden by the node is to consider nodes
+	// equal if they have the all of the same; tag, value and pointer.
+	//
+	// 2. If either side is nil (or both) the nodes are never considered equal.
+	//
+	// 3. If both nodes are different types they are not considered equal.
+	//
+	// 4. Despite being a shallow equality test some nodes need to check the
+	// equality some children to make a determination. For example, a BirthNode
+	// is always equal to another BirthNode, even if they contain different
+	// children or dates. Whereas a ResidenceNode is only considered equal if
+	// they both contain at least one DateNode with exactly the same value.
+	//
+	// The rules above play heavily into the logic of other things, such as
+	// CompareNodes.
 	Equals(node2 Node) bool
 }
 
