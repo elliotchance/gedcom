@@ -2,6 +2,7 @@ package gedcom_test
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/tf"
 	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
@@ -703,4 +704,33 @@ func TestDateNode_Similarity(t *testing.T) {
 			assert.Equal(t, test.expected, similarity)
 		})
 	}
+}
+
+func TestDateNode_Equals(t *testing.T) {
+	// d1 and d2 are the same value.
+	d1 := gedcom.NewDateNode(nil, "15 SEP 1985", "", nil)
+	d2 := gedcom.NewDateNode(nil, "15 September 1985", "", nil)
+
+	// d3 and d4 represent the same enclosed ranges.
+	d3 := gedcom.NewDateNode(nil, "Bet. Oct 2000 and 3 Apr 2008", "", nil)
+	d4 := gedcom.NewDateNode(nil, "From OCT 2000 to Bef. Jun 2008", "", nil)
+
+	// d5 has a different Start from d3 and d4.
+	d5 := gedcom.NewDateNode(nil, "From Jun 2000 to 3 Apr 2008", "", nil)
+
+	Equals := tf.Function(t, (*gedcom.DateNode).Equals)
+
+	// nil values
+	Equals((*gedcom.DateNode)(nil), d1).Returns(false)
+	Equals(d1, (*gedcom.DateNode)(nil)).Returns(false)
+	Equals((*gedcom.DateNode)(nil), (*gedcom.DateNode)(nil)).Returns(false)
+
+	// Bad input
+	Equals(d1, gedcom.NewNameNode(nil, "15 SEP 1985", "", nil)).Returns(false)
+
+	// General cases.
+	Equals(d1, d2).Returns(true)
+	Equals(d2, d1).Returns(true)
+	Equals(d3, d4).Returns(true)
+	Equals(d4, d5).Returns(false)
 }

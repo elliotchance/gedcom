@@ -2,6 +2,7 @@ package gedcom_test
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/tf"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -148,4 +149,108 @@ func TestDate_Years(t *testing.T) {
 			assert.Equal(t, test.expected, test.date.Years())
 		})
 	}
+}
+
+func TestDate_Equals(t *testing.T) {
+	Equals := tf.Function(t, gedcom.Date.Equals)
+
+	at14Jan1845 := gedcom.Date{14, 1, 1845, false, gedcom.DateConstraintExact}
+	abt14Jan1845 := gedcom.Date{14, 1, 1845, false, gedcom.DateConstraintAbout}
+	bef14Jan1845 := gedcom.Date{14, 1, 1845, false, gedcom.DateConstraintBefore}
+	aft14Jan1845 := gedcom.Date{14, 1, 1845, false, gedcom.DateConstraintAfter}
+
+	at15Jan1845 := gedcom.Date{15, 1, 1845, false, gedcom.DateConstraintExact}
+	abt15Jan1845 := gedcom.Date{15, 1, 1845, false, gedcom.DateConstraintAbout}
+	bef15Jan1845 := gedcom.Date{15, 1, 1845, false, gedcom.DateConstraintBefore}
+	aft15Jan1845 := gedcom.Date{15, 1, 1845, false, gedcom.DateConstraintAfter}
+
+	// Zero dates are equal.
+	Equals(gedcom.Date{}, gedcom.Date{}).Returns(false)
+	Equals(at14Jan1845, gedcom.Date{}).Returns(false)
+	Equals(gedcom.Date{}, at14Jan1845).Returns(false)
+
+	// Test matrix.
+	Equals(at14Jan1845, at14Jan1845).Returns(true) // #4
+	Equals(at14Jan1845, abt14Jan1845).Returns(true)
+	Equals(at14Jan1845, bef14Jan1845).Returns(false)
+	Equals(at14Jan1845, aft14Jan1845).Returns(false)
+	Equals(at14Jan1845, at15Jan1845).Returns(false)
+	Equals(at14Jan1845, abt15Jan1845).Returns(false)
+	Equals(at14Jan1845, bef15Jan1845).Returns(true)
+	Equals(at14Jan1845, aft15Jan1845).Returns(false)
+
+	Equals(abt14Jan1845, at14Jan1845).Returns(true) // #12
+	Equals(abt14Jan1845, abt14Jan1845).Returns(true)
+	Equals(abt14Jan1845, bef14Jan1845).Returns(false)
+	Equals(abt14Jan1845, aft14Jan1845).Returns(false)
+	Equals(abt14Jan1845, at15Jan1845).Returns(false)
+	Equals(abt14Jan1845, abt15Jan1845).Returns(false)
+	Equals(abt14Jan1845, bef15Jan1845).Returns(false)
+	Equals(abt14Jan1845, aft15Jan1845).Returns(false)
+
+	Equals(bef14Jan1845, at14Jan1845).Returns(false) // #20
+	Equals(bef14Jan1845, abt14Jan1845).Returns(false)
+	Equals(bef14Jan1845, bef14Jan1845).Returns(true)
+	Equals(bef14Jan1845, aft14Jan1845).Returns(false)
+	Equals(bef14Jan1845, at15Jan1845).Returns(false)
+	Equals(bef14Jan1845, abt15Jan1845).Returns(false)
+	Equals(bef14Jan1845, bef15Jan1845).Returns(true)
+	Equals(bef14Jan1845, aft15Jan1845).Returns(false)
+
+	Equals(aft14Jan1845, at14Jan1845).Returns(false) // #28
+	Equals(aft14Jan1845, abt14Jan1845).Returns(false)
+	Equals(aft14Jan1845, bef14Jan1845).Returns(false)
+	Equals(aft14Jan1845, aft14Jan1845).Returns(true)
+	Equals(aft14Jan1845, at15Jan1845).Returns(true)
+	Equals(aft14Jan1845, abt15Jan1845).Returns(false)
+	Equals(aft14Jan1845, bef15Jan1845).Returns(false)
+	Equals(aft14Jan1845, aft15Jan1845).Returns(false)
+
+	Equals(at15Jan1845, at14Jan1845).Returns(false) // #36
+	Equals(at15Jan1845, abt14Jan1845).Returns(false)
+	Equals(at15Jan1845, bef14Jan1845).Returns(false)
+	Equals(at15Jan1845, aft14Jan1845).Returns(true)
+	Equals(at15Jan1845, at15Jan1845).Returns(true)
+	Equals(at15Jan1845, abt15Jan1845).Returns(true)
+	Equals(at15Jan1845, bef15Jan1845).Returns(false)
+	Equals(at15Jan1845, aft15Jan1845).Returns(false)
+
+	Equals(abt15Jan1845, at14Jan1845).Returns(false) // #44
+	Equals(abt15Jan1845, abt14Jan1845).Returns(false)
+	Equals(abt15Jan1845, bef14Jan1845).Returns(false)
+	Equals(abt15Jan1845, aft14Jan1845).Returns(false)
+	Equals(abt15Jan1845, at15Jan1845).Returns(true)
+	Equals(abt15Jan1845, abt15Jan1845).Returns(true)
+	Equals(abt15Jan1845, bef15Jan1845).Returns(false)
+	Equals(abt15Jan1845, aft15Jan1845).Returns(false)
+
+	Equals(bef15Jan1845, at14Jan1845).Returns(true) // #52
+	Equals(bef15Jan1845, abt14Jan1845).Returns(false)
+	Equals(bef15Jan1845, bef14Jan1845).Returns(false)
+	Equals(bef15Jan1845, aft14Jan1845).Returns(false)
+	Equals(bef15Jan1845, at15Jan1845).Returns(false)
+	Equals(bef15Jan1845, abt15Jan1845).Returns(false)
+	Equals(bef15Jan1845, bef15Jan1845).Returns(true)
+	Equals(bef15Jan1845, aft15Jan1845).Returns(false)
+
+	Equals(aft15Jan1845, at14Jan1845).Returns(false) // #60
+	Equals(aft15Jan1845, abt14Jan1845).Returns(false)
+	Equals(aft15Jan1845, bef14Jan1845).Returns(false)
+	Equals(aft15Jan1845, aft14Jan1845).Returns(true)
+	Equals(aft15Jan1845, at15Jan1845).Returns(false)
+	Equals(aft15Jan1845, abt15Jan1845).Returns(false)
+	Equals(aft15Jan1845, bef15Jan1845).Returns(false)
+	Equals(aft15Jan1845, aft15Jan1845).Returns(true)
+}
+
+func TestDate_IsZero(t *testing.T) {
+	IsZero := tf.Function(t, gedcom.Date.IsZero)
+
+	IsZero(gedcom.Date{}).Returns(true)
+	IsZero(gedcom.Date{14, 1, 1845, false, gedcom.DateConstraintExact}).Returns(false)
+	IsZero(gedcom.Date{0, 1, 1845, false, gedcom.DateConstraintExact}).Returns(false)
+	IsZero(gedcom.Date{0, 0, 1845, false, gedcom.DateConstraintExact}).Returns(false)
+	IsZero(gedcom.Date{0, 0, 0, false, gedcom.DateConstraintExact}).Returns(true)
+	IsZero(gedcom.Date{0, 0, 0, true, gedcom.DateConstraintExact}).Returns(true)
+	IsZero(gedcom.Date{0, 0, 0, false, gedcom.DateConstraintAfter}).Returns(true)
 }
