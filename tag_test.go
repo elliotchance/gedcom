@@ -219,7 +219,7 @@ func TestTags(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.tag, func(t *testing.T) {
-			if test.expected.Known() {
+			if test.expected.IsKnown() {
 				assert.Contains(t, gedcom.Tags(), test.expected)
 			} else {
 				assert.NotContains(t, gedcom.Tags(), test.expected)
@@ -268,7 +268,7 @@ func TestTag_Known(t *testing.T) {
 	for _, tag := range gedcom.Tags() {
 		t.Run(tag.String(), func(t *testing.T) {
 			expected := tagTests[tag.Tag()]
-			assert.Equal(t, expected.isKnown, tag.Known())
+			assert.Equal(t, expected.isKnown, tag.IsKnown())
 		})
 	}
 }

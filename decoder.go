@@ -159,6 +159,9 @@ func parseLine(document *Document, line string) (Node, int, error) {
 // that will be returned. Otherwise a *SimpleNode will be used.
 func NewNode(document *Document, tag Tag, value, pointer string) Node {
 	switch tag {
+	case TagBirth:
+		return NewBirthNode(document, value, pointer, nil)
+
 	case TagDate:
 		return NewDateNode(document, value, pointer, nil)
 
@@ -173,6 +176,9 @@ func NewNode(document *Document, tag Tag, value, pointer string) Node {
 
 	case TagPlace:
 		return NewPlaceNode(document, value, pointer, nil)
+
+	case TagResidence:
+		return NewResidenceNode(document, value, pointer, nil)
 
 	case TagSource:
 		return NewSourceNode(document, value, pointer, nil)

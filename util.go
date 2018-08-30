@@ -108,23 +108,21 @@ func Compound(nodes ...interface{}) []Node {
 	result := []Node{}
 
 	for _, n := range nodes {
-		switch i := n.(type) {
-		case nil:
+		v := reflect.ValueOf(n)
+
+		switch v.Kind() {
+		case reflect.Invalid:
 			// Ignore
 
-		case Node:
-			result = append(result, i)
-
-		case []Node:
-			// Should this be replaced with a function that removes nil items?
-			for _, item := range i {
-				if item != nil {
-					result = append(result, item)
+		case reflect.Slice:
+			for i := 0; i < v.Len(); i++ {
+				if j := v.Index(i).Interface(); j != nil {
+					result = append(result, j.(Node))
 				}
 			}
 
 		default:
-			panic("cannot compound type: " + reflect.TypeOf(i).Name())
+			result = append(result, v.Interface().(Node))
 		}
 	}
 

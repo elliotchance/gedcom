@@ -60,7 +60,7 @@ var tests = map[string]*gedcom.Document{
 	"0 HEAD\n1 BIRT": {
 		Nodes: []gedcom.Node{
 			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", nil),
+				gedcom.NewBirthNode(nil, "", "", nil),
 			}),
 		},
 	},
@@ -94,7 +94,7 @@ var tests = map[string]*gedcom.Document{
 	"0 HEAD\n1 BIRT\n2 PLAC Camperdown, Nsw, Australia": {
 		Nodes: []gedcom.Node{
 			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", []gedcom.Node{
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
 					gedcom.NewPlaceNode(nil, "Camperdown, Nsw, Australia", "", nil),
 				}),
 			}),
@@ -131,7 +131,7 @@ var tests = map[string]*gedcom.Document{
 	"0 HEAD\n1 BIRT\n2 PLAC Camperdown, Nsw, Australia\n1 SEX M": {
 		Nodes: []gedcom.Node{
 			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", []gedcom.Node{
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
 					gedcom.NewPlaceNode(nil, "Camperdown, Nsw, Australia", "", nil),
 				}),
 				gedcom.NewSimpleNode(nil, gedcom.TagSex, "M", "", nil),
@@ -142,7 +142,7 @@ var tests = map[string]*gedcom.Document{
 		Nodes: []gedcom.Node{
 			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", nil),
 			gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", nil),
+				gedcom.NewBirthNode(nil, "", "", nil),
 			}),
 		},
 	},
@@ -207,14 +207,14 @@ var tests = map[string]*gedcom.Document{
 	"0 HEAD\n1 BIRT ": {
 		Nodes: []gedcom.Node{
 			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", nil),
+				gedcom.NewBirthNode(nil, "", "", nil),
 			}),
 		},
 	},
 	"0 @P221@ INDI\n1 BIRT\n2 DATE 1851\n1 DEAT\n2 DATE 1856": {
 		Nodes: []gedcom.Node{
 			gedcom.NewIndividualNode(nil, "", "P221", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", []gedcom.Node{
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
 					gedcom.NewDateNode(nil, "1851", "", nil),
 				}),
 				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{
@@ -279,11 +279,13 @@ func TestNewNode(t *testing.T) {
 		tag      gedcom.Tag
 		expected gedcom.Node
 	}{
+		{gedcom.TagBirth, gedcom.NewBirthNode(nil, v, p, nil)},
 		{gedcom.TagDate, gedcom.NewDateNode(nil, v, p, nil)},
 		{gedcom.TagFamily, gedcom.NewFamilyNode(nil, p, nil)},
 		{gedcom.TagIndividual, gedcom.NewIndividualNode(nil, v, p, nil)},
 		{gedcom.TagName, gedcom.NewNameNode(nil, v, p, nil)},
 		{gedcom.TagPlace, gedcom.NewPlaceNode(nil, v, p, nil)},
+		{gedcom.TagResidence, gedcom.NewResidenceNode(nil, v, p, nil)},
 		{gedcom.TagSource, gedcom.NewSourceNode(nil, v, p, nil)},
 		{gedcom.TagVersion, gedcom.NewSimpleNode(nil, gedcom.TagVersion, v, p, nil)},
 	} {

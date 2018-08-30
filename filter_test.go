@@ -10,7 +10,7 @@ import (
 func TestFilter(t *testing.T) {
 	root := gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 		gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
-		gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", []gedcom.Node{
+		gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
 			gedcom.NewDateNode(nil, "6 MAY 1989", "", nil),
 		}),
 	})
@@ -132,7 +132,7 @@ func TestFilter(t *testing.T) {
 func TestWhitelistTagFilter(t *testing.T) {
 	root := gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 		gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
-		gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", []gedcom.Node{
+		gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
 			gedcom.NewDateNode(nil, "6 MAY 1989", "", nil),
 		}),
 	})
@@ -172,7 +172,7 @@ func TestWhitelistTagFilter(t *testing.T) {
 func TestBlacklistTagFilter(t *testing.T) {
 	root := gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 		gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
-		gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", []gedcom.Node{
+		gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
 			gedcom.NewDateNode(nil, "6 MAY 1989", "", nil),
 		}),
 	})
@@ -217,7 +217,7 @@ func TestOfficialTagFilter(t *testing.T) {
 		gedcom.NewSimpleNode(nil, gedcom.UnofficialTagCreated, "Elliot /Chance/", "", []gedcom.Node{
 			gedcom.NewDateNode(nil, "3 Mar 2007", "", nil),
 		}),
-		gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", []gedcom.Node{
+		gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
 			gedcom.NewDateNode(nil, "6 MAY 1989", "", nil),
 		}),
 	})

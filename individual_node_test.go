@@ -80,42 +80,42 @@ func TestIndividualNode_Sex(t *testing.T) {
 func TestIndividualNode_Births(t *testing.T) {
 	var tests = []struct {
 		node   *gedcom.IndividualNode
-		births []gedcom.Node
+		births []*gedcom.BirthNode
 	}{
 		{
 			node:   individual("P1", "", "", ""),
-			births: []gedcom.Node{},
+			births: nil,
 		},
 		{
 			node:   gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{}),
-			births: []gedcom.Node{},
+			births: nil,
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", []gedcom.Node{}),
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{}),
 			}),
-			births: []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", []gedcom.Node{}),
+			births: []*gedcom.BirthNode{
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{}),
 			},
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", []gedcom.Node{}),
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{}),
 				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
 			}),
-			births: []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", []gedcom.Node{}),
+			births: []*gedcom.BirthNode{
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{}),
 			},
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBirth, "foo", "", []gedcom.Node{}),
+				gedcom.NewBirthNode(nil, "foo", "", []gedcom.Node{}),
 				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagBirth, "bar", "", []gedcom.Node{}),
+				gedcom.NewBirthNode(nil, "bar", "", []gedcom.Node{}),
 			}),
-			births: []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBirth, "foo", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagBirth, "bar", "", []gedcom.Node{}),
+			births: []*gedcom.BirthNode{
+				gedcom.NewBirthNode(nil, "foo", "", []gedcom.Node{}),
+				gedcom.NewBirthNode(nil, "bar", "", []gedcom.Node{}),
 			},
 		},
 	}
@@ -207,7 +207,7 @@ func TestIndividualNode_Deaths(t *testing.T) {
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", []gedcom.Node{}),
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{}),
 			}),
 			deaths: []gedcom.Node{
 				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
@@ -257,7 +257,7 @@ func TestIndividualNode_Burials(t *testing.T) {
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewSimpleNode(nil, gedcom.TagBurial, "", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", []gedcom.Node{}),
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{}),
 			}),
 			burials: []gedcom.Node{
 				gedcom.NewSimpleNode(nil, gedcom.TagBurial, "", "", []gedcom.Node{}),
@@ -551,7 +551,7 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 		// A single date.
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", []gedcom.Node{
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
 					gedcom.NewDateNode(nil, "1 Aug 1980", "", nil),
 				}),
 			}),
@@ -577,7 +577,7 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 		// Multiple dates and other cases.
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", []gedcom.Node{
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
 					gedcom.NewDateNode(nil, "1 Aug 1980", "", nil),
 				}),
 				gedcom.NewSimpleNode(nil, gedcom.TagBaptism, "", "", []gedcom.Node{
@@ -588,7 +588,7 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", []gedcom.Node{
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
 					gedcom.NewDateNode(nil, "1 Aug 1980", "", nil),
 					gedcom.NewDateNode(nil, "23 Mar 1979", "", nil),
 				}),
@@ -597,7 +597,7 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", []gedcom.Node{
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
 					gedcom.NewDateNode(nil, "1 Aug 1980", "", nil),
 				}),
 				gedcom.NewSimpleNode(nil, gedcom.TagLDSBaptism, "", "", []gedcom.Node{
@@ -608,14 +608,14 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", []gedcom.Node{}),
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{}),
 				gedcom.NewSimpleNode(nil, gedcom.TagLDSBaptism, "", "", []gedcom.Node{}),
 			}),
 			expected: nil,
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", []gedcom.Node{}),
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{}),
 				gedcom.NewSimpleNode(nil, gedcom.TagLDSBaptism, "", "", []gedcom.Node{
 					gedcom.NewDateNode(nil, "1 Aug 1980", "", nil),
 				}),
@@ -731,8 +731,8 @@ func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 	}
 }
 
-func born(value string) gedcom.Node {
-	return gedcom.NewSimpleNode(nil, gedcom.TagBirth, "", "", []gedcom.Node{
+func born(value string) *gedcom.BirthNode {
+	return gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
 		gedcom.NewDateNode(nil, value, "", []gedcom.Node{}),
 	})
 }

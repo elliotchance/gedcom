@@ -11,7 +11,7 @@ func TestGedcomLine(t *testing.T) {
 
 	GedcomLine(0, (*gedcom.SimpleNode)(nil)).Returns("")
 
-	GedcomLine(0, gedcom.NewSimpleNode(nil, gedcom.TagBirth, "foo", "72", nil)).
+	GedcomLine(0, gedcom.NewBirthNode(nil, "foo", "72", nil)).
 		Returns("0 @72@ BIRT foo")
 
 	GedcomLine(3, gedcom.NewSimpleNode(nil, gedcom.TagDeath, "bar", "baz", nil)).
@@ -20,6 +20,6 @@ func TestGedcomLine(t *testing.T) {
 	GedcomLine(2, gedcom.NewDateNode(nil, "3 SEP 1945", "", nil)).
 		Returns("2 DATE 3 SEP 1945")
 
-	GedcomLine(-1, gedcom.NewSimpleNode(nil, gedcom.TagBirth, "foo", "72", nil)).
+	GedcomLine(-1, gedcom.NewBirthNode(nil, "foo", "72", nil)).
 		Returns("@72@ BIRT foo")
 }
