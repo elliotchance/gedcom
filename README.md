@@ -17,6 +17,7 @@ exporting and diffing GEDCOM files.
       * [Nodes](#nodes)
    * [Nodes](#nodes-1)
       * [Dates](#dates)
+      * [Equality](#equality)
       * [Filtering](#filtering)
    * [Rendering as HTML](#rendering-as-html)
    * [Converting to JSON](#converting-to-json)
@@ -166,6 +167,19 @@ date range into a number for easier distance and comparison measurements.
 4. Algorithms for calculating the similarity of dates on a configurable
 parabola.
 
+Equality
+--------
+
+[`Node.Equals`][9] performs a shallow comparison between two nodes. The
+implementation is different depending on the types of nodes being compared. You
+should see the specific documentation for the Node.
+
+Equality is not to be confused with the `Is` function seen on some of the nodes,
+such as [`Date.Is`][12]. The `Is` function is used to compare exact raw values
+in nodes.
+
+[`DeepEqual`][10] tests if left and right are recursively equal.
+
 Filtering
 ---------
 
@@ -287,3 +301,6 @@ You can (and probably should) also use
 [6]: https://godoc.org/github.com/elliotchance/gedcom#WhitelistTagFilter
 [7]: https://godoc.org/github.com/elliotchance/gedcom#BlacklistTagFilter
 [8]: https://godoc.org/github.com/elliotchance/gedcom#OfficialTagFilter
+[9]: https://godoc.org/github.com/elliotchance/gedcom#Node
+[10]: https://godoc.org/github.com/elliotchance/gedcom#DeepEqual
+[11]: https://godoc.org/github.com/elliotchance/gedcom#Date.Is
