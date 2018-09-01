@@ -3,6 +3,7 @@ package gedcom
 import (
 	"fmt"
 	"strings"
+	"unicode"
 )
 
 // NodeDiff is used to describe the difference when two nodes are compared.
@@ -214,5 +215,35 @@ func (nd *NodeDiff) string(indent int) string {
 // You should not rely on this format to be machine readable as it may change in
 // the future.
 func (nd *NodeDiff) String() string {
-	return strings.TrimSpace(nd.string(0))
+	return strings.TrimRightFunc(nd.string(0), unicode.IsSpace)
+}
+
+// IsDeepEqual returns true if the current NodeDiff and all of its children have
+// been assigned to the left and right.
+//
+// The following diff (rendered with String) shows each NodeDiff and if it would
+// be considered DeepEqual:
+//
+//   LR 0 INDI @P3@           | false
+//   LR 1 NAME John /Smith/   | true
+//   LR 1 BIRT                | false
+//   L  2 DATE Abt. Oct 1943  | false
+//   LR 2 DATE 3 SEP 1943     | true
+//    R 2 DATE Abt. Sep 1943  | false
+//   LR 1 DEAT                | true
+//   LR 2 PLAC England        | true
+//    R 1 NAME J. /Smith/     | false
+//
+func (nd *NodeDiff) IsDeepEqual() bool {
+	if IsNil(nd.Left) || IsNil(nd.Right) {
+		return false
+	}
+
+	for _, child := range nd.Children {
+		if !child.IsDeepEqual() {
+			return false
+		}
+	}
+
+	return true
 }
