@@ -376,3 +376,35 @@ func (node *DateNode) Equals(node2 Node) bool {
 
 	return false
 }
+
+// MinimumDateNode returns the date node with the minimum Years value from the
+// provided slice.
+//
+// If the slice is nil or contains zero elements then nil will be returned.
+func MinimumDateNode(dates []*DateNode) *DateNode {
+	min := (*DateNode)(nil)
+
+	for _, date := range dates {
+		if min == nil || date.Years() < min.Years() {
+			min = date
+		}
+	}
+
+	return min
+}
+
+// MaximumDateNode returns the date node with the maximum Years value from the
+// provided slice.
+//
+// If the slice is nil or contains zero elements then nil will be returned.
+func MaximumDateNode(dates []*DateNode) *DateNode {
+	min := (*DateNode)(nil)
+
+	for _, date := range dates {
+		if min == nil || date.Years() > min.Years() {
+			min = date
+		}
+	}
+
+	return min
+}
