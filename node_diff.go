@@ -2,6 +2,7 @@ package gedcom
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 	"unicode"
 )
@@ -246,4 +247,74 @@ func (nd *NodeDiff) IsDeepEqual() bool {
 	}
 
 	return true
+}
+
+// Sort mutates the existing NodeDiff to order the nodes recursively.
+//
+// Nodes are first sorted by their tag group. The tag group places some tags are
+// specific points, such as the name as the top, and the burial after the death
+// event.
+//
+// For nodes in the same tag group they are then ordered by date based on the
+// Yearer interface.
+//
+// If nodes do not implement Yearer, or the values are equal it will then use
+// the third level of ordering which is the node Value itself.
+//
+// Sort uses SliceStable to make the results more predicable and also ensures
+// that nodes remain in the same order if all three levels are the same.
+func (nd *NodeDiff) Sort() {
+	sort.SliceStable(nd.Children, func(i, j int) bool {
+		left, right := nd.Children[i].LeftNode(), nd.Children[j].LeftNode()
+
+		if left.Tag().sortValue != right.Tag().sortValue {
+			return left.Tag().sortValue < right.Tag().sortValue
+		}
+
+		y1, ok1 := left.(Yearer)
+		y2, ok2 := right.(Yearer)
+		if ok1 && ok2 {
+			return y1.Years() < y2.Years()
+		}
+
+		return left.Value() < right.Value()
+	})
+
+	for _, child := range nd.Children {
+		child.Sort()
+	}
+}
+
+// LeftNode returns the flattening Node value that favors the left side.
+//
+// To favor means to return the Left value when both the Left and Right are set.
+func (nd *NodeDiff) LeftNode() Node {
+	n := nd.Left
+
+	if IsNil(n) {
+		n = nd.Right
+	}
+
+	for _, child := range nd.Children {
+		n.AddNode(child.LeftNode())
+	}
+
+	return n
+}
+
+// RightNode returns the flattening Node value that favors the right side.
+//
+// To favor means to return the Left value when both the Left and Right are set.
+func (nd *NodeDiff) RightNode() Node {
+	n := nd.Right
+
+	if IsNil(n) {
+		n = nd.Left
+	}
+
+	for _, child := range nd.Children {
+		n.AddNode(child.RightNode())
+	}
+
+	return n
 }

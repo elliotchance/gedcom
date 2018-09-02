@@ -349,3 +349,165 @@ LR 2 PLAC England
 		})
 	}
 }
+
+func TestNodeDiff_Sort(t *testing.T) {
+	d := &gedcom.NodeDiff{
+		Left:  parse("0 INDI @P3@")[0],
+		Right: parse("0 INDI @P3@")[0],
+		Children: []*gedcom.NodeDiff{
+			{
+				Left:  parse("0 BURI")[0],
+				Right: parse("0 BURI")[0],
+				Children: []*gedcom.NodeDiff{
+					{
+						Left: parse("0 DATE Abt. 1943")[0],
+					},
+				},
+			},
+			{
+				Left: parse("0 NAME John /Smith/")[0],
+			},
+			{
+				Left:  parse("0 DEAT")[0],
+				Right: parse("0 DEAT")[0],
+				Children: []*gedcom.NodeDiff{
+					{
+						Left:  parse("0 PLAC England")[0],
+						Right: parse("0 PLAC England")[0],
+					},
+				},
+			},
+			{
+				Left: parse("0 BIRT")[0],
+				Children: []*gedcom.NodeDiff{
+					{
+						Right: parse("0 PLAC England")[0],
+					},
+					{
+						Left: parse("0 DATE 1943")[0],
+					},
+					{
+						Right: parse("0 DATE 3 SEP 1942")[0],
+					},
+				},
+			},
+			{
+				Left: parse("0 SEX M")[0],
+			},
+			{
+				Right: parse("0 NAME John R /Smith/")[0],
+			},
+			{
+				Left:  parse("0 RESI")[0],
+				Right: parse("0 RESI")[0],
+				Children: []*gedcom.NodeDiff{
+					{
+						Left: parse("0 DATE 3 Mar 1937")[0],
+					},
+				},
+			},
+			{
+				Left:  parse("0 RESI")[0],
+				Right: parse("0 RESI")[0],
+				Children: []*gedcom.NodeDiff{
+					{
+						Left: parse("0 DATE Aft. Sep 1920")[0],
+					},
+				},
+			},
+		},
+	}
+
+	assert.Equal(t, strings.TrimSpace(`
+LR 0 INDI @P3@
+LR 1 BURI
+L  2 DATE Abt. 1943
+L  1 NAME John /Smith/
+LR 1 DEAT
+LR 2 PLAC England
+L  1 BIRT
+ R 2 PLAC England
+L  2 DATE 1943
+ R 2 DATE 3 SEP 1942
+L  1 SEX M
+ R 1 NAME John R /Smith/
+LR 1 RESI
+L  2 DATE 3 Mar 1937
+LR 1 RESI
+L  2 DATE Aft. Sep 1920`), d.String())
+
+	d.Sort()
+
+	assert.Equal(t, strings.TrimSpace(`
+LR 0 INDI @P3@
+L  1 NAME John /Smith/
+ R 1 NAME John R /Smith/
+L  1 SEX M
+L  1 BIRT
+ R 2 DATE 3 SEP 1942
+L  2 DATE 1943
+ R 2 PLAC England
+LR 1 RESI
+L  2 DATE Aft. Sep 1920
+LR 1 RESI
+L  2 DATE 3 Mar 1937
+LR 1 DEAT
+LR 2 PLAC England
+LR 1 BURI
+L  2 DATE Abt. 1943`), d.String())
+}
+
+func TestNodeDiff_LeftNode(t *testing.T) {
+	d := &gedcom.NodeDiff{
+		Left:  parse("0 INDI @P3@")[0],
+		Right: parse("0 INDI @P4@")[0],
+		Children: []*gedcom.NodeDiff{
+			{
+				Left: parse("0 BURI")[0],
+				Children: []*gedcom.NodeDiff{
+					{
+						Left:  parse("0 DATE 1943")[0],
+						Right: parse("0 DATE Abt. 1943")[0],
+					},
+				},
+			},
+			{
+				Right: parse("0 NAME John /Smith/")[0],
+			},
+		},
+	}
+
+	assert.Equal(t, `0 INDI @P3@
+1 BURI
+2 DATE 1943
+1 NAME John /Smith/
+`, gedcom.NodeGedcom(d.LeftNode()))
+}
+
+func TestNodeDiff_RightNode(t *testing.T) {
+	d := &gedcom.NodeDiff{
+		Left:  parse("0 INDI @P3@")[0],
+		Right: parse("0 INDI @P4@")[0],
+		Children: []*gedcom.NodeDiff{
+			{
+				Left: parse("0 BURI")[0],
+				Children: []*gedcom.NodeDiff{
+					{
+						Left:  parse("0 DATE 1943")[0],
+						Right: parse("0 DATE Abt. 1943")[0],
+					},
+				},
+			},
+			{
+				Left:  parse("0 NAME J /Smith/")[0],
+				Right: parse("0 NAME John /Smith/")[0],
+			},
+		},
+	}
+
+	assert.Equal(t, `0 INDI @P4@
+1 BURI
+2 DATE Abt. 1943
+1 NAME John /Smith/
+`, gedcom.NodeGedcom(d.RightNode()))
+}

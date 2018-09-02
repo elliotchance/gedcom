@@ -52,3 +52,12 @@ func (node *ResidenceNode) Equals(node2 Node) bool {
 
 	return false
 }
+
+// Years returns the Years value of the minimum date node in the node.
+func (node *ResidenceNode) Years() float64 {
+	if min := MinimumDateNode(node.Dates()); min != nil {
+		return Years(min)
+	}
+
+	return 0
+}
