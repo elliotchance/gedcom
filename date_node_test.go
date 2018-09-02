@@ -1,12 +1,13 @@
 package gedcom_test
 
 import (
-	"github.com/elliotchance/gedcom"
-	"github.com/elliotchance/tf"
-	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/tf"
+	"github.com/stretchr/testify/assert"
 )
 
 func parseTime(s string) time.Time {
@@ -733,4 +734,60 @@ func TestDateNode_Equals(t *testing.T) {
 	Equals(d2, d1).Returns(true)
 	Equals(d3, d4).Returns(true)
 	Equals(d4, d5).Returns(false)
+}
+
+func TestMinimumDateNode(t *testing.T) {
+	MinimumDateNode := tf.Function(t, gedcom.MinimumDateNode)
+
+	at3Sep1923 := gedcom.NewDateNode(nil, "3 Sep 1923", "", nil)
+	at4Mar1923 := gedcom.NewDateNode(nil, "4 Mar 1923", "", nil)
+	at5Mar1923 := gedcom.NewDateNode(nil, "5 Mar 1923", "", nil)
+
+	// Nils
+	MinimumDateNode(([]*gedcom.DateNode)(nil)).Returns((*gedcom.DateNode)(nil))
+	MinimumDateNode([]*gedcom.DateNode{}).Returns((*gedcom.DateNode)(nil))
+
+	// Values
+	MinimumDateNode([]*gedcom.DateNode{
+		at3Sep1923,
+	}).Returns(at3Sep1923)
+
+	MinimumDateNode([]*gedcom.DateNode{
+		at3Sep1923,
+		at4Mar1923,
+	}).Returns(at4Mar1923)
+
+	MinimumDateNode([]*gedcom.DateNode{
+		at3Sep1923,
+		at4Mar1923,
+		at5Mar1923,
+	}).Returns(at4Mar1923)
+}
+
+func TestMaximumDateNode(t *testing.T) {
+	MaximumDateNode := tf.Function(t, gedcom.MaximumDateNode)
+
+	at3Sep1923 := gedcom.NewDateNode(nil, "3 Sep 1923", "", nil)
+	at4Mar1923 := gedcom.NewDateNode(nil, "4 Mar 1923", "", nil)
+	at5Mar1923 := gedcom.NewDateNode(nil, "5 Mar 1923", "", nil)
+
+	// Nils
+	MaximumDateNode(([]*gedcom.DateNode)(nil)).Returns((*gedcom.DateNode)(nil))
+	MaximumDateNode([]*gedcom.DateNode{}).Returns((*gedcom.DateNode)(nil))
+
+	// Values
+	MaximumDateNode([]*gedcom.DateNode{
+		at3Sep1923,
+	}).Returns(at3Sep1923)
+
+	MaximumDateNode([]*gedcom.DateNode{
+		at3Sep1923,
+		at4Mar1923,
+	}).Returns(at3Sep1923)
+
+	MaximumDateNode([]*gedcom.DateNode{
+		at4Mar1923,
+		at3Sep1923,
+		at5Mar1923,
+	}).Returns(at3Sep1923)
 }
