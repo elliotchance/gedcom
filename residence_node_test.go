@@ -70,3 +70,18 @@ func TestResidenceNode_Equals(t *testing.T) {
 	Equals(n1, n3).Returns(false)
 	Equals(n3, n4).Returns(true)
 }
+
+func TestResidenceNode_Years(t *testing.T) {
+	Years := tf.Function(t, (*gedcom.ResidenceNode).Years)
+
+	Years(gedcom.NewResidenceNode(nil, "", "", nil)).Returns(0.0)
+
+	Years(gedcom.NewResidenceNode(nil, "", "", []gedcom.Node{
+		gedcom.NewDateNode(nil, "3 SEP 1943", "", nil),
+	})).Returns(1943.672131147541)
+
+	Years(gedcom.NewResidenceNode(nil, "", "", []gedcom.Node{
+		gedcom.NewDateNode(nil, "3 SEP 1943", "", nil),
+		gedcom.NewDateNode(nil, "3 SEP 1920", "", nil),
+	})).Returns(1920.6730245231608)
+}
