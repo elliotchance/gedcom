@@ -27,7 +27,7 @@ func (node *ResidenceNode) Dates() (result []*DateNode) {
 // Equal tests if two residence events are the same.
 //
 // Two residence events are considered equal if they both contain the same date.
-// If either or both contain more than one date only a single date in must match
+// If either or both contain more than one date only a single date must match
 // both sides.
 //
 // If either node is nil (including both) or if the right side is not a
