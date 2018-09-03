@@ -239,3 +239,61 @@ func TestOfficialTagFilter(t *testing.T) {
 		})
 	}
 }
+
+func TestSimpleNameFilter(t *testing.T) {
+	for _, test := range []struct {
+		root     gedcom.Node
+		expected string
+	}{
+		{
+			root: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+				gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+					gedcom.NewDateNode(nil, "6 MAY 1989", "", nil),
+				}),
+			}),
+			expected: `0 @P1@ INDI
+1 NAME Elliot /Chance/
+1 BIRT
+2 DATE 6 MAY 1989
+`,
+		},
+		{
+			root: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+					gedcom.NewDateNode(nil, "6 MAY 1989", "", nil),
+				}),
+				gedcom.NewNameNode(nil, "Elliot /Chance/", "", []gedcom.Node{
+					gedcom.NewSimpleNode(nil, gedcom.TagSurname, "Smith", "", nil),
+				}),
+			}),
+			expected: `0 @P1@ INDI
+1 BIRT
+2 DATE 6 MAY 1989
+1 NAME Elliot /Smith/
+`,
+		},
+		{
+			root: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+				gedcom.NewNameNode(nil, "", "", []gedcom.Node{
+					gedcom.NewSimpleNode(nil, gedcom.TagGivenName, "Bob", "", nil),
+					gedcom.NewSimpleNode(nil, gedcom.TagSurname, "Smith", "", nil),
+				}),
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+					gedcom.NewDateNode(nil, "6 MAY 1989", "", nil),
+				}),
+			}),
+			expected: `0 @P1@ INDI
+1 NAME Bob /Smith/
+1 BIRT
+2 DATE 6 MAY 1989
+`,
+		},
+	} {
+		t.Run("", func(t *testing.T) {
+			filter := gedcom.SimpleNameFilter()
+			result := gedcom.NodeGedcom(gedcom.Filter(test.root, filter))
+			assert.Equal(t, test.expected, result)
+		})
+	}
+}

@@ -90,3 +90,21 @@ func OfficialTagFilter() FilterFunction {
 		return NodeCondition(isOfficial, node, nil), isOfficial
 	}
 }
+
+// SimpleNameFilter flattens NAME nodes.
+//
+// This is useful for comparing names when the components of the name (title,
+// suffix, etc) are less important than the name itself.
+//
+// The new name nodes will have a value constructed with NameNode.GedcomName.
+func SimpleNameFilter() FilterFunction {
+	return func(node Node) (Node, bool) {
+		if name, ok := node.(*NameNode); ok {
+			newNode := NewNameNode(name.Document(), name.GedcomName(), name.Pointer(), nil)
+
+			return newNode, false
+		}
+
+		return node, true
+	}
+}
