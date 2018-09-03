@@ -281,6 +281,7 @@ func TestNewNode(t *testing.T) {
 	}{
 		{gedcom.TagBirth, gedcom.NewBirthNode(nil, v, p, nil)},
 		{gedcom.TagDate, gedcom.NewDateNode(nil, v, p, nil)},
+		{gedcom.TagEvent, gedcom.NewEventNode(nil, v, p, nil)},
 		{gedcom.TagFamily, gedcom.NewFamilyNode(nil, p, nil)},
 		{gedcom.TagIndividual, gedcom.NewIndividualNode(nil, v, p, nil)},
 		{gedcom.TagName, gedcom.NewNameNode(nil, v, p, nil)},

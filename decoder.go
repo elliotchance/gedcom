@@ -165,6 +165,9 @@ func NewNode(document *Document, tag Tag, value, pointer string) Node {
 	case TagDate:
 		return NewDateNode(document, value, pointer, nil)
 
+	case TagEvent:
+		return NewEventNode(document, value, pointer, nil)
+
 	case TagFamily:
 		return NewFamilyNode(document, pointer, nil)
 
