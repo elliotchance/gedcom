@@ -299,8 +299,7 @@ var (
 	// become married.
 	TagEngagement = newTag("ENGA", "Engagement", tagOptionEvent, tagSortIndividualEvents)
 
-	// A noteworthy happening related to an individual, a group, or an
-	// organization.
+	// See EventNode.
 	TagEvent = newTag("EVEN", "Event", tagOptionEvent, tagSortIndividualEvents)
 
 	// Pertaining to a noteworthy attribute or fact concerning an individual, a
