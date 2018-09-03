@@ -8,13 +8,14 @@ import (
 
 var nameTests = []struct {
 	node          *gedcom.NameNode
-	title         string
-	prefix        string
-	givenName     string
-	surnamePrefix string
-	surname       string
-	suffix        string
-	str           string
+	title         string // Title()
+	prefix        string // Prefix()
+	givenName     string // GivenName()
+	surnamePrefix string // SurnamePrefix()
+	surname       string // Surname()
+	suffix        string // Suffix()
+	str           string // String()
+	gedcomName    string // GedcomName()
 }{
 	{
 		node:          gedcom.NewNameNode(nil, "", "", nil),
@@ -25,6 +26,7 @@ var nameTests = []struct {
 		surname:       "",
 		suffix:        "",
 		str:           "",
+		gedcomName:    "",
 	},
 	{
 		node:          gedcom.NewNameNode(nil, "/Double  Last/", "", nil),
@@ -35,6 +37,7 @@ var nameTests = []struct {
 		surname:       "Double Last",
 		suffix:        "",
 		str:           "Double Last",
+		gedcomName:    "/Double Last/",
 	},
 	{
 		node:          gedcom.NewNameNode(nil, "//", "", nil),
@@ -45,6 +48,7 @@ var nameTests = []struct {
 		surname:       "",
 		suffix:        "",
 		str:           "",
+		gedcomName:    "",
 	},
 	{
 		// This is an invalid case. I don't mind that the data returned seems
@@ -57,6 +61,7 @@ var nameTests = []struct {
 		surname:       "",
 		suffix:        "/ b",
 		str:           "a / b",
+		gedcomName:    "a / b",
 	},
 	{
 		node:          gedcom.NewNameNode(nil, "Double First", "", nil),
@@ -67,6 +72,7 @@ var nameTests = []struct {
 		surname:       "",
 		suffix:        "",
 		str:           "Double First",
+		gedcomName:    "Double First",
 	},
 	{
 		node:          gedcom.NewNameNode(nil, "First /Last/", "", nil),
@@ -77,6 +83,7 @@ var nameTests = []struct {
 		surname:       "Last",
 		suffix:        "",
 		str:           "First Last",
+		gedcomName:    "First /Last/",
 	},
 	{
 		node:          gedcom.NewNameNode(nil, "First   Middle /Last/", "", nil),
@@ -87,6 +94,7 @@ var nameTests = []struct {
 		surname:       "Last",
 		suffix:        "",
 		str:           "First Middle Last",
+		gedcomName:    "First Middle /Last/",
 	},
 	{
 		node:          gedcom.NewNameNode(nil, "First /Last/  Suffix ", "", nil),
@@ -97,6 +105,7 @@ var nameTests = []struct {
 		surname:       "Last",
 		suffix:        "Suffix",
 		str:           "First Last Suffix",
+		gedcomName:    "First /Last/ Suffix",
 	},
 	{
 		node:          gedcom.NewNameNode(nil, "   /Last/ Suffix", "", nil),
@@ -107,6 +116,7 @@ var nameTests = []struct {
 		surname:       "Last",
 		suffix:        "Suffix",
 		str:           "Last Suffix",
+		gedcomName:    "/Last/ Suffix",
 	},
 	{
 		// The GivenName overrides the givenName name if provided. When multiple
@@ -122,6 +132,7 @@ var nameTests = []struct {
 		surname:       "Last",
 		suffix:        "II",
 		str:           "Other Name Last II",
+		gedcomName:    "Other Name /Last/ II",
 	},
 	{
 		// The Surname overrides the surname name if provided. When multiple
@@ -137,6 +148,7 @@ var nameTests = []struct {
 		surname:       "Other name",
 		suffix:        "II",
 		str:           "First Other name II",
+		gedcomName:    "First /Other name/ II",
 	},
 	{
 		node: gedcom.NewNameNode(nil, "First /Last/ Esq.", "", []gedcom.Node{
@@ -150,6 +162,7 @@ var nameTests = []struct {
 		surname:       "Last",
 		suffix:        "Esq.",
 		str:           "Mr First Last Esq.",
+		gedcomName:    "Mr First /Last/ Esq.",
 	},
 	{
 		// The NameSuffix overrides the suffix in the name if provided.
@@ -167,6 +180,7 @@ var nameTests = []struct {
 		surname:       "Last",
 		suffix:        "Esq.",
 		str:           "Sir First Last Esq.",
+		gedcomName:    "Sir First /Last/ Esq.",
 	},
 	{
 		node: gedcom.NewNameNode(nil, "First /Last/ Esq.", "", []gedcom.Node{
@@ -180,6 +194,7 @@ var nameTests = []struct {
 		surname:       "Last",
 		suffix:        "Esq.",
 		str:           "First Foo Last Esq.",
+		gedcomName:    "First Foo /Last/ Esq.",
 	},
 	{
 		node: gedcom.NewNameNode(nil, "First /Last/ Esq.", "", []gedcom.Node{
@@ -193,6 +208,7 @@ var nameTests = []struct {
 		surname:       "Last",
 		suffix:        "Esq.",
 		str:           "Grand Duke First Last Esq.",
+		gedcomName:    "Grand Duke First /Last/ Esq.",
 	},
 }
 
@@ -248,6 +264,14 @@ func TestNameNode_String(t *testing.T) {
 	for _, test := range nameTests {
 		t.Run("", func(t *testing.T) {
 			assert.Equal(t, test.node.String(), test.str)
+		})
+	}
+}
+
+func TestNameNode_GedcomName(t *testing.T) {
+	for _, test := range nameTests {
+		t.Run("", func(t *testing.T) {
+			assert.Equal(t, test.node.GedcomName(), test.gedcomName)
 		})
 	}
 }
