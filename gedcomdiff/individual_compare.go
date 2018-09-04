@@ -4,41 +4,32 @@ import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html"
-	"strings"
+	"github.com/elliotchance/gedcom/util"
 )
 
 type individualCompare struct {
-	comparison    gedcom.IndividualComparison
-	includePlaces bool
-	hideSame      bool
+	comparison  gedcom.IndividualComparison
+	filterFlags *util.FilterFlags
 }
 
-func newIndividualCompare(comparison gedcom.IndividualComparison, includePlaces, hideSame bool) *individualCompare {
+func newIndividualCompare(comparison gedcom.IndividualComparison, filterFlags *util.FilterFlags) *individualCompare {
 	return &individualCompare{
-		comparison:    comparison,
-		includePlaces: includePlaces,
-		hideSame:      hideSame,
+		comparison:  comparison,
+		filterFlags: filterFlags,
 	}
 }
 
-func getName(node *gedcom.IndividualNode) string {
-	if node == nil {
-		return ""
+func (c *individualCompare) appendChildren(nd *gedcom.NodeDiff, prefix string) []fmt.Stringer {
+	tableRows := []fmt.Stringer{
+		newDiffRow(prefix+nd.Tag().String(), nd, c.filterFlags.HideEqual),
 	}
 
-	return node.Name().String()
-}
-
-func getTag(node *gedcom.IndividualNode, tags ...gedcom.Tag) string {
-	if node == nil {
-		return ""
+	for _, child := range nd.Children {
+		children := c.appendChildren(child, prefix+"&nbsp;&nbsp;&nbsp;&nbsp;")
+		tableRows = append(tableRows, children...)
 	}
 
-	if n := gedcom.First(gedcom.NodesWithTagPath(node, tags...)); n != nil {
-		return n.Value()
-	}
-
-	return ""
+	return tableRows
 }
 
 func (c *individualCompare) String() string {
@@ -53,66 +44,105 @@ func (c *individualCompare) String() string {
 		name = n.Name().String()
 	}
 
-	diffRows := []struct {
-		name string
-		tags []gedcom.Tag
-	}{
-		{"Birth Date", []gedcom.Tag{gedcom.TagBirth, gedcom.TagDate}},
-		{"Birth Place", []gedcom.Tag{gedcom.TagBirth, gedcom.TagPlace}},
-		{"Baptism Date", []gedcom.Tag{gedcom.TagChristening, gedcom.TagDate}},
-		{"Baptism Place", []gedcom.Tag{gedcom.TagChristening, gedcom.TagPlace}},
-		{"Death Date", []gedcom.Tag{gedcom.TagDeath, gedcom.TagDate}},
-		{"Death Place", []gedcom.Tag{gedcom.TagDeath, gedcom.TagPlace}},
-		{"Burial Date", []gedcom.Tag{gedcom.TagBurial, gedcom.TagDate}},
-		{"Burial Place", []gedcom.Tag{gedcom.TagBurial, gedcom.TagPlace}},
+	if !gedcom.IsNil(left) {
+		left = c.filterFlags.Filter(left).(*gedcom.IndividualNode)
 	}
 
-	tableRows := []fmt.Stringer{
-		newDiffRow("Name", getName(left), getName(right), c.hideSame),
+	if !gedcom.IsNil(right) {
+		right = c.filterFlags.Filter(right).(*gedcom.IndividualNode)
 	}
-	for _, diffRow := range diffRows {
-		if !c.includePlaces && strings.HasSuffix(diffRow.name, " Place") {
-			continue
-		}
 
-		tableRows = append(tableRows, newDiffRow(diffRow.name,
-			getTag(left, diffRow.tags...),
-			getTag(right, diffRow.tags...),
-			c.hideSame,
-		))
-	}
+	diff := gedcom.CompareNodes(left, right)
+
+	diff.Sort()
+
+	tableRows := c.appendChildren(diff, "")
 
 	// Parents
-	fatherLeft := ""
-	motherLeft := ""
-	if c.comparison.Left != nil {
-		if p := c.comparison.Left.Parents(); len(p) > 0 {
-			if n := p[0].Husband(); n != nil && n.Name() != nil {
-				fatherLeft = n.Name().String()
+	leftParents := gedcom.IndividualNodes{}
+	if !gedcom.IsNil(left) {
+		for _, parents := range left.Parents() {
+			if parent := parents.Husband(); parent != nil {
+				leftParents = append(leftParents, parent)
 			}
-			if n := p[0].Wife(); n != nil && n.Name() != nil {
-				motherLeft = n.Name().String()
-			}
-		}
-	}
-
-	fatherRight := ""
-	motherRight := ""
-	if c.comparison.Right != nil {
-		if p := c.comparison.Right.Parents(); len(p) > 0 {
-			if n := p[0].Husband(); n != nil && n.Name() != nil {
-				fatherRight = n.Name().String()
-			}
-			if n := p[0].Wife(); n != nil && n.Name() != nil {
-				motherRight = n.Name().String()
+			if parent := parents.Wife(); parent != nil {
+				leftParents = append(leftParents, parent)
 			}
 		}
 	}
 
-	tableRows = append(tableRows,
-		newDiffRow("Father", fatherLeft, fatherRight, c.hideSame),
-		newDiffRow("Mother", motherLeft, motherRight, c.hideSame),
-	)
+	rightParents := gedcom.IndividualNodes{}
+	if !gedcom.IsNil(right) {
+		for _, parents := range right.Parents() {
+			if parent := parents.Husband(); parent != nil {
+				rightParents = append(rightParents, parent)
+			}
+			if parent := parents.Wife(); parent != nil {
+				rightParents = append(rightParents, parent)
+			}
+		}
+	}
+
+	options := gedcom.NewSimilarityOptions()
+	for _, parents := range leftParents.Compare(rightParents, options) {
+		var row *diffRow
+		name := "Parent"
+
+		switch {
+		case !gedcom.IsNil(parents.Left) && !gedcom.IsNil(parents.Right):
+			row = newDiffRow(name, &gedcom.NodeDiff{
+				Left:  parents.Left.Name(),
+				Right: parents.Right.Name(),
+			}, c.filterFlags.HideEqual)
+
+		case !gedcom.IsNil(parents.Left):
+			row = newDiffRow(name, &gedcom.NodeDiff{
+				Left: parents.Left.Name(),
+			}, c.filterFlags.HideEqual)
+
+		case !gedcom.IsNil(parents.Right):
+			row = newDiffRow(name, &gedcom.NodeDiff{
+				Right: parents.Right.Name(),
+			}, c.filterFlags.HideEqual)
+		}
+
+		tableRows = append(tableRows, row)
+	}
+
+	// Spouses
+	switch {
+	case !gedcom.IsNil(left) && !gedcom.IsNil(right):
+		for _, spouse := range left.Spouses().Compare(right.Spouses(), options) {
+			nodeDiff := &gedcom.NodeDiff{}
+
+			if spouse.Left != nil {
+				nodeDiff.Left = spouse.Left.Name()
+			}
+
+			if spouse.Right != nil {
+				nodeDiff.Right = spouse.Right.Name()
+			}
+
+			row := newDiffRow("Spouse", nodeDiff, c.filterFlags.HideEqual)
+			tableRows = append(tableRows, row)
+		}
+
+	case !gedcom.IsNil(left):
+		for _, spouse := range left.Spouses() {
+			row := newDiffRow("Spouse", &gedcom.NodeDiff{
+				Left: spouse.Name(),
+			}, c.filterFlags.HideEqual)
+			tableRows = append(tableRows, row)
+		}
+
+	case !gedcom.IsNil(right):
+		for _, spouse := range right.Spouses() {
+			row := newDiffRow("Spouse", &gedcom.NodeDiff{
+				Right: spouse.Name(),
+			}, c.filterFlags.HideEqual)
+			tableRows = append(tableRows, row)
+		}
+	}
 
 	return html.NewComponents(
 		html.NewBigTitle(name),

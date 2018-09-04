@@ -370,6 +370,9 @@ var (
 	// A person.
 	TagIndividual = newTag("INDI", "Individual", tagOptionNone, tagSortIndividualInfo)
 
+	// Defines label for given fact.
+	TagLabel = newTag("LABL", "Label", tagOptionNone, tagSortIndividualInfo)
+
 	// The name of the language used in a communication or transmission of
 	// information.
 	TagLanguage = newTag("LANG", "Language", tagOptionNone, tagSortIndividualInfo)
@@ -731,7 +734,7 @@ func Tags() []Tag {
 		TagSealingChild, TagSealingSpouse, TagSource, TagSurnamePrefix,
 		TagSocialSecurityNumber, TagState, TagStatus, TagSubmitter,
 		TagSubmission, TagSurname, TagTemple, TagText, TagTime, TagTitle,
-		TagTrailer, TagType, TagVersion, TagWife, TagWWW, TagWill,
+		TagTrailer, TagType, TagVersion, TagWife, TagWWW, TagWill, TagLabel,
 
 		// Unofficial
 		UnofficialTagFamilySearchID, UnofficialTagLatitudeDegrees,
