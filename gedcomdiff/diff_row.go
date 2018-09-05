@@ -20,8 +20,14 @@ func newDiffRow(name string, nd *gedcom.NodeDiff, hideSame bool) *diffRow {
 }
 
 func (c *diffRow) String() string {
-	if c.hideSame && c.nd.IsDeepEqual() {
-		return ""
+	if c.hideSame {
+		if c.nd.IsDeepEqual() {
+			return ""
+		}
+
+		if c.nd.Tag().IsEvent() && len(c.nd.Children) == 0 {
+			return ""
+		}
 	}
 
 	leftClass := ""

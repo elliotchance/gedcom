@@ -1,3 +1,5 @@
+// Package gedcomdiff is a command line tool for comparing GEDCOM files and
+// producing a HTML report.
 package main
 
 import (

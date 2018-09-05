@@ -1,3 +1,5 @@
+// Package gedcom2json is a command line tool for converting GEDCOM to JSON so
+// that it can easily processed and consumed by other applications.
 package main
 
 import (
