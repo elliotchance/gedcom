@@ -41,6 +41,11 @@ func (c *diffPage) String() string {
 	})
 
 	for _, comparison := range c.comparisons {
+		// Same as below.
+		if optionSubset && gedcom.IsNil(comparison.Right) {
+			continue
+		}
+
 		weightedSimilarity := comparison.Similarity.WeightedSimilarity(c.options)
 
 		leftClass := ""
@@ -56,6 +61,9 @@ func (c *diffPage) String() string {
 		case weightedSimilarity < 1:
 			leftClass = "bg-info"
 			rightClass = "bg-info"
+
+		case c.filterFlags.HideEqual:
+			continue
 		}
 
 		rows = append(rows, html.NewTableRow(
@@ -73,6 +81,11 @@ func (c *diffPage) String() string {
 		html.NewTable("", rows...),
 	}
 	for _, comparison := range c.comparisons {
+		// Same as above.
+		if optionSubset && gedcom.IsNil(comparison.Right) {
+			continue
+		}
+
 		components = append(components,
 			newIndividualCompare(comparison, c.filterFlags))
 	}

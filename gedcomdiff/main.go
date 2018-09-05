@@ -14,6 +14,7 @@ var (
 	optionLeftGedcomFile  string
 	optionRightGedcomFile string
 	optionOutputFile      string
+	optionSubset          bool
 )
 
 var filterFlags = &util.FilterFlags{}
@@ -53,6 +54,10 @@ func parseCLIFlags() {
 	flag.StringVar(&optionLeftGedcomFile, "left-gedcom", "", "Left GEDCOM file.")
 	flag.StringVar(&optionRightGedcomFile, "right-gedcom", "", "Right GEDCOM file.")
 	flag.StringVar(&optionOutputFile, "output", "", "Output file.")
+	flag.BoolVar(&optionSubset, "subset", false, "When -subset is enabled the "+
+		"right side will be considered a smaller part of the larger left "+
+		"side. This means that individuals that entirely exist on the left "+
+		"side will not be included.")
 
 	filterFlags.SetupCLI()
 
