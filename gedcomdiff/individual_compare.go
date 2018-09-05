@@ -38,10 +38,10 @@ func (c *individualCompare) String() string {
 
 	name := ""
 	if n := left; n != nil {
-		name = n.Name().String()
+		name = html.NewIndividualNameAndDates(n, true, "").String()
 	}
 	if n := right; name == "" && n != nil {
-		name = n.Name().String()
+		name = html.NewIndividualNameAndDates(n, true, "").String()
 	}
 
 	if !gedcom.IsNil(left) {
