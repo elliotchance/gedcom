@@ -15,6 +15,7 @@ type FilterFlags struct {
 	NoChanges    bool
 	NoObjects    bool
 	NoLabels     bool
+	NoCensuses   bool
 
 	// Only official tags.
 	OnlyOfficial bool
@@ -35,6 +36,7 @@ func (ff *FilterFlags) SetupCLI() {
 	flag.BoolVar(&ff.NoChanges, "no-changes", false, "Exclude change timestamps.")
 	flag.BoolVar(&ff.NoObjects, "no-objects", false, "Exclude objects.")
 	flag.BoolVar(&ff.NoLabels, "no-labels", false, "Exclude labels.")
+	flag.BoolVar(&ff.NoCensuses, "no-censuses", false, "Exclude censuses.")
 
 	flag.BoolVar(&ff.OnlyOfficial, "only-official", false, "Only include official GEDCOM tags.")
 
@@ -53,6 +55,7 @@ func (ff *FilterFlags) FilterFunctions() []gedcom.FilterFunction {
 		&ff.NoChanges:    gedcom.TagChange,
 		&ff.NoObjects:    gedcom.TagObject,
 		&ff.NoLabels:     gedcom.TagLabel,
+		&ff.NoCensuses:   gedcom.TagCensus,
 	}
 
 	blacklistTags := []gedcom.Tag{gedcom.TagFamilyChild, gedcom.TagFamilySpouse}

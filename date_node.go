@@ -134,6 +134,7 @@ type DateNode struct {
 	parsedEndDate   Date
 }
 
+// NewDateNode creates a new DATE node.
 func NewDateNode(document *Document, value, pointer string, children []Node) *DateNode {
 	return &DateNode{
 		NewSimpleNode(document, TagDate, value, pointer, children),
@@ -259,12 +260,14 @@ func (node *DateNode) DateRange() (startDate Date, endDate Date) {
 	return parseDateParts(dateString, false), parseDateParts(dateString, true)
 }
 
+// StartDate returns the start component date of DateRange.
 func (node *DateNode) StartDate() Date {
 	start, _ := node.DateRange()
 
 	return start
 }
 
+// EndDate returns the end component date of DateRange.
 func (node *DateNode) EndDate() Date {
 	_, end := node.DateRange()
 

@@ -1,3 +1,5 @@
+// Package gedcom2text is a command line tool for converting GEDCOM to a
+// human-readable text format.
 package main
 
 import (

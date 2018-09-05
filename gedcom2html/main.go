@@ -1,3 +1,5 @@
+// Package gedcom2html is a command line tool for rendering a GEDCOM file into
+// HTML pages that shared and published easily.
 package main
 
 import (
