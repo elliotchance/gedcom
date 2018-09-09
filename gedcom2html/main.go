@@ -78,4 +78,6 @@ func createFile(name string, contents fmt.Stringer) {
 	}
 
 	out.Write([]byte(contents.String()))
+
+	out.Close()
 }
