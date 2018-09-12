@@ -11,10 +11,11 @@ import (
 )
 
 var (
-	optionLeftGedcomFile  string
-	optionRightGedcomFile string
-	optionOutputFile      string
-	optionSubset          bool
+	optionLeftGedcomFile    string
+	optionRightGedcomFile   string
+	optionOutputFile        string
+	optionSubset            bool
+	optionGoogleAnalyticsID string
 )
 
 var filterFlags = &util.FilterFlags{}
@@ -46,7 +47,8 @@ func main() {
 	options := gedcom.NewSimilarityOptions()
 	comparisons := leftIndividuals.Compare(rightIndividuals, options)
 
-	out.Write([]byte(newDiffPage(comparisons, options, filterFlags).String()))
+	page := newDiffPage(comparisons, options, filterFlags, optionGoogleAnalyticsID)
+	out.Write([]byte(page.String()))
 }
 
 func parseCLIFlags() {
@@ -58,6 +60,8 @@ func parseCLIFlags() {
 		"right side will be considered a smaller part of the larger left "+
 		"side. This means that individuals that entirely exist on the left "+
 		"side will not be included.")
+	flag.StringVar(&optionGoogleAnalyticsID, "google-analytics-id", "",
+		"The Google Analytics ID, like 'UA-78454410-2'.")
 
 	filterFlags.SetupCLI()
 

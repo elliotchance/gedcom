@@ -7,14 +7,16 @@ import (
 )
 
 type placePage struct {
-	document *gedcom.Document
-	placeKey string
+	document          *gedcom.Document
+	placeKey          string
+	googleAnalyticsID string
 }
 
-func newPlacePage(document *gedcom.Document, placeKey string) *placePage {
+func newPlacePage(document *gedcom.Document, placeKey string, googleAnalyticsID string) *placePage {
 	return &placePage{
-		document: document,
-		placeKey: placeKey,
+		document:          document,
+		placeKey:          placeKey,
+		googleAnalyticsID: googleAnalyticsID,
 	}
 }
 
@@ -39,5 +41,6 @@ func (c *placePage) String() string {
 				html.NewColumn(html.EntireRow, html.NewTable("", table...)),
 			),
 		),
+		c.googleAnalyticsID,
 	).String()
 }

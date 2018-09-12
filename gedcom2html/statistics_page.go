@@ -6,12 +6,14 @@ import (
 )
 
 type statisticsPage struct {
-	document *gedcom.Document
+	document          *gedcom.Document
+	googleAnalyticsID string
 }
 
-func newStatisticsPage(document *gedcom.Document) *statisticsPage {
+func newStatisticsPage(document *gedcom.Document, googleAnalyticsID string) *statisticsPage {
 	return &statisticsPage{
-		document: document,
+		document:          document,
+		googleAnalyticsID: googleAnalyticsID,
 	}
 }
 
@@ -37,5 +39,6 @@ func (c *statisticsPage) String() string {
 				html.NewColumn(html.HalfRow, newEmpty()),
 			),
 		),
+		c.googleAnalyticsID,
 	).String()
 }

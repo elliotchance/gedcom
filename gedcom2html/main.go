@@ -11,8 +11,9 @@ import (
 )
 
 var (
-	optionGedcomFile string
-	optionOutputDir  string
+	optionGedcomFile        string
+	optionOutputDir         string
+	optionGoogleAnalyticsID string
 )
 
 func main() {
@@ -21,6 +22,8 @@ func main() {
 		" will use the current directory if output-dir is not provided. "+
 		"Output files will only be added or replaced. Existing files will not"+
 		" be deleted.")
+	flag.StringVar(&optionGoogleAnalyticsID, "google-analytics-id", "",
+		"The Google Analytics ID, like 'UA-78454410-2'.")
 	flag.Parse()
 
 	file, err := os.Open(optionGedcomFile)
@@ -37,7 +40,7 @@ func main() {
 	// Create the pages.
 	for _, letter := range getIndexLetters(document) {
 		createFile(pageIndividuals(letter),
-			newIndividualListPage(document, letter))
+			newIndividualListPage(document, letter, optionGoogleAnalyticsID))
 	}
 
 	for _, individual := range getIndividuals(document) {
@@ -45,27 +48,27 @@ func main() {
 			continue
 		}
 
-		page := newIndividualPage(document, individual)
+		page := newIndividualPage(document, individual, optionGoogleAnalyticsID)
 		createFile(pageIndividual(document, individual), page)
 	}
 
-	createFile(pagePlaces(), newPlaceListPage(document))
+	createFile(pagePlaces(), newPlaceListPage(document, optionGoogleAnalyticsID))
 
 	for key, place := range getPlaces(document) {
-		page := newPlacePage(document, key)
+		page := newPlacePage(document, key, optionGoogleAnalyticsID)
 		createFile(pagePlace(document, place.prettyName), page)
 	}
 
-	createFile(pageFamilies(), newFamilyListPage(document))
+	createFile(pageFamilies(), newFamilyListPage(document, optionGoogleAnalyticsID))
 
-	createFile(pageSources(), newSourceListPage(document))
+	createFile(pageSources(), newSourceListPage(document, optionGoogleAnalyticsID))
 
 	for _, source := range document.Sources() {
-		page := newSourcePage(document, source)
+		page := newSourcePage(document, source, optionGoogleAnalyticsID)
 		createFile(pageSource(source), page)
 	}
 
-	createFile(pageStatistics(), newStatisticsPage(document))
+	createFile(pageStatistics(), newStatisticsPage(document, optionGoogleAnalyticsID))
 }
 
 func createFile(name string, contents fmt.Stringer) {

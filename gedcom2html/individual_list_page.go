@@ -10,14 +10,16 @@ import (
 
 // individualListPage is the page that lists of all the individuals.
 type individualListPage struct {
-	document       *gedcom.Document
-	selectedLetter rune
+	document          *gedcom.Document
+	selectedLetter    rune
+	googleAnalyticsID string
 }
 
-func newIndividualListPage(document *gedcom.Document, selectedLetter rune) *individualListPage {
+func newIndividualListPage(document *gedcom.Document, selectedLetter rune, googleAnalyticsID string) *individualListPage {
 	return &individualListPage{
-		document:       document,
-		selectedLetter: selectedLetter,
+		document:          document,
+		selectedLetter:    selectedLetter,
+		googleAnalyticsID: googleAnalyticsID,
 	}
 }
 
@@ -68,5 +70,5 @@ func (c *individualListPage) String() string {
 		html.NewRow(
 			html.NewColumn(html.EntireRow, html.NewTable("", table...)),
 		),
-	)).String()
+	), c.googleAnalyticsID).String()
 }
