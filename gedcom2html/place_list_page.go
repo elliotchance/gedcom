@@ -9,12 +9,14 @@ import (
 
 // placeListPage lists all places.
 type placeListPage struct {
-	document *gedcom.Document
+	document          *gedcom.Document
+	googleAnalyticsID string
 }
 
-func newPlaceListPage(document *gedcom.Document) *placeListPage {
+func newPlaceListPage(document *gedcom.Document, googleAnalyticsID string) *placeListPage {
 	return &placeListPage{
-		document: document,
+		document:          document,
+		googleAnalyticsID: googleAnalyticsID,
 	}
 }
 
@@ -43,5 +45,5 @@ func (c *placeListPage) String() string {
 		html.NewRow(
 			html.NewColumn(html.EntireRow, html.NewTable("", table...)),
 		),
-	)).String()
+	), c.googleAnalyticsID).String()
 }

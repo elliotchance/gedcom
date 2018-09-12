@@ -8,14 +8,16 @@ import (
 // individualPage is the page that shows detailed information about an
 // individual.
 type individualPage struct {
-	document   *gedcom.Document
-	individual *gedcom.IndividualNode
+	document          *gedcom.Document
+	individual        *gedcom.IndividualNode
+	googleAnalyticsID string
 }
 
-func newIndividualPage(document *gedcom.Document, individual *gedcom.IndividualNode) *individualPage {
+func newIndividualPage(document *gedcom.Document, individual *gedcom.IndividualNode, googleAnalyticsID string) *individualPage {
 	return &individualPage{
-		document:   document,
-		individual: individual,
+		document:          document,
+		individual:        individual,
+		googleAnalyticsID: googleAnalyticsID,
 	}
 }
 
@@ -38,5 +40,6 @@ func (c *individualPage) String() string {
 			html.NewSpace(),
 			newPartnersAndChildren(c.document, c.individual),
 		),
+		c.googleAnalyticsID,
 	).String()
 }

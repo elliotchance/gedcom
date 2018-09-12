@@ -7,12 +7,14 @@ import (
 )
 
 type sourceListPage struct {
-	document *gedcom.Document
+	document          *gedcom.Document
+	googleAnalyticsID string
 }
 
-func newSourceListPage(document *gedcom.Document) *sourceListPage {
+func newSourceListPage(document *gedcom.Document, googleAnalyticsID string) *sourceListPage {
 	return &sourceListPage{
-		document: document,
+		document:          document,
+		googleAnalyticsID: googleAnalyticsID,
 	}
 }
 
@@ -30,5 +32,5 @@ func (c *sourceListPage) String() string {
 		html.NewRow(
 			html.NewColumn(html.EntireRow, html.NewTable("", table...)),
 		),
-	)).String()
+	), c.googleAnalyticsID).String()
 }

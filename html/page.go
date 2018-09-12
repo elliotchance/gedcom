@@ -8,14 +8,16 @@ import (
 
 // Page is the entire page wrapped that provides the HTML head and body.
 type Page struct {
-	title string
-	body  fmt.Stringer
+	title             string
+	body              fmt.Stringer
+	googleAnalyticsID string
 }
 
-func NewPage(title string, body fmt.Stringer) *Page {
+func NewPage(title string, body fmt.Stringer, googleAnalyticsID string) *Page {
 	return &Page{
-		title: title,
-		body:  body,
+		title:             title,
+		body:              body,
+		googleAnalyticsID: googleAnalyticsID,
 	}
 }
 
@@ -23,6 +25,7 @@ func (c *Page) String() string {
 	return fmt.Sprintf(`
     <html>
 	<head>
+		%s
 		<title>%s</title>
 		<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
 	rel="stylesheet"
@@ -43,5 +46,5 @@ func (c *Page) String() string {
 		</div>
 	</body>
 	</html>
-	`, c.title, c.body, NewFooter())
+	`, newGoogleAnalytics(c.googleAnalyticsID), c.title, c.body, NewFooter())
 }

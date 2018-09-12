@@ -9,16 +9,18 @@ import (
 )
 
 type diffPage struct {
-	comparisons []gedcom.IndividualComparison
-	options     *gedcom.SimilarityOptions
-	filterFlags *util.FilterFlags
+	comparisons       []gedcom.IndividualComparison
+	options           *gedcom.SimilarityOptions
+	filterFlags       *util.FilterFlags
+	googleAnalyticsID string
 }
 
-func newDiffPage(comparisons []gedcom.IndividualComparison, options *gedcom.SimilarityOptions, filterFlags *util.FilterFlags) *diffPage {
+func newDiffPage(comparisons []gedcom.IndividualComparison, options *gedcom.SimilarityOptions, filterFlags *util.FilterFlags, googleAnalyticsID string) *diffPage {
 	return &diffPage{
-		comparisons: comparisons,
-		options:     options,
-		filterFlags: filterFlags,
+		comparisons:       comparisons,
+		options:           options,
+		filterFlags:       filterFlags,
+		googleAnalyticsID: googleAnalyticsID,
 	}
 }
 
@@ -93,5 +95,6 @@ func (c *diffPage) String() string {
 	return html.NewPage(
 		"Comparison",
 		html.NewComponents(components...),
+		c.googleAnalyticsID,
 	).String()
 }

@@ -7,12 +7,14 @@ import (
 )
 
 type familyListPage struct {
-	document *gedcom.Document
+	document          *gedcom.Document
+	googleAnalyticsID string
 }
 
-func newFamilyListPage(document *gedcom.Document) *familyListPage {
+func newFamilyListPage(document *gedcom.Document, googleAnalyticsID string) *familyListPage {
 	return &familyListPage{
-		document: document,
+		document:          document,
+		googleAnalyticsID: googleAnalyticsID,
 	}
 }
 
@@ -30,5 +32,5 @@ func (c *familyListPage) String() string {
 		html.NewRow(
 			html.NewColumn(html.EntireRow, html.NewTable("", table...)),
 		),
-	)).String()
+	), c.googleAnalyticsID).String()
 }
