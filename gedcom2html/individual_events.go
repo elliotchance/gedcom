@@ -23,7 +23,10 @@ func newIndividualEvents(document *gedcom.Document, individual *gedcom.Individua
 func (c *individualEvents) String() string {
 	events := []fmt.Stringer{}
 
-	birthDate, birthPlace := html.GetBirth(c.individual)
+	birth := gedcom.First(c.individual.Births())
+	birthDate := gedcom.String(gedcom.First(gedcom.Dates(birth)))
+	birthPlace := gedcom.String(gedcom.First(gedcom.Places(birth)))
+
 	events = append(events, newIndividualEvent("Birth", birthDate, birthPlace, ""))
 
 	for _, family := range c.individual.Families() {
@@ -67,7 +70,10 @@ func (c *individualEvents) String() string {
 		}
 	}
 
-	deathDate, deathPlace := html.GetDeath(c.individual)
+	death := gedcom.First(c.individual.Deaths())
+	deathDate := gedcom.String(gedcom.First(gedcom.Dates(death)))
+	deathPlace := gedcom.String(gedcom.First(gedcom.Places(death)))
+
 	events = append(events, newIndividualEvent("Death", deathDate, deathPlace, ""))
 
 	s := html.NewTable("text-center",

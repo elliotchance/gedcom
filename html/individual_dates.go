@@ -17,12 +17,12 @@ func NewIndividualDates(individual *gedcom.IndividualNode, showLiving bool) *Ind
 }
 
 func (c *IndividualDates) String() string {
-	birthDate, _ := GetBirth(c.individual)
-	deathDate, _ := GetDeath(c.individual)
+	birthDate := gedcom.First(c.individual.Births())
+	deathDate := gedcom.Last(c.individual.Deaths())
 
 	eventDates := NewEventDates([]*EventDate{
-		NewEventDate("b.", birthDate),
-		NewEventDate("d.", deathDate),
+		NewEventDate("b.", gedcom.String(birthDate)),
+		NewEventDate("d.", gedcom.String(deathDate)),
 	}).String()
 
 	if c.individual != nil && c.individual.IsLiving() && !c.showLiving {

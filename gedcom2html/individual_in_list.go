@@ -20,8 +20,13 @@ func newIndividualInList(document *gedcom.Document, individual *gedcom.Individua
 }
 
 func (c *individualInList) String() string {
-	birthDate, birthPlace := html.GetBirth(c.individual)
-	deathDate, deathPlace := html.GetDeath(c.individual)
+	birth := gedcom.First(c.individual.Births())
+	birthDate := gedcom.String(gedcom.First(gedcom.Dates(birth)))
+	birthPlace := gedcom.String(gedcom.First(gedcom.Places(birth)))
+
+	death := gedcom.First(c.individual.Deaths())
+	deathDate := gedcom.String(gedcom.First(gedcom.Dates(death)))
+	deathPlace := gedcom.String(gedcom.First(gedcom.Places(death)))
 
 	birthPlace = prettyPlaceName(birthPlace)
 	deathPlace = prettyPlaceName(deathPlace)

@@ -549,3 +549,16 @@ func (node *IndividualNode) Children() IndividualNodes {
 
 	return children
 }
+
+// AllEvents returns zero or more events of any kind for the individual.
+//
+// This is not to be confused with the EventNode.
+func (node *IndividualNode) AllEvents() (nodes []Node) {
+	for _, n := range node.Nodes() {
+		if n.Tag().IsEvent() {
+			nodes = append(nodes, n)
+		}
+	}
+
+	return
+}
