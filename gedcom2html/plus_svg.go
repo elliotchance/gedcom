@@ -1,6 +1,6 @@
 package main
 
-import "fmt"
+import "github.com/elliotchance/gedcom/html"
 
 // plusSVG draws a "+" as an SVG with each line of the "+" being optional.
 type plusSVG struct {
@@ -45,7 +45,7 @@ func (c *plusSVG) String() string {
 		vLineY2 = 80
 	}
 
-	return fmt.Sprintf(`
+	return html.Sprintf(`
 		<svg style="width: 100%%; height: 75px">
 			<line x1="%d%%" y1="%d%%" x2="%d%%" y2="%d%%" style="stroke:rgb(0,0,0);stroke-width:3" />
 			<line x1="%d%%" y1="%d%%" x2="%d%%" y2="%d%%" style="stroke:rgb(0,0,0);stroke-width:3" />

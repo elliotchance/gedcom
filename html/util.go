@@ -1,6 +1,9 @@
 package html
 
-import "github.com/elliotchance/gedcom"
+import (
+	"fmt"
+	"github.com/elliotchance/gedcom"
+)
 
 func GetBirth(individual *gedcom.IndividualNode) (birthDate string, birthPlace string) {
 	if individual == nil {
@@ -42,4 +45,17 @@ func GetDeath(individual *gedcom.IndividualNode) (deathDate string, deathPlace s
 	}
 
 	return
+}
+
+func Sprintf(format string, args ...interface{}) string {
+	newArgs := make([]interface{}, len(args))
+	for i, arg := range args {
+		if a, ok := arg.(fmt.Stringer); ok {
+			newArgs[i] = a.String()
+		} else {
+			newArgs[i] = arg
+		}
+	}
+
+	return fmt.Sprintf(format, newArgs...)
 }

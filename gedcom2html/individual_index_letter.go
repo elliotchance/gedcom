@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"github.com/elliotchance/gedcom/html"
 	"unicode"
 )
 
@@ -23,7 +23,7 @@ func (c *individualIndexLetter) String() string {
 		active = "active"
 	}
 
-	return fmt.Sprintf(`
+	return html.Sprintf(`
 			<li class="nav-item">
     			<a class="nav-link %s" href="%s">%c</a>
   			</li>`,

@@ -1,9 +1,5 @@
 package html
 
-import (
-	"fmt"
-)
-
 const (
 	QuarterRow = 3
 	HalfRow    = 6
@@ -27,7 +23,7 @@ func (c *Row) String() string {
 		columns += column.String()
 	}
 
-	return fmt.Sprintf(`
+	return Sprintf(`
 		<div class="row">
 			%s
 		</div>`, columns)

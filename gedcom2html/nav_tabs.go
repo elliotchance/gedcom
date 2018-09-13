@@ -1,8 +1,6 @@
 package main
 
-import (
-	"fmt"
-)
+import "github.com/elliotchance/gedcom/html"
 
 // navTabs is a group of tabs.
 type navTabs struct {
@@ -21,7 +19,7 @@ func (c *navTabs) String() string {
 		tabs += tab.String()
 	}
 
-	return fmt.Sprintf(`
+	return html.Sprintf(`
     <div class="row">
         <div class="col">
             <ul class="nav nav-tabs">

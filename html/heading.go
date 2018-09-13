@@ -1,9 +1,5 @@
 package html
 
-import (
-	"fmt"
-)
-
 // Heading is larger text.
 type Heading struct {
 	text, class string
@@ -19,6 +15,6 @@ func NewHeading(number int, class, text string) *Heading {
 }
 
 func (c *Heading) String() string {
-	return fmt.Sprintf(`<h%d class="%s">%s</h%d>`,
+	return Sprintf(`<h%d class="%s">%s</h%d>`,
 		c.number, c.class, c.text, c.number)
 }

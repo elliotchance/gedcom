@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 )
 
 type placeEvent struct {
@@ -36,10 +36,10 @@ func (c *placeEvent) String() string {
 		}
 	}
 
-	return fmt.Sprintf(fmt.Sprintf(`
+	return html.Sprintf(`
 		<tr>
 			<td nowrap="nowrap">%s</td>
 			<td nowrap="nowrap">%s</td>
 			<td nowrap="nowrap">%s</td>
-		</tr>`, date, description, person))
+		</tr>`, date, description, person)
 }

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html"
 )
@@ -21,7 +20,7 @@ func newIndividualLink(document *gedcom.Document, individual *gedcom.IndividualN
 }
 
 func (c *individualLink) String() string {
-	return fmt.Sprintf(`
+	return html.Sprintf(`
 		<span class="octicon octicon-primitive-dot" style="color: %s; font-size: 18px"></span>
 		<a href="%s">%s</a>`,
 		colorForIndividual(c.individual),

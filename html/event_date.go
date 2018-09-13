@@ -1,7 +1,5 @@
 package html
 
-import "fmt"
-
 // EventDate shows a date like "d. 1882" but will not show anything if the date
 // is not provided.
 type EventDate struct {
@@ -21,5 +19,5 @@ func (c *EventDate) String() string {
 		return ""
 	}
 
-	return fmt.Sprintf("<em>%s</em> %s", c.event, c.date)
+	return Sprintf("<em>%s</em> %s", c.event, c.date)
 }

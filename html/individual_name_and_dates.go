@@ -1,7 +1,6 @@
 package html
 
 import (
-	"fmt"
 	"github.com/elliotchance/gedcom"
 )
 
@@ -27,5 +26,5 @@ func (c *IndividualNameAndDates) String() string {
 		return name
 	}
 
-	return fmt.Sprintf("%s (%s)", name, dates)
+	return Sprintf("%s (%s)", name, dates)
 }

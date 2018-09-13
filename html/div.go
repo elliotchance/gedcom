@@ -18,5 +18,5 @@ func NewDiv(class string, body fmt.Stringer) *Div {
 }
 
 func (c *Div) String() string {
-	return fmt.Sprintf(`<div class="%s">%s</div>`, c.class, c.body)
+	return Sprintf(`<div class="%s">%s</div>`, c.class, c.body)
 }

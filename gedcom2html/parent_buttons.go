@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html"
 )
@@ -21,7 +20,7 @@ func newParentButtons(document *gedcom.Document, family *gedcom.FamilyNode) *par
 }
 
 func (c *parentButtons) String() string {
-	return fmt.Sprintf(`
+	return html.Sprintf(`
 		<div class="row">
 		   <div class="col-5">
 		       %s

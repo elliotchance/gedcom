@@ -17,6 +17,6 @@ func NewStyledTableCell(style, class string, content fmt.Stringer) *StyledTableC
 }
 
 func (c *StyledTableCell) String() string {
-	return fmt.Sprintf(`<td scope="col" class="%s" style="%s">%s</td>`,
+	return Sprintf(`<td scope="col" class="%s" style="%s">%s</td>`,
 		c.class, c.style, c.content)
 }

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html"
 )
@@ -35,7 +34,7 @@ func (c *individualInList) String() string {
 		deathDate = "-"
 	}
 
-	return fmt.Sprintf(fmt.Sprintf(`
+	return html.Sprintf(`
 		<tr>
 			<td nowrap="nowrap">%s</td>
 			<td>%s<br/>%s</td>
@@ -43,5 +42,5 @@ func (c *individualInList) String() string {
 		</tr>`,
 		newIndividualLink(c.document, c.individual),
 		birthDate, newPlaceLink(c.document, birthPlace),
-		deathDate, newPlaceLink(c.document, deathPlace)))
+		deathDate, newPlaceLink(c.document, deathPlace))
 }

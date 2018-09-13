@@ -22,7 +22,7 @@ func NewPage(title string, body fmt.Stringer, googleAnalyticsID string) *Page {
 }
 
 func (c *Page) String() string {
-	return fmt.Sprintf(`
+	return Sprintf(`
     <html>
 	<head>
 		%s
