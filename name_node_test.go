@@ -2,6 +2,7 @@ package gedcom_test
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/tf"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -17,6 +18,17 @@ var nameTests = []struct {
 	str           string // String()
 	gedcomName    string // GedcomName()
 }{
+	{
+		node:          nil,
+		title:         "",
+		prefix:        "",
+		givenName:     "",
+		surnamePrefix: "",
+		surname:       "",
+		suffix:        "",
+		str:           "",
+		gedcomName:    "",
+	},
 	{
 		node:          gedcom.NewNameNode(nil, "", "", nil),
 		title:         "",
@@ -274,4 +286,10 @@ func TestNameNode_GedcomName(t *testing.T) {
 			assert.Equal(t, test.node.GedcomName(), test.gedcomName)
 		})
 	}
+}
+
+func TestNameNode_Type(t *testing.T) {
+	Type := tf.Function(t, (*gedcom.NameNode).Type)
+
+	Type((*gedcom.NameNode)(nil)).Returns(gedcom.NameTypeNormal)
 }

@@ -139,3 +139,20 @@ func TestNodeCondition(t *testing.T) {
 	NodeCondition(true, bob, sally).Returns(bob)
 	NodeCondition(false, bob, sally).Returns(sally)
 }
+
+func TestPointer(t *testing.T) {
+	tests := []struct {
+		node gedcom.Node
+		want string
+	}{
+		{nil, ""},
+		{gedcom.NewSimpleNode(nil, gedcom.TagVersion, "foo", "a", nil), "a"},
+		{gedcom.NewNameNode(nil, "foo bar", "b", nil), "b"},
+	}
+
+	for _, test := range tests {
+		t.Run("", func(t *testing.T) {
+			assert.Equal(t, test.want, gedcom.Pointer(test.node))
+		})
+	}
+}

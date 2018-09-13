@@ -23,6 +23,8 @@ func TestNewEventNode(t *testing.T) {
 func TestEventNode_Dates(t *testing.T) {
 	Dates := tf.Function(t, (*gedcom.EventNode).Dates)
 
+	Dates((*gedcom.EventNode)(nil)).Returns([]*gedcom.DateNode(nil))
+
 	Dates(gedcom.NewEventNode(nil, "", "", nil)).Returns([]*gedcom.DateNode(nil))
 
 	Dates(gedcom.NewEventNode(nil, "", "", []gedcom.Node{})).
@@ -73,6 +75,8 @@ func TestEventNode_Equals(t *testing.T) {
 
 func TestEventNode_Years(t *testing.T) {
 	Years := tf.Function(t, (*gedcom.EventNode).Years)
+
+	Years((*gedcom.EventNode)(nil)).Returns(0.0)
 
 	Years(gedcom.NewEventNode(nil, "", "", nil)).Returns(0.0)
 

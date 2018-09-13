@@ -1,10 +1,11 @@
 package gedcom_test
 
 import (
+	"testing"
+
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/tf"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestSimpleNode_ChildNodes(t *testing.T) {
@@ -60,4 +61,44 @@ func TestSimpleNode_Equals(t *testing.T) {
 	Equals(s6, s4).Returns(false)
 	Equals(s6, s5).Returns(false)
 	Equals(s6, s6).Returns(true)
+}
+
+func TestSimpleNode_Tag(t *testing.T) {
+	Tag := tf.Function(t, (*gedcom.SimpleNode).Tag)
+
+	Tag((*gedcom.SimpleNode)(nil)).Returns(gedcom.Tag{})
+}
+
+func TestSimpleNode_Value(t *testing.T) {
+	Value := tf.Function(t, (*gedcom.SimpleNode).Value)
+
+	Value((*gedcom.SimpleNode)(nil)).Returns("")
+}
+
+func TestSimpleNode_Pointer(t *testing.T) {
+	Pointer := tf.Function(t, (*gedcom.SimpleNode).Pointer)
+
+	Pointer((*gedcom.SimpleNode)(nil)).Returns("")
+}
+
+func TestSimpleNode_Document(t *testing.T) {
+	Document := tf.Function(t, (*gedcom.SimpleNode).Document)
+
+	Document((*gedcom.SimpleNode)(nil)).Returns((*gedcom.Document)(nil))
+}
+
+func TestSimpleNode_SetDocument(t *testing.T) {
+	(*gedcom.SimpleNode)(nil).SetDocument(nil)
+}
+
+func TestSimpleNode_Nodes(t *testing.T) {
+	Nodes := tf.Function(t, (*gedcom.SimpleNode).Nodes)
+
+	Nodes((*gedcom.SimpleNode)(nil)).Returns(([]gedcom.Node)(nil))
+}
+
+func TestSimpleNode_String(t *testing.T) {
+	String := tf.Function(t, (*gedcom.SimpleNode).String)
+
+	String((*gedcom.SimpleNode)(nil)).Returns("")
 }

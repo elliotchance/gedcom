@@ -23,6 +23,8 @@ func TestNewResidenceNode(t *testing.T) {
 func TestResidenceNode_Dates(t *testing.T) {
 	Dates := tf.Function(t, (*gedcom.ResidenceNode).Dates)
 
+	Dates((*gedcom.ResidenceNode)(nil)).Returns([]*gedcom.DateNode(nil))
+
 	Dates(gedcom.NewResidenceNode(nil, "", "", nil)).Returns([]*gedcom.DateNode(nil))
 
 	Dates(gedcom.NewResidenceNode(nil, "", "", []gedcom.Node{})).

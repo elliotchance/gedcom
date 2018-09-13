@@ -17,7 +17,13 @@ func NewEventNode(document *Document, value, pointer string, children []Node) *E
 //
 // When more than one date is returned you should not assume that the order has
 // any significance for the importance of the dates.
+//
+// If the node is nil the result will also be nil.
 func (node *EventNode) Dates() (result []*DateNode) {
+	if node == nil {
+		return nil
+	}
+
 	for _, n := range NodesWithTag(node, TagDate) {
 		result = append(result, n.(*DateNode))
 	}

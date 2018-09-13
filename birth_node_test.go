@@ -23,6 +23,8 @@ func TestNewBirthNode(t *testing.T) {
 func TestBirthNode_Dates(t *testing.T) {
 	Dates := tf.Function(t, (*gedcom.BirthNode).Dates)
 
+	Dates((*gedcom.BirthNode)(nil)).Returns([]*gedcom.DateNode(nil))
+
 	Dates(gedcom.NewBirthNode(nil, "", "", nil)).Returns([]*gedcom.DateNode(nil))
 
 	Dates(gedcom.NewBirthNode(nil, "", "", []gedcom.Node{})).

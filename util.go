@@ -86,7 +86,7 @@ func Last(nodes []Node) Node {
 // Value is a safe way to fetch the Value() from a node. If the node is nil then
 // an empty string will be returned.
 func Value(node Node) string {
-	if node == nil {
+	if IsNil(node) {
 		return ""
 	}
 
@@ -136,4 +136,14 @@ func NodeCondition(condition bool, node1, node2 Node) Node {
 	}
 
 	return node2
+}
+
+// Pointer is a safe way to fetch the Pointer() from a node. If the node is nil
+// then an empty string will be returned.
+func Pointer(node Node) string {
+	if IsNil(node) {
+		return ""
+	}
+
+	return node.Pointer()
 }

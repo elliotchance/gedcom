@@ -1,9 +1,11 @@
 package gedcom_test
 
 import (
-	"github.com/elliotchance/gedcom"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/tf"
+	"github.com/stretchr/testify/assert"
 )
 
 var individualTests = []struct {
@@ -67,6 +69,10 @@ func TestIndividualNode_Names(t *testing.T) {
 			assert.Equal(t, test.node.Names(), test.names)
 		})
 	}
+
+	Names := tf.Function(t, (*gedcom.IndividualNode).Names)
+
+	Names((*gedcom.IndividualNode)(nil)).Returns(([]*gedcom.NameNode)(nil))
 }
 
 func TestIndividualNode_Sex(t *testing.T) {
@@ -75,6 +81,10 @@ func TestIndividualNode_Sex(t *testing.T) {
 			assert.Equal(t, test.node.Sex(), test.sex)
 		})
 	}
+
+	Sex := tf.Function(t, (*gedcom.IndividualNode).Sex)
+
+	Sex((*gedcom.IndividualNode)(nil)).Returns(gedcom.SexUnknown)
 }
 
 func TestIndividualNode_Births(t *testing.T) {
@@ -82,6 +92,10 @@ func TestIndividualNode_Births(t *testing.T) {
 		node   *gedcom.IndividualNode
 		births []*gedcom.BirthNode
 	}{
+		{
+			node:   nil,
+			births: nil,
+		},
 		{
 			node:   individual("P1", "", "", ""),
 			births: nil,
@@ -132,6 +146,10 @@ func TestIndividualNode_Baptisms(t *testing.T) {
 		node     *gedcom.IndividualNode
 		baptisms []gedcom.Node
 	}{
+		{
+			node:     nil,
+			baptisms: nil,
+		},
 		{
 			node:     individual("P1", "", "", ""),
 			baptisms: []gedcom.Node{},
@@ -189,6 +207,10 @@ func TestIndividualNode_Deaths(t *testing.T) {
 		deaths []gedcom.Node
 	}{
 		{
+			node:   nil,
+			deaths: nil,
+		},
+		{
 			node:   individual("P1", "", "", ""),
 			deaths: []gedcom.Node{},
 		},
@@ -238,6 +260,10 @@ func TestIndividualNode_Burials(t *testing.T) {
 		node    *gedcom.IndividualNode
 		burials []gedcom.Node
 	}{
+		{
+			node:    nil,
+			burials: nil,
+		},
 		{
 			node:    individual("P1", "", "", ""),
 			burials: []gedcom.Node{},
@@ -359,6 +385,10 @@ func TestIndividualNode_Parents(t *testing.T) {
 		parents []*gedcom.FamilyNode
 	}{
 		{
+			node:    nil,
+			parents: nil,
+		},
+		{
 			node:    doc.Individuals()[0],
 			parents: []*gedcom.FamilyNode{},
 		},
@@ -393,7 +423,7 @@ func TestIndividualNode_Parents(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Run(test.node.Pointer(), func(t *testing.T) {
+		t.Run(gedcom.Pointer(test.node), func(t *testing.T) {
 			for _, n := range doc.Nodes {
 				n.SetDocument(doc)
 			}
@@ -409,6 +439,10 @@ func TestIndividualNode_SpouseChildren(t *testing.T) {
 		node     *gedcom.IndividualNode
 		expected gedcom.SpouseChildren
 	}{
+		{
+			node:     nil,
+			expected: gedcom.SpouseChildren{},
+		},
 		{
 			node: doc.Individuals()[0],
 			expected: gedcom.SpouseChildren{
@@ -468,7 +502,7 @@ func TestIndividualNode_SpouseChildren(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Run(test.node.Pointer(), func(t *testing.T) {
+		t.Run(gedcom.Pointer(test.node), func(t *testing.T) {
 			for _, n := range doc.Nodes {
 				n.SetDocument(doc)
 			}
@@ -482,6 +516,10 @@ func TestIndividualNode_LDSBaptisms(t *testing.T) {
 		node     *gedcom.IndividualNode
 		baptisms []gedcom.Node
 	}{
+		{
+			node:     nil,
+			baptisms: nil,
+		},
 		{
 			node:     individual("P1", "", "", ""),
 			baptisms: []gedcom.Node{},
@@ -538,6 +576,12 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 		node     *gedcom.IndividualNode
 		expected *gedcom.DateNode
 	}{
+		// Nil
+		{
+			node:     nil,
+			expected: nil,
+		},
+
 		// No dates
 		{
 			node:     individual("P1", "", "", ""),
@@ -642,6 +686,12 @@ func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 		node     *gedcom.IndividualNode
 		expected *gedcom.DateNode
 	}{
+		// Nil
+		{
+			node:     nil,
+			expected: nil,
+		},
+
 		// No dates
 		{
 			node:     individual("P1", "", "", ""),
@@ -1205,4 +1255,46 @@ func document(nodes ...gedcom.Node) *gedcom.Document {
 	return &gedcom.Document{
 		Nodes: nodes,
 	}
+}
+
+func TestIndividualNode_Name(t *testing.T) {
+	Name := tf.Function(t, (*gedcom.IndividualNode).Name)
+
+	Name((*gedcom.IndividualNode)(nil)).Returns((*gedcom.NameNode)(nil))
+}
+
+func TestIndividualNode_Spouses(t *testing.T) {
+	Spouses := tf.Function(t, (*gedcom.IndividualNode).Spouses)
+
+	Spouses((*gedcom.IndividualNode)(nil)).Returns((gedcom.IndividualNodes)(nil))
+}
+
+func TestIndividualNode_Families(t *testing.T) {
+	Families := tf.Function(t, (*gedcom.IndividualNode).Families)
+
+	Families((*gedcom.IndividualNode)(nil)).Returns(([]*gedcom.FamilyNode)(nil))
+}
+
+func TestIndividualNode_FamilyWithSpouse(t *testing.T) {
+	FamilyWithSpouse := tf.Function(t, (*gedcom.IndividualNode).FamilyWithSpouse)
+
+	FamilyWithSpouse((*gedcom.IndividualNode)(nil), (*gedcom.IndividualNode)(nil)).Returns((*gedcom.FamilyNode)(nil))
+}
+
+func TestIndividualNode_FamilyWithUnknownSpouse(t *testing.T) {
+	FamilyWithUnknownSpouse := tf.Function(t, (*gedcom.IndividualNode).FamilyWithUnknownSpouse)
+
+	FamilyWithUnknownSpouse((*gedcom.IndividualNode)(nil)).Returns((*gedcom.FamilyNode)(nil))
+}
+
+func TestIndividualNode_IsLiving(t *testing.T) {
+	IsLiving := tf.Function(t, (*gedcom.IndividualNode).IsLiving)
+
+	IsLiving((*gedcom.IndividualNode)(nil)).Returns(false)
+}
+
+func TestIndividualNode_Children(t *testing.T) {
+	Children := tf.Function(t, (*gedcom.IndividualNode).Children)
+
+	Children((*gedcom.IndividualNode)(nil)).Returns(gedcom.IndividualNodes{})
 }

@@ -25,19 +25,39 @@ func NewSimpleNode(document *Document, tag Tag, value, pointer string, children 
 	}
 }
 
+// If the node is nil the result will be an empty tag.
 func (node *SimpleNode) Tag() Tag {
+	if node == nil {
+		return Tag{}
+	}
+
 	return node.tag
 }
 
+// If the node is nil the result will be an empty string.
 func (node *SimpleNode) Value() string {
+	if node == nil {
+		return ""
+	}
+
 	return node.value
 }
 
+// If the node is nil the result will be an empty string.
 func (node *SimpleNode) Pointer() string {
+	if node == nil {
+		return ""
+	}
+
 	return node.pointer
 }
 
+// If the node is nil the result will also be nil.
 func (node *SimpleNode) Document() *Document {
+	if node == nil {
+		return nil
+	}
+
 	return node.document
 }
 
@@ -60,7 +80,12 @@ func (node *SimpleNode) Equals(node2 Node) bool {
 		node.pointer == node2.Pointer()
 }
 
+// If the node is nil the invocation will not have any effect.
 func (node *SimpleNode) SetDocument(document *Document) {
+	if node == nil {
+		return
+	}
+
 	node.document = document
 
 	for _, child := range node.children {
@@ -68,7 +93,12 @@ func (node *SimpleNode) SetDocument(document *Document) {
 	}
 }
 
+// If the node is nil the result will also be nil.
 func (node *SimpleNode) Nodes() []Node {
+	if node == nil {
+		return nil
+	}
+
 	return node.children
 }
 
@@ -76,6 +106,11 @@ func (node *SimpleNode) AddNode(n Node) {
 	node.children = append(node.children, n)
 }
 
+// If the node is nil the result be an empty string.
 func (node *SimpleNode) String() string {
+	if node == nil {
+		return ""
+	}
+
 	return GedcomLine(0, node)
 }

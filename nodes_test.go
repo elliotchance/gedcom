@@ -11,7 +11,7 @@ var nodesWithTagTests = []struct {
 	tag  gedcom.Tag
 	want []gedcom.Node
 }{
-	{nil, gedcom.TagHeader, []gedcom.Node{}},
+	{nil, gedcom.TagHeader, nil},
 	{gedcom.NewNameNode(nil, "", "", nil), gedcom.TagHeader, []gedcom.Node{}},
 	{
 		gedcom.NewNameNode(nil, "", "", []gedcom.Node{
