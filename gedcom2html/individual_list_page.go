@@ -59,7 +59,7 @@ func (c *individualListPage) String() string {
 	return html.NewPage("Individuals", html.NewComponents(
 		newHeader(c.document, "", selectedIndividualsTab),
 		html.NewRow(
-			html.NewColumn(html.EntireRow, html.NewText(fmt.Sprintf(
+			html.NewColumn(html.EntireRow, html.NewText(html.Sprintf(
 				"%d individuals are hidden because they are living.",
 				livingCount,
 			))),

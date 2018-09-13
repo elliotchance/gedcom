@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 )
 
 type sourceInList struct {
@@ -18,8 +18,8 @@ func newSourceInList(document *gedcom.Document, source *gedcom.SourceNode) *sour
 }
 
 func (c *sourceInList) String() string {
-	return fmt.Sprintf(fmt.Sprintf(`
+	return html.Sprintf(`
 		<tr>
 			<td>%s</td>
-		</tr>`, newSourceLink(c.source)))
+		</tr>`, newSourceLink(c.source))
 }

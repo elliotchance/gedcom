@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 )
 
 // sexBadge shows a coloured "Male", "Female" or "Unknown" badge.
@@ -17,6 +17,6 @@ func newSexBadge(sex gedcom.Sex) *sexBadge {
 }
 
 func (c *sexBadge) String() string {
-	return fmt.Sprintf(`<span class="badge badge-%s">%s</span>`,
+	return html.Sprintf(`<span class="badge badge-%s">%s</span>`,
 		colorClassForSex(c.sex), c.sex)
 }

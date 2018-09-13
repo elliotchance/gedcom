@@ -1,6 +1,6 @@
 package main
 
-import "fmt"
+import "github.com/elliotchance/gedcom/html"
 
 // keyedTableRow is a table row consisting of two columns where the left column
 // is a header and a key for the data in the right column. It also allows the
@@ -23,7 +23,7 @@ func (c *keyedTableRow) String() string {
 		return ""
 	}
 
-	return fmt.Sprintf(`
+	return html.Sprintf(`
        <tr>
            <th scope="row">%s</th>
            <td>%s</td>

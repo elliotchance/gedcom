@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html"
 )
@@ -26,7 +25,7 @@ func (c *individualButton) String() string {
 
 	onclick := ""
 	if c.individual != nil {
-		onclick = fmt.Sprintf(`onclick="location.href='%s'"`,
+		onclick = html.Sprintf(`onclick="location.href='%s'"`,
 			pageIndividual(c.document, c.individual))
 	}
 
@@ -38,7 +37,7 @@ func (c *individualButton) String() string {
 		onclick = ""
 	}
 
-	return fmt.Sprintf(`
+	return html.Sprintf(`
 		<button type="button" class="btn btn-outline-%s btn-block" %s>
 			<strong>%s</strong><br/>
 			%s&nbsp;

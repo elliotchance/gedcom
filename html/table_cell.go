@@ -15,5 +15,5 @@ func NewTableCell(class string, content fmt.Stringer) *TableCell {
 }
 
 func (c *TableCell) String() string {
-	return fmt.Sprintf(`<td scope="col" class="%s">%s</td>`, c.class, c.content)
+	return Sprintf(`<td scope="col" class="%s">%s</td>`, c.class, c.content)
 }

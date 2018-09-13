@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 )
 
 type familyInList struct {
@@ -23,7 +23,7 @@ func (c *familyInList) String() string {
 		date = n.Value()
 	}
 
-	return fmt.Sprintf(fmt.Sprintf(`
+	return html.Sprintf(`
 		<tr>
 			<td>%s</td>
 			<td nowrap="nowrap" class="text-center">%s</td>
@@ -31,5 +31,5 @@ func (c *familyInList) String() string {
 		</tr>`,
 		newIndividualLink(c.document, c.family.Husband()),
 		date,
-		newIndividualLink(c.document, c.family.Wife())))
+		newIndividualLink(c.document, c.family.Wife()))
 }

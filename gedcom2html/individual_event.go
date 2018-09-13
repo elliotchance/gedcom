@@ -1,6 +1,6 @@
 package main
 
-import "fmt"
+import "github.com/elliotchance/gedcom/html"
 
 // individualEvent is a row in the "Events" section of the individuals page.
 type individualEvent struct {
@@ -20,7 +20,7 @@ func newIndividualEvent(kind, date, place, description string) *individualEvent 
 }
 
 func (c *individualEvent) String() string {
-	return fmt.Sprintf(`
+	return html.Sprintf(`
 		<tr>
 			<th>%s</th>
 			<td>%s</td>

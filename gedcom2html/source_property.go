@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 )
 
 type sourceProperty struct {
@@ -18,7 +18,7 @@ func newSourceProperty(document *gedcom.Document, node gedcom.Node) *sourcePrope
 }
 
 func (c *sourceProperty) String() string {
-	s := fmt.Sprintf(`
+	s := html.Sprintf(`
 		<tr>
 			<th nowrap="nowrap">%s</th>
 			<td>%s</td>

@@ -1,9 +1,5 @@
 package html
 
-import (
-	"fmt"
-)
-
 type GoogleAnalytics struct {
 	id string
 }
@@ -19,7 +15,7 @@ func (c *GoogleAnalytics) String() string {
 		return ""
 	}
 
-	return fmt.Sprintf(`<!-- Global site tag (gtag.js) - Google Analytics -->
+	return Sprintf(`<!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=%s"></script>
 <script>
 window.dataLayer = window.dataLayer || [];

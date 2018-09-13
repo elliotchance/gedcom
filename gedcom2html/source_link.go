@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 )
 
 type sourceLink struct {
@@ -16,7 +16,7 @@ func newSourceLink(source *gedcom.SourceNode) *sourceLink {
 }
 
 func (c *sourceLink) String() string {
-	return fmt.Sprintf(`
+	return html.Sprintf(`
 		<a href="%s">%s</a>`,
 		pageSource(c.source), c.source.Title())
 }

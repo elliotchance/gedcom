@@ -1,8 +1,6 @@
 package main
 
-import (
-	"fmt"
-)
+import "github.com/elliotchance/gedcom/html"
 
 // navItem is a single tab in the tab bar.
 type navItem struct {
@@ -24,7 +22,7 @@ func (c *navItem) String() string {
 		active = "active"
 	}
 
-	return fmt.Sprintf(`
+	return html.Sprintf(`
 		<li class="nav-item">
 			<a class="nav-link %s" href="%s">%s</a>
 		</li>`, active, c.href, c.content)
