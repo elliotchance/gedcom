@@ -471,6 +471,10 @@ func TestDateNode_StartDate(t *testing.T) {
 			assert.Equal(t, node.StartDate(), test.startDate)
 		})
 	}
+
+	StartDate := tf.Function(t, (*gedcom.DateNode).StartDate)
+
+	StartDate((*gedcom.DateNode)(nil)).Returns(gedcom.Date{})
 }
 
 func TestDateNode_EndDate(t *testing.T) {
@@ -481,6 +485,10 @@ func TestDateNode_EndDate(t *testing.T) {
 			assert.Equal(t, node.EndDate(), test.endDate)
 		})
 	}
+
+	EndDate := tf.Function(t, (*gedcom.DateNode).EndDate)
+
+	EndDate((*gedcom.DateNode)(nil)).Returns(gedcom.Date{})
 }
 
 func TestDateNode_String(t *testing.T) {
@@ -491,6 +499,10 @@ func TestDateNode_String(t *testing.T) {
 			assert.Equalf(t, test.str, node.String(), "%#+v", date)
 		})
 	}
+
+	String := tf.Function(t, (*gedcom.DateNode).String)
+
+	String((*gedcom.DateNode)(nil)).Returns("")
 }
 
 func TestDateNode_Years(t *testing.T) {
@@ -498,6 +510,9 @@ func TestDateNode_Years(t *testing.T) {
 		date     *gedcom.DateNode
 		expected float64
 	}{
+		// Nil
+		{nil, 0.0},
+
 		// Zero
 		{gedcom.NewDateNode(nil, "", "", nil), 0.0},
 
@@ -538,7 +553,7 @@ func TestDateNode_Years(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Run(test.date.Value(), func(t *testing.T) {
+		t.Run(gedcom.Value(test.date), func(t *testing.T) {
 			assert.Equal(t, test.expected, test.date.Years())
 		})
 	}
@@ -790,4 +805,10 @@ func TestMaximumDateNode(t *testing.T) {
 		at3Sep1923,
 		at5Mar1923,
 	}).Returns(at3Sep1923)
+}
+
+func TestDateNode_DateRange(t *testing.T) {
+	DateRange := tf.Function(t, (*gedcom.DateNode).DateRange)
+
+	DateRange((*gedcom.DateNode)(nil)).Returns(gedcom.Date{}, gedcom.Date{})
 }

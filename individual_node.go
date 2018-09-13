@@ -26,7 +26,13 @@ func NewIndividualNode(document *Document, value, pointer string, children []Nod
 }
 
 // TODO: Needs tests
+//
+// If the node is nil the result will also be nil.
 func (node *IndividualNode) Name() *NameNode {
+	if node == nil {
+		return nil
+	}
+
 	nameTag := First(NodesWithTag(node, TagName))
 	if nameTag != nil {
 		return nameTag.(*NameNode)
@@ -35,7 +41,12 @@ func (node *IndividualNode) Name() *NameNode {
 	return nil
 }
 
+// If the node is nil the result will also be nil.
 func (node *IndividualNode) Names() []*NameNode {
+	if node == nil {
+		return nil
+	}
+
 	nameTags := NodesWithTag(node, TagName)
 	names := make([]*NameNode, len(nameTags))
 
@@ -46,6 +57,7 @@ func (node *IndividualNode) Names() []*NameNode {
 	return names
 }
 
+// If the node is nil the result will be SexUnknown.
 func (node *IndividualNode) Sex() Sex {
 	sex := NodesWithTag(node, TagSex)
 	if len(sex) == 0 {
@@ -56,7 +68,13 @@ func (node *IndividualNode) Sex() Sex {
 }
 
 // TODO: needs tests
+//
+// If the node is nil the result will also be nil.
 func (node *IndividualNode) Spouses() (spouses IndividualNodes) {
+	if node == nil {
+		return nil
+	}
+
 	if node.cachedSpouses {
 		return node.spouses
 	}
@@ -91,7 +109,13 @@ func (node *IndividualNode) Spouses() (spouses IndividualNodes) {
 }
 
 // TODO: needs tests
+//
+// If the node is nil the result will also be nil.
 func (node *IndividualNode) Families() (families []*FamilyNode) {
+	if node == nil {
+		return nil
+	}
+
 	if node.cachedFamilies {
 		return node.families
 	}
@@ -114,11 +138,18 @@ func (node *IndividualNode) Families() (families []*FamilyNode) {
 
 // TODO: needs tests
 func (node *IndividualNode) Is(individual *IndividualNode) bool {
-	return node != nil && individual != nil && node.Pointer() == individual.Pointer()
+	return node != nil && !IsNil(individual) &&
+		node.Pointer() == individual.Pointer()
 }
 
 // TODO: needs tests
+//
+// If the node is nil the result will also be nil.
 func (node *IndividualNode) FamilyWithSpouse(spouse *IndividualNode) *FamilyNode {
+	if node == nil {
+		return nil
+	}
+
 	for _, family := range node.document.Families() {
 		a := family.Husband().Is(node) && family.Wife().Is(spouse)
 		b := family.Wife().Is(node) && family.Husband().Is(spouse)
@@ -132,7 +163,13 @@ func (node *IndividualNode) FamilyWithSpouse(spouse *IndividualNode) *FamilyNode
 }
 
 // TODO: needs tests
+//
+// If the node is nil the result will also be nil.
 func (node *IndividualNode) FamilyWithUnknownSpouse() *FamilyNode {
+	if node == nil {
+		return nil
+	}
+
 	for _, family := range node.document.Families() {
 		a := family.Husband().Is(node) && family.Wife() == nil
 		b := family.Wife().Is(node) && family.Husband() == nil
@@ -146,12 +183,24 @@ func (node *IndividualNode) FamilyWithUnknownSpouse() *FamilyNode {
 }
 
 // TODO: needs tests
+//
+// If the node is nil the result will always be false.
 func (node *IndividualNode) IsLiving() bool {
+	if node == nil {
+		return false
+	}
+
 	return len(NodesWithTag(node, TagDeath)) == 0
 }
 
 // Births returns zero or more birth events for the individual.
+//
+// If the node is nil the result will also be nil.
 func (node *IndividualNode) Births() (nodes []*BirthNode) {
+	if node == nil {
+		return nil
+	}
+
 	for _, n := range NodesWithTag(node, TagBirth) {
 		nodes = append(nodes, n.(*BirthNode))
 	}
@@ -161,6 +210,8 @@ func (node *IndividualNode) Births() (nodes []*BirthNode) {
 
 // Baptisms returns zero or more baptism events for the individual. The baptisms
 // do not include LDS baptisms.
+//
+// If the node is nil the result will also be nil.
 func (node *IndividualNode) Baptisms() []Node {
 	return NodesWithTag(node, TagBaptism)
 }
@@ -168,11 +219,15 @@ func (node *IndividualNode) Baptisms() []Node {
 // Deaths returns zero or more death events for the individual. It is common for
 // individuals to not have a death event if the death date is not known. If you
 // need to check if an individual is living you should use IsLiving().
+//
+// If the node is nil the result will also be nil.
 func (node *IndividualNode) Deaths() []Node {
 	return NodesWithTag(node, TagDeath)
 }
 
 // Burials returns zero or more burial events for the individual.
+//
+// If the node is nil the result will also be nil.
 func (node *IndividualNode) Burials() []Node {
 	return NodesWithTag(node, TagBurial)
 }
@@ -185,7 +240,13 @@ func (node *IndividualNode) Burials() []Node {
 // It is also possible to have duplicate families. That is, families that have
 // the same husband and wife combinations if these families are defined in the
 // GEDCOM file.
+//
+// If the node is nil the result will also be nil.
 func (node *IndividualNode) Parents() []*FamilyNode {
+	if node == nil {
+		return nil
+	}
+
 	parents := []*FamilyNode{}
 
 	for _, family := range node.Families() {
@@ -200,6 +261,8 @@ func (node *IndividualNode) Parents() []*FamilyNode {
 // SpouseChildren maps the known spouses to their children. The spouse will be
 // nil if the other parent is not known for some or all of the children.
 // Children can appear under multiple spouses.
+//
+// If the node is nil the result will also be nil.
 func (node *IndividualNode) SpouseChildren() SpouseChildren {
 	spouseChildren := map[*IndividualNode]IndividualNodes{}
 
@@ -233,6 +296,8 @@ func (node *IndividualNode) SpouseChildren() SpouseChildren {
 
 // LDSBaptisms returns zero or more LDS baptism events for the individual. These
 // are not to be confused with Baptisms().
+//
+// If the node is nil the result will also be nil.
 func (node *IndividualNode) LDSBaptisms() []Node {
 	return NodesWithTag(node, TagLDSBaptism)
 }
@@ -257,6 +322,8 @@ func (node *IndividualNode) LDSBaptisms() []Node {
 // are less important that attempting to serve approximate information for
 // comparison. You almost certainly do not want to use the EstimatedBirthDate
 // value for anything meaningful aside from comparisons.
+//
+// If the node is nil the result will also be nil.
 func (node *IndividualNode) EstimatedBirthDate() *DateNode {
 	potentialNodes :=
 		Compound(node.Births(), node.Baptisms(), node.LDSBaptisms())
@@ -294,6 +361,8 @@ func (node *IndividualNode) EstimatedBirthDate() *DateNode {
 // are less important that attempting to serve approximate information for
 // comparison. You almost certainly do not want to use the EstimatedDeathDate
 // value for anything meaningful aside from comparisons.
+//
+// If the node is nil the result will also be nil.
 func (node *IndividualNode) EstimatedDeathDate() *DateNode {
 	// Try to return the earliest the death date first.
 	bestMatch := (*DateNode)(nil)
@@ -467,6 +536,8 @@ func (node *IndividualNode) SurroundingSimilarity(other *IndividualNode, options
 }
 
 // TODO: Needs tests
+//
+// If the node is nil the result will also be nil.
 func (node *IndividualNode) Children() IndividualNodes {
 	children := IndividualNodes{}
 

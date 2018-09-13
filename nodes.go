@@ -8,6 +8,8 @@ var nodeCache = map[Node]map[Tag][]Node{}
 
 // NodesWithTag returns the zero or more nodes that have a specific GEDCOM tag.
 // If the provided node is nil then an empty slice will always be returned.
+//
+// If the node is nil the result will also be nil.
 func NodesWithTag(node Node, tag Tag) (result []Node) {
 	if v, ok := nodeCache[node][tag]; ok {
 		return v
@@ -21,13 +23,14 @@ func NodesWithTag(node Node, tag Tag) (result []Node) {
 		nodeCache[node][tag] = result
 	}()
 
-	nodes := []Node{}
+	if IsNil(node) {
+		return nil
+	}
 
-	if node != nil {
-		for _, node := range node.Nodes() {
-			if node.Tag().Is(tag) {
-				nodes = append(nodes, node)
-			}
+	nodes := []Node{}
+	for _, node := range node.Nodes() {
+		if node.Tag().Is(tag) {
+			nodes = append(nodes, node)
 		}
 	}
 
@@ -40,7 +43,12 @@ func NodesWithTag(node Node, tag Tag) (result []Node) {
 //
 //   birthPlaces := NodesWithTagPath(individual, TagBirth, TagPlace)
 //
+// If the node is nil the result will also be nil.
 func NodesWithTagPath(node Node, tagPath ...Tag) []Node {
+	if IsNil(node) {
+		return nil
+	}
+
 	if len(tagPath) == 0 {
 		return []Node{}
 	}

@@ -236,7 +236,12 @@ func parseDateParts(dateString string, isEndOfRange bool) Date {
 var rangeRegexp = regexp.MustCompile(fmt.Sprintf(`(?i)^(%s) (.+) (%s) (.+)$`,
 	DateWordsBetween, DateWordsAnd))
 
+// If the node is nil both results will be zero dates.
 func (node *DateNode) DateRange() (startDate Date, endDate Date) {
+	if node == nil {
+		return Date{}, Date{}
+	}
+
 	// Parsing dates is very expensive. Cache them.
 	if node.didParseDate {
 		return node.parsedStartDate, node.parsedEndDate

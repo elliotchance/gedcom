@@ -11,6 +11,7 @@ func NewSourceNode(document *Document, value, pointer string, children []Node) *
 	}
 }
 
+// If the node is nil the result will be an empty string.
 func (node *SourceNode) Title() string {
 	if n := First(NodesWithTag(node, TagTitle)); n != nil {
 		return n.Value()

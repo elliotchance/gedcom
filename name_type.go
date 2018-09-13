@@ -3,6 +3,7 @@ package gedcom
 type NameType string
 
 const (
+	NameTypeNormal      = NameType("")
 	NameTypeMarriedName = NameType("married")
 	NameTypeAlsoKnownAs = NameType("aka")
 	NameTypeMaidenName  = NameType("maiden")

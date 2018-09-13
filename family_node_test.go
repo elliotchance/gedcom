@@ -1,9 +1,11 @@
 package gedcom_test
 
 import (
-	"github.com/elliotchance/gedcom"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/tf"
+	"github.com/stretchr/testify/assert"
 )
 
 var familyTests = []struct {
@@ -54,6 +56,10 @@ func TestFamilyNode_Husband(t *testing.T) {
 			assert.Equal(t, node.Husband(), test.husband)
 		})
 	}
+
+	Husband := tf.Function(t, (*gedcom.FamilyNode).Husband)
+
+	Husband((*gedcom.FamilyNode)(nil)).Returns((*gedcom.IndividualNode)(nil))
 }
 
 func TestFamilyNode_Wife(t *testing.T) {
@@ -63,6 +69,10 @@ func TestFamilyNode_Wife(t *testing.T) {
 			assert.Equal(t, node.Wife(), test.wife)
 		})
 	}
+
+	Wife := tf.Function(t, (*gedcom.FamilyNode).Wife)
+
+	Wife((*gedcom.FamilyNode)(nil)).Returns((*gedcom.IndividualNode)(nil))
 }
 
 func TestFamilyNode_Similarity(t *testing.T) {
@@ -213,4 +223,16 @@ func TestFamilyNode_Similarity(t *testing.T) {
 			assert.Equal(t, test.expected, got)
 		})
 	}
+}
+
+func TestFamilyNode_Children(t *testing.T) {
+	Children := tf.Function(t, (*gedcom.FamilyNode).Children)
+
+	Children((*gedcom.FamilyNode)(nil)).Returns((gedcom.IndividualNodes)(nil))
+}
+
+func TestFamilyNode_HasChild(t *testing.T) {
+	HasChild := tf.Function(t, (*gedcom.FamilyNode).HasChild)
+
+	HasChild((*gedcom.FamilyNode)(nil), (*gedcom.IndividualNode)(nil)).Returns(false)
 }

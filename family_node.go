@@ -14,7 +14,12 @@ func NewFamilyNode(document *Document, pointer string, children []Node) *FamilyN
 	}
 }
 
+// If the node is nil the result will also be nil.
 func (node *FamilyNode) Husband() (husband *IndividualNode) {
+	if node == nil {
+		return nil
+	}
+
 	if node.cachedHusband {
 		return node.husband
 	}
@@ -27,7 +32,12 @@ func (node *FamilyNode) Husband() (husband *IndividualNode) {
 	return node.partner(TagHusband)
 }
 
+// If the node is nil the result will also be nil.
 func (node *FamilyNode) Wife() (wife *IndividualNode) {
+	if node == nil {
+		return nil
+	}
+
 	if node.cachedWife {
 		return node.wife
 	}
@@ -56,7 +66,13 @@ func (node *FamilyNode) partner(tag Tag) *IndividualNode {
 }
 
 // TODO: Needs tests
+//
+// If the node is nil the result will also be nil.
 func (node *FamilyNode) Children() IndividualNodes {
+	if node == nil {
+		return nil
+	}
+
 	children := IndividualNodes{}
 
 	for _, n := range NodesWithTag(node, TagChild) {
@@ -69,7 +85,13 @@ func (node *FamilyNode) Children() IndividualNodes {
 }
 
 // TODO: Needs tests
+//
+// If the node is nil the result will also be nil.
 func (node *FamilyNode) HasChild(individual *IndividualNode) bool {
+	if node == nil {
+		return false
+	}
+
 	for _, n := range NodesWithTag(node, TagChild) {
 		if n.Value() == "@"+individual.Pointer()+"@" {
 			return true

@@ -27,6 +27,10 @@ func (node *NameNode) parts() []string {
 // GivenName is the given or earned name used for official identification of a
 // person. It is also commonly known as the "first name".
 func (node *NameNode) GivenName() string {
+	if node == nil {
+		return ""
+	}
+
 	// GivenName is the proper first name.
 	givenNames := NodesWithTag(node, TagGivenName)
 	if len(givenNames) > 0 {
@@ -39,6 +43,10 @@ func (node *NameNode) GivenName() string {
 
 // Surname is a family name passed on or used by members of a family.
 func (node *NameNode) Surname() string {
+	if node == nil {
+		return ""
+	}
+
 	// Surname is the proper last name.
 	surnames := NodesWithTag(node, TagSurname)
 	if len(surnames) > 0 {
@@ -56,6 +64,10 @@ func (node *NameNode) Surname() string {
 }
 
 func (node *NameNode) Prefix() string {
+	if node == nil {
+		return ""
+	}
+
 	// NamePrefix is the proper name prefix. If it is not provided then no
 	// prefix should be returned.
 	namePrefixes := NodesWithTag(node, TagNamePrefix)
@@ -67,6 +79,10 @@ func (node *NameNode) Prefix() string {
 }
 
 func (node *NameNode) Suffix() string {
+	if node == nil {
+		return ""
+	}
+
 	// NameSuffix is the proper name suffix.
 	nameSuffixes := NodesWithTag(node, TagNameSuffix)
 	if len(nameSuffixes) > 0 {
@@ -78,6 +94,10 @@ func (node *NameNode) Suffix() string {
 }
 
 func (node *NameNode) SurnamePrefix() string {
+	if node == nil {
+		return ""
+	}
+
 	// SurnameSuffix is the proper surname prefix.
 	surnamePrefixes := NodesWithTag(node, TagSurnamePrefix)
 	if len(surnamePrefixes) > 0 {
@@ -89,6 +109,10 @@ func (node *NameNode) SurnamePrefix() string {
 }
 
 func (node *NameNode) Title() string {
+	if node == nil {
+		return ""
+	}
+
 	// Title is the proper individual title.
 	titles := NodesWithTag(node, TagTitle)
 	if len(titles) > 0 {
@@ -100,18 +124,26 @@ func (node *NameNode) Title() string {
 }
 
 func (node *NameNode) String() string {
+	if node == nil {
+		return ""
+	}
+
 	return CleanSpace(fmt.Sprintf("%s %s %s %s %s %s", node.Title(),
 		node.Prefix(), node.GivenName(), node.SurnamePrefix(), node.Surname(),
 		node.Suffix()))
 }
 
 func (node *NameNode) Type() NameType {
+	if node == nil {
+		return NameTypeNormal
+	}
+
 	if nameType := First(NodesWithTag(node, TagType)); nameType != nil {
 		return NameType(nameType.Value())
 	}
 
 	// Otherwise return nothing.
-	return ""
+	return NameTypeNormal
 }
 
 // GedcomName returns the simplified GEDCOM name often used also as the value
