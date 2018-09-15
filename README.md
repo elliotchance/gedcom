@@ -19,10 +19,12 @@ exporting and diffing GEDCOM files.
       * [Dates](#dates)
       * [Equality](#equality)
       * [Filtering](#filtering)
-   * [Rendering as HTML](#rendering-as-html)
-   * [Converting to JSON](#converting-to-json)
-   * [Converting to Text](#converting-to-text)
-      * [Comparing Output](#comparing-output)
+      * [Names](#names)
+   * [Exporting](#exporting)
+      * [HTML](#html)
+      * [JSON](#json)
+      * [Text](#text)
+         * [Comparing Output](#comparing-output)
 
 Project Goals
 =============
@@ -203,12 +205,46 @@ newNodes := gedcom.Filter(node, gedcom.OfficialTagFilter())
 
 Filter functions:
 
-1. [`WhitelistTagFilter`][6]
-2. [`BlacklistTagFilter`][7]
-3. [`OfficialTagFilter`][8]
+1. [`BlacklistTagFilter`][7]
+2. [`OfficialTagFilter`][8]
+3. [`SimpleNameFilter`][12]
+4. [`WhitelistTagFilter`][6]
 
-Rendering as HTML
-=================
+Names
+-----
+
+A [`NameNode`][14] represents all the parts that make up a single name. An
+individual may have more than one name, each one would be represented by a
+`NameNode`.
+
+Apart from functions to extract name parts there is also [`Format`][13] which
+works similar to `fmt.Printf` where placeholders represent different components
+of the name:
+
+```txt
+%% "%"
+%f GivenName
+%l Surname
+%m SurnamePrefix
+%p Prefix
+%s Suffix
+%t Title
+```
+
+Each of the letters may be in upper case to convert the name part to upper case
+also. Whitespace before, after and between name components will be removed:
+
+```txt
+name.Format("%l, %f")     // Smith, Bob
+name.Format("%f %L")      // Bob SMITH
+name.Format("%f %m (%l)") // Bob (Smith)
+```
+
+Exporting
+=========
+
+HTML
+----
 
 `gedcom2html` converts a GEDCOM file to a directory of HTML files. This produces
 a pretty output that looks like this:
@@ -222,8 +258,8 @@ Usage of gedcom2html:
     	Output directory. It will use the current directory if output-dir is not provided. Output files will only be added or replaced. Existing files will not be deleted. (default ".")
 ```
 
-Converting to JSON
-==================
+JSON
+----
 
 `gedcom2json` is a subpackage and binary that converts a GEDCOM file to a JSON
 structure. It offers several options for the output:
@@ -252,8 +288,8 @@ Usage of gedcom2json:
     	Use tags (pretty or raw) as object keys rather than arrays.
 ```
 
-Converting to Text
-==================
+Text
+----
 
 `gedcom2text` is a subpackage and binary that converts a GEDCOM file to a simple
 text output (or split into individual files) that is ideal for easily reading
@@ -279,8 +315,7 @@ Usage of gedcom2text:
     	Split the individuals into separate files in this directory.
 ```
 
-Comparing Output
-----------------
+### Comparing Output
 
 Here is an example to compare two large GEDCOM files:
 
@@ -304,3 +339,6 @@ You can (and probably should) also use
 [9]: https://godoc.org/github.com/elliotchance/gedcom#Node
 [10]: https://godoc.org/github.com/elliotchance/gedcom#DeepEqual
 [11]: https://godoc.org/github.com/elliotchance/gedcom#Date.Is
+[12]: https://godoc.org/github.com/elliotchance/gedcom#SimpleNameFilter
+[13]: https://godoc.org/github.com/elliotchance/gedcom#NameNode.Format
+[14]: https://godoc.org/github.com/elliotchance/gedcom#NameNode
