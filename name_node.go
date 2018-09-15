@@ -1,10 +1,25 @@
 package gedcom
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
 	"unicode"
+)
+
+// NameFormat constants can be used with NameNode.Format.
+const (
+	// This is the written format, also used by String().
+	NameFormatWritten = "%t %p %f %m %l %s"
+
+	// This is the style used in GEDCOM NAME nodes. It is used in GedcomName().
+	//
+	// It should be noted that while the formatted name is valid GEDCOM, it
+	// cannot be reverse back into its individual name parts.
+	NameFormatGEDCOM = "%t %p %f %m /%l/ %s"
+
+	// NameFormatIndex is appropriate for showing names that are indexed by
+	// their surname, such as "Smith, Bob"
+	NameFormatIndex = "%m %l, %t %p %f %s"
 )
 
 // NameNode represents all the parts that make up a single name. An individual
@@ -124,14 +139,10 @@ func (node *NameNode) Title() string {
 	return ""
 }
 
+// String returns all name components in the format that would be written like
+// "Grand Duke Bob Smith Esq.". It specifically uses NameFormatWritten.
 func (node *NameNode) String() string {
-	if node == nil {
-		return ""
-	}
-
-	return CleanSpace(fmt.Sprintf("%s %s %s %s %s %s", node.Title(),
-		node.Prefix(), node.GivenName(), node.SurnamePrefix(), node.Surname(),
-		node.Suffix()))
+	return node.Format(NameFormatWritten)
 }
 
 func (node *NameNode) Type() NameType {
@@ -155,13 +166,17 @@ func (node *NameNode) Type() NameType {
 //
 //   Sir Elliot Rupert /Chance/ Sr
 //
+// Even this uses the NameFormatGEDCOM it may return a different value from
+// Format(NameFormatGEDCOM) because any empty surnames will be removed.
 func (node *NameNode) GedcomName() string {
-	name := node.Format("%t %p %f %m /%l/ %s")
+	name := node.Format(NameFormatGEDCOM)
 
 	return CleanSpace(strings.Replace(name, "//", "", -1))
 }
 
 // Format returns a formatted name.
+//
+// There are some common formats described with the NameFormat constants.
 //
 // Format works similar to Printf where placeholders represent different
 // components of the name:

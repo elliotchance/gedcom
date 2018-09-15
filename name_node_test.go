@@ -298,6 +298,9 @@ func TestNameNode_Type(t *testing.T) {
 func TestNameNode_Format(t *testing.T) {
 	Format := tf.Function(t, (*gedcom.NameNode).Format)
 
+	Format(nil, "").Returns("")
+	Format(nil, "%f %l").Returns("")
+
 	name := gedcom.NewNameNode(nil, "", "", []gedcom.Node{
 		gedcom.NewSimpleNode(nil, gedcom.TagGivenName, "Given", "", nil),
 		gedcom.NewSimpleNode(nil, gedcom.TagSurname, "Surname", "", nil),
@@ -330,6 +333,10 @@ func TestNameNode_Format(t *testing.T) {
 	Format(name, "HI %t").Returns("HI Title")
 	Format(name, "HI %t bar").Returns("HI Title bar")
 	Format(name, "%l, %f").Returns("Surname, Given")
+
+	Format(name, gedcom.NameFormatWritten).Returns("Title Prefix Given SurnamePrefix Surname Suffix")
+	Format(name, gedcom.NameFormatGEDCOM).Returns("Title Prefix Given SurnamePrefix /Surname/ Suffix")
+	Format(name, gedcom.NameFormatIndex).Returns("SurnamePrefix Surname, Title Prefix Given Suffix")
 
 	name = gedcom.NewNameNode(nil, "Bob /Smith/", "", nil)
 
