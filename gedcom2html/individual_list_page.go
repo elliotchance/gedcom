@@ -5,7 +5,6 @@ import (
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html"
 	"sort"
-	"strings"
 )
 
 // individualListPage is the page that lists of all the individuals.
@@ -31,13 +30,7 @@ func (c *individualListPage) String() string {
 	individuals := gedcom.IndividualNodes{}
 
 	for _, individual := range c.document.Individuals() {
-		name := individual.Name().Format(gedcom.NameFormatIndex)
-		if name == "" {
-			name = "#"
-		}
-
-		lowerName := strings.ToLower(name)
-		if rune(lowerName[0]) == c.selectedLetter {
+		if surnameStartsWith(individual, c.selectedLetter) {
 			individuals = append(individuals, individual)
 		}
 	}
@@ -51,10 +44,26 @@ func (c *individualListPage) String() string {
 	})
 
 	livingCount := 0
+	lastSurname := ""
 	for _, i := range individuals {
 		if i.IsLiving() {
 			livingCount += 1
 			continue
+		}
+
+		if newSurname := i.Name().Surname(); newSurname != lastSurname {
+			heading := html.NewComponents(
+				html.NewAnchor(newSurname),
+				html.NewHeading(3, "", newSurname),
+			)
+
+			table = append(table, html.NewTableRow(
+				html.NewTableCell("", heading),
+				html.NewTableCell("", html.NewText("")),
+				html.NewTableCell("", html.NewText("")),
+			))
+
+			lastSurname = newSurname
 		}
 
 		table = append(table, newIndividualInList(c.document, i))
@@ -70,6 +79,8 @@ func (c *individualListPage) String() string {
 		),
 		html.NewSpace(),
 		newIndividualIndexHeader(c.document, c.selectedLetter),
+		html.NewSpace(),
+		newSurnameIndex(c.document, c.selectedLetter),
 		html.NewSpace(),
 		html.NewRow(
 			html.NewColumn(html.EntireRow, html.NewTable("", table...)),

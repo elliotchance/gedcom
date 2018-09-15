@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html"
 	"strings"
@@ -48,15 +49,13 @@ func getIndexLetter(individual *gedcom.IndividualNode) rune {
 }
 
 func (c *individualIndexHeader) String() string {
-	s := `<ul class="nav nav-pills nav-fill">`
+	pills := []fmt.Stringer{}
 
 	for _, letter := range getIndexLetters(c.document) {
-		s += newIndividualIndexLetter(letter, letter == c.selectedLetter).String()
+		pills = append(pills, newIndividualIndexLetter(letter, letter == c.selectedLetter))
 	}
 
-	s += `</ul>`
-
 	return html.NewRow(
-		html.NewColumn(html.EntireRow, html.NewText(s)),
+		html.NewColumn(html.EntireRow, newNavPills(pills)),
 	).String()
 }

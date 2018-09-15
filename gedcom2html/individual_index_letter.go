@@ -1,9 +1,6 @@
 package main
 
-import (
-	"github.com/elliotchance/gedcom/html"
-	"unicode"
-)
+import "unicode"
 
 type individualIndexLetter struct {
 	letter     rune
@@ -18,14 +15,8 @@ func newIndividualIndexLetter(letter rune, isSelected bool) *individualIndexLett
 }
 
 func (c *individualIndexLetter) String() string {
-	active := ""
-	if c.isSelected {
-		active = "active"
-	}
+	text := string(unicode.ToUpper(c.letter))
+	link := pageIndividuals(c.letter)
 
-	return html.Sprintf(`
-			<li class="nav-item">
-    			<a class="nav-link %s" href="%s">%c</a>
-  			</li>`,
-		active, pageIndividuals(c.letter), unicode.ToUpper(c.letter))
+	return newNavLink(text, link, c.isSelected).String()
 }

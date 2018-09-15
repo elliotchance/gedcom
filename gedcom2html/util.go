@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
+	"strings"
 )
 
 func colorForIndividual(individual *gedcom.IndividualNode) string {
@@ -67,4 +68,14 @@ func getUniqueKey(s string) string {
 
 	// This should not be possible
 	panic(s)
+}
+
+func surnameStartsWith(individual *gedcom.IndividualNode, letter rune) bool {
+	name := individual.Name().Format(gedcom.NameFormatIndex)
+	if name == "" {
+		name = "#"
+	}
+
+	lowerName := strings.ToLower(name)
+	return rune(lowerName[0]) == letter
 }
