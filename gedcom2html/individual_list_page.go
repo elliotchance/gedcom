@@ -31,19 +31,23 @@ func (c *individualListPage) String() string {
 	individuals := gedcom.IndividualNodes{}
 
 	for _, individual := range c.document.Individuals() {
-		name := strings.ToLower(individual.Name().String())
+		name := individual.Name().Format(gedcom.NameFormatIndex)
 		if name == "" {
 			name = "#"
 		}
 
-		if rune(name[0]) == c.selectedLetter {
+		lowerName := strings.ToLower(name)
+		if rune(lowerName[0]) == c.selectedLetter {
 			individuals = append(individuals, individual)
 		}
 	}
 
 	// Sort individuals by name.
 	sort.Slice(individuals, func(i, j int) bool {
-		return individuals[i].Name().String() < individuals[j].Name().String()
+		left := individuals[i].Name().Format(gedcom.NameFormatIndex)
+		right := individuals[j].Name().Format(gedcom.NameFormatIndex)
+
+		return left < right
 	})
 
 	livingCount := 0
