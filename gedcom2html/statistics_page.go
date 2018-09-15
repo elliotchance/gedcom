@@ -25,18 +25,16 @@ func (c *statisticsPage) String() string {
 			html.NewBigTitle("Statistics"),
 			html.NewSpace(),
 			html.NewRow(
-				html.NewColumn(html.HalfRow, newIndividualStatistics(c.document)),
+				html.NewColumn(html.HalfRow, html.NewComponents(
+					newIndividualStatistics(c.document),
+					html.NewSpace(),
+					newFamilyStatistics(c.document),
+					html.NewSpace(),
+					newSourceStatistics(c.document),
+					html.NewSpace(),
+					newPlaceStatistics(c.document),
+				)),
 				html.NewColumn(html.HalfRow, newEventStatistics(c.document)),
-			),
-			html.NewSpace(),
-			html.NewRow(
-				html.NewColumn(html.HalfRow, newFamilyStatistics(c.document)),
-				html.NewColumn(html.HalfRow, newSourceStatistics(c.document)),
-			),
-			html.NewSpace(),
-			html.NewRow(
-				html.NewColumn(html.HalfRow, newPlaceStatistics(c.document)),
-				html.NewColumn(html.HalfRow, newEmpty()),
 			),
 		),
 		c.googleAnalyticsID,

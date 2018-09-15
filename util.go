@@ -53,34 +53,38 @@ func CleanSpace(s string) string {
 	return s
 }
 
-// First returns the first node of nodes. If the length of nodes is zero then
-// nil is returned. If the first node is nil then nil is also returned.
+// First returns the first non-nil node of nodes. If the length of nodes is zero
+// or a non-nil value is not found then nil is returned.
 //
 // First is useful in combination with other functions like:
 //
 //   birth := First(individual.Births())
 //
-func First(nodes []Node) Node {
-	if len(nodes) == 0 {
+func First(nodes interface{}) Node {
+	n := Compound(nodes)
+	if len(n) == 0 {
 		return nil
 	}
 
-	return nodes[0]
+	return n[0]
 }
 
-// Last returns the last node of nodes. If the length of nodes is zero then
-// nil is returned. If the last node is nil then nil is also returned.
+// Last returns the last non-nil node of nodes. If the length of nodes is zero
+// or a non-nil value is not found then nil is returned.
 //
 // Last is useful in combination with other functions like:
 //
 //   death := Last(individual.Deaths())
 //
-func Last(nodes []Node) Node {
-	if len(nodes) == 0 {
-		return nil
+func Last(nodes interface{}) Node {
+	n := Compound(nodes)
+	for i := len(n) - 1; i >= 0; i-- {
+		if n[i] != nil {
+			return n[i]
+		}
 	}
 
-	return nodes[len(nodes)-1]
+	return nil
 }
 
 // Value is a safe way to fetch the Value() from a node. If the node is nil then
@@ -146,4 +150,36 @@ func Pointer(node Node) string {
 	}
 
 	return node.Pointer()
+}
+
+// String is a safe way to fetch the String() from a node. If the node is nil
+// then an empty string will be returned.
+func String(node Node) string {
+	if node == nil {
+		return ""
+	}
+
+	return node.String()
+}
+
+// Dates returns the shallow DateNodes for each of the provided nodes.
+func Dates(nodes ...Node) (dates []*DateNode) {
+	for _, node := range nodes {
+		for _, n := range NodesWithTag(node, TagDate) {
+			dates = append(dates, n.(*DateNode))
+		}
+	}
+
+	return
+}
+
+// Places returns the shallow PlaceNodes for each of the provided nodes.
+func Places(nodes ...Node) (places []*PlaceNode) {
+	for _, node := range nodes {
+		for _, n := range NodesWithTag(node, TagPlace) {
+			places = append(places, n.(*PlaceNode))
+		}
+	}
+
+	return
 }

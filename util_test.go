@@ -66,8 +66,18 @@ var firtLastTests = []struct {
 	},
 	{
 		[]gedcom.Node{nil, gedcom.NewNameNode(nil, "a", "", nil)},
-		nil,
 		gedcom.NewNameNode(nil, "a", "", nil),
+		gedcom.NewNameNode(nil, "a", "", nil),
+	},
+	{
+		[]gedcom.Node{
+			nil,
+			gedcom.NewNameNode(nil, "a", "", nil),
+			gedcom.NewNameNode(nil, "b", "", nil),
+			nil,
+		},
+		gedcom.NewNameNode(nil, "a", "", nil),
+		gedcom.NewNameNode(nil, "b", "", nil),
 	},
 }
 
@@ -153,6 +163,163 @@ func TestPointer(t *testing.T) {
 	for _, test := range tests {
 		t.Run("", func(t *testing.T) {
 			assert.Equal(t, test.want, gedcom.Pointer(test.node))
+		})
+	}
+}
+
+func TestString(t *testing.T) {
+	tests := []struct {
+		node gedcom.Node
+		want string
+	}{
+		{nil, ""},
+		{gedcom.NewSimpleNode(nil, gedcom.TagVersion, "foo", "", nil), "foo"},
+		{gedcom.NewNameNode(nil, "foo bar", "", nil), "foo bar"},
+	}
+
+	for _, test := range tests {
+		t.Run("", func(t *testing.T) {
+			assert.Equal(t, test.want, gedcom.String(test.node))
+		})
+	}
+}
+
+func TestDates(t *testing.T) {
+	tests := []struct {
+		nodes []gedcom.Node
+		want  []*gedcom.DateNode
+	}{
+		{nil, nil},
+		{
+			[]gedcom.Node{
+				gedcom.NewSimpleNode(nil, gedcom.TagVersion, "foo", "", nil),
+			},
+			nil,
+		},
+		{
+			[]gedcom.Node{
+				gedcom.NewNameNode(nil, "foo bar", "", []gedcom.Node{
+					gedcom.NewDateNode(nil, "2 Sep 1981", "", nil),
+				}),
+			},
+			[]*gedcom.DateNode{
+				gedcom.NewDateNode(nil, "2 Sep 1981", "", nil),
+			},
+		},
+		{
+			[]gedcom.Node{
+				gedcom.NewNameNode(nil, "foo bar", "", []gedcom.Node{
+					gedcom.NewDateNode(nil, "2 Sep 1981", "", nil),
+					gedcom.NewDateNode(nil, "3 Sep 1981", "", nil),
+				}),
+			},
+			[]*gedcom.DateNode{
+				gedcom.NewDateNode(nil, "2 Sep 1981", "", nil),
+				gedcom.NewDateNode(nil, "3 Sep 1981", "", nil),
+			},
+		},
+		{
+			[]gedcom.Node{
+				gedcom.NewNameNode(nil, "foo bar", "", []gedcom.Node{
+					gedcom.NewDateNode(nil, "2 Sep 1981", "", nil),
+					gedcom.NewDateNode(nil, "3 Sep 1981", "", nil),
+				}),
+				gedcom.NewNameNode(nil, "foo bar", "", []gedcom.Node{
+					gedcom.NewDateNode(nil, "4 Sep 1981", "", nil),
+				}),
+			},
+			[]*gedcom.DateNode{
+				gedcom.NewDateNode(nil, "2 Sep 1981", "", nil),
+				gedcom.NewDateNode(nil, "3 Sep 1981", "", nil),
+				gedcom.NewDateNode(nil, "4 Sep 1981", "", nil),
+			},
+		},
+		{
+			[]gedcom.Node{
+				gedcom.NewNameNode(nil, "foo bar", "", nil),
+				gedcom.NewNameNode(nil, "foo bar", "", []gedcom.Node{
+					gedcom.NewDateNode(nil, "4 Sep 1981", "", nil),
+				}),
+			},
+			[]*gedcom.DateNode{
+				gedcom.NewDateNode(nil, "4 Sep 1981", "", nil),
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run("", func(t *testing.T) {
+			assert.Equal(t, test.want, gedcom.Dates(test.nodes...))
+		})
+	}
+}
+
+func TestPlaces(t *testing.T) {
+	tests := []struct {
+		nodes []gedcom.Node
+		want  []*gedcom.PlaceNode
+	}{
+		{nil, nil},
+		{
+			[]gedcom.Node{
+				gedcom.NewSimpleNode(nil, gedcom.TagVersion, "foo", "", nil),
+			},
+			nil,
+		},
+		{
+			[]gedcom.Node{
+				gedcom.NewNameNode(nil, "foo bar", "", []gedcom.Node{
+					gedcom.NewPlaceNode(nil, "Australia", "", nil),
+				}),
+			},
+			[]*gedcom.PlaceNode{
+				gedcom.NewPlaceNode(nil, "Australia", "", nil),
+			},
+		},
+		{
+			[]gedcom.Node{
+				gedcom.NewNameNode(nil, "foo bar", "", []gedcom.Node{
+					gedcom.NewPlaceNode(nil, "Australia", "", nil),
+					gedcom.NewPlaceNode(nil, "United States", "", nil),
+				}),
+			},
+			[]*gedcom.PlaceNode{
+				gedcom.NewPlaceNode(nil, "Australia", "", nil),
+				gedcom.NewPlaceNode(nil, "United States", "", nil),
+			},
+		},
+		{
+			[]gedcom.Node{
+				gedcom.NewNameNode(nil, "foo bar", "", []gedcom.Node{
+					gedcom.NewPlaceNode(nil, "Australia", "", nil),
+					gedcom.NewPlaceNode(nil, "United States", "", nil),
+				}),
+				gedcom.NewNameNode(nil, "foo bar", "", []gedcom.Node{
+					gedcom.NewPlaceNode(nil, "England", "", nil),
+				}),
+			},
+			[]*gedcom.PlaceNode{
+				gedcom.NewPlaceNode(nil, "Australia", "", nil),
+				gedcom.NewPlaceNode(nil, "United States", "", nil),
+				gedcom.NewPlaceNode(nil, "England", "", nil),
+			},
+		},
+		{
+			[]gedcom.Node{
+				gedcom.NewNameNode(nil, "foo bar", "", nil),
+				gedcom.NewNameNode(nil, "foo bar", "", []gedcom.Node{
+					gedcom.NewPlaceNode(nil, "Australia", "", nil),
+				}),
+			},
+			[]*gedcom.PlaceNode{
+				gedcom.NewPlaceNode(nil, "Australia", "", nil),
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run("", func(t *testing.T) {
+			assert.Equal(t, test.want, gedcom.Places(test.nodes...))
 		})
 	}
 }

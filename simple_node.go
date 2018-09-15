@@ -112,5 +112,5 @@ func (node *SimpleNode) String() string {
 		return ""
 	}
 
-	return GedcomLine(0, node)
+	return node.value
 }
