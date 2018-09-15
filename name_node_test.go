@@ -1,10 +1,11 @@
 package gedcom_test
 
 import (
+	"testing"
+
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/tf"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 var nameTests = []struct {
@@ -292,4 +293,47 @@ func TestNameNode_Type(t *testing.T) {
 	Type := tf.Function(t, (*gedcom.NameNode).Type)
 
 	Type((*gedcom.NameNode)(nil)).Returns(gedcom.NameTypeNormal)
+}
+
+func TestNameNode_Format(t *testing.T) {
+	Format := tf.Function(t, (*gedcom.NameNode).Format)
+
+	name := gedcom.NewNameNode(nil, "", "", []gedcom.Node{
+		gedcom.NewSimpleNode(nil, gedcom.TagGivenName, "Given", "", nil),
+		gedcom.NewSimpleNode(nil, gedcom.TagSurname, "Surname", "", nil),
+		gedcom.NewSimpleNode(nil, gedcom.TagNamePrefix, "Prefix", "", nil),
+		gedcom.NewSimpleNode(nil, gedcom.TagNameSuffix, "Suffix", "", nil),
+		gedcom.NewSimpleNode(nil, gedcom.TagSurnamePrefix, "SurnamePrefix", "", nil),
+		gedcom.NewSimpleNode(nil, gedcom.TagTitle, "Title", "", nil),
+	})
+
+	Format(name, "").Returns("")
+	Format(name, "%").Returns("%")
+	Format(name, "%a").Returns("%a")
+	Format(name, "%A").Returns("%A")
+	Format(name, "%%").Returns("%")
+
+	Format(name, "%f").Returns("Given")
+	Format(name, "%l").Returns("Surname")
+	Format(name, "%m").Returns("SurnamePrefix")
+	Format(name, "%p").Returns("Prefix")
+	Format(name, "%s").Returns("Suffix")
+	Format(name, "%t").Returns("Title")
+
+	Format(name, "%F").Returns("GIVEN")
+	Format(name, "%L").Returns("SURNAME")
+	Format(name, "%M").Returns("SURNAMEPREFIX")
+	Format(name, "%P").Returns("PREFIX")
+	Format(name, "%S").Returns("SUFFIX")
+	Format(name, "%T").Returns("TITLE")
+
+	Format(name, "HI %t").Returns("HI Title")
+	Format(name, "HI %t bar").Returns("HI Title bar")
+	Format(name, "%l, %f").Returns("Surname, Given")
+
+	name = gedcom.NewNameNode(nil, "Bob /Smith/", "", nil)
+
+	Format(name, "%f %L").Returns("Bob SMITH")
+	Format(name, "%f%L").Returns("BobSMITH")
+	Format(name, "%f %m (%l)").Returns("Bob (Smith)")
 }

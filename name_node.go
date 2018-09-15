@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"unicode"
 )
 
 // NameNode represents all the parts that make up a single name. An individual
@@ -155,9 +156,87 @@ func (node *NameNode) Type() NameType {
 //   Sir Elliot Rupert /Chance/ Sr
 //
 func (node *NameNode) GedcomName() string {
-	name := fmt.Sprintf("%s %s %s %s /%s/ %s", node.Title(),
-		node.Prefix(), node.GivenName(), node.SurnamePrefix(), node.Surname(),
-		node.Suffix())
+	name := node.Format("%t %p %f %m /%l/ %s")
 
 	return CleanSpace(strings.Replace(name, "//", "", -1))
+}
+
+// Format returns a formatted name.
+//
+// Format works similar to Printf where placeholders represent different
+// components of the name:
+//
+//   %% "%"
+//   %f GivenName
+//   %l Surname
+//   %m SurnamePrefix
+//   %p Prefix
+//   %s Suffix
+//   %t Title
+//
+// Each of the letters may be in upper case to convert the name part to upper
+// case also.
+//
+// Whitespace before, after and between name components will be removed.
+//
+// Examples:
+//
+//   name.Format("%l, %f")     // Smith, Bob
+//   name.Format("%f %L")      // Bob SMITH
+//   name.Format("%f %m (%l)") // Bob (Smith)
+//
+func (node *NameNode) Format(format string) string {
+	result := ""
+
+	for i := 0; i < len(format); i++ {
+		if format[i] == '%' && i < len(format)-1 {
+			nextLetter := format[i+1]
+
+			switch nextLetter {
+			case '%':
+				result += "%"
+
+			case 'f', 'F':
+				result += renderNameComponent(nextLetter, node.GivenName())
+
+			case 'l', 'L':
+				result += renderNameComponent(nextLetter, node.Surname())
+
+			case 'm', 'M':
+				result += renderNameComponent(nextLetter, node.SurnamePrefix())
+
+			case 'p', 'P':
+				result += renderNameComponent(nextLetter, node.Prefix())
+
+			case 's', 'S':
+				result += renderNameComponent(nextLetter, node.Suffix())
+
+			case 't', 'T':
+				result += renderNameComponent(nextLetter, node.Title())
+
+			default:
+				result += "%" + string(nextLetter)
+			}
+
+			i++
+		} else {
+			result += string(format[i])
+		}
+	}
+
+	return CleanSpace(result)
+}
+
+func renderNameComponent(letter byte, namePart string) string {
+	isUpper := unicode.IsUpper(rune(letter))
+
+	return conditionalUpperCase(namePart, isUpper)
+}
+
+func conditionalUpperCase(s string, upperCase bool) string {
+	if upperCase {
+		return strings.ToUpper(s)
+	}
+
+	return s
 }
