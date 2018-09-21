@@ -236,6 +236,11 @@ var tests = map[string]*gedcom.Document{
 			gedcom.NewDateNode(nil, "1856", "", nil),
 		},
 	},
+	"0 NAME κόσμε": {
+		Nodes: []gedcom.Node{
+			gedcom.NewNameNode(nil, "κόσμε", "", nil),
+		},
+	},
 }
 
 func TestDecoder_Decode(t *testing.T) {

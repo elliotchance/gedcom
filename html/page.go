@@ -25,6 +25,7 @@ func (c *Page) String() string {
 	return Sprintf(`
     <html>
 	<head>
+		<meta charset="UTF-8">
 		%s
 		<title>%s</title>
 		<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
