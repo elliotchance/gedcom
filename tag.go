@@ -334,11 +334,10 @@ var (
 	// preservation and reference.
 	TagFile = newTag("FILE", "File", tagOptionNone, tagSortIndividualInfo)
 
-	// A phonetic variation of a superior text string. New in Gedcom 5.5.1
+	// See PhoneticNode.
 	TagPhonetic = newTag("FONE", "Phonetic", tagOptionNone, tagSortIndividualInfo)
 
-	// An assigned name given to a consistent format in which information can be
-	// conveyed.
+	// See FormatNode.
 	TagFormat = newTag("FORM", "Format", tagOptionNone, tagSortIndividualInfo)
 
 	// Information about the use of GEDCOM in a transmission.
@@ -377,20 +376,17 @@ var (
 	// information.
 	TagLanguage = newTag("LANG", "Language", tagOptionNone, tagSortIndividualInfo)
 
-	// A value indicating a coordinate position on a line, plane, or space. New
-	// in Gedcom 5.5.1.
+	// See LatitudeNode.
 	TagLatitude = newTag("LATI", "Latitude", tagOptionNone, tagSortIndividualInfo)
 
 	// A role of an individual acting as a person receiving a bequest or legal
 	// devise.
 	TagLegatee = newTag("LEGA", "Legatee", tagOptionNone, tagSortIndividualInfo)
 
-	// A value indicating a coordinate position on a line, plane, or space. New
-	// in Gedcom 5.5.1.
+	// See LongitudeNode.
 	TagLongitude = newTag("LONG", "Longitude", tagOptionNone, tagSortIndividualInfo)
 
-	// Pertains to a representation of measurements usually presented in a
-	// graphical form. New in Gedcom 5.5.1
+	// See MapNode.
 	TagMap = newTag("MAP", "Map", tagOptionNone, tagSortIndividualInfo)
 
 	// An event of an official public notice given that two people intend to
@@ -444,8 +440,7 @@ var (
 	// or parent.
 	TagMarriageCount = newTag("NMR", "Marriage Count", tagOptionNone, tagSortIndividualInfo)
 
-	// Additional information provided by the submitter for understanding the
-	// enclosing data.
+	// See NoteNode.
 	TagNote = newTag("NOTE", "Note", tagOptionNone, tagSortIndividualInfo)
 
 	// Text which appears on a name line before the given and surname parts of a
@@ -487,7 +482,7 @@ var (
 	// A unique number assigned to access a specific telephone.
 	TagPhone = newTag("PHON", "Phone", tagOptionNone, tagSortIndividualInfo)
 
-	// A jurisdictional name to identify the place or location of an event.
+	// See PlaceNode.
 	TagPlace = newTag("PLAC", "Place", tagOptionNone, tagSortIndividualInfo)
 
 	// A code used by a postal service to identify an area to facilitate mail
@@ -613,10 +608,7 @@ var (
 	// At level 0, specifies the end of a GEDCOM transmission.
 	TagTrailer = newTag("TRLR", "Trailer", tagOptionNone, tagSortIndividualInfo)
 
-	// A further qualification to the meaning of the associated superior tag.
-	// The value does not have any computer processing reliability. It is more
-	// in the form of a short one or two word note that should be displayed any
-	// time the associated data is displayed.
+	// See TypeNode.
 	TagType = newTag("TYPE", "Type", tagOptionNone, tagSortIndividualInfo)
 
 	// Indicates which version of a product, item, or publication is being used

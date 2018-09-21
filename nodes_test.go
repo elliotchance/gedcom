@@ -1,9 +1,11 @@
 package gedcom_test
 
 import (
-	"github.com/elliotchance/gedcom"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/tf"
+	"github.com/stretchr/testify/assert"
 )
 
 var nodesWithTagTests = []struct {
@@ -248,4 +250,18 @@ func TestHasNestedNode(t *testing.T) {
 			assert.Equal(t, test.want, result)
 		})
 	}
+}
+
+func TestCastNodes(t *testing.T) {
+	CastNodes := tf.Function(t, gedcom.CastNodes)
+
+	CastNodes(nil, (*gedcom.NameNode)(nil)).
+		Returns([]*gedcom.NameNode{})
+
+	CastNodes([]gedcom.Node{}, (*gedcom.NameNode)(nil)).
+		Returns([]*gedcom.NameNode{})
+
+	name := gedcom.NewNameNode(nil, "Elliot Rupert de Peyster /Chance/", "", nil)
+	CastNodes([]gedcom.Node{name}, (*gedcom.NameNode)(nil)).
+		Returns([]*gedcom.NameNode{name})
 }

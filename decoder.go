@@ -171,11 +171,29 @@ func NewNode(document *Document, tag Tag, value, pointer string) Node {
 	case TagFamily:
 		return NewFamilyNode(document, pointer, nil)
 
+	case TagFormat:
+		return NewFormatNode(document, value, pointer, nil)
+
 	case TagIndividual:
 		return NewIndividualNode(document, value, pointer, nil)
 
+	case TagLatitude:
+		return NewLatitudeNode(document, value, pointer, nil)
+
+	case TagLongitude:
+		return NewLongitudeNode(document, value, pointer, nil)
+
+	case TagMap:
+		return NewMapNode(document, value, pointer, nil)
+
 	case TagName:
 		return NewNameNode(document, value, pointer, nil)
+
+	case TagNote:
+		return NewNoteNode(document, value, pointer, nil)
+
+	case TagPhonetic:
+		return NewPhoneticVariationNode(document, value, pointer, nil)
 
 	case TagPlace:
 		return NewPlaceNode(document, value, pointer, nil)
@@ -183,8 +201,14 @@ func NewNode(document *Document, tag Tag, value, pointer string) Node {
 	case TagResidence:
 		return NewResidenceNode(document, value, pointer, nil)
 
+	case TagRomanized:
+		return NewRomanizedVariationNode(document, value, pointer, nil)
+
 	case TagSource:
 		return NewSourceNode(document, value, pointer, nil)
+
+	case TagType:
+		return NewTypeNode(document, value, pointer, nil)
 	}
 
 	return NewSimpleNode(document, tag, value, pointer, nil)

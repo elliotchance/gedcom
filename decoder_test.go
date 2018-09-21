@@ -86,7 +86,7 @@ var tests = map[string]*gedcom.Document{
 		Nodes: []gedcom.Node{
 			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", []gedcom.Node{
 				gedcom.NewSimpleNode(nil, gedcom.TagGedcomInformation, "", "", []gedcom.Node{
-					gedcom.NewSimpleNode(nil, gedcom.TagFormat, "LINEAGE-LINKED", "", nil),
+					gedcom.NewFormatNode(nil, "LINEAGE-LINKED", "", nil),
 				}),
 			}),
 		},
@@ -150,7 +150,7 @@ var tests = map[string]*gedcom.Document{
 		Nodes: []gedcom.Node{
 			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", []gedcom.Node{
 				gedcom.NewSimpleNode(nil, gedcom.TagGedcomInformation, "", "", []gedcom.Node{
-					gedcom.NewSimpleNode(nil, gedcom.TagFormat, "LINEAGE-LINKED", "", nil),
+					gedcom.NewFormatNode(nil, "LINEAGE-LINKED", "", nil),
 				}),
 			}),
 			gedcom.NewIndividualNode(nil, "", "P1", nil),
@@ -288,11 +288,19 @@ func TestNewNode(t *testing.T) {
 		{gedcom.TagDate, gedcom.NewDateNode(nil, v, p, nil)},
 		{gedcom.TagEvent, gedcom.NewEventNode(nil, v, p, nil)},
 		{gedcom.TagFamily, gedcom.NewFamilyNode(nil, p, nil)},
+		{gedcom.TagFormat, gedcom.NewFormatNode(nil, v, p, nil)},
 		{gedcom.TagIndividual, gedcom.NewIndividualNode(nil, v, p, nil)},
+		{gedcom.TagLatitude, gedcom.NewLatitudeNode(nil, v, p, nil)},
+		{gedcom.TagLongitude, gedcom.NewLongitudeNode(nil, v, p, nil)},
+		{gedcom.TagMap, gedcom.NewMapNode(nil, v, p, nil)},
 		{gedcom.TagName, gedcom.NewNameNode(nil, v, p, nil)},
+		{gedcom.TagNote, gedcom.NewNoteNode(nil, v, p, nil)},
+		{gedcom.TagPhonetic, gedcom.NewPhoneticVariationNode(nil, v, p, nil)},
 		{gedcom.TagPlace, gedcom.NewPlaceNode(nil, v, p, nil)},
 		{gedcom.TagResidence, gedcom.NewResidenceNode(nil, v, p, nil)},
+		{gedcom.TagRomanized, gedcom.NewRomanizedVariationNode(nil, v, p, nil)},
 		{gedcom.TagSource, gedcom.NewSourceNode(nil, v, p, nil)},
+		{gedcom.TagType, gedcom.NewTypeNode(nil, v, p, nil)},
 		{gedcom.TagVersion, gedcom.NewSimpleNode(nil, gedcom.TagVersion, v, p, nil)},
 	} {
 		t.Run(test.tag.String(), func(t *testing.T) {
