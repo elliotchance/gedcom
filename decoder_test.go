@@ -17,75 +17,75 @@ var tests = map[string]*gedcom.Document{
 	},
 	"0 HEAD": {
 		Nodes: []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", nil),
+			gedcom.NewNode(nil, gedcom.TagHeader, "", ""),
 		},
 	},
 	"0 HEAD\n1 CHAR UTF-8": {
 		Nodes: []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagCharacterSet, "UTF-8", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagHeader, "", "", []gedcom.Node{
+				gedcom.NewNode(nil, gedcom.TagCharacterSet, "UTF-8", ""),
 			}),
 		},
 	},
 	"0 HEAD\n\n1 CHAR UTF-8\n": {
 		Nodes: []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagCharacterSet, "UTF-8", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagHeader, "", "", []gedcom.Node{
+				gedcom.NewNode(nil, gedcom.TagCharacterSet, "UTF-8", ""),
 			}),
 		},
 	},
 	"0 HEAD\n1 CHAR UTF-8\n1 SOUR Ancestry.com Family Trees": {
 		Nodes: []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagCharacterSet, "UTF-8", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagHeader, "", "", []gedcom.Node{
+				gedcom.NewNode(nil, gedcom.TagCharacterSet, "UTF-8", ""),
 				gedcom.NewSourceNode(nil, "Ancestry.com Family Trees", "", nil),
 			}),
 		},
 	},
 	"0 HEAD\n1 CHAR UTF-8\n1 CHAR UTF-8": {
 		Nodes: []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagCharacterSet, "UTF-8", "", nil),
-				gedcom.NewSimpleNode(nil, gedcom.TagCharacterSet, "UTF-8", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagHeader, "", "", []gedcom.Node{
+				gedcom.NewNode(nil, gedcom.TagCharacterSet, "UTF-8", ""),
+				gedcom.NewNode(nil, gedcom.TagCharacterSet, "UTF-8", ""),
 			}),
 		},
 	},
 	"0 HEAD\n1 SOUR Ancestry.com Family Trees": {
 		Nodes: []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", []gedcom.Node{
+			gedcom.NewNodeWithChildren(nil, gedcom.TagHeader, "", "", []gedcom.Node{
 				gedcom.NewSourceNode(nil, "Ancestry.com Family Trees", "", nil),
 			}),
 		},
 	},
 	"0 HEAD\n1 BIRT": {
 		Nodes: []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", []gedcom.Node{
+			gedcom.NewNodeWithChildren(nil, gedcom.TagHeader, "", "", []gedcom.Node{
 				gedcom.NewBirthNode(nil, "", "", nil),
 			}),
 		},
 	},
 	"0 HEAD\n1 GEDC\n2 VERS (2010.3)": {
 		Nodes: []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagGedcomInformation, "", "", []gedcom.Node{
-					gedcom.NewSimpleNode(nil, gedcom.TagVersion, "(2010.3)", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagHeader, "", "", []gedcom.Node{
+				gedcom.NewNodeWithChildren(nil, gedcom.TagGedcomInformation, "", "", []gedcom.Node{
+					gedcom.NewNode(nil, gedcom.TagVersion, "(2010.3)", ""),
 				}),
 			}),
 		},
 	},
 	"0 HEAD\n1 GEDC\n2 VERS 5.5": {
 		Nodes: []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagGedcomInformation, "", "", []gedcom.Node{
-					gedcom.NewSimpleNode(nil, gedcom.TagVersion, "5.5", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagHeader, "", "", []gedcom.Node{
+				gedcom.NewNodeWithChildren(nil, gedcom.TagGedcomInformation, "", "", []gedcom.Node{
+					gedcom.NewNode(nil, gedcom.TagVersion, "5.5", ""),
 				}),
 			}),
 		},
 	},
 	"0 HEAD\n1 GEDC\n2 FORM LINEAGE-LINKED": {
 		Nodes: []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagGedcomInformation, "", "", []gedcom.Node{
+			gedcom.NewNodeWithChildren(nil, gedcom.TagHeader, "", "", []gedcom.Node{
+				gedcom.NewNodeWithChildren(nil, gedcom.TagGedcomInformation, "", "", []gedcom.Node{
 					gedcom.NewFormatNode(nil, "LINEAGE-LINKED", "", nil),
 				}),
 			}),
@@ -93,7 +93,7 @@ var tests = map[string]*gedcom.Document{
 	},
 	"0 HEAD\n1 BIRT\n2 PLAC Camperdown, Nsw, Australia": {
 		Nodes: []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", []gedcom.Node{
+			gedcom.NewNodeWithChildren(nil, gedcom.TagHeader, "", "", []gedcom.Node{
 				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
 					gedcom.NewPlaceNode(nil, "Camperdown, Nsw, Australia", "", nil),
 				}),
@@ -102,45 +102,45 @@ var tests = map[string]*gedcom.Document{
 	},
 	"0 HEAD\n1 NAME Elliot Rupert de Peyster /Chance/": {
 		Nodes: []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", []gedcom.Node{
+			gedcom.NewNodeWithChildren(nil, gedcom.TagHeader, "", "", []gedcom.Node{
 				gedcom.NewNameNode(nil, "Elliot Rupert de Peyster /Chance/", "", nil),
 			}),
 		},
 	},
 	"0 HEAD\n0 @P1@ INDI": {
 		Nodes: []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagHeader, "", "", nil),
 			gedcom.NewIndividualNode(nil, "", "P1", nil),
 		},
 	},
 	"0 HEAD\n1 SEX M\n0 @P1@ INDI": {
 		Nodes: []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagSex, "M", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagHeader, "", "", []gedcom.Node{
+				gedcom.NewNode(nil, gedcom.TagSex, "M", ""),
 			}),
 			gedcom.NewIndividualNode(nil, "", "P1", nil),
 		},
 	},
 	"0 HEAD\n1 SEX M": {
 		Nodes: []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagSex, "M", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagHeader, "", "", []gedcom.Node{
+				gedcom.NewNode(nil, gedcom.TagSex, "M", ""),
 			}),
 		},
 	},
 	"0 HEAD\n1 BIRT\n2 PLAC Camperdown, Nsw, Australia\n1 SEX M": {
 		Nodes: []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", []gedcom.Node{
+			gedcom.NewNodeWithChildren(nil, gedcom.TagHeader, "", "", []gedcom.Node{
 				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
 					gedcom.NewPlaceNode(nil, "Camperdown, Nsw, Australia", "", nil),
 				}),
-				gedcom.NewSimpleNode(nil, gedcom.TagSex, "M", "", nil),
+				gedcom.NewNode(nil, gedcom.TagSex, "M", ""),
 			}),
 		},
 	},
 	"0 HEAD\n0 @P1@ INDI\n1 BIRT": {
 		Nodes: []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", nil),
+			gedcom.NewNode(nil, gedcom.TagHeader, "", ""),
 			gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewBirthNode(nil, "", "", nil),
 			}),
@@ -148,8 +148,8 @@ var tests = map[string]*gedcom.Document{
 	},
 	"0 HEAD\n1 GEDC\n2 FORM LINEAGE-LINKED\n0 @P1@ INDI": {
 		Nodes: []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagGedcomInformation, "", "", []gedcom.Node{
+			gedcom.NewNodeWithChildren(nil, gedcom.TagHeader, "", "", []gedcom.Node{
+				gedcom.NewNodeWithChildren(nil, gedcom.TagGedcomInformation, "", "", []gedcom.Node{
 					gedcom.NewFormatNode(nil, "LINEAGE-LINKED", "", nil),
 				}),
 			}),
@@ -158,55 +158,55 @@ var tests = map[string]*gedcom.Document{
 	},
 	"0 HEAD0\n1 HEAD1\n2 HEAD2\n3 HEAD3\n0 HEAD00": {
 		Nodes: []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagFromString("HEAD0"), "", "", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagFromString("HEAD1"), "", "", []gedcom.Node{
-					gedcom.NewSimpleNode(nil, gedcom.TagFromString("HEAD2"), "", "", []gedcom.Node{
-						gedcom.NewSimpleNode(nil, gedcom.TagFromString("HEAD3"), "", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagFromString("HEAD0"), "", "", []gedcom.Node{
+				gedcom.NewNodeWithChildren(nil, gedcom.TagFromString("HEAD1"), "", "", []gedcom.Node{
+					gedcom.NewNodeWithChildren(nil, gedcom.TagFromString("HEAD2"), "", "", []gedcom.Node{
+						gedcom.NewNode(nil, gedcom.TagFromString("HEAD3"), "", ""),
 					}),
 				}),
 			}),
-			gedcom.NewSimpleNode(nil, gedcom.TagFromString("HEAD00"), "", "", nil),
+			gedcom.NewNode(nil, gedcom.TagFromString("HEAD00"), "", ""),
 		},
 	},
 	"0 HEAD0\n1 HEAD1\n2 HEAD2\n3 HEAD3\n1 HEAD10": {
 		Nodes: []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagFromString("HEAD0"), "", "", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagFromString("HEAD1"), "", "", []gedcom.Node{
-					gedcom.NewSimpleNode(nil, gedcom.TagFromString("HEAD2"), "", "", []gedcom.Node{
-						gedcom.NewSimpleNode(nil, gedcom.TagFromString("HEAD3"), "", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagFromString("HEAD0"), "", "", []gedcom.Node{
+				gedcom.NewNodeWithChildren(nil, gedcom.TagFromString("HEAD1"), "", "", []gedcom.Node{
+					gedcom.NewNodeWithChildren(nil, gedcom.TagFromString("HEAD2"), "", "", []gedcom.Node{
+						gedcom.NewNode(nil, gedcom.TagFromString("HEAD3"), "", ""),
 					}),
 				}),
-				gedcom.NewSimpleNode(nil, gedcom.TagFromString("HEAD10"), "", "", nil),
+				gedcom.NewNode(nil, gedcom.TagFromString("HEAD10"), "", ""),
 			}),
 		},
 	},
 	"0 HEAD0\r1 HEAD1": {
 		Nodes: []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagFromString("HEAD0"), "", "", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagFromString("HEAD1"), "", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagFromString("HEAD0"), "", "", []gedcom.Node{
+				gedcom.NewNode(nil, gedcom.TagFromString("HEAD1"), "", ""),
 			}),
 		},
 	},
 	"0 HEAD0\r\n1 HEAD1": {
 		Nodes: []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagFromString("HEAD0"), "", "", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagFromString("HEAD1"), "", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagFromString("HEAD0"), "", "", []gedcom.Node{
+				gedcom.NewNode(nil, gedcom.TagFromString("HEAD1"), "", ""),
 			}),
 		},
 	},
 	"0 HEAD0\n1 HEAD1\n1 HEAD10\n2 HEAD2": {
 		Nodes: []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagFromString("HEAD0"), "", "", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagFromString("HEAD1"), "", "", nil),
-				gedcom.NewSimpleNode(nil, gedcom.TagFromString("HEAD10"), "", "", []gedcom.Node{
-					gedcom.NewSimpleNode(nil, gedcom.TagFromString("HEAD2"), "", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagFromString("HEAD0"), "", "", []gedcom.Node{
+				gedcom.NewNode(nil, gedcom.TagFromString("HEAD1"), "", ""),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagFromString("HEAD10"), "", "", []gedcom.Node{
+					gedcom.NewNode(nil, gedcom.TagFromString("HEAD2"), "", ""),
 				}),
 			}),
 		},
 	},
 	"0 HEAD\n1 BIRT ": {
 		Nodes: []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagHeader, "", "", []gedcom.Node{
+			gedcom.NewNodeWithChildren(nil, gedcom.TagHeader, "", "", []gedcom.Node{
 				gedcom.NewBirthNode(nil, "", "", nil),
 			}),
 		},
@@ -217,7 +217,7 @@ var tests = map[string]*gedcom.Document{
 				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
 					gedcom.NewDateNode(nil, "1851", "", nil),
 				}),
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{
 					gedcom.NewDateNode(nil, "1856", "", nil),
 				}),
 			}),
@@ -226,8 +226,8 @@ var tests = map[string]*gedcom.Document{
 	"0 @F1@ FAM\n1 HUSB @P2@\n1 WIFE @P3@": {
 		Nodes: []gedcom.Node{
 			gedcom.NewFamilyNode(nil, "F1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagHusband, "@P2@", "", nil),
-				gedcom.NewSimpleNode(nil, gedcom.TagWife, "@P3@", "", nil),
+				gedcom.NewNode(nil, gedcom.TagHusband, "@P2@", ""),
+				gedcom.NewNode(nil, gedcom.TagWife, "@P3@", ""),
 			}),
 		},
 	},
@@ -301,7 +301,7 @@ func TestNewNode(t *testing.T) {
 		{gedcom.TagRomanized, gedcom.NewRomanizedVariationNode(nil, v, p, nil)},
 		{gedcom.TagSource, gedcom.NewSourceNode(nil, v, p, nil)},
 		{gedcom.TagType, gedcom.NewTypeNode(nil, v, p, nil)},
-		{gedcom.TagVersion, gedcom.NewSimpleNode(nil, gedcom.TagVersion, v, p, nil)},
+		{gedcom.TagVersion, gedcom.NewNode(nil, gedcom.TagVersion, v, p)},
 	} {
 		t.Run(test.tag.String(), func(t *testing.T) {
 			assert.Equal(t, test.expected, gedcom.NewNode(nil, test.tag, v, p))

@@ -17,7 +17,7 @@ type PlaceNode struct {
 // http://wiki-en.genealogy.net/GEDCOM/PLAC-Tag
 func NewPlaceNode(document *Document, value, pointer string, children []Node) *PlaceNode {
 	return &PlaceNode{
-		NewSimpleNode(document, TagPlace, value, pointer, children),
+		newSimpleNode(document, TagPlace, value, pointer, children),
 	}
 }
 

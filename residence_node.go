@@ -8,7 +8,7 @@ type ResidenceNode struct {
 // NewResidenceNode creates a new RESI node.
 func NewResidenceNode(document *Document, value, pointer string, children []Node) *ResidenceNode {
 	return &ResidenceNode{
-		NewSimpleNode(document, TagResidence, value, pointer, children),
+		newSimpleNode(document, TagResidence, value, pointer, children),
 	}
 }
 

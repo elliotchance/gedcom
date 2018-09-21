@@ -103,7 +103,7 @@ func TestValue(t *testing.T) {
 		want string
 	}{
 		{nil, ""},
-		{gedcom.NewSimpleNode(nil, gedcom.TagVersion, "foo", "", nil), "foo"},
+		{gedcom.NewNodeWithChildren(nil, gedcom.TagVersion, "foo", "", nil), "foo"},
 		{gedcom.NewNameNode(nil, "foo bar", "", nil), "foo bar"},
 	}
 
@@ -156,7 +156,7 @@ func TestPointer(t *testing.T) {
 		want string
 	}{
 		{nil, ""},
-		{gedcom.NewSimpleNode(nil, gedcom.TagVersion, "foo", "a", nil), "a"},
+		{gedcom.NewNodeWithChildren(nil, gedcom.TagVersion, "foo", "a", nil), "a"},
 		{gedcom.NewNameNode(nil, "foo bar", "b", nil), "b"},
 	}
 
@@ -173,7 +173,7 @@ func TestString(t *testing.T) {
 		want string
 	}{
 		{nil, ""},
-		{gedcom.NewSimpleNode(nil, gedcom.TagVersion, "foo", "", nil), "foo"},
+		{gedcom.NewNodeWithChildren(nil, gedcom.TagVersion, "foo", "", nil), "foo"},
 		{gedcom.NewNameNode(nil, "foo bar", "", nil), "foo bar"},
 	}
 
@@ -192,7 +192,7 @@ func TestDates(t *testing.T) {
 		{nil, nil},
 		{
 			[]gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagVersion, "foo", "", nil),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagVersion, "foo", "", nil),
 			},
 			nil,
 		},
@@ -262,7 +262,7 @@ func TestPlaces(t *testing.T) {
 		{nil, nil},
 		{
 			[]gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagVersion, "foo", "", nil),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagVersion, "foo", "", nil),
 			},
 			nil,
 		},

@@ -24,7 +24,7 @@ type PhoneticVariationNode struct {
 // NewPhoneticVariationNode creates a new FONE node.
 func NewPhoneticVariationNode(document *Document, value, pointer string, children []Node) *PhoneticVariationNode {
 	return &PhoneticVariationNode{
-		NewSimpleNode(document, TagPhonetic, value, pointer, children),
+		newSimpleNode(document, TagPhonetic, value, pointer, children),
 	}
 }
 

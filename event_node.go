@@ -9,7 +9,7 @@ type EventNode struct {
 // EventNode creates a new EVEN node.
 func NewEventNode(document *Document, value, pointer string, children []Node) *EventNode {
 	return &EventNode{
-		NewSimpleNode(document, TagEvent, value, pointer, children),
+		newSimpleNode(document, TagEvent, value, pointer, children),
 	}
 }
 

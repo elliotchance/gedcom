@@ -26,7 +26,7 @@ var familyTests = []struct {
 		doc: &gedcom.Document{
 			Nodes: []gedcom.Node{
 				gedcom.NewFamilyNode(nil, "F1", []gedcom.Node{
-					gedcom.NewSimpleNode(nil, gedcom.TagHusband, "@P1@", "", []gedcom.Node{}),
+					gedcom.NewNodeWithChildren(nil, gedcom.TagHusband, "@P1@", "", []gedcom.Node{}),
 				}),
 				gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{}),
 			},
@@ -38,7 +38,7 @@ var familyTests = []struct {
 		doc: &gedcom.Document{
 			Nodes: []gedcom.Node{
 				gedcom.NewFamilyNode(nil, "F2", []gedcom.Node{
-					gedcom.NewSimpleNode(nil, gedcom.TagWife, "@P3@", "", []gedcom.Node{}),
+					gedcom.NewNodeWithChildren(nil, gedcom.TagWife, "@P3@", "", []gedcom.Node{}),
 				}),
 				gedcom.NewIndividualNode(nil, "", "P3", []gedcom.Node{}),
 			},
@@ -106,12 +106,12 @@ func TestFamilyNode_Similarity(t *testing.T) {
 			doc: &gedcom.Document{
 				Nodes: []gedcom.Node{
 					gedcom.NewFamilyNode(nil, "F1", []gedcom.Node{
-						gedcom.NewSimpleNode(nil, gedcom.TagHusband, "@P1@", "", nil),
-						gedcom.NewSimpleNode(nil, gedcom.TagWife, "@P2@", "", nil),
+						gedcom.NewNodeWithChildren(nil, gedcom.TagHusband, "@P1@", "", nil),
+						gedcom.NewNodeWithChildren(nil, gedcom.TagWife, "@P2@", "", nil),
 					}),
 					gedcom.NewFamilyNode(nil, "F2", []gedcom.Node{
-						gedcom.NewSimpleNode(nil, gedcom.TagHusband, "@P3@", "", nil),
-						gedcom.NewSimpleNode(nil, gedcom.TagWife, "@P4@", "", nil),
+						gedcom.NewNodeWithChildren(nil, gedcom.TagHusband, "@P3@", "", nil),
+						gedcom.NewNodeWithChildren(nil, gedcom.TagWife, "@P4@", "", nil),
 					}),
 					gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 						name("Elliot Rupert de Peyster /Chance/"),
@@ -144,12 +144,12 @@ func TestFamilyNode_Similarity(t *testing.T) {
 			doc: &gedcom.Document{
 				Nodes: []gedcom.Node{
 					gedcom.NewFamilyNode(nil, "F1", []gedcom.Node{
-						gedcom.NewSimpleNode(nil, gedcom.TagHusband, "@P1@", "", nil),
-						gedcom.NewSimpleNode(nil, gedcom.TagWife, "@P2@", "", nil),
+						gedcom.NewNodeWithChildren(nil, gedcom.TagHusband, "@P1@", "", nil),
+						gedcom.NewNodeWithChildren(nil, gedcom.TagWife, "@P2@", "", nil),
 					}),
 					gedcom.NewFamilyNode(nil, "F2", []gedcom.Node{
-						gedcom.NewSimpleNode(nil, gedcom.TagHusband, "@P3@", "", nil),
-						gedcom.NewSimpleNode(nil, gedcom.TagWife, "@P4@", "", nil),
+						gedcom.NewNodeWithChildren(nil, gedcom.TagHusband, "@P3@", "", nil),
+						gedcom.NewNodeWithChildren(nil, gedcom.TagWife, "@P4@", "", nil),
 					}),
 					gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 						name("Elliot Rupert de Peyster /Chance/"),
@@ -179,12 +179,12 @@ func TestFamilyNode_Similarity(t *testing.T) {
 			doc: &gedcom.Document{
 				Nodes: []gedcom.Node{
 					gedcom.NewFamilyNode(nil, "F1", []gedcom.Node{
-						gedcom.NewSimpleNode(nil, gedcom.TagHusband, "@P1@", "", nil),
-						gedcom.NewSimpleNode(nil, gedcom.TagWife, "@P2@", "", nil),
+						gedcom.NewNodeWithChildren(nil, gedcom.TagHusband, "@P1@", "", nil),
+						gedcom.NewNodeWithChildren(nil, gedcom.TagWife, "@P2@", "", nil),
 					}),
 					gedcom.NewFamilyNode(nil, "F2", []gedcom.Node{
-						gedcom.NewSimpleNode(nil, gedcom.TagHusband, "@P3@", "", nil),
-						gedcom.NewSimpleNode(nil, gedcom.TagWife, "@P4@", "", nil),
+						gedcom.NewNodeWithChildren(nil, gedcom.TagHusband, "@P3@", "", nil),
+						gedcom.NewNodeWithChildren(nil, gedcom.TagWife, "@P4@", "", nil),
 					}),
 					gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 						name("Elliot Rupert de Peyster /Chance/"),

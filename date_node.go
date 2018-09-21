@@ -137,7 +137,7 @@ type DateNode struct {
 // NewDateNode creates a new DATE node.
 func NewDateNode(document *Document, value, pointer string, children []Node) *DateNode {
 	return &DateNode{
-		NewSimpleNode(document, TagDate, value, pointer, children),
+		newSimpleNode(document, TagDate, value, pointer, children),
 		false, Date{}, Date{},
 	}
 }

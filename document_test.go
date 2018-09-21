@@ -43,7 +43,7 @@ var documentTests = []struct {
 				gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 					gedcom.NewNameNode(nil, "Joe /Bloggs/", "", []gedcom.Node{}),
 				}),
-				gedcom.NewSimpleNode(nil, gedcom.TagVersion, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagVersion, "", "", []gedcom.Node{}),
 				gedcom.NewIndividualNode(nil, "", "P2", []gedcom.Node{
 					gedcom.NewNameNode(nil, "John /Doe/", "", []gedcom.Node{}),
 				}),

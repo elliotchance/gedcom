@@ -35,7 +35,7 @@ var individualTests = []struct {
 	{
 		node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 			gedcom.NewNameNode(nil, "Joe /Bloggs/", "", []gedcom.Node{}),
-			gedcom.NewSimpleNode(nil, gedcom.TagVersion, "", "", []gedcom.Node{}),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagVersion, "", "", []gedcom.Node{}),
 			gedcom.NewNameNode(nil, "John /Doe/", "", []gedcom.Node{}),
 		}),
 		names: []*gedcom.NameNode{
@@ -46,7 +46,7 @@ var individualTests = []struct {
 	},
 	{
 		node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagSex, "M", "", []gedcom.Node{}),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagSex, "M", "", []gedcom.Node{}),
 		}),
 		names: []*gedcom.NameNode{},
 		sex:   gedcom.SexMale,
@@ -54,7 +54,7 @@ var individualTests = []struct {
 	{
 		node: gedcom.NewIndividualNode(nil, "", "P2", []gedcom.Node{
 			gedcom.NewNameNode(nil, "Joan /Bloggs/", "", []gedcom.Node{}),
-			gedcom.NewSimpleNode(nil, gedcom.TagSex, "F", "", []gedcom.Node{}),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagSex, "F", "", []gedcom.Node{}),
 		}),
 		names: []*gedcom.NameNode{
 			gedcom.NewNameNode(nil, "Joan /Bloggs/", "", []gedcom.Node{}),
@@ -115,7 +115,7 @@ func TestIndividualNode_Births(t *testing.T) {
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
 			}),
 			births: []*gedcom.BirthNode{
 				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{}),
@@ -124,7 +124,7 @@ func TestIndividualNode_Births(t *testing.T) {
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewBirthNode(nil, "foo", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
 				gedcom.NewBirthNode(nil, "bar", "", []gedcom.Node{}),
 			}),
 			births: []*gedcom.BirthNode{
@@ -160,36 +160,36 @@ func TestIndividualNode_Baptisms(t *testing.T) {
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBaptism, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBaptism, "", "", []gedcom.Node{}),
 			}),
 			baptisms: []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBaptism, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBaptism, "", "", []gedcom.Node{}),
 			},
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagLDSBaptism, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagLDSBaptism, "", "", []gedcom.Node{}),
 			}),
 			baptisms: []gedcom.Node{},
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBaptism, "", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBaptism, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
 			}),
 			baptisms: []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBaptism, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBaptism, "", "", []gedcom.Node{}),
 			},
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBaptism, "foo", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagBaptism, "bar", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBaptism, "foo", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBaptism, "bar", "", []gedcom.Node{}),
 			}),
 			baptisms: []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBaptism, "foo", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagBaptism, "bar", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBaptism, "foo", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBaptism, "bar", "", []gedcom.Node{}),
 			},
 		},
 	}
@@ -220,30 +220,30 @@ func TestIndividualNode_Deaths(t *testing.T) {
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
 			}),
 			deaths: []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
 			},
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
 				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{}),
 			}),
 			deaths: []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
 			},
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "foo", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagBurial, "", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "bar", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "foo", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBurial, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "bar", "", []gedcom.Node{}),
 			}),
 			deaths: []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "foo", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "bar", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "foo", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "bar", "", []gedcom.Node{}),
 			},
 		},
 	}
@@ -274,30 +274,30 @@ func TestIndividualNode_Burials(t *testing.T) {
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBurial, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBurial, "", "", []gedcom.Node{}),
 			}),
 			burials: []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBurial, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBurial, "", "", []gedcom.Node{}),
 			},
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBurial, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBurial, "", "", []gedcom.Node{}),
 				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{}),
 			}),
 			burials: []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBurial, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBurial, "", "", []gedcom.Node{}),
 			},
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBurial, "foo", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagBaptism, "", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagBurial, "bar", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBurial, "foo", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBaptism, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBurial, "bar", "", []gedcom.Node{}),
 			}),
 			burials: []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBurial, "foo", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagBurial, "bar", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBurial, "foo", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBurial, "bar", "", []gedcom.Node{}),
 			},
 		},
 	}
@@ -338,35 +338,35 @@ func getDocument() *gedcom.Document {
 	//  -----
 	// P4   P5
 	f1 := gedcom.NewFamilyNode(nil, "F1", []gedcom.Node{
-		gedcom.NewSimpleNode(nil, gedcom.TagHusband, "@P1@", "", nil),
-		gedcom.NewSimpleNode(nil, gedcom.TagWife, "@P3@", "", nil),
-		gedcom.NewSimpleNode(nil, gedcom.TagChild, "@P4@", "", nil),
-		gedcom.NewSimpleNode(nil, gedcom.TagChild, "@P5@", "", nil),
+		gedcom.NewNodeWithChildren(nil, gedcom.TagHusband, "@P1@", "", nil),
+		gedcom.NewNodeWithChildren(nil, gedcom.TagWife, "@P3@", "", nil),
+		gedcom.NewNodeWithChildren(nil, gedcom.TagChild, "@P4@", "", nil),
+		gedcom.NewNodeWithChildren(nil, gedcom.TagChild, "@P5@", "", nil),
 	})
 
 	// P1 - P2
 	//    |
 	//   P6
 	f2 := gedcom.NewFamilyNode(nil, "F2", []gedcom.Node{
-		gedcom.NewSimpleNode(nil, gedcom.TagHusband, "@P1@", "", nil),
-		gedcom.NewSimpleNode(nil, gedcom.TagWife, "@P2@", "", nil),
-		gedcom.NewSimpleNode(nil, gedcom.TagChild, "@P6@", "", nil),
+		gedcom.NewNodeWithChildren(nil, gedcom.TagHusband, "@P1@", "", nil),
+		gedcom.NewNodeWithChildren(nil, gedcom.TagWife, "@P2@", "", nil),
+		gedcom.NewNodeWithChildren(nil, gedcom.TagChild, "@P6@", "", nil),
 	})
 
 	// P6 - ?
 	//    |
 	//   P7
 	f3 := gedcom.NewFamilyNode(nil, "F3", []gedcom.Node{
-		gedcom.NewSimpleNode(nil, gedcom.TagHusband, "@P6@", "", nil),
-		gedcom.NewSimpleNode(nil, gedcom.TagChild, "@P7@", "", nil),
+		gedcom.NewNodeWithChildren(nil, gedcom.TagHusband, "@P6@", "", nil),
+		gedcom.NewNodeWithChildren(nil, gedcom.TagChild, "@P7@", "", nil),
 	})
 
 	// ? - P3
 	//   |
 	//   P6
 	f4 := gedcom.NewFamilyNode(nil, "F4", []gedcom.Node{
-		gedcom.NewSimpleNode(nil, gedcom.TagWife, "@P3@", "", nil),
-		gedcom.NewSimpleNode(nil, gedcom.TagChild, "@P6@", "", nil),
+		gedcom.NewNodeWithChildren(nil, gedcom.TagWife, "@P3@", "", nil),
+		gedcom.NewNodeWithChildren(nil, gedcom.TagChild, "@P6@", "", nil),
 	})
 
 	return &gedcom.Document{
@@ -530,36 +530,36 @@ func TestIndividualNode_LDSBaptisms(t *testing.T) {
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagLDSBaptism, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagLDSBaptism, "", "", []gedcom.Node{}),
 			}),
 			baptisms: []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagLDSBaptism, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagLDSBaptism, "", "", []gedcom.Node{}),
 			},
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBaptism, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBaptism, "", "", []gedcom.Node{}),
 			}),
 			baptisms: []gedcom.Node{},
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagLDSBaptism, "", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagLDSBaptism, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
 			}),
 			baptisms: []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagLDSBaptism, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagLDSBaptism, "", "", []gedcom.Node{}),
 			},
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagLDSBaptism, "foo", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagLDSBaptism, "bar", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagLDSBaptism, "foo", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagLDSBaptism, "bar", "", []gedcom.Node{}),
 			}),
 			baptisms: []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagLDSBaptism, "foo", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagLDSBaptism, "bar", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagLDSBaptism, "foo", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagLDSBaptism, "bar", "", []gedcom.Node{}),
 			},
 		},
 	}
@@ -603,7 +603,7 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBaptism, "", "", []gedcom.Node{
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBaptism, "", "", []gedcom.Node{
 					gedcom.NewDateNode(nil, "Abt. Dec 1980", "", nil),
 				}),
 			}),
@@ -611,7 +611,7 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagLDSBaptism, "", "", []gedcom.Node{
+				gedcom.NewNodeWithChildren(nil, gedcom.TagLDSBaptism, "", "", []gedcom.Node{
 					gedcom.NewDateNode(nil, "Abt. Nov 1980", "", nil),
 				}),
 			}),
@@ -624,7 +624,7 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
 					gedcom.NewDateNode(nil, "1 Aug 1980", "", nil),
 				}),
-				gedcom.NewSimpleNode(nil, gedcom.TagBaptism, "", "", []gedcom.Node{
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBaptism, "", "", []gedcom.Node{
 					gedcom.NewDateNode(nil, "Abt. Jan 1980", "", nil),
 				}),
 			}),
@@ -644,7 +644,7 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
 					gedcom.NewDateNode(nil, "1 Aug 1980", "", nil),
 				}),
-				gedcom.NewSimpleNode(nil, gedcom.TagLDSBaptism, "", "", []gedcom.Node{
+				gedcom.NewNodeWithChildren(nil, gedcom.TagLDSBaptism, "", "", []gedcom.Node{
 					gedcom.NewDateNode(nil, "23 Mar 1979", "", nil),
 				}),
 			}),
@@ -653,14 +653,14 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagLDSBaptism, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagLDSBaptism, "", "", []gedcom.Node{}),
 			}),
 			expected: nil,
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagLDSBaptism, "", "", []gedcom.Node{
+				gedcom.NewNodeWithChildren(nil, gedcom.TagLDSBaptism, "", "", []gedcom.Node{
 					gedcom.NewDateNode(nil, "1 Aug 1980", "", nil),
 				}),
 			}),
@@ -705,7 +705,7 @@ func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 		// A single date.
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{
 					gedcom.NewDateNode(nil, "1 Aug 1980", "", nil),
 				}),
 			}),
@@ -713,7 +713,7 @@ func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBurial, "", "", []gedcom.Node{
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBurial, "", "", []gedcom.Node{
 					gedcom.NewDateNode(nil, "Abt. Dec 1980", "", nil),
 				}),
 			}),
@@ -724,7 +724,7 @@ func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 		{
 			// Multiple death dates always returns the earliest.
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{
 					gedcom.NewDateNode(nil, "1 Aug 1980", "", nil),
 					gedcom.NewDateNode(nil, "Mar 1980", "", nil),
 					gedcom.NewDateNode(nil, "Jun 1980", "", nil),
@@ -735,7 +735,7 @@ func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 		{
 			// Multiple burial dates always returns the earliest.
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagBurial, "", "", []gedcom.Node{
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBurial, "", "", []gedcom.Node{
 					gedcom.NewDateNode(nil, "3 Aug 1980", "", nil),
 					gedcom.NewDateNode(nil, "Apr 1980", "", nil),
 				}),
@@ -745,10 +745,10 @@ func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 		{
 			// Death is before burial.
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{
 					gedcom.NewDateNode(nil, "1 Aug 1980", "", nil),
 				}),
-				gedcom.NewSimpleNode(nil, gedcom.TagBurial, "", "", []gedcom.Node{
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBurial, "", "", []gedcom.Node{
 					gedcom.NewDateNode(nil, "3 Aug 1980", "", nil),
 				}),
 			}),
@@ -757,10 +757,10 @@ func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 		{
 			// Burial is before death.
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{
 					gedcom.NewDateNode(nil, "3 Aug 1980", "", nil),
 				}),
-				gedcom.NewSimpleNode(nil, gedcom.TagBurial, "", "", []gedcom.Node{
+				gedcom.NewNodeWithChildren(nil, gedcom.TagBurial, "", "", []gedcom.Node{
 					gedcom.NewDateNode(nil, "1 Aug 1980", "", nil),
 				}),
 			}),
@@ -788,7 +788,7 @@ func born(value string) *gedcom.BirthNode {
 }
 
 func died(value string) gedcom.Node {
-	return gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{
+	return gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{
 		gedcom.NewDateNode(nil, value, "", []gedcom.Node{}),
 	})
 }
@@ -798,13 +798,13 @@ func name(value string) gedcom.Node {
 }
 
 func baptised(value string) gedcom.Node {
-	return gedcom.NewSimpleNode(nil, gedcom.TagBaptism, "", "", []gedcom.Node{
+	return gedcom.NewNodeWithChildren(nil, gedcom.TagBaptism, "", "", []gedcom.Node{
 		gedcom.NewDateNode(nil, value, "", []gedcom.Node{}),
 	})
 }
 
 func buried(value string) gedcom.Node {
-	return gedcom.NewSimpleNode(nil, gedcom.TagBurial, "", "", []gedcom.Node{
+	return gedcom.NewNodeWithChildren(nil, gedcom.TagBurial, "", "", []gedcom.Node{
 		gedcom.NewDateNode(nil, value, "", []gedcom.Node{}),
 	})
 }
@@ -1234,17 +1234,17 @@ func family(pointer, husband, wife string, children ...string) *gedcom.FamilyNod
 	nodes := []gedcom.Node{}
 
 	if husband != "" {
-		nodes = append(nodes, gedcom.NewSimpleNode(nil,
+		nodes = append(nodes, gedcom.NewNodeWithChildren(nil,
 			gedcom.TagHusband, "@"+husband+"@", "", nil))
 	}
 
 	if wife != "" {
-		nodes = append(nodes, gedcom.NewSimpleNode(nil,
+		nodes = append(nodes, gedcom.NewNodeWithChildren(nil,
 			gedcom.TagWife, "@"+wife+"@", "", nil))
 	}
 
 	for _, child := range children {
-		nodes = append(nodes, gedcom.NewSimpleNode(nil,
+		nodes = append(nodes, gedcom.NewNodeWithChildren(nil,
 			gedcom.TagChild, "@"+child+"@", "", nil))
 	}
 
@@ -1323,7 +1323,7 @@ func TestIndividualNode_AllEvents(t *testing.T) {
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagNote, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagNote, "", "", []gedcom.Node{}),
 			}),
 			events: []gedcom.Node{
 				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{}),
@@ -1332,22 +1332,22 @@ func TestIndividualNode_AllEvents(t *testing.T) {
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
 			}),
 			events: []gedcom.Node{
 				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
 			},
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewBirthNode(nil, "foo", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
 				gedcom.NewBirthNode(nil, "bar", "", []gedcom.Node{}),
 			}),
 			events: []gedcom.Node{
 				gedcom.NewBirthNode(nil, "foo", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
 				gedcom.NewBirthNode(nil, "bar", "", []gedcom.Node{}),
 			},
 		},

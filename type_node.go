@@ -13,6 +13,6 @@ type TypeNode struct {
 // NewTypeNode creates a new TYPE node.
 func NewTypeNode(document *Document, value, pointer string, children []Node) *TypeNode {
 	return &TypeNode{
-		NewSimpleNode(document, TagType, value, pointer, children),
+		newSimpleNode(document, TagType, value, pointer, children),
 	}
 }

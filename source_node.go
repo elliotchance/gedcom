@@ -7,7 +7,7 @@ type SourceNode struct {
 
 func NewSourceNode(document *Document, value, pointer string, children []Node) *SourceNode {
 	return &SourceNode{
-		NewSimpleNode(document, TagSource, value, pointer, children),
+		newSimpleNode(document, TagSource, value, pointer, children),
 	}
 }
 

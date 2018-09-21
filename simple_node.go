@@ -12,10 +12,9 @@ type SimpleNode struct {
 
 // NewSimpleNode creates a non-specific node.
 //
-// Note: You should not use this constructor for general use. Instead use
-// NewNode which will return a *SimpleNode if a more appropriate node type
-// exists for the tag.
-func NewSimpleNode(document *Document, tag Tag, value, pointer string, children []Node) *SimpleNode {
+// Unlike all of the other node types this constructor is not public because it
+// is used internally by NewNode if a specific node type can not be determined.
+func newSimpleNode(document *Document, tag Tag, value, pointer string, children []Node) *SimpleNode {
 	return &SimpleNode{
 		document: document,
 		tag:      tag,

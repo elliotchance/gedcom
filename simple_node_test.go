@@ -9,7 +9,7 @@ import (
 )
 
 func TestSimpleNode_ChildNodes(t *testing.T) {
-	node := gedcom.NewSimpleNode(nil, gedcom.TagText, "", "", nil)
+	node := gedcom.NewNodeWithChildren(nil, gedcom.TagText, "", "", nil)
 
 	assert.Len(t, node.Nodes(), 0)
 }
@@ -29,38 +29,39 @@ func TestIsNil(t *testing.T) {
 func TestSimpleNode_Equals(t *testing.T) {
 	Equals := tf.Function(t, (*gedcom.SimpleNode).Equals)
 
-	s0 := (*gedcom.SimpleNode)(nil)
+	left := []*gedcom.SimpleNode{
+		(*gedcom.SimpleNode)(nil),
+		gedcom.NewNode(nil, gedcom.TagVersion, "", "").(*gedcom.SimpleNode),
+		gedcom.NewNode(nil, gedcom.TagVersion, "a", "").(*gedcom.SimpleNode),
+		gedcom.NewNode(nil, gedcom.TagVersion, "", "b").(*gedcom.SimpleNode),
+		gedcom.NewNode(nil, gedcom.TagVersion, "a", "b").(*gedcom.SimpleNode),
+	}
 
-	// These are the same.
-	s1 := gedcom.NewSimpleNode(nil, gedcom.TagName, "", "", nil)
-	s2 := gedcom.NewNameNode(nil, "", "", nil)
+	right := []gedcom.Node{
+		(*gedcom.SimpleNode)(nil),
+		gedcom.NewNode(nil, gedcom.TagVersion, "", "").(*gedcom.SimpleNode),
+		gedcom.NewNode(nil, gedcom.TagVersion, "a", "").(*gedcom.SimpleNode),
+		gedcom.NewNode(nil, gedcom.TagVersion, "", "b").(*gedcom.SimpleNode),
+		gedcom.NewNode(nil, gedcom.TagVersion, "a", "b").(*gedcom.SimpleNode),
+		gedcom.NewNameNode(nil, "", "", nil),
+	}
 
-	// These are different in some way from each other.
-	s3 := gedcom.NewSimpleNode(nil, gedcom.TagName, "", "a", nil)
-	s4 := gedcom.NewNameNode(nil, "a", "", nil)
-	s5 := gedcom.NewNameNode(nil, "", "b", nil)
-	s6 := gedcom.NewSimpleNode(nil, gedcom.TagVersion, "", "a", nil)
+	const N = false
+	const Y = true
 
-	// Nils
-	Equals(s0, s0).Returns(false)
-	Equals(s0, s1).Returns(false)
-	Equals(s1, s0).Returns(false)
+	expected := [][]bool{
+		{N, N, N, N, N, N},
+		{N, Y, N, N, N, N},
+		{N, N, Y, N, N, N},
+		{N, N, N, Y, N, N},
+		{N, N, N, N, Y, N},
+	}
 
-	Equals(s1, s1).Returns(true)
-	Equals(s1, s2).Returns(true)
-
-	Equals(s1, s3).Returns(false)
-	Equals(s1, s4).Returns(false)
-	Equals(s1, s5).Returns(false)
-
-	Equals(s3, s3).Returns(true)
-	Equals(s3, s4).Returns(false)
-	Equals(s3, s5).Returns(false)
-	Equals(s3, s6).Returns(false)
-	Equals(s6, s3).Returns(false)
-	Equals(s6, s4).Returns(false)
-	Equals(s6, s5).Returns(false)
-	Equals(s6, s6).Returns(true)
+	for i, l := range left {
+		for j, r := range right {
+			Equals(l, r).Returns(expected[i][j])
+		}
+	}
 }
 
 func TestSimpleNode_Tag(t *testing.T) {
