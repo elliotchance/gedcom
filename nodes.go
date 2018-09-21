@@ -1,5 +1,7 @@
 package gedcom
 
+import "reflect"
+
 // nodeCache is used by NodesWithTag. Even though the lookup of child tags are
 // fairly inexpensive it happens a lot and its common for the same paths to be
 // looked up many time. Especially when doing larger task like comparing GEDCOM
@@ -88,4 +90,25 @@ func HasNestedNode(node Node, lookingFor Node) bool {
 	}
 
 	return false
+}
+
+// CastNodes creates a slice of a more specific node type.
+//
+// All Nodes must be the same type and the same as the provided t.
+func CastNodes(nodes []Node, t interface{}) interface{} {
+	size := len(nodes)
+	nodeType := reflect.TypeOf(t)
+	sliceType := reflect.SliceOf(nodeType)
+	slice := reflect.MakeSlice(sliceType, size, size)
+
+	for i, node := range nodes {
+		value := reflect.ValueOf(node)
+		slice.Index(i).Set(value)
+	}
+
+	return slice.Interface()
+}
+
+func castNodesWithTag(node Node, tag Tag, t interface{}) interface{} {
+	return CastNodes(NodesWithTag(node, tag), t)
 }
