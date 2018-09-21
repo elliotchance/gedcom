@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
-	"github.com/elliotchance/gedcom/html"
+	"github.com/elliotchance/gedcom/util"
 	"sort"
 )
 
@@ -19,16 +19,6 @@ func newSurnameIndex(document *gedcom.Document, selectedLetter rune) *surnameInd
 	}
 }
 
-func stringInSlice(slice []string, s string) bool {
-	for _, e := range slice {
-		if s == e {
-			return true
-		}
-	}
-
-	return false
-}
-
 func (c *surnameIndex) String() string {
 	surnames := []string{}
 
@@ -38,7 +28,8 @@ func (c *surnameIndex) String() string {
 		}
 
 		surname := individual.Name().Surname()
-		if surnameStartsWith(individual, c.selectedLetter) && !stringInSlice(surnames, surname) {
+		exists := util.StringSliceContains(surnames, surname)
+		if surnameStartsWith(individual, c.selectedLetter) && !exists {
 			surnames = append(surnames, surname)
 		}
 	}
@@ -52,7 +43,5 @@ func (c *surnameIndex) String() string {
 		pills = append(pills, newNavLink(surname, "#"+surname, false))
 	}
 
-	return html.NewRow(html.NewColumn(
-		html.EntireRow, html.NewDiv("", newNavPills(pills)),
-	)).String()
+	return newNavPillsRow(pills).String()
 }
