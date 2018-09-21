@@ -28,7 +28,8 @@ func (c *placePage) String() string {
 	}
 
 	for _, node := range place.nodes {
-		table = append(table, newPlaceEvent(c.document, node))
+		placeEvent := newPlaceEvent(c.document, node)
+		table = append(table, placeEvent)
 	}
 
 	return html.NewPage(
