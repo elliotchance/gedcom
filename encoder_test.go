@@ -14,7 +14,7 @@ func TestGedcomLine(t *testing.T) {
 	GedcomLine(0, gedcom.NewBirthNode(nil, "foo", "72", nil)).
 		Returns("0 @72@ BIRT foo")
 
-	GedcomLine(3, gedcom.NewSimpleNode(nil, gedcom.TagDeath, "bar", "baz", nil)).
+	GedcomLine(3, gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "bar", "baz", nil)).
 		Returns("3 @baz@ DEAT bar")
 
 	GedcomLine(2, gedcom.NewDateNode(nil, "3 SEP 1945", "", nil)).

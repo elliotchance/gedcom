@@ -214,7 +214,7 @@ func TestBlacklistTagFilter(t *testing.T) {
 
 func TestOfficialTagFilter(t *testing.T) {
 	root := gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-		gedcom.NewSimpleNode(nil, gedcom.UnofficialTagCreated, "Elliot /Chance/", "", []gedcom.Node{
+		gedcom.NewNodeWithChildren(nil, gedcom.UnofficialTagCreated, "Elliot /Chance/", "", []gedcom.Node{
 			gedcom.NewDateNode(nil, "3 Mar 2007", "", nil),
 		}),
 		gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
@@ -264,7 +264,7 @@ func TestSimpleNameFilter(t *testing.T) {
 					gedcom.NewDateNode(nil, "6 MAY 1989", "", nil),
 				}),
 				gedcom.NewNameNode(nil, "Elliot /Chance/", "", []gedcom.Node{
-					gedcom.NewSimpleNode(nil, gedcom.TagSurname, "Smith", "", nil),
+					gedcom.NewNodeWithChildren(nil, gedcom.TagSurname, "Smith", "", nil),
 				}),
 			}),
 			expected: `0 @P1@ INDI
@@ -276,8 +276,8 @@ func TestSimpleNameFilter(t *testing.T) {
 		{
 			root: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewNameNode(nil, "", "", []gedcom.Node{
-					gedcom.NewSimpleNode(nil, gedcom.TagGivenName, "Bob", "", nil),
-					gedcom.NewSimpleNode(nil, gedcom.TagSurname, "Smith", "", nil),
+					gedcom.NewNodeWithChildren(nil, gedcom.TagGivenName, "Bob", "", nil),
+					gedcom.NewNodeWithChildren(nil, gedcom.TagSurname, "Smith", "", nil),
 				}),
 				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
 					gedcom.NewDateNode(nil, "6 MAY 1989", "", nil),

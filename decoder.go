@@ -158,24 +158,28 @@ func parseLine(document *Document, line string) (Node, int, error) {
 // If the node tag is recognised as a more specific type, such as *DateNode then
 // that will be returned. Otherwise a *SimpleNode will be used.
 func NewNode(document *Document, tag Tag, value, pointer string) Node {
+	return NewNodeWithChildren(document, tag, value, pointer, nil)
+}
+
+func NewNodeWithChildren(document *Document, tag Tag, value, pointer string, children []Node) Node {
 	switch tag {
 	case TagBirth:
-		return NewBirthNode(document, value, pointer, nil)
+		return NewBirthNode(document, value, pointer, children)
 
 	case TagDate:
-		return NewDateNode(document, value, pointer, nil)
+		return NewDateNode(document, value, pointer, children)
 
 	case TagEvent:
-		return NewEventNode(document, value, pointer, nil)
+		return NewEventNode(document, value, pointer, children)
 
 	case TagFamily:
-		return NewFamilyNode(document, pointer, nil)
+		return NewFamilyNode(document, pointer, children)
 
 	case TagFormat:
 		return NewFormatNode(document, value, pointer, nil)
 
 	case TagIndividual:
-		return NewIndividualNode(document, value, pointer, nil)
+		return NewIndividualNode(document, value, pointer, children)
 
 	case TagLatitude:
 		return NewLatitudeNode(document, value, pointer, nil)
@@ -187,7 +191,7 @@ func NewNode(document *Document, tag Tag, value, pointer string) Node {
 		return NewMapNode(document, value, pointer, nil)
 
 	case TagName:
-		return NewNameNode(document, value, pointer, nil)
+		return NewNameNode(document, value, pointer, children)
 
 	case TagNote:
 		return NewNoteNode(document, value, pointer, nil)
@@ -196,20 +200,20 @@ func NewNode(document *Document, tag Tag, value, pointer string) Node {
 		return NewPhoneticVariationNode(document, value, pointer, nil)
 
 	case TagPlace:
-		return NewPlaceNode(document, value, pointer, nil)
+		return NewPlaceNode(document, value, pointer, children)
 
 	case TagResidence:
-		return NewResidenceNode(document, value, pointer, nil)
+		return NewResidenceNode(document, value, pointer, children)
 
 	case TagRomanized:
 		return NewRomanizedVariationNode(document, value, pointer, nil)
 
 	case TagSource:
-		return NewSourceNode(document, value, pointer, nil)
+		return NewSourceNode(document, value, pointer, children)
 
 	case TagType:
 		return NewTypeNode(document, value, pointer, nil)
 	}
 
-	return NewSimpleNode(document, tag, value, pointer, nil)
+	return newSimpleNode(document, tag, value, pointer, children)
 }

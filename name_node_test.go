@@ -135,8 +135,8 @@ var nameTests = []struct {
 		// The GivenName overrides the givenName name if provided. When multiple
 		// GivenNames are provided then it will always use the first one.
 		node: gedcom.NewNameNode(nil, "First /Last/ II", "", []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagGivenName, " Other  Name ", "", nil),
-			gedcom.NewSimpleNode(nil, gedcom.TagGivenName, "Uh-oh", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagGivenName, " Other  Name ", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagGivenName, "Uh-oh", "", nil),
 		}),
 		title:         "",
 		prefix:        "",
@@ -151,8 +151,8 @@ var nameTests = []struct {
 		// The Surname overrides the surname name if provided. When multiple
 		// Surnames are provided then it will always use the first one.
 		node: gedcom.NewNameNode(nil, "First /Last/ II", "", []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagSurname, " Other  name ", "", nil),
-			gedcom.NewSimpleNode(nil, gedcom.TagSurname, "uh-oh", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagSurname, " Other  name ", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagSurname, "uh-oh", "", nil),
 		}),
 		title:         "",
 		prefix:        "",
@@ -165,8 +165,8 @@ var nameTests = []struct {
 	},
 	{
 		node: gedcom.NewNameNode(nil, "First /Last/ Esq.", "", []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagNamePrefix, " Mr ", "", nil),
-			gedcom.NewSimpleNode(nil, gedcom.TagNamePrefix, "Dr", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagNamePrefix, " Mr ", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagNamePrefix, "Dr", "", nil),
 		}),
 		title:         "",
 		prefix:        "Mr",
@@ -182,9 +182,9 @@ var nameTests = []struct {
 		// When multiple name suffixes are provided then it will always use the
 		// first one.
 		node: gedcom.NewNameNode(nil, "First /Last/ Suffix", "", []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagNameSuffix, " Esq. ", "", nil),
-			gedcom.NewSimpleNode(nil, gedcom.TagNameSuffix, "Dr", "", nil),
-			gedcom.NewSimpleNode(nil, gedcom.TagNamePrefix, "Sir", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagNameSuffix, " Esq. ", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagNameSuffix, "Dr", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagNamePrefix, "Sir", "", nil),
 		}),
 		title:         "",
 		prefix:        "Sir",
@@ -197,8 +197,8 @@ var nameTests = []struct {
 	},
 	{
 		node: gedcom.NewNameNode(nil, "First /Last/ Esq.", "", []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagSurnamePrefix, " Foo ", "", nil),
-			gedcom.NewSimpleNode(nil, gedcom.TagSurnamePrefix, "Bar", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagSurnamePrefix, " Foo ", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagSurnamePrefix, "Bar", "", nil),
 		}),
 		title:         "",
 		prefix:        "",
@@ -211,8 +211,8 @@ var nameTests = []struct {
 	},
 	{
 		node: gedcom.NewNameNode(nil, "First /Last/ Esq.", "", []gedcom.Node{
-			gedcom.NewSimpleNode(nil, gedcom.TagTitle, " Grand  Duke ", "", nil),
-			gedcom.NewSimpleNode(nil, gedcom.TagTitle, "Nobody", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagTitle, " Grand  Duke ", "", nil),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagTitle, "Nobody", "", nil),
 		}),
 		title:         "Grand Duke",
 		prefix:        "",
@@ -302,12 +302,12 @@ func TestNameNode_Format(t *testing.T) {
 	Format(nil, "%f %l").Returns("")
 
 	name := gedcom.NewNameNode(nil, "", "", []gedcom.Node{
-		gedcom.NewSimpleNode(nil, gedcom.TagGivenName, "Given", "", nil),
-		gedcom.NewSimpleNode(nil, gedcom.TagSurname, "Surname", "", nil),
-		gedcom.NewSimpleNode(nil, gedcom.TagNamePrefix, "Prefix", "", nil),
-		gedcom.NewSimpleNode(nil, gedcom.TagNameSuffix, "Suffix", "", nil),
-		gedcom.NewSimpleNode(nil, gedcom.TagSurnamePrefix, "SurnamePrefix", "", nil),
-		gedcom.NewSimpleNode(nil, gedcom.TagTitle, "Title", "", nil),
+		gedcom.NewNodeWithChildren(nil, gedcom.TagGivenName, "Given", "", nil),
+		gedcom.NewNodeWithChildren(nil, gedcom.TagSurname, "Surname", "", nil),
+		gedcom.NewNodeWithChildren(nil, gedcom.TagNamePrefix, "Prefix", "", nil),
+		gedcom.NewNodeWithChildren(nil, gedcom.TagNameSuffix, "Suffix", "", nil),
+		gedcom.NewNodeWithChildren(nil, gedcom.TagSurnamePrefix, "SurnamePrefix", "", nil),
+		gedcom.NewNodeWithChildren(nil, gedcom.TagTitle, "Title", "", nil),
 	})
 
 	Format(name, "").Returns("")

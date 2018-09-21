@@ -8,7 +8,7 @@ type BirthNode struct {
 // NewBirthNode creates a new BIRT node.
 func NewBirthNode(document *Document, value, pointer string, children []Node) *BirthNode {
 	return &BirthNode{
-		NewSimpleNode(document, TagBirth, value, pointer, children),
+		newSimpleNode(document, TagBirth, value, pointer, children),
 	}
 }
 

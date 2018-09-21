@@ -30,7 +30,7 @@ type NameNode struct {
 
 func NewNameNode(document *Document, value, pointer string, children []Node) *NameNode {
 	return &NameNode{
-		NewSimpleNode(document, TagName, value, pointer, children),
+		newSimpleNode(document, TagName, value, pointer, children),
 	}
 }
 

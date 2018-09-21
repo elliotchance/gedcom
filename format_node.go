@@ -9,6 +9,6 @@ type FormatNode struct {
 // NewFormatNode creates a new FORM node.
 func NewFormatNode(document *Document, value, pointer string, children []Node) *FormatNode {
 	return &FormatNode{
-		NewSimpleNode(document, TagFormat, value, pointer, children),
+		newSimpleNode(document, TagFormat, value, pointer, children),
 	}
 }

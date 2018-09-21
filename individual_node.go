@@ -20,7 +20,7 @@ type SpouseChildren map[*IndividualNode]IndividualNodes
 
 func NewIndividualNode(document *Document, value, pointer string, children []Node) *IndividualNode {
 	return &IndividualNode{
-		NewSimpleNode(document, TagIndividual, value, pointer, children),
+		newSimpleNode(document, TagIndividual, value, pointer, children),
 		false, false, nil, nil,
 	}
 }

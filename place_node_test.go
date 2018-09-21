@@ -172,7 +172,7 @@ func TestPlaceNode_PhoneticVariations(t *testing.T) {
 		{
 			node: gedcom.NewPlaceNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewPhoneticVariationNode(nil, "", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
 			}),
 			expected: []*gedcom.PhoneticVariationNode{
 				gedcom.NewPhoneticVariationNode(nil, "", "", []gedcom.Node{}),
@@ -181,7 +181,7 @@ func TestPlaceNode_PhoneticVariations(t *testing.T) {
 		{
 			node: gedcom.NewPlaceNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewPhoneticVariationNode(nil, "foo", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
 				gedcom.NewPhoneticVariationNode(nil, "bar", "", []gedcom.Node{}),
 			}),
 			expected: []*gedcom.PhoneticVariationNode{
@@ -226,7 +226,7 @@ func TestPlaceNode_RomanizedVariations(t *testing.T) {
 		{
 			node: gedcom.NewPlaceNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewRomanizedVariationNode(nil, "", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
 			}),
 			expected: []*gedcom.RomanizedVariationNode{
 				gedcom.NewRomanizedVariationNode(nil, "", "", []gedcom.Node{}),
@@ -235,7 +235,7 @@ func TestPlaceNode_RomanizedVariations(t *testing.T) {
 		{
 			node: gedcom.NewPlaceNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewRomanizedVariationNode(nil, "foo", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
 				gedcom.NewRomanizedVariationNode(nil, "bar", "", []gedcom.Node{}),
 			}),
 			expected: []*gedcom.RomanizedVariationNode{
@@ -326,7 +326,7 @@ func TestPlaceNode_Notes(t *testing.T) {
 		{
 			node: gedcom.NewPlaceNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewNoteNode(nil, "", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
 			}),
 			expected: []*gedcom.NoteNode{
 				gedcom.NewNoteNode(nil, "", "", []gedcom.Node{}),
@@ -335,7 +335,7 @@ func TestPlaceNode_Notes(t *testing.T) {
 		{
 			node: gedcom.NewPlaceNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewNoteNode(nil, "foo", "", []gedcom.Node{}),
-				gedcom.NewSimpleNode(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
+				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
 				gedcom.NewNoteNode(nil, "bar", "", []gedcom.Node{}),
 			}),
 			expected: []*gedcom.NoteNode{

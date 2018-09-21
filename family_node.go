@@ -9,7 +9,7 @@ type FamilyNode struct {
 
 func NewFamilyNode(document *Document, pointer string, children []Node) *FamilyNode {
 	return &FamilyNode{
-		NewSimpleNode(document, TagFamily, "", pointer, children),
+		newSimpleNode(document, TagFamily, "", pointer, children),
 		false, false, nil, nil,
 	}
 }

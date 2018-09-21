@@ -11,6 +11,6 @@ type LongitudeNode struct {
 // NewLongitudeNode creates a new LONG node.
 func NewLongitudeNode(document *Document, value, pointer string, children []Node) *LongitudeNode {
 	return &LongitudeNode{
-		NewSimpleNode(document, TagLongitude, value, pointer, children),
+		newSimpleNode(document, TagLongitude, value, pointer, children),
 	}
 }

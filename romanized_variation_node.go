@@ -21,7 +21,7 @@ type RomanizedVariationNode struct {
 // NewRomanizedVariationNode creates a new ROMN node.
 func NewRomanizedVariationNode(document *Document, value, pointer string, children []Node) *RomanizedVariationNode {
 	return &RomanizedVariationNode{
-		NewSimpleNode(document, TagRomanized, value, pointer, children),
+		newSimpleNode(document, TagRomanized, value, pointer, children),
 	}
 }
 

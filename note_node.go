@@ -9,6 +9,6 @@ type NoteNode struct {
 // NewNoteNode creates a new NOTE node.
 func NewNoteNode(document *Document, value, pointer string, children []Node) *NoteNode {
 	return &NoteNode{
-		NewSimpleNode(document, TagNote, value, pointer, children),
+		newSimpleNode(document, TagNote, value, pointer, children),
 	}
 }
