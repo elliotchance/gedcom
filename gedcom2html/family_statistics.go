@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html"
-	"strconv"
 )
 
 type familyStatistics struct {
@@ -32,9 +31,9 @@ func (c *familyStatistics) String() string {
 	}
 
 	s := html.NewComponents(
-		newKeyedTableRow("Total Families", strconv.Itoa(total), true),
-		newKeyedTableRow("Marriage Events", strconv.Itoa(marriageEvents), true),
-		newKeyedTableRow("Divorce Events", strconv.Itoa(divorceEvents), true),
+		newKeyedTableRow("Total Families", html.NewNumber(total).String(), true),
+		newKeyedTableRow("Marriage Events", html.NewNumber(marriageEvents).String(), true),
+		newKeyedTableRow("Divorce Events", html.NewNumber(divorceEvents).String(), true),
 	)
 
 	return newCard("Families", noBadgeCount, html.NewTable("", s)).String()

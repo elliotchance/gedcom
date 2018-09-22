@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html"
-	"strconv"
 )
 
 type individualStatistics struct {
@@ -29,9 +28,9 @@ func (c *individualStatistics) String() string {
 	}
 
 	s := html.NewComponents(
-		newKeyedTableRow("Total", strconv.Itoa(total), true),
-		newKeyedTableRow("Living", strconv.Itoa(living), true),
-		newKeyedTableRow("Dead", strconv.Itoa(total-living), true),
+		newKeyedTableRow("Total", html.NewNumber(total).String(), true),
+		newKeyedTableRow("Living", html.NewNumber(living).String(), true),
+		newKeyedTableRow("Dead", html.NewNumber(total-living).String(), true),
 	)
 
 	return newCard("Individuals", noBadgeCount, html.NewTable("", s)).String()

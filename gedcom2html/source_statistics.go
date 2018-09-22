@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html"
-	"strconv"
 )
 
 type sourceStatistics struct {
@@ -17,8 +16,9 @@ func newSourceStatistics(document *gedcom.Document) *sourceStatistics {
 }
 
 func (c *sourceStatistics) String() string {
+	total := html.NewNumber(len(c.document.Sources())).String()
 	s := html.NewComponents(
-		newKeyedTableRow("Total", strconv.Itoa(len(c.document.Sources())), true),
+		newKeyedTableRow("Total", total, true),
 	)
 
 	return newCard("Sources", noBadgeCount, html.NewTable("", s)).String()
