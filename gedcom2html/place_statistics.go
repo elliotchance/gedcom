@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html"
-	"strconv"
 )
 
 type placeStatistics struct {
@@ -17,8 +16,9 @@ func newPlaceStatistics(document *gedcom.Document) *placeStatistics {
 }
 
 func (c *placeStatistics) String() string {
+	total := html.NewNumber(len(getPlaces(c.document))).String()
 	s := html.NewComponents(
-		newKeyedTableRow("Total", strconv.Itoa(len(getPlaces(c.document))), true),
+		newKeyedTableRow("Total", total, true),
 	)
 
 	return newCard("Places", noBadgeCount, html.NewTable("", s)).String()

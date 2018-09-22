@@ -18,7 +18,6 @@ func newPlaceLink(document *gedcom.Document, place string) *placeLink {
 }
 
 func (c *placeLink) String() string {
-	return html.Sprintf(`
-		<a href="%s">%s</a>`,
-		pagePlace(c.document, c.place), c.place)
+	return html.Sprintf(`<a href="%s">%s%s</a>`,
+		pagePlace(c.document, c.place), newOcticon("location", ""), c.place)
 }

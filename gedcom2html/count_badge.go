@@ -1,9 +1,6 @@
 package main
 
-import (
-	"golang.org/x/text/language"
-	"golang.org/x/text/message"
-)
+import "github.com/elliotchance/gedcom/html"
 
 // countBadge shows a pill badge containing an integer. The appropriate
 // localization will be applied (like a thousands separator).
@@ -18,7 +15,7 @@ func newCountBadge(value int) *countBadge {
 }
 
 func (c *countBadge) String() string {
-	p := message.NewPrinter(language.English)
+	number := html.NewNumber(c.value)
 
-	return newBadgePill("light", "", p.Sprintf("%d", c.value)).String()
+	return newBadgePill("light", "", number.String()).String()
 }
