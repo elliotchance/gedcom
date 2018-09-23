@@ -5,7 +5,6 @@ import (
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html"
 	"sort"
-	"strconv"
 )
 
 type eventStatistics struct {
@@ -33,7 +32,7 @@ func (c *eventStatistics) String() string {
 	}
 
 	rows := []fmt.Stringer{
-		newKeyedTableRow("Total", strconv.Itoa(total), true),
+		newKeyedTableRow("Total", html.NewNumber(total).String(), true),
 	}
 
 	keys := []string{}
@@ -45,7 +44,7 @@ func (c *eventStatistics) String() string {
 
 	for _, name := range keys {
 		rows = append(rows,
-			newKeyedTableRow(name, strconv.Itoa(counts[name]), true))
+			newKeyedTableRow(name, html.NewNumber(counts[name]).String(), true))
 	}
 
 	return newCard("Events", noBadgeCount,

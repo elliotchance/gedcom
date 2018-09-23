@@ -58,3 +58,7 @@ func pageSource(source *gedcom.SourceNode) string {
 func pageStatistics() string {
 	return "statistics.html"
 }
+
+func pageSurnames() string {
+	return "surnames.html"
+}
