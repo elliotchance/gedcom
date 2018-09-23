@@ -14,6 +14,13 @@ var (
 	optionGedcomFile        string
 	optionOutputDir         string
 	optionGoogleAnalyticsID string
+
+	optionNoIndividuals bool
+	optionNoPlaces      bool
+	optionNoFamilies    bool
+	optionNoSurnames    bool
+	optionNoSources     bool
+	optionNoStatistics  bool
 )
 
 func main() {
@@ -24,6 +31,20 @@ func main() {
 		" be deleted.")
 	flag.StringVar(&optionGoogleAnalyticsID, "google-analytics-id", "",
 		"The Google Analytics ID, like 'UA-78454410-2'.")
+
+	flag.BoolVar(&optionNoIndividuals, "no-individuals", false,
+		"Exclude Individuals.")
+	flag.BoolVar(&optionNoPlaces, "no-places", false,
+		"Exclude Places.")
+	flag.BoolVar(&optionNoFamilies, "no-families", false,
+		"Exclude Families.")
+	flag.BoolVar(&optionNoSurnames, "no-surnames", false,
+		"Exclude Surnames.")
+	flag.BoolVar(&optionNoSources, "no-sources", false,
+		"Exclude Sources.")
+	flag.BoolVar(&optionNoStatistics, "no-statistics", false,
+		"Exclude Statistics.")
+
 	flag.Parse()
 
 	file, err := os.Open(optionGedcomFile)
@@ -38,37 +59,51 @@ func main() {
 	}
 
 	// Create the pages.
-	for _, letter := range getIndexLetters(document) {
-		createFile(pageIndividuals(letter),
-			newIndividualListPage(document, letter, optionGoogleAnalyticsID))
-	}
-
-	for _, individual := range getIndividuals(document) {
-		if individual.IsLiving() {
-			continue
+	if !optionNoIndividuals {
+		for _, letter := range getIndexLetters(document) {
+			createFile(pageIndividuals(letter),
+				newIndividualListPage(document, letter, optionGoogleAnalyticsID))
 		}
 
-		page := newIndividualPage(document, individual, optionGoogleAnalyticsID)
-		createFile(pageIndividual(document, individual), page)
+		for _, individual := range getIndividuals(document) {
+			if individual.IsLiving() {
+				continue
+			}
+
+			page := newIndividualPage(document, individual, optionGoogleAnalyticsID)
+			createFile(pageIndividual(document, individual), page)
+		}
 	}
 
-	createFile(pagePlaces(), newPlaceListPage(document, optionGoogleAnalyticsID))
+	if !optionNoPlaces {
+		createFile(pagePlaces(), newPlaceListPage(document, optionGoogleAnalyticsID))
 
-	for key, place := range getPlaces(document) {
-		page := newPlacePage(document, key, optionGoogleAnalyticsID)
-		createFile(pagePlace(document, place.prettyName), page)
+		for key, place := range getPlaces(document) {
+			page := newPlacePage(document, key, optionGoogleAnalyticsID)
+			createFile(pagePlace(document, place.prettyName), page)
+		}
 	}
 
-	createFile(pageFamilies(), newFamilyListPage(document, optionGoogleAnalyticsID))
-
-	createFile(pageSources(), newSourceListPage(document, optionGoogleAnalyticsID))
-
-	for _, source := range document.Sources() {
-		page := newSourcePage(document, source, optionGoogleAnalyticsID)
-		createFile(pageSource(source), page)
+	if !optionNoFamilies {
+		createFile(pageFamilies(), newFamilyListPage(document, optionGoogleAnalyticsID))
 	}
 
-	createFile(pageStatistics(), newStatisticsPage(document, optionGoogleAnalyticsID))
+	if !optionNoSurnames {
+		createFile(pageSurnames(), newSurnameListPage(document, optionGoogleAnalyticsID))
+	}
+
+	if !optionNoSources {
+		createFile(pageSources(), newSourceListPage(document, optionGoogleAnalyticsID))
+
+		for _, source := range document.Sources() {
+			page := newSourcePage(document, source, optionGoogleAnalyticsID)
+			createFile(pageSource(source), page)
+		}
+	}
+
+	if !optionNoStatistics {
+		createFile(pageStatistics(), newStatisticsPage(document, optionGoogleAnalyticsID))
+	}
 }
 
 func createFile(name string, contents fmt.Stringer) {

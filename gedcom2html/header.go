@@ -3,12 +3,16 @@ package main
 import (
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html"
+	"github.com/elliotchance/gedcom/util"
+	"sort"
+	"strings"
 )
 
 const (
 	selectedIndividualsTab = "individuals"
 	selectedPlacesTab      = "places"
 	selectedFamiliesTab    = "families"
+	selectedSurnamesTab    = "surnames"
 	selectedSourcesTab     = "sources"
 	selectedStatisticsTab  = "statistics"
 	selectedExtraTab       = "extra"
@@ -33,40 +37,69 @@ func newHeader(document *gedcom.Document, extraTab string, selectedTab string) *
 func (c *header) String() string {
 	letters := getIndexLetters(c.document)
 
-	items := []*navItem{
-		newNavItem(
+	items := []*navItem{}
+
+	if !optionNoIndividuals {
+		item := newNavItem(
 			"Individuals "+newCountBadge(len(c.document.Individuals())).String(),
 			c.selectedTab == selectedIndividualsTab,
 			pageIndividuals(letters[0]),
-		),
-		newNavItem(
+		)
+		items = append(items, item)
+	}
+
+	if !optionNoPlaces {
+		item := newNavItem(
 			"Places "+newCountBadge(len(getPlaces(c.document))).String(),
 			c.selectedTab == selectedPlacesTab,
 			pagePlaces(),
-		),
-		newNavItem(
+		)
+		items = append(items, item)
+	}
+
+	if !optionNoFamilies {
+		item := newNavItem(
 			"Families "+newCountBadge(len(c.document.Families())).String(),
 			c.selectedTab == selectedFamiliesTab,
 			pageFamilies(),
-		),
-		newNavItem(
+		)
+		items = append(items, item)
+	}
+
+	if !optionNoSurnames {
+		item := newNavItem(
+			"Surnames "+newCountBadge(len(getSurnames(c.document))).String(),
+			c.selectedTab == selectedSurnamesTab,
+			pageSurnames(),
+		)
+		items = append(items, item)
+	}
+
+	if !optionNoSources {
+		item := newNavItem(
 			"Sources "+newCountBadge(len(c.document.Sources())).String(),
 			c.selectedTab == selectedSourcesTab,
 			pageSources(),
-		),
-		newNavItem(
+		)
+		items = append(items, item)
+	}
+
+	if !optionNoStatistics {
+		item := newNavItem(
 			"Statistics",
 			c.selectedTab == selectedStatisticsTab,
 			pageStatistics(),
-		),
+		)
+		items = append(items, item)
 	}
 
 	if c.extraTab != "" {
-		items = append(items, newNavItem(
+		item := newNavItem(
 			c.extraTab,
 			c.selectedTab == selectedExtraTab,
 			"#",
-		))
+		)
+		items = append(items, item)
 	}
 
 	return html.NewComponents(
@@ -74,4 +107,25 @@ func (c *header) String() string {
 		newNavTabs(items),
 		html.NewSpace(),
 	).String()
+}
+
+var surnames = []string{}
+
+func getSurnames(document *gedcom.Document) []string {
+	if len(surnames) == 0 {
+		for _, individual := range document.Individuals() {
+			surname := individual.Name().Surname()
+			if surname == "" || util.StringSliceContains(surnames, surname) {
+				continue
+			}
+
+			surnames = append(surnames, surname)
+		}
+
+		sort.SliceStable(surnames, func(i, j int) bool {
+			return strings.ToLower(surnames[i]) < strings.ToLower(surnames[j])
+		})
+	}
+
+	return surnames
 }
