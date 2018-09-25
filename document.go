@@ -13,6 +13,17 @@ type Document struct {
 	Nodes        []Node
 	pointerCache map[string]Node
 	families     []*FamilyNode
+
+	// HasBOM controls if the encoded stream will start with the Byte Order
+	// Mark.
+	//
+	// This is not recommended by the UTF-8 standard and many applications will
+	// have problems reading the data. However, streams that were decoded
+	// containing the BOM will retain it so that the re-encoded stream is as
+	// compatible and similar to the original stream as possible.
+	//
+	// Also see Decoder.consumeOptionalBOM().
+	HasBOM bool
 }
 
 // String will render the entire GEDCOM document.

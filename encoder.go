@@ -37,15 +37,17 @@ func (enc *Encoder) renderNode(indent int, node Node) error {
 }
 
 // Encode will write the GEDCOM document to the Writer.
-func (enc *Encoder) Encode() error {
+func (enc *Encoder) Encode() (err error) {
+	err = enc.restoreOptionalBOM()
+
 	for _, node := range enc.document.Nodes {
-		err := enc.renderNode(0, node)
+		err = enc.renderNode(0, node)
 		if err != nil {
-			return err
+			return
 		}
 	}
 
-	return nil
+	return
 }
 
 // GedcomLine converts a node into its single line GEDCOM value. It is used
@@ -82,4 +84,13 @@ func GedcomLine(indent int, node Node) string {
 	}
 
 	return buf.String()
+}
+
+// See Decoder.consumeOptionalBOM for more information.
+func (enc *Encoder) restoreOptionalBOM() (err error) {
+	if enc.document.HasBOM {
+		_, err = enc.w.Write(byteOrderMark)
+	}
+
+	return
 }

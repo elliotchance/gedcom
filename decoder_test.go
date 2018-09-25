@@ -241,6 +241,14 @@ var tests = map[string]*gedcom.Document{
 			gedcom.NewNameNode(nil, "κόσμε", "", nil),
 		},
 	},
+	"\xEF\xBB\xBF0 HEAD\n1 CHAR UTF-8": {
+		Nodes: []gedcom.Node{
+			gedcom.NewNodeWithChildren(nil, gedcom.TagHeader, "", "", []gedcom.Node{
+				gedcom.NewNode(nil, gedcom.TagCharacterSet, "UTF-8", ""),
+			}),
+		},
+		HasBOM: true,
+	},
 }
 
 func TestDecoder_Decode(t *testing.T) {
@@ -248,6 +256,7 @@ func TestDecoder_Decode(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			decoder := gedcom.NewDecoder(strings.NewReader(ged))
 			actual, err := decoder.Decode()
+			actual.HasBOM = expected.HasBOM
 
 			assert.NoError(t, err, ged)
 
