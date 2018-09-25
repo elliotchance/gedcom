@@ -9,6 +9,9 @@ import (
 	"strconv"
 )
 
+// See Decoder.consumeOptionalBOM().
+var byteOrderMark = []byte{0xef, 0xbb, 0xbf}
+
 // Decoder represents a GEDCOM decoder.
 type Decoder struct {
 	r *bufio.Reader
@@ -32,6 +35,8 @@ func (dec *Decoder) Decode() (*Document, error) {
 		Nodes: []Node{},
 	}
 	indents := []Node{}
+
+	document.HasBOM = dec.consumeOptionalBOM()
 
 	finished := false
 	lineNumber := 0
@@ -111,9 +116,9 @@ func (dec *Decoder) readLine() (string, error) {
 		}
 
 		// The line endings in the GEDCOM files can be different. A newline and
-		// carriage return are both considered to be the end of the line and empty
-		// lines are ignored so we can treat both of these characters as independent
-		// line terminators.
+		// carriage return are both considered to be the end of the line and
+		// empty lines are ignored so we can treat both of these characters as
+		// independent line terminators.
 		if b == '\n' || b == '\r' {
 			break
 		}
@@ -216,4 +221,26 @@ func NewNodeWithChildren(document *Document, tag Tag, value, pointer string, chi
 	}
 
 	return newSimpleNode(document, tag, value, pointer, children)
+}
+
+// consumeOptionalBOM will test and discard the Byte Order Mark at the start of
+// the stream.
+//
+// In order to keep the original stream as intact as possible when encoding the
+// BOM will be written back if it existed originally.
+//
+// Use of a BOM is neither required nor recommended for UTF-8, but may be
+// encountered in contexts where UTF-8 data is converted from other encoding
+// forms that use a BOM or where the BOM is used as a UTF-8 signature. See the
+// “Byte Order Mark” subsection in Section 16.8, Specials, for more information.
+// - 2.6 Encoding Schemes, http://www.unicode.org/versions/Unicode5.0.0/ch02.pdf
+func (dec *Decoder) consumeOptionalBOM() bool {
+	possibleBOM, _ := dec.r.Peek(3)
+	hasBOM := bytes.Compare(possibleBOM, byteOrderMark) == 0
+
+	if hasBOM {
+		dec.r.Discard(3)
+	}
+
+	return hasBOM
 }
