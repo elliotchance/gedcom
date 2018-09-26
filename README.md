@@ -9,6 +9,7 @@ github.com/elliotchance/gedcom
 exporting and diffing GEDCOM files.
 
    * [Project Goals](#project-goals)
+   * [Installation](#installation)
    * [GEDCOM Document](#gedcom-document)
       * [Decoding](#decoding)
       * [Encoding](#encoding)
@@ -44,6 +45,20 @@ information can be manipulated and ingested by other applications.
 
 4. Provide more advanced functionality to deal with comparing and diffing GEDCOM
 files.
+
+Installation
+============
+
+You can download the latest binaries for Mac, Windows or Linux on the
+[Releases][15] page. This will not require you to install Go or any other
+dependencies.
+
+If you wish to build it from source you must include the dependencies with:
+
+```bash
+dep ensure
+```
+
 
 GEDCOM Document
 ===============
@@ -342,3 +357,4 @@ You can (and probably should) also use
 [12]: https://godoc.org/github.com/elliotchance/gedcom#SimpleNameFilter
 [13]: https://godoc.org/github.com/elliotchance/gedcom#NameNode.Format
 [14]: https://godoc.org/github.com/elliotchance/gedcom#NameNode
+[15]: https://github.com/elliotchance/gedcom/releases
