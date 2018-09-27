@@ -27,12 +27,13 @@ func (c *placeEvent) String() string {
 	}
 
 	for _, individual := range c.document.Individuals() {
-		if individual.IsLiving() {
-			return ""
-		}
-
 		if gedcom.HasNestedNode(individual, c.node) {
+			if individual.IsLiving() {
+				return ""
+			}
+
 			person = newIndividualLink(c.document, individual).String()
+			break
 		}
 	}
 
