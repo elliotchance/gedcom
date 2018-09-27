@@ -5,19 +5,22 @@ sudo: false
 language: go
 
 go:
-  - 1.8.x
-  - 1.9.x
+  - 1.11.x
   - 1.10.x
+  - 1.9.x
+  - 1.8.x
 
-env:
-  global:
-    - DEP_VERSION="0.4.1"
+stages:
+  - Test
+  - name: Release
+    if: tag =~ ^v
 
 # Only clone the most recent commit.
 git:
   depth: 1
 
 before_install:
+  - DEP_VERSION="0.4.1"
   # Download the binary to bin folder in $GOPATH
   - curl -L -s https://github.com/golang/dep/releases/download/v${DEP_VERSION}/dep-linux-amd64 -o $GOPATH/bin/dep
   # Make the binary executable
@@ -27,14 +30,38 @@ install: dep ensure
 
 script:
   # Check that all files are Go formatted. Only run this on the latest Go.
-  - if [[ "$TRAVIS_GO_VERSION" == 1.10* ]]; then
+  - if [[ "$TRAVIS_GO_VERSION" == 1.11* ]]; then
     $(exit $(go fmt ./... | wc -l)); fi
 
-  # Run all the tests with the race detector enabled.
-  - go test -race ./...
-  
+  - make test
+
   # We only run code coverage on the gedcom package for now.
-  - go test -race -coverprofile=coverage.txt -covermode=atomic
+  - if [[ "$TRAVIS_GO_VERSION" == 1.11* ]]; then
+    go test -race -coverprofile=coverage.txt -covermode=atomic; fi
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - if [[ "$TRAVIS_GO_VERSION" == 1.11* ]]; then
+    bash <(curl -s https://codecov.io/bash); fi
+
+jobs:
+  include:
+    - stage: Release
+      script:
+        - GOOS=linux GOARCH=amd64 make zip
+        - GOOS=darwin GOARCH=amd64 make zip
+        - GOOS=windows GOARCH=amd64 make zip
+        - GOOS=windows GOARCH=386 make zip
+
+      deploy:
+        provider: releases
+        api_key:
+          secure: j1woYgRSru2tvqeVDXFJsWSkZi/am7a/+/tuM8j61G28hZ/tz6AKvFHqjbCl/vRIp6Yx3B+wieCKNxyH25iTKIhTL3y6p8RATaABdrZXnVlZDw+4svkkA1dAyTkueST4S2jtVxLeCca4FVIXd2NCnau3kzBWG+TzRvWo6mc592vFA3POv1VBD9eYYEwnwR0vmU4VzWjHaPex+ENua08PGKhOIO4trGg/AtsJvQl8W50ecanrL7h+tFRQUSkZvTT0RHJEGpvFPd101Kl+hI+h2y1Sdoo94OdAhzoDu59yaVxBiz/ScOOxWjpIAkgix5AkwKk5JXKONrP+eFSe+BgjIU9LiH2El9fyubKRq0/QrUNnaIF/+eCDznGE+G99/qkZkrfBwHlqNzktdQnLriqT1Of3wnja5jVOrOypzkdeza943oAOrDI/ShwL6mWShjjCJ3Qio7C+ljJkSdEQjhgzlqhioVigMZdX7KGEDPn/VtoV8snL6ckj3rLXKBno8UQmDZp0xH1sFNOliO/6Id2XgwcSV6WWYdOm3s1foK6kJrUwBeJ2JMvXVxJGQHl6bc9AOxLPTy2puUCOjgenNRSkaNBXJtEtMDpzspYBQpJ0+lhyCOw+tVYTbXat7hAo3kAoTgv26Qo/VQF9soe2iXChsltMlFBYyZKb0wVjTRWUxm8=
+        skip_cleanup: true
+        file:
+          - gedcom-linux-amd64.zip
+          - gedcom-darwin-amd64.zip
+          - gedcom-windows-amd64.zip
+          - gedcom-windows-386.zip
+        on:
+          repo: elliotchance/gedcom
+          all_branches: true
