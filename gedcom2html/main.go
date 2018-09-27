@@ -3,17 +3,24 @@
 package main
 
 import (
+	"crypto/sha1"
 	"flag"
 	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
+	"io"
+	"io/ioutil"
 	"log"
 	"os"
+	"sort"
+	"strings"
 )
 
 var (
 	optionGedcomFile        string
 	optionOutputDir         string
 	optionGoogleAnalyticsID string
+	optionChecksum          bool
 
 	optionNoIndividuals bool
 	optionNoPlaces      bool
@@ -31,6 +38,8 @@ func main() {
 		" be deleted.")
 	flag.StringVar(&optionGoogleAnalyticsID, "google-analytics-id", "",
 		"The Google Analytics ID, like 'UA-78454410-2'.")
+	flag.BoolVar(&optionChecksum, "checksum", false,
+		"Output a checksum file, helpful for syncing large trees.")
 
 	flag.BoolVar(&optionNoIndividuals, "no-individuals", false,
 		"Exclude Individuals.")
@@ -104,6 +113,40 @@ func main() {
 	if !optionNoStatistics {
 		createFile(pageStatistics(), newStatisticsPage(document, optionGoogleAnalyticsID))
 	}
+
+	// Calculate checksum
+	if optionChecksum {
+		lines := []string{}
+		fileInfos, err := ioutil.ReadDir(optionOutputDir)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		for _, fileInfo := range fileInfos {
+			checksum := fileSha1(fileInfo.Name())
+			line := fmt.Sprintf("%s,%s", fileInfo.Name(), checksum)
+			lines = append(lines, line)
+		}
+
+		sort.Strings(lines)
+
+		createFile("checksum.csv", html.NewText(strings.Join(lines, "\n")))
+	}
+}
+
+func fileSha1(path string) string {
+	f, err := os.Open(optionOutputDir + "/" + path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+
+	h := sha1.New()
+	if _, err := io.Copy(h, f); err != nil {
+		log.Fatal(err)
+	}
+
+	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 func createFile(name string, contents fmt.Stringer) {

@@ -40,8 +40,14 @@ func (c *header) String() string {
 	items := []*navItem{}
 
 	if !optionNoIndividuals {
+		badge := ""
+		if !optionChecksum {
+			badge = newCountBadge(len(c.document.Individuals())).String()
+		}
+
+		title := "Individuals " + badge
 		item := newNavItem(
-			"Individuals "+newCountBadge(len(c.document.Individuals())).String(),
+			title,
 			c.selectedTab == selectedIndividualsTab,
 			pageIndividuals(letters[0]),
 		)
@@ -49,8 +55,13 @@ func (c *header) String() string {
 	}
 
 	if !optionNoPlaces {
+		badge := ""
+		if !optionChecksum {
+			badge = newCountBadge(len(getPlaces(c.document))).String()
+		}
+
 		item := newNavItem(
-			"Places "+newCountBadge(len(getPlaces(c.document))).String(),
+			"Places "+badge,
 			c.selectedTab == selectedPlacesTab,
 			pagePlaces(),
 		)
@@ -58,8 +69,13 @@ func (c *header) String() string {
 	}
 
 	if !optionNoFamilies {
+		badge := ""
+		if !optionChecksum {
+			badge = newCountBadge(len(c.document.Families())).String()
+		}
+
 		item := newNavItem(
-			"Families "+newCountBadge(len(c.document.Families())).String(),
+			"Families "+badge,
 			c.selectedTab == selectedFamiliesTab,
 			pageFamilies(),
 		)
@@ -67,8 +83,13 @@ func (c *header) String() string {
 	}
 
 	if !optionNoSurnames {
+		badge := ""
+		if !optionChecksum {
+			badge = newCountBadge(len(getSurnames(c.document))).String()
+		}
+
 		item := newNavItem(
-			"Surnames "+newCountBadge(len(getSurnames(c.document))).String(),
+			"Surnames "+badge,
 			c.selectedTab == selectedSurnamesTab,
 			pageSurnames(),
 		)
@@ -76,8 +97,13 @@ func (c *header) String() string {
 	}
 
 	if !optionNoSources {
+		badge := ""
+		if !optionChecksum {
+			badge = newCountBadge(len(c.document.Sources())).String()
+		}
+
 		item := newNavItem(
-			"Sources "+newCountBadge(len(c.document.Sources())).String(),
+			"Sources "+badge,
 			c.selectedTab == selectedSourcesTab,
 			pageSources(),
 		)
