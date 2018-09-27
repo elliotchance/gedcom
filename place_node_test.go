@@ -50,6 +50,34 @@ var placeTests = []struct {
 		state:   "Utah",
 		country: "USA.",
 	},
+	{
+		node:    gedcom.NewPlaceNode(nil, "United States", "", nil),
+		name:    "United States",
+		county:  "",
+		state:   "",
+		country: "United States",
+	},
+	{
+		node:    gedcom.NewPlaceNode(nil, "Foo, australia.", "", nil),
+		name:    "Foo, australia.",
+		county:  "",
+		state:   "",
+		country: "Australia",
+	},
+	{
+		node:    gedcom.NewPlaceNode(nil, "Bar, Nashville, USA", "", nil),
+		name:    "Bar, Nashville, USA",
+		county:  "",
+		state:   "",
+		country: "USA",
+	},
+	{
+		node:    gedcom.NewPlaceNode(nil, "Hobbitown, New zealand ", "", nil),
+		name:    "Hobbitown, New zealand",
+		county:  "",
+		state:   "",
+		country: "New Zealand",
+	},
 }
 
 func TestNewPlaceNode(t *testing.T) {

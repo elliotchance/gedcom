@@ -79,11 +79,27 @@ func (node *PlaceNode) State() string {
 // Country is the forth part of the JurisdictionalName().
 //
 // Country will only return a non-empty response if the JurisdictionalName is
-// exactly in the form of "Name,County,State,Country".
+// exactly in the form of "Name,County,State,Country" or the country can be
+// identified from the list of Countries.
 func (node *PlaceNode) Country() string {
 	_, _, _, country := node.JurisdictionalEntities()
 
-	return country
+	if country != "" {
+		return country
+	}
+
+	// If the country is empty it is likely because the place is not formatted
+	// into four jurisdictional entities. In this case we will try to find the
+	// country by looking at the suffix of the place name.
+	name := strings.ToLower(strings.Trim(node.JurisdictionalName(), ",. "))
+
+	for _, c := range Countries {
+		if strings.HasSuffix(name, strings.ToLower(c)) {
+			return c
+		}
+	}
+
+	return ""
 }
 
 // Format shows the jurisdictional entities that are named in a sequence from
