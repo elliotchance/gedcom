@@ -78,7 +78,7 @@ func (c *diffPage) String() string {
 
 	// Individual pages
 	components := []fmt.Stringer{
-		html.NewBigTitle("Individuals"),
+		html.NewBigTitle(1, "Individuals"),
 		html.NewSpace(),
 		html.NewTable("", rows...),
 	}

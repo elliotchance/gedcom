@@ -18,12 +18,8 @@ func NewResidenceNode(document *Document, value, pointer string, children []Node
 // any significance for the importance of the dates.
 //
 // If the node is nil the result will also be nil.
-func (node *ResidenceNode) Dates() (result []*DateNode) {
-	for _, n := range NodesWithTag(node, TagDate) {
-		result = append(result, n.(*DateNode))
-	}
-
-	return
+func (node *ResidenceNode) Dates() []*DateNode {
+	return Dates(node)
 }
 
 // Equal tests if two residence events are the same.

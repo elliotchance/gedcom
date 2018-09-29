@@ -147,8 +147,7 @@ var (
 	// authority of the LDS Church. (See also BAPM)
 	TagLDSBaptism = newTag("BAPL", "LDS Baptism", tagOptionEvent, tagSortIndividualEvents)
 
-	// The event of baptism (not LDS), performed in infancy or later. (See also
-	// BAPL and CHR)
+	// See BaptismNode.
 	TagBaptism = newTag("BAPM", "Baptism", tagOptionEvent, tagSortIndividualEvents)
 
 	// The ceremonial event held when a Jewish boy reaches age 13.
@@ -170,8 +169,7 @@ var (
 	// 5.5.1
 	TagBinaryObject = newTag("BLOB", "Binary Object", tagOptionNone, tagSortIndividualInfo)
 
-	// The event of the proper disposing of the mortal remains of a deceased
-	// person.
+	// See BurialNode.
 	TagBurial = newTag("BURI", "Burial", tagOptionEvent, tagSortIndividualBurial)
 
 	// The number used by a repository to identify the specific items in its
@@ -259,7 +257,7 @@ var (
 	// The time of an event in a calendar format.
 	TagDate = newTag("DATE", "Date", tagOptionNone, tagSortIndividualInfo)
 
-	// The event when mortal life terminates.
+	// See DeathNode.
 	TagDeath = newTag("DEAT", "Death", tagOptionEvent, tagSortIndividualDeath)
 
 	// Pertaining to offspring of an individual.
@@ -432,8 +430,7 @@ var (
 	// family when subordinate to a FAM_RECORD.
 	TagChildrenCount = newTag("NCHI", "Children Count", tagOptionNone, tagSortIndividualInfo)
 
-	// A descriptive or familiar that is used instead of, or in addition to,
-	// one's proper name.
+	// See NicknameNode.
 	TagNickname = newTag("NICK", "Nickname", tagOptionNone, tagSortIndividualInfo)
 
 	// The number of times this person has participated in a family as a spouse

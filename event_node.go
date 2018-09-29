@@ -19,16 +19,8 @@ func NewEventNode(document *Document, value, pointer string, children []Node) *E
 // any significance for the importance of the dates.
 //
 // If the node is nil the result will also be nil.
-func (node *EventNode) Dates() (result []*DateNode) {
-	if node == nil {
-		return nil
-	}
-
-	for _, n := range NodesWithTag(node, TagDate) {
-		result = append(result, n.(*DateNode))
-	}
-
-	return
+func (node *EventNode) Dates() []*DateNode {
+	return Dates(node)
 }
 
 // Equal tests if two events are the same.

@@ -212,8 +212,10 @@ func (node *IndividualNode) Births() (nodes []*BirthNode) {
 // do not include LDS baptisms.
 //
 // If the node is nil the result will also be nil.
-func (node *IndividualNode) Baptisms() []Node {
-	return NodesWithTag(node, TagBaptism)
+func (node *IndividualNode) Baptisms() []*BaptismNode {
+	nodes := NodesWithTag(node, TagBaptism)
+
+	return CastNodes(nodes, (*BaptismNode)(nil)).([]*BaptismNode)
 }
 
 // Deaths returns zero or more death events for the individual. It is common for
@@ -221,15 +223,19 @@ func (node *IndividualNode) Baptisms() []Node {
 // need to check if an individual is living you should use IsLiving().
 //
 // If the node is nil the result will also be nil.
-func (node *IndividualNode) Deaths() []Node {
-	return NodesWithTag(node, TagDeath)
+func (node *IndividualNode) Deaths() []*DeathNode {
+	nodes := NodesWithTag(node, TagDeath)
+
+	return CastNodes(nodes, (*DeathNode)(nil)).([]*DeathNode)
 }
 
 // Burials returns zero or more burial events for the individual.
 //
 // If the node is nil the result will also be nil.
-func (node *IndividualNode) Burials() []Node {
-	return NodesWithTag(node, TagBurial)
+func (node *IndividualNode) Burials() []*BurialNode {
+	nodes := NodesWithTag(node, TagBurial)
+
+	return CastNodes(nodes, (*BurialNode)(nil)).([]*BurialNode)
 }
 
 // Parents returns the families for which this individual is a child. There may

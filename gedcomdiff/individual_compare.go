@@ -145,7 +145,7 @@ func (c *individualCompare) String() string {
 	}
 
 	return html.NewComponents(
-		html.NewBigTitle(name),
+		html.NewBigTitle(1, name),
 		html.NewSpace(),
 		html.NewTable("", tableRows...),
 	).String()

@@ -168,11 +168,20 @@ func NewNode(document *Document, tag Tag, value, pointer string) Node {
 
 func NewNodeWithChildren(document *Document, tag Tag, value, pointer string, children []Node) Node {
 	switch tag {
+	case TagBaptism:
+		return NewBaptismNode(document, value, pointer, children)
+
 	case TagBirth:
 		return NewBirthNode(document, value, pointer, children)
 
+	case TagBurial:
+		return NewBurialNode(document, value, pointer, children)
+
 	case TagDate:
 		return NewDateNode(document, value, pointer, children)
+
+	case TagDeath:
+		return NewDeathNode(document, value, pointer, children)
 
 	case TagEvent:
 		return NewEventNode(document, value, pointer, children)
@@ -197,6 +206,9 @@ func NewNodeWithChildren(document *Document, tag Tag, value, pointer string, chi
 
 	case TagName:
 		return NewNameNode(document, value, pointer, children)
+
+	case TagNickname:
+		return NewNicknameNode(document, value, pointer, children)
 
 	case TagNote:
 		return NewNoteNode(document, value, pointer, nil)

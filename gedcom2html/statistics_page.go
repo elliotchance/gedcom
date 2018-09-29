@@ -22,7 +22,7 @@ func (c *statisticsPage) String() string {
 		"Statistics",
 		html.NewComponents(
 			newHeader(c.document, "", selectedStatisticsTab),
-			html.NewBigTitle("Statistics"),
+			html.NewBigTitle(1, "Statistics"),
 			html.NewSpace(),
 			html.NewRow(
 				html.NewColumn(html.HalfRow, html.NewComponents(

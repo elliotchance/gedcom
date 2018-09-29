@@ -162,17 +162,6 @@ func String(node Node) string {
 	return node.String()
 }
 
-// Dates returns the shallow DateNodes for each of the provided nodes.
-func Dates(nodes ...Node) (dates []*DateNode) {
-	for _, node := range nodes {
-		for _, n := range NodesWithTag(node, TagDate) {
-			dates = append(dates, n.(*DateNode))
-		}
-	}
-
-	return
-}
-
 // Places returns the shallow PlaceNodes for each of the provided nodes.
 func Places(nodes ...Node) (places []*PlaceNode) {
 	for _, node := range nodes {

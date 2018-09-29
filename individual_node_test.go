@@ -144,41 +144,41 @@ func TestIndividualNode_Births(t *testing.T) {
 func TestIndividualNode_Baptisms(t *testing.T) {
 	var tests = []struct {
 		node     *gedcom.IndividualNode
-		baptisms []gedcom.Node
+		baptisms []*gedcom.BaptismNode
 	}{
 		{
 			node:     nil,
-			baptisms: nil,
+			baptisms: []*gedcom.BaptismNode{},
 		},
 		{
 			node:     individual("P1", "", "", ""),
-			baptisms: []gedcom.Node{},
+			baptisms: []*gedcom.BaptismNode{},
 		},
 		{
 			node:     gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{}),
-			baptisms: []gedcom.Node{},
+			baptisms: []*gedcom.BaptismNode{},
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewNodeWithChildren(nil, gedcom.TagBaptism, "", "", []gedcom.Node{}),
 			}),
-			baptisms: []gedcom.Node{
-				gedcom.NewNodeWithChildren(nil, gedcom.TagBaptism, "", "", []gedcom.Node{}),
+			baptisms: []*gedcom.BaptismNode{
+				gedcom.NewBaptismNode(nil, "", "", []gedcom.Node{}),
 			},
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewNodeWithChildren(nil, gedcom.TagLDSBaptism, "", "", []gedcom.Node{}),
 			}),
-			baptisms: []gedcom.Node{},
+			baptisms: []*gedcom.BaptismNode{},
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewNodeWithChildren(nil, gedcom.TagBaptism, "", "", []gedcom.Node{}),
 				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
 			}),
-			baptisms: []gedcom.Node{
-				gedcom.NewNodeWithChildren(nil, gedcom.TagBaptism, "", "", []gedcom.Node{}),
+			baptisms: []*gedcom.BaptismNode{
+				gedcom.NewBaptismNode(nil, "", "", []gedcom.Node{}),
 			},
 		},
 		{
@@ -187,9 +187,9 @@ func TestIndividualNode_Baptisms(t *testing.T) {
 				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
 				gedcom.NewNodeWithChildren(nil, gedcom.TagBaptism, "bar", "", []gedcom.Node{}),
 			}),
-			baptisms: []gedcom.Node{
-				gedcom.NewNodeWithChildren(nil, gedcom.TagBaptism, "foo", "", []gedcom.Node{}),
-				gedcom.NewNodeWithChildren(nil, gedcom.TagBaptism, "bar", "", []gedcom.Node{}),
+			baptisms: []*gedcom.BaptismNode{
+				gedcom.NewBaptismNode(nil, "foo", "", []gedcom.Node{}),
+				gedcom.NewBaptismNode(nil, "bar", "", []gedcom.Node{}),
 			},
 		},
 	}
@@ -204,26 +204,26 @@ func TestIndividualNode_Baptisms(t *testing.T) {
 func TestIndividualNode_Deaths(t *testing.T) {
 	var tests = []struct {
 		node   *gedcom.IndividualNode
-		deaths []gedcom.Node
+		deaths []*gedcom.DeathNode
 	}{
 		{
 			node:   nil,
-			deaths: nil,
+			deaths: []*gedcom.DeathNode{},
 		},
 		{
 			node:   individual("P1", "", "", ""),
-			deaths: []gedcom.Node{},
+			deaths: []*gedcom.DeathNode{},
 		},
 		{
 			node:   gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{}),
-			deaths: []gedcom.Node{},
+			deaths: []*gedcom.DeathNode{},
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
 			}),
-			deaths: []gedcom.Node{
-				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
+			deaths: []*gedcom.DeathNode{
+				gedcom.NewDeathNode(nil, "", "", []gedcom.Node{}),
 			},
 		},
 		{
@@ -231,8 +231,8 @@ func TestIndividualNode_Deaths(t *testing.T) {
 				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
 				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{}),
 			}),
-			deaths: []gedcom.Node{
-				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
+			deaths: []*gedcom.DeathNode{
+				gedcom.NewDeathNode(nil, "", "", []gedcom.Node{}),
 			},
 		},
 		{
@@ -241,9 +241,9 @@ func TestIndividualNode_Deaths(t *testing.T) {
 				gedcom.NewNodeWithChildren(nil, gedcom.TagBurial, "", "", []gedcom.Node{}),
 				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "bar", "", []gedcom.Node{}),
 			}),
-			deaths: []gedcom.Node{
-				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "foo", "", []gedcom.Node{}),
-				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "bar", "", []gedcom.Node{}),
+			deaths: []*gedcom.DeathNode{
+				gedcom.NewDeathNode(nil, "foo", "", []gedcom.Node{}),
+				gedcom.NewDeathNode(nil, "bar", "", []gedcom.Node{}),
 			},
 		},
 	}
@@ -258,26 +258,26 @@ func TestIndividualNode_Deaths(t *testing.T) {
 func TestIndividualNode_Burials(t *testing.T) {
 	var tests = []struct {
 		node    *gedcom.IndividualNode
-		burials []gedcom.Node
+		burials []*gedcom.BurialNode
 	}{
 		{
 			node:    nil,
-			burials: nil,
+			burials: []*gedcom.BurialNode{},
 		},
 		{
 			node:    individual("P1", "", "", ""),
-			burials: []gedcom.Node{},
+			burials: []*gedcom.BurialNode{},
 		},
 		{
 			node:    gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{}),
-			burials: []gedcom.Node{},
+			burials: []*gedcom.BurialNode{},
 		},
 		{
 			node: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewNodeWithChildren(nil, gedcom.TagBurial, "", "", []gedcom.Node{}),
 			}),
-			burials: []gedcom.Node{
-				gedcom.NewNodeWithChildren(nil, gedcom.TagBurial, "", "", []gedcom.Node{}),
+			burials: []*gedcom.BurialNode{
+				gedcom.NewBurialNode(nil, "", "", []gedcom.Node{}),
 			},
 		},
 		{
@@ -285,8 +285,8 @@ func TestIndividualNode_Burials(t *testing.T) {
 				gedcom.NewNodeWithChildren(nil, gedcom.TagBurial, "", "", []gedcom.Node{}),
 				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{}),
 			}),
-			burials: []gedcom.Node{
-				gedcom.NewNodeWithChildren(nil, gedcom.TagBurial, "", "", []gedcom.Node{}),
+			burials: []*gedcom.BurialNode{
+				gedcom.NewBurialNode(nil, "", "", []gedcom.Node{}),
 			},
 		},
 		{
@@ -295,9 +295,9 @@ func TestIndividualNode_Burials(t *testing.T) {
 				gedcom.NewNodeWithChildren(nil, gedcom.TagBaptism, "", "", []gedcom.Node{}),
 				gedcom.NewNodeWithChildren(nil, gedcom.TagBurial, "bar", "", []gedcom.Node{}),
 			}),
-			burials: []gedcom.Node{
-				gedcom.NewNodeWithChildren(nil, gedcom.TagBurial, "foo", "", []gedcom.Node{}),
-				gedcom.NewNodeWithChildren(nil, gedcom.TagBurial, "bar", "", []gedcom.Node{}),
+			burials: []*gedcom.BurialNode{
+				gedcom.NewBurialNode(nil, "foo", "", []gedcom.Node{}),
+				gedcom.NewBurialNode(nil, "bar", "", []gedcom.Node{}),
 			},
 		},
 	}
