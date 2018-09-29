@@ -17,17 +17,39 @@ func NewIndividualDates(individual *gedcom.IndividualNode, showLiving bool) *Ind
 }
 
 func (c *IndividualDates) String() string {
-	birthDate := gedcom.First(c.individual.Births())
-	deathDate := gedcom.Last(c.individual.Deaths())
+	eventDates := []*EventDate{}
 
-	eventDates := NewEventDates([]*EventDate{
-		NewEventDate("b.", gedcom.String(birthDate)),
-		NewEventDate("d.", gedcom.String(deathDate)),
-	}).String()
+	// Use birth or fallback to baptism.
+	births := c.individual.Births()
+	baptisms := c.individual.Baptisms()
+	switch {
+	case len(births) > 0:
+		eventDate := NewEventDate("b.", births[0].Dates())
+		eventDates = append(eventDates, eventDate)
 
-	if c.individual != nil && c.individual.IsLiving() && !c.showLiving {
-		eventDates = "living"
+	case len(baptisms) > 0:
+		eventDate := NewEventDate("bap.", baptisms[0].Dates())
+		eventDates = append(eventDates, eventDate)
 	}
 
-	return eventDates
+	// Use death or fallback to burial.
+	deaths := c.individual.Deaths()
+	burials := c.individual.Burials()
+	switch {
+	case len(deaths) > 0:
+		eventDate := NewEventDate("d.", deaths[0].Dates())
+		eventDates = append(eventDates, eventDate)
+
+	case len(burials) > 0:
+		eventDate := NewEventDate("bur.", burials[0].Dates())
+		eventDates = append(eventDates, eventDate)
+	}
+
+	eventDatesString := NewEventDates(eventDates).String()
+
+	if c.individual != nil && c.individual.IsLiving() && !c.showLiving {
+		eventDatesString = "living"
+	}
+
+	return eventDatesString
 }

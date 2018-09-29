@@ -23,9 +23,11 @@ func (c *individualAdditionalNames) String() string {
 	names := c.individual.Names()
 
 	for _, name := range names {
-		rows = append(rows, newKeyedTableRow(name.Type().String(), name.String(), name.Type() != ""))
+		row := newKeyedTableRow(name.Type().String(), name.String(), name.Type() != "")
+		rows = append(rows, row)
 	}
 
-	return newCard("Additional Names", len(names)-1,
-		html.NewTable("", rows...)).String()
+	table := html.NewTable("", rows...)
+
+	return newCard("Additional Names", len(names)-1, table).String()
 }

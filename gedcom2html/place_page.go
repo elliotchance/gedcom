@@ -36,7 +36,7 @@ func (c *placePage) String() string {
 		place.prettyName,
 		html.NewComponents(
 			newHeader(c.document, place.prettyName, selectedExtraTab),
-			html.NewBigTitle(place.prettyName),
+			html.NewBigTitle(1, place.prettyName),
 			html.NewSpace(),
 			html.NewRow(
 				html.NewColumn(html.EntireRow, html.NewTable("", table...)),

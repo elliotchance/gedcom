@@ -33,7 +33,7 @@ func (c *sourcePage) String() string {
 		c.source.Title(),
 		html.NewComponents(
 			newHeader(c.document, "Source", selectedExtraTab),
-			html.NewBigTitle(c.source.Title()),
+			html.NewBigTitle(1, c.source.Title()),
 			html.NewSpace(),
 			html.NewRow(
 				html.NewColumn(html.EntireRow, html.NewTable("", table...)),

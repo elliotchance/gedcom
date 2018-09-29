@@ -18,16 +18,8 @@ func NewBirthNode(document *Document, value, pointer string, children []Node) *B
 // any significance for the importance of the dates.
 //
 // If the node is nil the result will also be nil.
-func (node *BirthNode) Dates() (result []*DateNode) {
-	if node == nil {
-		return nil
-	}
-
-	for _, n := range NodesWithTag(node, TagDate) {
-		result = append(result, n.(*DateNode))
-	}
-
-	return
+func (node *BirthNode) Dates() []*DateNode {
+	return Dates(node)
 }
 
 // Equal will always return true if both nodes are not nil.

@@ -293,8 +293,11 @@ func TestNewNode(t *testing.T) {
 		tag      gedcom.Tag
 		expected gedcom.Node
 	}{
+		{gedcom.TagBaptism, gedcom.NewBaptismNode(nil, v, p, nil)},
 		{gedcom.TagBirth, gedcom.NewBirthNode(nil, v, p, nil)},
+		{gedcom.TagBurial, gedcom.NewBurialNode(nil, v, p, nil)},
 		{gedcom.TagDate, gedcom.NewDateNode(nil, v, p, nil)},
+		{gedcom.TagDeath, gedcom.NewDeathNode(nil, v, p, nil)},
 		{gedcom.TagEvent, gedcom.NewEventNode(nil, v, p, nil)},
 		{gedcom.TagFamily, gedcom.NewFamilyNode(nil, p, nil)},
 		{gedcom.TagFormat, gedcom.NewFormatNode(nil, v, p, nil)},
@@ -304,6 +307,7 @@ func TestNewNode(t *testing.T) {
 		{gedcom.TagMap, gedcom.NewMapNode(nil, v, p, nil)},
 		{gedcom.TagName, gedcom.NewNameNode(nil, v, p, nil)},
 		{gedcom.TagNote, gedcom.NewNoteNode(nil, v, p, nil)},
+		{gedcom.TagNickname, gedcom.NewNicknameNode(nil, v, p, nil)},
 		{gedcom.TagPhonetic, gedcom.NewPhoneticVariationNode(nil, v, p, nil)},
 		{gedcom.TagPlace, gedcom.NewPlaceNode(nil, v, p, nil)},
 		{gedcom.TagResidence, gedcom.NewResidenceNode(nil, v, p, nil)},

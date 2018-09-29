@@ -27,7 +27,8 @@ func (c *individualEvents) String() string {
 	birthDate := gedcom.String(gedcom.First(gedcom.Dates(birth)))
 	birthPlace := gedcom.String(gedcom.First(gedcom.Places(birth)))
 
-	events = append(events, newIndividualEvent("Birth", birthDate, birthPlace, ""))
+	event := newIndividualEvent("Birth", birthDate, birthPlace, "", c.document)
+	events = append(events, event)
 
 	for _, family := range c.individual.Families() {
 		marriage := gedcom.First(gedcom.NodesWithTag(family, gedcom.TagMarriage))
@@ -65,8 +66,9 @@ func (c *individualEvents) String() string {
 		// Empty description means that the individual is a child so this is not
 		// an event we want to show.
 		if description != "" {
-			events = append(events,
-				newIndividualEvent("Marriage", date.Value(), place, description))
+			event := newIndividualEvent("Marriage", date.Value(), place,
+				description, c.document)
+			events = append(events, event)
 		}
 	}
 
@@ -74,7 +76,9 @@ func (c *individualEvents) String() string {
 	deathDate := gedcom.String(gedcom.First(gedcom.Dates(death)))
 	deathPlace := gedcom.String(gedcom.First(gedcom.Places(death)))
 
-	events = append(events, newIndividualEvent("Death", deathDate, deathPlace, ""))
+	individualEvent := newIndividualEvent("Death", deathDate, deathPlace, "",
+		c.document)
+	events = append(events, individualEvent)
 
 	s := html.NewTable("text-center",
 		html.NewTableHead("Type", "Date", "Place", "Description"),
