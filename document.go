@@ -6,6 +6,10 @@ import (
 	"strings"
 )
 
+// DefaultMaxLivingAge is used when creating a new document. See
+// Document.MaxLivingAge for a full description.
+const DefaultMaxLivingAge = 100.0
+
 // Document represents a whole GEDCOM document. It is possible for a
 // Document to contain zero Nodes, this means the GEDCOM file was empty. It
 // may also (and usually) contain several Nodes.
@@ -24,6 +28,13 @@ type Document struct {
 	//
 	// Also see Decoder.consumeOptionalBOM().
 	HasBOM bool
+
+	// MaxLivingAge is used by Individual.IsLiving to determine if an individual
+	// without a DeathNode should be considered living.
+	//
+	// 100 is chosen as a reasonable default. If you set it to 0 then an
+	// individual will never be considered dead without a DeathNode.
+	MaxLivingAge float64
 }
 
 // String will render the entire GEDCOM document.
@@ -148,5 +159,7 @@ func NewDocumentFromString(gedcom string) (*Document, error) {
 
 // NewDocument returns an empty document.
 func NewDocument() *Document {
-	return &Document{}
+	return &Document{
+		MaxLivingAge: DefaultMaxLivingAge,
+	}
 }

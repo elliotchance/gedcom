@@ -1,5 +1,7 @@
 package gedcom
 
+import "time"
+
 // IndividualNode represents a person.
 type IndividualNode struct {
 	*SimpleNode
@@ -182,7 +184,16 @@ func (node *IndividualNode) FamilyWithUnknownSpouse() *FamilyNode {
 	return nil
 }
 
-// TODO: needs tests
+// IsLiving determines if the individual is living.
+//
+// If no death node exists, but the estimated birth date is found to be older
+// than Document.MaxLivingAge then the individual will not be considered living.
+//
+// The default value for MaxLivingAge is 100 and can be modified on the document
+// attached to this node. A MaxLivingAge of 0 means that it will only consider
+// the individual to be not living if there is an explicit Death event.
+//
+// If there is no document attached DefaultMaxLivingAge will be used.
 //
 // If the node is nil the result will always be false.
 func (node *IndividualNode) IsLiving() bool {
@@ -190,7 +201,22 @@ func (node *IndividualNode) IsLiving() bool {
 		return false
 	}
 
-	return len(NodesWithTag(node, TagDeath)) == 0
+	if len(node.Deaths()) > 0 {
+		return false
+	}
+
+	maxLivingAge := DefaultMaxLivingAge
+
+	if node.Document() != nil {
+		maxLivingAge = node.Document().MaxLivingAge
+	}
+
+	nowYear := float64(time.Now().Year())
+	birthDate := node.EstimatedBirthDate()
+	birthYear := Years(birthDate)
+	age := nowYear - birthYear
+
+	return birthYear == 0 || age <= maxLivingAge
 }
 
 // Births returns zero or more birth events for the individual.

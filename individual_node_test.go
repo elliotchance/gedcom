@@ -1290,7 +1290,40 @@ func TestIndividualNode_FamilyWithUnknownSpouse(t *testing.T) {
 func TestIndividualNode_IsLiving(t *testing.T) {
 	IsLiving := tf.Function(t, (*gedcom.IndividualNode).IsLiving)
 
-	IsLiving((*gedcom.IndividualNode)(nil)).Returns(false)
+	IsLiving(nil).Returns(false)
+
+	IsLiving(gedcom.NewIndividualNode(nil, "", "", nil)).Returns(true)
+
+	IsLiving(gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewDeathNode(nil, "", "", nil),
+	})).Returns(false)
+
+	IsLiving(gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+			gedcom.NewDateNode(nil, "3 Sep 1845", "", nil),
+		}),
+	})).Returns(false)
+
+	IsLiving(gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+			gedcom.NewDateNode(nil, "3 Sep 1945", "", nil),
+		}),
+	})).Returns(true)
+
+	doc := gedcom.NewDocument()
+	IsLiving(gedcom.NewIndividualNode(doc, "", "", []gedcom.Node{
+		gedcom.NewBirthNode(doc, "", "", []gedcom.Node{
+			gedcom.NewDateNode(doc, "3 Sep 1945", "", nil),
+		}),
+	})).Returns(true)
+
+	doc = gedcom.NewDocument()
+	doc.MaxLivingAge = 25
+	IsLiving(gedcom.NewIndividualNode(doc, "", "", []gedcom.Node{
+		gedcom.NewBirthNode(doc, "", "", []gedcom.Node{
+			gedcom.NewDateNode(doc, "3 Sep 1945", "", nil),
+		}),
+	})).Returns(false)
 }
 
 func TestIndividualNode_Children(t *testing.T) {
