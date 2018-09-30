@@ -29,19 +29,17 @@ before_install:
 install: dep ensure
 
 script:
-  # Check that all files are Go formatted. Only run this on the latest Go.
   - if [[ "$TRAVIS_GO_VERSION" == 1.11* ]]; then
-    $(exit $(go fmt ./... | wc -l)); fi
-
-  - make test
-
-  # We only run code coverage on the gedcom package for now.
-  - if [[ "$TRAVIS_GO_VERSION" == 1.11* ]]; then
-    go test -race -coverprofile=coverage.txt -covermode=atomic; fi
+      make check-go-fmt;
+      make test-coverage;
+    else
+      make test;
+    fi
 
 after_success:
   - if [[ "$TRAVIS_GO_VERSION" == 1.11* ]]; then
-    bash <(curl -s https://codecov.io/bash); fi
+      bash <(curl -s https://codecov.io/bash);
+    fi
 
 jobs:
   include:

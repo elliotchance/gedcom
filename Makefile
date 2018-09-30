@@ -2,6 +2,20 @@ test:
  	# Run all the tests with the race detector enabled.
 	go test -race ./...
 
+test-coverage:
+	echo "" > coverage.txt
+
+	for d in $$(go list ./... | grep -v vendor); do \
+		go test -race -coverprofile=profile.out -covermode=atomic $$d; \
+		if [ -f profile.out ]; then \
+			cat profile.out >> coverage.txt; \
+			rm profile.out; \
+		fi \
+	done
+
+check-go-fmt:
+	exit $$(go fmt ./... | wc -l)
+
 zip:
 	rm -rf bin
 	mkdir bin
