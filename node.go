@@ -73,9 +73,8 @@ func NodeGedcom(node Node) string {
 		return ""
 	}
 
-	document := &Document{
-		Nodes: []Node{node},
-	}
+	document := NewDocument()
+	document.Nodes = []Node{node}
 
 	return document.String()
 }

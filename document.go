@@ -13,6 +13,10 @@ const DefaultMaxLivingAge = 100.0
 // Document represents a whole GEDCOM document. It is possible for a
 // Document to contain zero Nodes, this means the GEDCOM file was empty. It
 // may also (and usually) contain several Nodes.
+//
+// You should not instantiate a Document yourself because there are sensible
+// defaults that need to be setup. Use one of the NewDocument constructors
+// instead.
 type Document struct {
 	Nodes        []Node
 	pointerCache map[string]Node

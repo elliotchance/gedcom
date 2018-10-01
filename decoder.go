@@ -31,9 +31,7 @@ func NewDecoder(r io.Reader) *Decoder {
 // A blank GEDCOM or a GEDCOM that only contains empty lines is valid and a
 // Document will be returned with zero nodes.
 func (dec *Decoder) Decode() (*Document, error) {
-	document := &Document{
-		Nodes: []Node{},
-	}
+	document := NewDocument()
 	indents := []Node{}
 
 	document.HasBOM = dec.consumeOptionalBOM()

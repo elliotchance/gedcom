@@ -1,8 +1,8 @@
 package main
 
 import (
-	"testing"
 	"github.com/elliotchance/tf"
+	"testing"
 )
 
 func Test_badgePill_String(t *testing.T) {

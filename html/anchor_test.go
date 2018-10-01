@@ -1,8 +1,8 @@
 package html
 
 import (
-	"testing"
 	"github.com/elliotchance/tf"
+	"testing"
 )
 
 func TestAnchor_String(t *testing.T) {
