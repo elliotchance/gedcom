@@ -1,6 +1,8 @@
 package gedcom
 
-import "time"
+import (
+	"time"
+)
 
 // IndividualNode represents a person.
 type IndividualNode struct {
@@ -209,6 +211,10 @@ func (node *IndividualNode) IsLiving() bool {
 
 	if node.Document() != nil {
 		maxLivingAge = node.Document().MaxLivingAge
+	}
+
+	if maxLivingAge == 0 {
+		return true
 	}
 
 	nowYear := float64(time.Now().Year())

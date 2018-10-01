@@ -135,7 +135,7 @@ func TestNewDocumentFromString(t *testing.T) {
 	}{
 		{
 			"",
-			&gedcom.Document{Nodes: []gedcom.Node{}},
+			&gedcom.Document{},
 			nil,
 		},
 		{
@@ -156,6 +156,11 @@ func TestNewDocumentFromString(t *testing.T) {
 	} {
 		t.Run(test.ged, func(t *testing.T) {
 			result, err := gedcom.NewDocumentFromString(test.ged)
+
+			if test.expected != nil {
+				test.expected.MaxLivingAge = gedcom.DefaultMaxLivingAge
+			}
+
 			assert.Equal(t, err, test.err)
 			assert.Equal(t, test.expected, result)
 		})

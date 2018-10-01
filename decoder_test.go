@@ -10,10 +10,10 @@ import (
 
 var tests = map[string]*gedcom.Document{
 	"": {
-		Nodes: []gedcom.Node{},
+		Nodes: nil,
 	},
 	"\n\n": {
-		Nodes: []gedcom.Node{},
+		Nodes: nil,
 	},
 	"0 HEAD": {
 		Nodes: []gedcom.Node{
@@ -257,6 +257,7 @@ func TestDecoder_Decode(t *testing.T) {
 			decoder := gedcom.NewDecoder(strings.NewReader(ged))
 			actual, err := decoder.Decode()
 			actual.HasBOM = expected.HasBOM
+			expected.MaxLivingAge = gedcom.DefaultMaxLivingAge
 
 			assert.NoError(t, err, ged)
 

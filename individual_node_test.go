@@ -1317,13 +1317,19 @@ func TestIndividualNode_IsLiving(t *testing.T) {
 		}),
 	})).Returns(true)
 
-	doc = gedcom.NewDocument()
 	doc.MaxLivingAge = 25
 	IsLiving(gedcom.NewIndividualNode(doc, "", "", []gedcom.Node{
 		gedcom.NewBirthNode(doc, "", "", []gedcom.Node{
 			gedcom.NewDateNode(doc, "3 Sep 1945", "", nil),
 		}),
 	})).Returns(false)
+
+	doc.MaxLivingAge = 0
+	IsLiving(gedcom.NewIndividualNode(doc, "", "", []gedcom.Node{
+		gedcom.NewBirthNode(doc, "", "", []gedcom.Node{
+			gedcom.NewDateNode(doc, "3 Sep 1945", "", nil),
+		}),
+	})).Returns(true)
 }
 
 func TestIndividualNode_Children(t *testing.T) {
