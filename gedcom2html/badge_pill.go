@@ -1,6 +1,8 @@
 package main
 
-import "github.com/elliotchance/gedcom/html"
+import (
+	"fmt"
+)
 
 // badgePill is a rounded badge that contains a value.
 type badgePill struct {
@@ -16,6 +18,7 @@ func newBadgePill(color, class, value string) *badgePill {
 }
 
 func (c *badgePill) String() string {
-	return html.Sprintf(`<span class="badge badge-pill badge-%s %s">%s</span>`,
-		c.color, c.class, c.value)
+	class := fmt.Sprintf("badge badge-pill badge-%s %s", c.color, c.class)
+
+	return newSpan(class, c.value).String()
 }

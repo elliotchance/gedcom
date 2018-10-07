@@ -24,13 +24,13 @@ func (c *familyListPage) String() string {
 	}
 
 	for _, family := range c.document.Families() {
-		table = append(table, newFamilyInList(c.document, family))
+		familyInList := newFamilyInList(c.document, family)
+		table = append(table, familyInList)
 	}
 
-	return html.NewPage("Families", html.NewComponents(
-		newHeader(c.document, "", selectedFamiliesTab),
-		html.NewRow(
-			html.NewColumn(html.EntireRow, html.NewTable("", table...)),
-		),
-	), c.googleAnalyticsID).String()
+	column := html.NewColumn(html.EntireRow, html.NewTable("", table...))
+	header := newHeader(c.document, "", selectedFamiliesTab)
+	components := html.NewComponents(header, html.NewRow(column))
+
+	return html.NewPage("Families", components, c.googleAnalyticsID).String()
 }

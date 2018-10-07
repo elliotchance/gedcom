@@ -23,8 +23,10 @@ func (c *allParentButtons) String() (s string) {
 	families := c.individual.Families()
 
 	for _, family := range families {
-		if family.Husband().Is(c.individual) ||
-			family.Wife().Is(c.individual) {
+		husbandMatches := family.Husband().Is(c.individual)
+		wifeMatches := family.Wife().Is(c.individual)
+
+		if husbandMatches || wifeMatches {
 			continue
 		}
 

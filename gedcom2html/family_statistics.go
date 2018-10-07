@@ -21,19 +21,24 @@ func (c *familyStatistics) String() string {
 	divorceEvents := 0
 
 	for _, family := range c.document.Families() {
-		if n := gedcom.First(gedcom.NodesWithTagPath(family, gedcom.TagMarriage)); n != nil {
+		n := gedcom.First(gedcom.NodesWithTagPath(family, gedcom.TagMarriage))
+		if n != nil {
 			marriageEvents += 1
 		}
 
-		if n := gedcom.First(gedcom.NodesWithTagPath(family, gedcom.TagDivorce)); n != nil {
+		n = gedcom.First(gedcom.NodesWithTagPath(family, gedcom.TagDivorce))
+		if n != nil {
 			divorceEvents += 1
 		}
 	}
 
+	totalFamilies := html.NewNumber(total).String()
+	marriageCount := html.NewNumber(marriageEvents).String()
+	divorceCount := html.NewNumber(divorceEvents).String()
 	s := html.NewComponents(
-		newKeyedTableRow("Total Families", html.NewNumber(total).String(), true),
-		newKeyedTableRow("Marriage Events", html.NewNumber(marriageEvents).String(), true),
-		newKeyedTableRow("Divorce Events", html.NewNumber(divorceEvents).String(), true),
+		newKeyedTableRow("Total Families", totalFamilies, true),
+		newKeyedTableRow("Marriage Events", marriageCount, true),
+		newKeyedTableRow("Divorce Events", divorceCount, true),
 	)
 
 	return newCard("Families", noBadgeCount, html.NewTable("", s)).String()

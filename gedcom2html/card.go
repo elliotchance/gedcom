@@ -31,8 +31,8 @@ func (c *card) String() string {
 		count = newBadgePill("secondary", "float-right", strconv.Itoa(c.count))
 	}
 
-	return html.NewDiv("card", html.NewComponents(
-		html.NewHeading(5, "card-header", c.title+count.String()),
-		c.body,
-	)).String()
+	heading := html.NewHeading(5, "card-header", c.title+count.String())
+	components := html.NewComponents(heading, c.body)
+
+	return html.NewDiv("card", components).String()
 }

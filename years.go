@@ -11,8 +11,12 @@ type Yearer interface {
 // nil or does not implement Yearer then 0.0 will be returned. Otherwise the
 // value of Years() is returned.
 func Years(v interface{}) float64 {
-	if y, ok := v.(Yearer); v != nil && ok {
+	if y, ok := v.(Yearer); ok {
 		return y.Years()
+	}
+
+	if d, ok := v.(Node); ok {
+		return Years(MinimumDateNode(Dates(d)))
 	}
 
 	return 0

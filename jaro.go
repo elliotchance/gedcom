@@ -3,6 +3,7 @@ package gedcom
 import (
 	"math"
 	"regexp"
+	"sort"
 	"strings"
 )
 
@@ -47,7 +48,7 @@ func JaroWinkler(a, b string, boostThreshold float64, prefixSize int) float64 {
 		return j
 	}
 
-	prefixSize = int(math.Min(float64(len(a)), math.Min(float64(prefixSize), float64(len(b)))))
+	prefixSize = minInt(prefixSize, len(a), len(b))
 
 	var prefixMatch float64
 	for i := 0; i < prefixSize; i++ {
@@ -57,6 +58,12 @@ func JaroWinkler(a, b string, boostThreshold float64, prefixSize int) float64 {
 	}
 
 	return j + 0.1*prefixMatch*(1.0-j)
+}
+
+func minInt(values ...int) int {
+	sort.Ints(values)
+
+	return values[0]
 }
 
 // jaro was copied from the same place as JaroWinkler.

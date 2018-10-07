@@ -19,7 +19,8 @@ func newFamilyInList(document *gedcom.Document, family *gedcom.FamilyNode) *fami
 
 func (c *familyInList) String() string {
 	date := "-"
-	if n := gedcom.First(gedcom.NodesWithTagPath(c.family, gedcom.TagMarriage, gedcom.TagDate)); n != nil {
+	n := gedcom.First(gedcom.NodesWithTagPath(c.family, gedcom.TagMarriage, gedcom.TagDate))
+	if n != nil {
 		date = n.Value()
 	}
 
