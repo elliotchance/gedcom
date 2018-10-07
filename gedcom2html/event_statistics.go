@@ -43,10 +43,12 @@ func (c *eventStatistics) String() string {
 	sort.Strings(keys)
 
 	for _, name := range keys {
-		rows = append(rows,
-			newKeyedTableRow(name, html.NewNumber(counts[name]).String(), true))
+		number := html.NewNumber(counts[name]).String()
+		tableRow := newKeyedTableRow(name, number, true)
+		rows = append(rows, tableRow)
 	}
 
-	return newCard("Events", noBadgeCount,
-		html.NewTable("", html.NewComponents(rows...))).String()
+	table := html.NewTable("", html.NewComponents(rows...))
+
+	return newCard("Events", noBadgeCount, table).String()
 }

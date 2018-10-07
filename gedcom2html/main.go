@@ -85,9 +85,22 @@ func main() {
 	}
 
 	if !optionNoPlaces {
-		createFile(pagePlaces(), newPlaceListPage(document, optionGoogleAnalyticsID))
+		page := newPlaceListPage(document, optionGoogleAnalyticsID)
+		createFile(pagePlaces(), page)
 
-		for key, place := range getPlaces(document) {
+		// Sort the places so that the generated page names will be more
+		// deterministic.
+		places := getPlaces(document)
+		placeKeys := []string{}
+
+		for key := range places {
+			placeKeys = append(placeKeys, key)
+		}
+
+		sort.Strings(placeKeys)
+
+		for _, key := range placeKeys {
+			place := places[key]
 			page := newPlacePage(document, key, optionGoogleAnalyticsID)
 			createFile(pagePlace(document, place.prettyName), page)
 		}

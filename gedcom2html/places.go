@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/elliotchance/gedcom"
+	"sort"
 	"strings"
 )
 
@@ -51,6 +52,48 @@ func getPlaces(document *gedcom.Document) map[string]*place {
 			}
 
 			placesMap[key].nodes = append(placesMap[key].nodes, node)
+		}
+
+		for key := range placesMap {
+			// Make sure the events are sorted otherwise the pages will be
+			// different.
+			sort.Slice(placesMap[key].nodes, func(i, j int) bool {
+				left := placesMap[key].nodes[i]
+				right := placesMap[key].nodes[j]
+
+				// Years.
+				leftYears := gedcom.Years(left)
+				rightYears := gedcom.Years(right)
+
+				if leftYears != rightYears {
+					return leftYears < rightYears
+				}
+
+				// Tag.
+				leftTag := left.Tag().String()
+				rightTag := right.Tag().String()
+
+				if leftTag != rightTag {
+					return leftTag < rightTag
+				}
+
+				// Individual name.
+				leftIndividual := individualForNode(left)
+				rightIndividual := individualForNode(right)
+
+				if leftIndividual != nil && rightIndividual != nil {
+					leftName := gedcom.String(leftIndividual.Name())
+					rightName := gedcom.String(rightIndividual.Name())
+
+					return leftName < rightName
+				}
+
+				// Value.
+				valueLeft := gedcom.Value(left)
+				valueRight := gedcom.Value(right)
+
+				return valueLeft < valueRight
+			})
 		}
 	}
 

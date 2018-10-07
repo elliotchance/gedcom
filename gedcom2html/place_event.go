@@ -22,19 +22,15 @@ func (c *placeEvent) String() string {
 	description := c.node.Tag().String()
 	person := ""
 
-	if d := gedcom.First(gedcom.NodesWithTag(c.node, gedcom.TagDate)); d != nil {
+	d := gedcom.MinimumDateNode(gedcom.Dates(c.node))
+
+	if d != nil {
 		date = d.Value()
 	}
 
-	for _, individual := range c.document.Individuals() {
-		if gedcom.HasNestedNode(individual, c.node) {
-			if individual.IsLiving() {
-				return ""
-			}
-
-			person = newIndividualLink(c.document, individual).String()
-			break
-		}
+	individual := individualForNode(c.node)
+	if individual != nil && !individual.IsLiving() {
+		person = newIndividualLink(c.document, individual).String()
 	}
 
 	return html.Sprintf(`

@@ -269,14 +269,23 @@ amos-adams.html,b0538fb8186a50c4079c902fec2b4ba0af843061
 massachusetts-united-states.html,79db811c089e8ab5653d34551e6540cb2ea2c947
 ```
 
-The lines are ordered by the file name so the output is ideal for diffing. Here
-is some example bash statements that may be useful:
+The lines are ordered by the file name so the output is ideal for comparison.
+
+Here is an example of using the previous and current checksum file to generate
+sync commands:
+
+```bash
+join -a 1 -a 2 -t, -o 0.1,1.2,2.2 /old/checksum.csv /new/checksum.csv | \
+    awk -F, '$2 == $3 { next } { print $3 == "" \
+        ? "rm /some/folder/" $1 \
+        : "cp" " " $1 " /some/folder/" $1 }'
+```
+
+Will produce commands like:
 
 ```
-DIFF="diff /old/checksum.csv /new/checksum.csv --suppress-common-lines -y -W 1000"
-NEW_FILES=$($DIFF | egrep ">" | rev | cut -f1 | rev | cut -d, -f1)
-CHANGED_FILES=$($DIFF | egrep "\|")
-DEL_FILES=$($DIFF | grep "<" | cut -d, -f1)
+cp abos-adams.html /some/folder/abos-adams.html
+rm /some/folder/massachusetts-united-states.html
 ```
 
 
