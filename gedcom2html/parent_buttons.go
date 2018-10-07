@@ -20,6 +20,11 @@ func newParentButtons(document *gedcom.Document, family *gedcom.FamilyNode) *par
 }
 
 func (c *parentButtons) String() string {
+	husband := newIndividualButton(c.document, c.family.Husband())
+	wife := newIndividualButton(c.document, c.family.Wife())
+	svg := newPlusSVG(false, true, true, true)
+	space := html.NewSpace()
+
 	return html.Sprintf(`
 		<div class="row">
 		   <div class="col-5">
@@ -33,8 +38,5 @@ func (c *parentButtons) String() string {
 		   </div>
 		</div>
 		%s`,
-		newIndividualButton(c.document, c.family.Husband()),
-		newPlusSVG(false, true, true, true),
-		newIndividualButton(c.document, c.family.Wife()),
-		html.NewSpace())
+		husband, svg, wife, space)
 }

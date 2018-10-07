@@ -28,10 +28,7 @@ func Filter(root Node, fn FilterFunction) Node {
 		return nil
 	}
 
-	// Shallow copy the node.
-	// https://github.com/elliotchance/gedcom/issues/74
-	result := NewNode(newRoot.Document(), newRoot.Tag(), newRoot.Value(),
-		newRoot.Pointer())
+	result := shallowCopyNode(newRoot)
 
 	if keepTraversing {
 		for _, child := range root.Nodes() {
@@ -43,6 +40,15 @@ func Filter(root Node, fn FilterFunction) Node {
 	}
 
 	return result
+}
+
+func shallowCopyNode(node Node) Node {
+	document := node.Document()
+	tag := node.Tag()
+	value := node.Value()
+	pointer := node.Pointer()
+
+	return NewNode(document, tag, value, pointer)
 }
 
 // WhitelistTagFilter returns any node that is one of the provided tags.

@@ -18,10 +18,11 @@ func newPlaceInList(document *gedcom.Document, place *place) *placeInList {
 }
 
 func (c *placeInList) String() string {
-	return html.Sprintf(`
-		<tr>
-			<td nowrap="nowrap">%s %s</td>
-		</tr>`,
-		newPlaceLink(c.document, c.place.prettyName),
-		newCountBadge(len(c.place.nodes)))
+	placeLink := newPlaceLink(c.document, c.place.prettyName)
+	countBadge := newCountBadge(len(c.place.nodes))
+	content := html.NewComponents(placeLink, countBadge)
+
+	return html.NewTableRow(
+		html.NewTableCell(content).NoWrap(),
+	).String()
 }

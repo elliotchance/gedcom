@@ -29,7 +29,8 @@ func (c *IndividualName) String() string {
 		return c.unknownText
 	}
 
-	if c.individual.IsLiving() && !c.showLiving {
+	isLiving := c.individual.IsLiving()
+	if isLiving && !c.showLiving {
 		return "<em>Hidden</em>"
 	}
 

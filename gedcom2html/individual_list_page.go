@@ -58,9 +58,9 @@ func (c *individualListPage) String() string {
 			)
 
 			table = append(table, html.NewTableRow(
-				html.NewTableCell("", heading),
-				html.NewTableCell("", html.NewText("")),
-				html.NewTableCell("", html.NewText("")),
+				html.NewTableCell(heading),
+				html.NewTableCell(html.NewText("")),
+				html.NewTableCell(html.NewText("")),
 			))
 
 			lastSurname = newSurname

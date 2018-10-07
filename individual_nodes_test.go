@@ -8,6 +8,7 @@ import (
 )
 
 func TestIndividualNodes_Similarity(t *testing.T) {
+	// ghost:ignore
 	var tests = []struct {
 		a, b          gedcom.IndividualNodes
 		minSimilarity float64
@@ -344,6 +345,7 @@ func TestIndividualNodes_Compare(t *testing.T) {
 	jane := individual("P3", "Jane /Doe/", "3 Mar 1803", "14 June 1877")
 	bob := individual("P4", "Bob /Jones/", "1749", "1810")
 
+	// ghost:ignore
 	tests := []struct {
 		doc1, doc2 *gedcom.Document
 		min        float64

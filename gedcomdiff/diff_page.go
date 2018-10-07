@@ -68,11 +68,11 @@ func (c *diffPage) String() string {
 			continue
 		}
 
+		leftNameAndDates := html.NewIndividualNameAndDates(comparison.Left, true, "")
+		rightNameAndDates := html.NewIndividualNameAndDates(comparison.Right, true, "")
 		rows = append(rows, html.NewTableRow(
-			html.NewTableCell(leftClass,
-				html.NewIndividualNameAndDates(comparison.Left, true, "")),
-			html.NewTableCell(rightClass,
-				html.NewIndividualNameAndDates(comparison.Right, true, "")),
+			html.NewTableCell(leftNameAndDates).Class(leftClass),
+			html.NewTableCell(rightNameAndDates).Class(rightClass),
 		))
 	}
 

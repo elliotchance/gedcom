@@ -76,7 +76,9 @@ func (node *NameNode) Surname() string {
 	}
 
 	// The surname (if provided) will be wrapped within //.
-	return lastName[1 : len(lastName)-1]
+	lastNameLength := len(lastName)
+
+	return lastName[1 : lastNameLength-1]
 }
 
 func (node *NameNode) Prefix() string {
@@ -168,10 +170,12 @@ func (node *NameNode) Type() NameType {
 //
 // Even this uses the NameFormatGEDCOM it may return a different value from
 // Format(NameFormatGEDCOM) because any empty surnames will be removed.
-func (node *NameNode) GedcomName() string {
-	name := node.Format(NameFormatGEDCOM)
+func (node *NameNode) GedcomName() (name string) {
+	name = node.Format(NameFormatGEDCOM)
+	name = strings.Replace(name, "//", "", -1)
+	name = CleanSpace(name)
 
-	return CleanSpace(strings.Replace(name, "//", "", -1))
+	return
 }
 
 // Format returns a formatted name.
@@ -202,9 +206,10 @@ func (node *NameNode) GedcomName() string {
 //
 func (node *NameNode) Format(format string) string {
 	result := ""
+	formatLen := len(format)
 
-	for i := 0; i < len(format); i++ {
-		if format[i] == '%' && i < len(format)-1 {
+	for i := 0; i < formatLen; i++ {
+		if format[i] == '%' && i < formatLen-1 {
 			nextLetter := format[i+1]
 
 			switch nextLetter {

@@ -25,11 +25,13 @@ before_install:
   # Make the binary executable
   - chmod +x $GOPATH/bin/dep
 
-install: dep ensure
+install:
+  - go get -u github.com/elliotchance/ghost
+  - dep ensure
 
 script:
   - if [[ "$TRAVIS_GO_VERSION" == 1.11* ]]; then
-      make check-go-fmt;
+      make checks;
       make test-coverage;
     else
       make test;

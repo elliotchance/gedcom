@@ -85,7 +85,9 @@ func main() {
 
 	page := newDiffPage(comparisons, compareOptions.SimilarityOptions,
 		filterFlags, optionGoogleAnalyticsID)
-	out.Write([]byte(page.String()))
+
+	pageString := page.String()
+	out.Write([]byte(pageString))
 }
 
 func parseCLIFlags() {

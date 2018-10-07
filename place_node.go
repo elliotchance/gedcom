@@ -91,10 +91,11 @@ func (node *PlaceNode) Country() string {
 	// If the country is empty it is likely because the place is not formatted
 	// into four jurisdictional entities. In this case we will try to find the
 	// country by looking at the suffix of the place name.
-	name := strings.ToLower(strings.Trim(node.JurisdictionalName(), ",. "))
+	nameWithoutPunctuation := strings.Trim(node.JurisdictionalName(), ",. ")
+	lowerCaseName := strings.ToLower(nameWithoutPunctuation)
 
 	for _, c := range Countries {
-		if strings.HasSuffix(name, strings.ToLower(c)) {
+		if strings.HasSuffix(lowerCaseName, strings.ToLower(c)) {
 			return c
 		}
 	}

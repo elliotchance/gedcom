@@ -186,6 +186,7 @@ func parseCLIFlags() {
 }
 
 func random(min, max float64) float64 {
+	// ghost:ignore
 	return min + rand.Float64()*(max-min)
 }
 
@@ -267,5 +268,6 @@ func run(gedcom1, gedcom2 *gedcom.Document, idealScore int, options *gedcom.Simi
 		}
 	}
 
-	fmt.Printf("%s, Score:%.6f\n", options, score/float64(idealScore))
+	adjustedScore := score / float64(idealScore)
+	fmt.Printf("%s, Score:%.6f\n", options, adjustedScore)
 }

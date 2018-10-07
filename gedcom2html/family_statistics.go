@@ -35,11 +35,11 @@ func (c *familyStatistics) String() string {
 	totalFamilies := html.NewNumber(total).String()
 	marriageCount := html.NewNumber(marriageEvents).String()
 	divorceCount := html.NewNumber(divorceEvents).String()
-	s := html.NewComponents(
-		newKeyedTableRow("Total Families", totalFamilies, true),
-		newKeyedTableRow("Marriage Events", marriageCount, true),
-		newKeyedTableRow("Divorce Events", divorceCount, true),
-	)
+	totalFamiliesRow := newKeyedTableRow("Total Families", totalFamilies, true)
+	marriageCountRow := newKeyedTableRow("Marriage Events", marriageCount, true)
+	divorceCountRow := newKeyedTableRow("Divorce Events", divorceCount, true)
+
+	s := html.NewComponents(totalFamiliesRow, marriageCountRow, divorceCountRow)
 
 	return newCard("Families", noBadgeCount, html.NewTable("", s)).String()
 }

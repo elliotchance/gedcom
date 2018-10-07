@@ -176,7 +176,7 @@ func (nd *NodeDiff) lrLine(indent int) string {
 		return fmt.Sprintf("LR %s\nLR %s", left, right)
 	}
 
-	return fmt.Sprintf("LR %s", GedcomLine(indent, nd.Left))
+	return fmt.Sprintf("LR %s", left)
 }
 
 func (nd *NodeDiff) string(indent int) string {
@@ -216,7 +216,9 @@ func (nd *NodeDiff) string(indent int) string {
 // You should not rely on this format to be machine readable as it may change in
 // the future.
 func (nd *NodeDiff) String() string {
-	return strings.TrimRightFunc(nd.string(0), unicode.IsSpace)
+	line := nd.string(0)
+
+	return strings.TrimRightFunc(line, unicode.IsSpace)
 }
 
 // IsDeepEqual returns true if the current NodeDiff and all of its children have
@@ -236,7 +238,10 @@ func (nd *NodeDiff) String() string {
 //    R 1 NAME J. /Smith/     | false
 //
 func (nd *NodeDiff) IsDeepEqual() bool {
-	if IsNil(nd.Left) || IsNil(nd.Right) {
+	leftIsNil := IsNil(nd.Left)
+	rightIsNil := IsNil(nd.Right)
+
+	if leftIsNil || rightIsNil {
 		return false
 	}
 
@@ -264,25 +269,34 @@ func (nd *NodeDiff) IsDeepEqual() bool {
 // Sort uses SliceStable to make the results more predicable and also ensures
 // that nodes remain in the same order if all three levels are the same.
 func (nd *NodeDiff) Sort() {
-	sort.SliceStable(nd.Children, func(i, j int) bool {
-		left, right := nd.Children[i].LeftNode(), nd.Children[j].LeftNode()
+	children := nd.Children
 
-		if left.Tag().sortValue != right.Tag().sortValue {
-			return left.Tag().sortValue < right.Tag().sortValue
-		}
-
-		y1, ok1 := left.(Yearer)
-		y2, ok2 := right.(Yearer)
-		if ok1 && ok2 {
-			return y1.Years() < y2.Years()
-		}
-
-		return left.Value() < right.Value()
+	sort.SliceStable(children, func(i, j int) bool {
+		return children[i].isLessThan(children[j])
 	})
 
-	for _, child := range nd.Children {
+	for _, child := range children {
 		child.Sort()
 	}
+}
+
+func (nd *NodeDiff) isLessThan(nd2 *NodeDiff) bool {
+	left, right := nd.LeftNode(), nd2.LeftNode()
+
+	if left.Tag().sortValue != right.Tag().sortValue {
+		return left.Tag().sortValue < right.Tag().sortValue
+	}
+
+	y1, ok1 := left.(Yearer)
+	y2, ok2 := right.(Yearer)
+	if ok1 && ok2 {
+		return y1.Years() < y2.Years()
+	}
+
+	leftValue := left.Value()
+	rightValue := right.Value()
+
+	return leftValue < rightValue
 }
 
 // LeftNode returns the flattening Node value that favors the left side.

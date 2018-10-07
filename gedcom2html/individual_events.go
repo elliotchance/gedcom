@@ -24,10 +24,13 @@ func (c *individualEvents) String() string {
 	events := []fmt.Stringer{}
 
 	birth := gedcom.First(c.individual.Births())
-	birthDate := gedcom.String(gedcom.First(gedcom.Dates(birth)))
-	birthPlace := gedcom.String(gedcom.First(gedcom.Places(birth)))
+	birthDate := gedcom.First(gedcom.Dates(birth))
+	birthPlace := gedcom.First(gedcom.Places(birth))
+	birthDateString := gedcom.String(birthDate)
+	birthPlaceString := gedcom.String(birthPlace)
 
-	event := newIndividualEvent("Birth", birthDate, birthPlace, "", c.document)
+	event := newIndividualEvent("Birth", birthDateString, birthPlaceString, "",
+		c.document)
 	events = append(events, event)
 
 	for _, family := range c.individual.Families() {
@@ -73,16 +76,18 @@ func (c *individualEvents) String() string {
 	}
 
 	death := gedcom.First(c.individual.Deaths())
-	deathDate := gedcom.String(gedcom.First(gedcom.Dates(death)))
-	deathPlace := gedcom.String(gedcom.First(gedcom.Places(death)))
+	deathDate := gedcom.First(gedcom.Dates(death))
+	deathPlace := gedcom.First(gedcom.Places(death))
+	deathDateString := gedcom.String(deathDate)
+	deathPlaceString := gedcom.String(deathPlace)
 
-	individualEvent := newIndividualEvent("Death", deathDate, deathPlace, "",
+	individualEvent := newIndividualEvent("Death", deathDateString, deathPlaceString, "",
 		c.document)
 	events = append(events, individualEvent)
 
-	s := html.NewTable("text-center",
-		html.NewTableHead("Type", "Date", "Place", "Description"),
-		html.NewComponents(events...))
+	tableHead := html.NewTableHead("Type", "Date", "Place", "Description")
+	components := html.NewComponents(events...)
+	s := html.NewTable("text-center", tableHead, components)
 
 	return html.NewRow(html.NewColumn(html.EntireRow,
 		newCard("Events", len(events), s),

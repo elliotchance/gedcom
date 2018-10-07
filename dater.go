@@ -6,7 +6,7 @@ type Dater interface {
 	Dates() []*DateNode
 }
 
-// Dates returns the shallow DateNodes for each of the provided nodes.
+// Dates returns the shallow DateNodes.
 //
 // Dates is safe to use with nil nodes.
 func Dates(node Node) (result []*DateNode) {

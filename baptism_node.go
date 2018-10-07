@@ -37,7 +37,11 @@ func (node *BaptismNode) Dates() []*DateNode {
 //
 // This logic is especially important for CompareNodes.
 func (node *BaptismNode) Equals(node2 Node) bool {
-	if IsNil(node) || IsNil(node2) {
+	if IsNil(node) {
+		return false
+	}
+
+	if IsNil(node2) {
 		return false
 	}
 

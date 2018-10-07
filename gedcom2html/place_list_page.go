@@ -56,7 +56,7 @@ func (c *placeListPage) String() string {
 			anchor := html.NewAnchor(place.country)
 			heading := html.NewHeading(2, "", place.country)
 			components := html.NewComponents(anchor, heading)
-			cell := html.NewTableCell("", components)
+			cell := html.NewTableCell(components)
 			countryTitle := html.NewTableRow(cell)
 			table = append(table, countryTitle)
 		}

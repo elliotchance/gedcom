@@ -21,6 +21,7 @@ func TestNewMapNode(t *testing.T) {
 }
 
 func TestPlaceNode_Latitude(t *testing.T) {
+	// ghost:ignore
 	var tests = []struct {
 		node     *gedcom.MapNode
 		expected *gedcom.LatitudeNode
@@ -67,6 +68,7 @@ func TestPlaceNode_Latitude(t *testing.T) {
 }
 
 func TestPlaceNode_Longitude(t *testing.T) {
+	// ghost:ignore
 	var tests = []struct {
 		node     *gedcom.MapNode
 		expected *gedcom.LongitudeNode

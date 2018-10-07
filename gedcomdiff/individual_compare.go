@@ -20,9 +20,9 @@ func newIndividualCompare(comparison gedcom.IndividualComparison, filterFlags *u
 }
 
 func (c *individualCompare) appendChildren(nd *gedcom.NodeDiff, prefix string) []fmt.Stringer {
-	tableRows := []fmt.Stringer{
-		newDiffRow(prefix+nd.Tag().String(), nd, c.filterFlags.HideEqual),
-	}
+	title := prefix + nd.Tag().String()
+	row := newDiffRow(title, nd, c.filterFlags.HideEqual)
+	tableRows := []fmt.Stringer{row}
 
 	for _, child := range nd.Children {
 		children := c.appendChildren(child, prefix+"&nbsp;&nbsp;&nbsp;&nbsp;")

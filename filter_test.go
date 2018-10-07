@@ -241,6 +241,7 @@ func TestOfficialTagFilter(t *testing.T) {
 }
 
 func TestSimpleNameFilter(t *testing.T) {
+	// ghost:ignore
 	for _, test := range []struct {
 		root     gedcom.Node
 		expected string

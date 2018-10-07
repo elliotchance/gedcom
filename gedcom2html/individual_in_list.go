@@ -20,32 +20,24 @@ func newIndividualInList(document *gedcom.Document, individual *gedcom.Individua
 }
 
 func (c *individualInList) String() string {
-	birth := gedcom.First(c.individual.Births())
-	birthDate := gedcom.String(gedcom.First(gedcom.Dates(birth)))
-	birthPlace := gedcom.String(gedcom.First(gedcom.Places(birth)))
+	birthDate, birthPlace := c.individual.Birth()
+	deathDate, deathPlace := c.individual.Death()
 
-	death := gedcom.First(c.individual.Deaths())
-	deathDate := gedcom.String(gedcom.First(gedcom.Dates(death)))
-	deathPlace := gedcom.String(gedcom.First(gedcom.Places(death)))
+	birthPlaceName := prettyPlaceName(birthPlace.String())
+	deathPlaceName := prettyPlaceName(deathPlace.String())
 
-	birthPlace = prettyPlaceName(birthPlace)
-	deathPlace = prettyPlaceName(deathPlace)
+	birthDateText := html.NewText(birthDate.String())
+	deathDateText := html.NewText(deathDate.String())
 
-	if birthDate == "" {
-		birthDate = "-"
-	}
+	link := newIndividualLink(c.document, c.individual)
+	birthPlaceLink := newPlaceLink(c.document, birthPlaceName)
+	deathPlaceLink := newPlaceLink(c.document, deathPlaceName)
+	birthLines := html.NewLines(birthDateText, birthPlaceLink)
+	deathLines := html.NewLines(deathDateText, deathPlaceLink)
 
-	if deathDate == "" {
-		deathDate = "-"
-	}
-
-	return html.Sprintf(`
-		<tr>
-			<td nowrap="nowrap">%s</td>
-			<td>%s<br/>%s</td>
-			<td>%s<br/>%s</td>
-		</tr>`,
-		newIndividualLink(c.document, c.individual),
-		birthDate, newPlaceLink(c.document, birthPlace),
-		deathDate, newPlaceLink(c.document, deathPlace))
+	return html.NewTableRow(
+		html.NewTableCell(link).NoWrap(),
+		html.NewTableCell(birthLines),
+		html.NewTableCell(deathLines),
+	).String()
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/elliotchance/gedcom/html"
 	"unicode"
 )
@@ -16,6 +17,9 @@ func newSurnameLink(surname string) *surnameLink {
 }
 
 func (c *surnameLink) String() string {
-	return html.Sprintf(`
-		<a href="%s#%s">%s</a>`, pageIndividuals(unicode.ToLower(rune(c.surname[0]))), c.surname, c.surname)
+	firstLetter := rune(c.surname[0])
+	lowerFirstLetter := unicode.ToLower(firstLetter)
+	destination := fmt.Sprintf("%s#%s", pageIndividuals(lowerFirstLetter), c.surname)
+
+	return html.NewLink(c.surname, destination).String()
 }
