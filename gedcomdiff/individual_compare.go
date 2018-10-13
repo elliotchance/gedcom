@@ -84,7 +84,10 @@ func (c *individualCompare) String() string {
 	}
 
 	options := gedcom.NewSimilarityOptions()
-	for _, parents := range leftParents.Compare(rightParents, options) {
+	compareOptions := &gedcom.IndividualNodesCompareOptions{
+		SimilarityOptions: options,
+	}
+	for _, parents := range leftParents.Compare(rightParents, compareOptions) {
 		var row *diffRow
 		name := "Parent"
 
@@ -112,7 +115,7 @@ func (c *individualCompare) String() string {
 	// Spouses
 	switch {
 	case !gedcom.IsNil(left) && !gedcom.IsNil(right):
-		for _, spouse := range left.Spouses().Compare(right.Spouses(), options) {
+		for _, spouse := range left.Spouses().Compare(right.Spouses(), compareOptions) {
 			nodeDiff := &gedcom.NodeDiff{}
 
 			if spouse.Left != nil {

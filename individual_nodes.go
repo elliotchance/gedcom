@@ -214,12 +214,67 @@ type IndividualComparison struct {
 	Similarity SurroundingSimilarity
 }
 
+// CompareProgress contains information about the progress of a Comparison.
+type CompareProgress struct {
+	Done, Total int64
+}
+
+// IndividualNodesCompareOptions provides more optional attributes for
+// IndividualNodes.Compare.
+type IndividualNodesCompareOptions struct {
+	// Options controls the weights of the comparisons. See SimilarityOptions
+	// for more information. Any matches below MinimumSimilarity will not be
+	// used.
+	//
+	// Since this can take a long time to run with a lot of individuals there is an
+	// optional notifier channel that can be listened to for progress updates. Or
+	// pass nil to ignore this feature.
+	//
+	SimilarityOptions *SimilarityOptions
+
+	// Notifier will be sent progress updates throughout the comparison if it is
+	// not nil. If it is nil then this feature is ignored.
+	//
+	// You can control how precise this is with NotifierStep.
+	Notifier chan CompareProgress
+
+	// NotifierStep is the number of comparisons that must happen before the
+	// Notifier is used. The default is zero so all comparisons will cause a
+	// notify. You should set this to a higher amount of reduce the frequency of
+	// chatter.
+	NotifierStep int64
+
+	// Jobs controls the parallelism of the processing. The default value of 0
+	// works the same as a value of 1 (no concurrency). Any number higher than 1
+	// will create extra go routines to increase the CPU utilization of the
+	// processing.
+	//
+	// It is important to note that the parallelism is still bound by
+	// GOMAXPROCS.
+	Jobs int
+}
+
+func (o *IndividualNodesCompareOptions) end() {
+	if o.Notifier != nil {
+		close(o.Notifier)
+	}
+}
+
+func (o *IndividualNodesCompareOptions) notify(m CompareProgress) {
+	if o.Notifier != nil {
+		o.Notifier <- m
+	}
+}
+
+func (o *IndividualNodesCompareOptions) notifierStep() int64 {
+	return maxInt64(o.NotifierStep, 1)
+}
+
+func (o *IndividualNodesCompareOptions) jobs() int {
+	return maxInt(o.Jobs, 1)
+}
+
 // Compare returns the matching individuals from two lists.
-//
-// It is expected that all of the individuals in a single slice come from the
-// same document. doc1 and doc2 are used as the Documents for the current and
-// other nodes respectively. If both sets of individuals come from the same
-// Document you must specify the same Document for both values.
 //
 // The length of the result slice will be no larger than the largest slice
 // provided and no smaller than the smallest slice provided.
@@ -228,26 +283,58 @@ type IndividualComparison struct {
 // guarantee that all the Left's are unique and belong to the current nodes.
 // Likewise all Right's will be unique and only belong to the other set.
 //
-// The options.MinimumCompareSimilarity sets a threshold of
-// WeightedSimilarity(). Any matches below minimumSimilarity will not be used.
-func (nodes IndividualNodes) Compare(other IndividualNodes, options *SimilarityOptions) []IndividualComparison {
+// See IndividualNodesCompareOptions for more options.
+func (nodes IndividualNodes) Compare(other IndividualNodes, options *IndividualNodesCompareOptions) []IndividualComparison {
 	// Calculate all the similarities of the matrix.
 	similarities := []IndividualComparison{}
+	total := int64(len(nodes)) * int64(len(other))
 
-	for _, a := range nodes {
-		for _, b := range other {
-			similarities = append(similarities, IndividualComparison{
-				Left:       a,
-				Right:      b,
-				Similarity: a.SurroundingSimilarity(b, options),
+	jobs := make(chan IndividualComparison, 100)
+	results := make(chan IndividualComparison, 100)
+
+	// Start workers.
+	for w := 1; w <= options.jobs(); w++ {
+		go nodes.compareWorker(options.SimilarityOptions, jobs, results)
+	}
+
+	// Send jobs.
+	go func() {
+		for _, a := range nodes {
+			for _, b := range other {
+				jobs <- IndividualComparison{
+					Left:  a,
+					Right: b,
+				}
+			}
+		}
+
+		close(jobs)
+	}()
+
+	// Collect results.
+	for done := int64(1); done <= total; done++ {
+		similarities = append(similarities, <-results)
+
+		if done%options.notifierStep() == 0 {
+			options.notify(CompareProgress{
+				Done:  done,
+				Total: total,
 			})
 		}
 	}
 
+	// Make sure we notify that all comparisons have completed.
+	options.notify(CompareProgress{
+		Done:  total,
+		Total: total,
+	})
+
 	// Sort by similarity.
 	sort.SliceStable(similarities, func(i, j int) bool {
-		return similarities[i].Similarity.WeightedSimilarity(options) >
-			similarities[j].Similarity.WeightedSimilarity(options)
+		similarityOptions := options.SimilarityOptions
+
+		return similarities[i].Similarity.WeightedSimilarity(similarityOptions) >
+			similarities[j].Similarity.WeightedSimilarity(similarityOptions)
 	})
 
 	// Find the winners.
@@ -255,7 +342,7 @@ func (nodes IndividualNodes) Compare(other IndividualNodes, options *SimilarityO
 	winners := []IndividualComparison{}
 	for _, s := range similarities {
 		// Once we have gone below the acceptable similarity we can bail out.
-		if s.Similarity.WeightedSimilarity(options) < options.MinimumWeightedSimilarity {
+		if s.Similarity.WeightedSimilarity(options.SimilarityOptions) < options.SimilarityOptions.MinimumWeightedSimilarity {
 			break
 		}
 
@@ -286,5 +373,14 @@ func (nodes IndividualNodes) Compare(other IndividualNodes, options *SimilarityO
 		}
 	}
 
+	options.end()
+
 	return winners
+}
+
+func (nodes IndividualNodes) compareWorker(similarityOptions *SimilarityOptions, jobs <-chan IndividualComparison, results chan<- IndividualComparison) {
+	for j := range jobs {
+		j.Similarity = j.Left.SurroundingSimilarity(j.Right, similarityOptions)
+		results <- j
+	}
 }

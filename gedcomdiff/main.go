@@ -4,6 +4,7 @@ package main
 
 import (
 	"flag"
+	"github.com/cheggaaa/pb"
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/util"
 	"log"
@@ -16,6 +17,8 @@ var (
 	optionOutputFile        string
 	optionSubset            bool
 	optionGoogleAnalyticsID string
+	optionProgress          bool
+	optionJobs              int
 )
 
 var filterFlags = &util.FilterFlags{}
@@ -37,17 +40,43 @@ func main() {
 	leftIndividuals := leftGedcom.Individuals()
 	rightIndividuals := rightGedcom.Individuals()
 
-	log.Printf("Writing %s...", optionOutputFile)
-
 	out, err := os.Create(optionOutputFile)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	options := gedcom.NewSimilarityOptions()
-	comparisons := leftIndividuals.Compare(rightIndividuals, options)
+	var comparisons []gedcom.IndividualComparison
+	compareOptions := &gedcom.IndividualNodesCompareOptions{
+		SimilarityOptions: gedcom.NewSimilarityOptions(),
+		Notifier:          make(chan gedcom.CompareProgress),
+		NotifierStep:      100,
+		Jobs:              optionJobs,
+	}
 
-	page := newDiffPage(comparisons, options, filterFlags, optionGoogleAnalyticsID)
+	if optionProgress {
+		go func() {
+			comparisons = leftIndividuals.Compare(rightIndividuals, compareOptions)
+		}()
+
+		progressBar := pb.StartNew(0)
+
+		for {
+			n, ok := <-compareOptions.Notifier
+			if !ok {
+				break
+			}
+
+			progressBar.SetTotal(n.Total)
+			progressBar.SetCurrent(n.Done)
+		}
+
+		progressBar.Finish()
+	} else {
+		comparisons = leftIndividuals.Compare(rightIndividuals, compareOptions)
+	}
+
+	page := newDiffPage(comparisons, compareOptions.SimilarityOptions,
+		filterFlags, optionGoogleAnalyticsID)
 	out.Write([]byte(page.String()))
 }
 
@@ -62,6 +91,8 @@ func parseCLIFlags() {
 		"side will not be included.")
 	flag.StringVar(&optionGoogleAnalyticsID, "google-analytics-id", "",
 		"The Google Analytics ID, like 'UA-78454410-2'.")
+	flag.BoolVar(&optionProgress, "progress", false, "Show progress bar.")
+	flag.IntVar(&optionJobs, "jobs", 1, "Number of jobs to run in parallel.")
 
 	filterFlags.SetupCLI()
 

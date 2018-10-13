@@ -437,7 +437,10 @@ func TestIndividualNodes_Compare(t *testing.T) {
 
 			individuals1 := test.doc1.Individuals()
 			individuals2 := test.doc2.Individuals()
-			got := individuals1.Compare(individuals2, options)
+			got := individuals1.Compare(individuals2,
+				&gedcom.IndividualNodesCompareOptions{
+					SimilarityOptions: options,
+				})
 
 			assert.Equal(t, test.want, got)
 		})

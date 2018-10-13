@@ -430,8 +430,7 @@ func TestIndividualNode_Parents(t *testing.T) {
 	}
 }
 
-func
-TestIndividualNode_SpouseChildren(t *testing.T) {
+func TestIndividualNode_SpouseChildren(t *testing.T) {
 	doc := getDocument()
 
 	var tests = []struct {
@@ -510,8 +509,7 @@ TestIndividualNode_SpouseChildren(t *testing.T) {
 	}
 }
 
-func
-TestIndividualNode_LDSBaptisms(t *testing.T) {
+func TestIndividualNode_LDSBaptisms(t *testing.T) {
 	var tests = []struct {
 		node     *gedcom.IndividualNode
 		baptisms []gedcom.Node
@@ -571,8 +569,7 @@ TestIndividualNode_LDSBaptisms(t *testing.T) {
 	}
 }
 
-func
-TestIndividualNode_EstimatedBirthDate(t *testing.T) {
+func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 	var tests = []struct {
 		node     *gedcom.IndividualNode
 		expected *gedcom.DateNode
@@ -682,8 +679,7 @@ TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 	}
 }
 
-func
-TestIndividualNode_EstimatedDeathDate(t *testing.T) {
+func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 	var tests = []struct {
 		node     *gedcom.IndividualNode
 		expected *gedcom.DateNode
@@ -1032,8 +1028,7 @@ func TestIndividualNode_Similarity(t *testing.T) {
 	}
 }
 
-func
-TestIndividualNode_SurroundingSimilarity(t *testing.T) {
+func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 	var tests = []struct {
 		doc      *gedcom.Document
 		expected gedcom.SurroundingSimilarity
@@ -1254,43 +1249,37 @@ func family(pointer, husband, wife string, children ...string) *gedcom.FamilyNod
 	return gedcom.NewFamilyNode(nil, pointer, nodes)
 }
 
-func
-TestIndividualNode_Name(t *testing.T) {
+func TestIndividualNode_Name(t *testing.T) {
 	Name := tf.Function(t, (*gedcom.IndividualNode).Name)
 
 	Name((*gedcom.IndividualNode)(nil)).Returns((*gedcom.NameNode)(nil))
 }
 
-func
-TestIndividualNode_Spouses(t *testing.T) {
+func TestIndividualNode_Spouses(t *testing.T) {
 	Spouses := tf.Function(t, (*gedcom.IndividualNode).Spouses)
 
 	Spouses((*gedcom.IndividualNode)(nil)).Returns((gedcom.IndividualNodes)(nil))
 }
 
-func
-TestIndividualNode_Families(t *testing.T) {
+func TestIndividualNode_Families(t *testing.T) {
 	Families := tf.Function(t, (*gedcom.IndividualNode).Families)
 
 	Families((*gedcom.IndividualNode)(nil)).Returns(([]*gedcom.FamilyNode)(nil))
 }
 
-func
-TestIndividualNode_FamilyWithSpouse(t *testing.T) {
+func TestIndividualNode_FamilyWithSpouse(t *testing.T) {
 	FamilyWithSpouse := tf.Function(t, (*gedcom.IndividualNode).FamilyWithSpouse)
 
 	FamilyWithSpouse((*gedcom.IndividualNode)(nil), (*gedcom.IndividualNode)(nil)).Returns((*gedcom.FamilyNode)(nil))
 }
 
-func
-TestIndividualNode_FamilyWithUnknownSpouse(t *testing.T) {
+func TestIndividualNode_FamilyWithUnknownSpouse(t *testing.T) {
 	FamilyWithUnknownSpouse := tf.Function(t, (*gedcom.IndividualNode).FamilyWithUnknownSpouse)
 
 	FamilyWithUnknownSpouse((*gedcom.IndividualNode)(nil)).Returns((*gedcom.FamilyNode)(nil))
 }
 
-func
-TestIndividualNode_IsLiving(t *testing.T) {
+func TestIndividualNode_IsLiving(t *testing.T) {
 	IsLiving := tf.Function(t, (*gedcom.IndividualNode).IsLiving)
 
 	IsLiving(nil).Returns(false)
@@ -1335,15 +1324,13 @@ TestIndividualNode_IsLiving(t *testing.T) {
 	})).Returns(true)
 }
 
-func
-TestIndividualNode_Children(t *testing.T) {
+func TestIndividualNode_Children(t *testing.T) {
 	Children := tf.Function(t, (*gedcom.IndividualNode).Children)
 
 	Children((*gedcom.IndividualNode)(nil)).Returns(gedcom.IndividualNodes{})
 }
 
-func
-TestIndividualNode_AllEvents(t *testing.T) {
+func TestIndividualNode_AllEvents(t *testing.T) {
 	var tests = []struct {
 		node   *gedcom.IndividualNode
 		events []gedcom.Node

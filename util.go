@@ -172,3 +172,33 @@ func Places(nodes ...Node) (places []*PlaceNode) {
 
 	return
 }
+
+func maxInt64(values ...int64) (r int64) {
+	if len(values) == 0 {
+		return
+	}
+
+	r = values[0]
+	for i := 1; i < len(values); i++ {
+		if values[i] > r {
+			r = values[i]
+		}
+	}
+
+	return
+}
+
+func maxInt(values ...int) (r int) {
+	if len(values) == 0 {
+		return
+	}
+
+	r = values[0]
+	for i := 1; i < len(values); i++ {
+		if values[i] > r {
+			r = values[i]
+		}
+	}
+
+	return
+}
