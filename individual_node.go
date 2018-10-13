@@ -142,8 +142,18 @@ func (node *IndividualNode) Families() (families []*FamilyNode) {
 
 // TODO: needs tests
 func (node *IndividualNode) Is(individual *IndividualNode) bool {
-	return node != nil && !IsNil(individual) &&
-		node.Pointer() == individual.Pointer()
+	if node == nil {
+		return false
+	}
+
+	if individual == nil {
+		return false
+	}
+
+	leftPointer := node.Pointer()
+	rightPointer := individual.Pointer()
+
+	return leftPointer == rightPointer
 }
 
 // TODO: needs tests
@@ -203,7 +213,8 @@ func (node *IndividualNode) IsLiving() bool {
 		return false
 	}
 
-	if len(node.Deaths()) > 0 {
+	deaths := node.Deaths()
+	if len(deaths) > 0 {
 		return false
 	}
 
@@ -363,8 +374,10 @@ func (node *IndividualNode) LDSBaptisms() []Node {
 //
 // If the node is nil the result will also be nil.
 func (node *IndividualNode) EstimatedBirthDate() *DateNode {
-	potentialNodes :=
-		Compound(node.Births(), node.Baptisms(), node.LDSBaptisms())
+	births := node.Births()
+	baptisms := node.Baptisms()
+	ldsBaptisms := node.LDSBaptisms()
+	potentialNodes := Compound(births, baptisms, ldsBaptisms)
 
 	bestMatch := (*DateNode)(nil)
 
@@ -490,15 +503,22 @@ func (node *IndividualNode) Similarity(other *IndividualNode, options *Similarit
 	}
 
 	// Compare the dates.
-	birthSimilarity := node.EstimatedBirthDate().
-		Similarity(other.EstimatedBirthDate(), options.MaxYears)
+	leftEstimatedBirthDate := node.EstimatedBirthDate()
+	rightEstimatedBirthDate := other.EstimatedBirthDate()
+	birthSimilarity := leftEstimatedBirthDate.
+		Similarity(rightEstimatedBirthDate, options.MaxYears)
 
-	deathSimilarity := node.EstimatedDeathDate().
-		Similarity(other.EstimatedDeathDate(), options.MaxYears)
+	leftEstimatedDeathDate := node.EstimatedDeathDate()
+	rightEstimatedDeathDate := other.EstimatedDeathDate()
+	deathSimilarity := leftEstimatedDeathDate.
+		Similarity(rightEstimatedDeathDate, options.MaxYears)
 
 	// Final calculation.
-	return nameSimilarity*options.NameToDateRatio +
-		((birthSimilarity+deathSimilarity)/2.0)*(1.0-options.NameToDateRatio)
+	nameSimilarityRatio := nameSimilarity * options.NameToDateRatio
+	avgBirthDeathSimilarity := (birthSimilarity + deathSimilarity) / 2.0
+	inverseRatio := 1.0 - options.NameToDateRatio
+
+	return nameSimilarityRatio + avgBirthDeathSimilarity*inverseRatio
 }
 
 // SurroundingSimilarity is a more advanced version of Similarity.

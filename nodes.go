@@ -1,28 +1,34 @@
 package gedcom
 
-import "reflect"
+import (
+	"reflect"
+	"sync"
+)
 
 // nodeCache is used by NodesWithTag. Even though the lookup of child tags are
 // fairly inexpensive it happens a lot and its common for the same paths to be
 // looked up many time. Especially when doing larger task like comparing GEDCOM
 // files.
-var nodeCache = map[Node]map[Tag][]Node{}
+var nodeCache = &sync.Map{} // map[Node]map[Tag][]Node{}
 
 // NodesWithTag returns the zero or more nodes that have a specific GEDCOM tag.
 // If the provided node is nil then an empty slice will always be returned.
 //
 // If the node is nil the result will also be nil.
 func NodesWithTag(node Node, tag Tag) (result []Node) {
-	if v, ok := nodeCache[node][tag]; ok {
-		return v
+	if v1, ok1 := nodeCache.Load(node); ok1 {
+		if v2, ok2 := v1.(*sync.Map).Load(tag); ok2 {
+			return v2.([]Node)
+		}
 	}
 
 	defer func() {
-		if _, ok := nodeCache[node]; !ok {
-			nodeCache[node] = map[Tag][]Node{}
+		if _, ok := nodeCache.Load(node); !ok {
+			nodeCache.Store(node, &sync.Map{})
 		}
 
-		nodeCache[node][tag] = result
+		v1, _ := nodeCache.Load(node)
+		v1.(*sync.Map).Store(tag, result)
 	}()
 
 	if IsNil(node) {

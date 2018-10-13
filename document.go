@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"os"
 	"strings"
+	"sync"
 )
 
 // DefaultMaxLivingAge is used when creating a new document. See
@@ -18,14 +19,6 @@ const DefaultMaxLivingAge = 100.0
 // defaults and cache that need to be setup. Use one of the NewDocument
 // constructors instead.
 type Document struct {
-	// nodes is private because we need to track changes.
-	nodes []Node
-
-	// pointerCache is setup once when the document is created.
-	pointerCache map[string]Node
-
-	families []*FamilyNode
-
 	// HasBOM controls if the encoded stream will start with the Byte Order
 	// Mark.
 	//
@@ -43,6 +36,14 @@ type Document struct {
 	// 100 is chosen as a reasonable default. If you set it to 0 then an
 	// individual will never be considered dead without a DeathNode.
 	MaxLivingAge float64
+
+	// nodes is private because we need to track changes.
+	nodes []Node
+
+	// pointerCache is setup once when the document is created.
+	pointerCache sync.Map // map[string]Node
+
+	families []*FamilyNode
 }
 
 // String will render the entire GEDCOM document.
@@ -71,22 +72,29 @@ func (doc *Document) Individuals() IndividualNodes {
 	return individuals
 }
 
+func (doc *Document) buildPointerCache() {
+	doc.pointerCache = sync.Map{}
+
+	for _, node := range doc.Nodes() {
+		pointer := node.Pointer()
+
+		if pointer != "" {
+			doc.pointerCache.Store(pointer, node)
+		}
+	}
+}
+
 // NodeByPointer returns the Node for a pointer value.
 //
 // If the pointer does not exist nil is returned.
 func (doc *Document) NodeByPointer(ptr string) Node {
-	// Build the cache once.
-	if doc.pointerCache == nil {
-		doc.pointerCache = map[string]Node{}
+	node, ok := doc.pointerCache.Load(ptr)
 
-		for _, node := range doc.Nodes() {
-			if node.Pointer() != "" {
-				doc.pointerCache[node.Pointer()] = node
-			}
-		}
+	if !ok {
+		return nil
 	}
 
-	return doc.pointerCache[ptr]
+	return node.(Node)
 }
 
 // Families returns the family entities in the document.
@@ -155,7 +163,13 @@ func (doc *Document) Sources() []*SourceNode {
 func (doc *Document) AddNode(node Node) *Document {
 	if !IsNil(node) {
 		doc.nodes = append(doc.nodes, node)
-		doc.pointerCache = nil
+
+		// Update pointer index.
+		pointer := node.Pointer()
+
+		if pointer != "" {
+			doc.pointerCache.Store(pointer, node)
+		}
 	}
 
 	return doc
@@ -205,6 +219,7 @@ func NewDocument() *Document {
 func NewDocumentWithNodes(nodes []Node) *Document {
 	document := NewDocument()
 	document.nodes = nodes
+	document.buildPointerCache()
 
 	return document
 }

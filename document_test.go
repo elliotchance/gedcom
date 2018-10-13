@@ -2,9 +2,9 @@ package gedcom_test
 
 import (
 	"errors"
-	"fmt"
 	"testing"
 
+	"fmt"
 	"github.com/elliotchance/gedcom"
 	"github.com/stretchr/testify/assert"
 )
@@ -105,8 +105,8 @@ func TestDocument_Individuals(t *testing.T) {
 func TestDocument_NodeByPointer(t *testing.T) {
 	for _, test := range documentTests {
 		t.Run("", func(t *testing.T) {
-			assert.Equal(t, test.doc.NodeByPointer("P2"), test.p2,
-				fmt.Sprintf("%+#v", test))
+			node := test.doc.NodeByPointer("P2")
+			assertNodeEqual(t, test.p2, node, fmt.Sprintf("%+#v", test))
 		})
 	}
 }

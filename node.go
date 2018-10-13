@@ -12,6 +12,8 @@ type Node interface {
 	Tag() Tag
 	Value() string
 	Pointer() string
+
+	// Document.
 	Document() *Document
 	SetDocument(document *Document)
 

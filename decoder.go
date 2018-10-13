@@ -101,6 +101,9 @@ func (dec *Decoder) Decode() (*Document, error) {
 		i.AddNode(node)
 	}
 
+	// Build the cache once.
+	document.buildPointerCache()
+
 	return document, nil
 }
 
