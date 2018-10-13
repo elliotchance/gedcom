@@ -38,7 +38,7 @@ type TransformOptions struct {
 func Transform(doc *gedcom.Document, options TransformOptions) []interface{} {
 	r := []interface{}{}
 
-	for _, node := range doc.Nodes {
+	for _, node := range doc.Nodes() {
 		newNode := transformNode(node, options)
 		if newNode != nil {
 			r = append(r, newNode)

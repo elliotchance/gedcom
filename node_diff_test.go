@@ -14,7 +14,7 @@ func parse(s ...string) []gedcom.Node {
 		panic(err)
 	}
 
-	return doc.Nodes
+	return doc.Nodes()
 }
 
 func TestCompareNodes(t *testing.T) {

@@ -40,7 +40,7 @@ func (enc *Encoder) renderNode(indent int, node Node) error {
 func (enc *Encoder) Encode() (err error) {
 	err = enc.restoreOptionalBOM()
 
-	for _, node := range enc.document.Nodes {
+	for _, node := range enc.document.Nodes() {
 		err = enc.renderNode(0, node)
 		if err != nil {
 			return

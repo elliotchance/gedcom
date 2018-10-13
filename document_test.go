@@ -16,19 +16,17 @@ var documentTests = []struct {
 	p2          gedcom.Node
 }{
 	{
-		doc:         &gedcom.Document{},
+		doc:         gedcom.NewDocument(),
 		individuals: gedcom.IndividualNodes{},
 		p2:          nil,
 		families:    []*gedcom.FamilyNode{},
 	},
 	{
-		doc: &gedcom.Document{
-			Nodes: []gedcom.Node{
-				gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-					gedcom.NewNameNode(nil, "Joe /Bloggs/", "", []gedcom.Node{}),
-				}),
-			},
-		},
+		doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
+			gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+				gedcom.NewNameNode(nil, "Joe /Bloggs/", "", []gedcom.Node{}),
+			}),
+		}),
 		individuals: gedcom.IndividualNodes{
 			gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewNameNode(nil, "Joe /Bloggs/", "", []gedcom.Node{}),
@@ -38,17 +36,15 @@ var documentTests = []struct {
 		families: []*gedcom.FamilyNode{},
 	},
 	{
-		doc: &gedcom.Document{
-			Nodes: []gedcom.Node{
-				gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-					gedcom.NewNameNode(nil, "Joe /Bloggs/", "", []gedcom.Node{}),
-				}),
-				gedcom.NewNodeWithChildren(nil, gedcom.TagVersion, "", "", []gedcom.Node{}),
-				gedcom.NewIndividualNode(nil, "", "P2", []gedcom.Node{
-					gedcom.NewNameNode(nil, "John /Doe/", "", []gedcom.Node{}),
-				}),
-			},
-		},
+		doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
+			gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+				gedcom.NewNameNode(nil, "Joe /Bloggs/", "", []gedcom.Node{}),
+			}),
+			gedcom.NewNodeWithChildren(nil, gedcom.TagVersion, "", "", []gedcom.Node{}),
+			gedcom.NewIndividualNode(nil, "", "P2", []gedcom.Node{
+				gedcom.NewNameNode(nil, "John /Doe/", "", []gedcom.Node{}),
+			}),
+		}),
 		individuals: gedcom.IndividualNodes{
 			gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewNameNode(nil, "Joe /Bloggs/", "", []gedcom.Node{}),
@@ -63,14 +59,12 @@ var documentTests = []struct {
 		families: []*gedcom.FamilyNode{},
 	},
 	{
-		doc: &gedcom.Document{
-			Nodes: []gedcom.Node{
-				gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-					gedcom.NewNameNode(nil, "Joe /Bloggs/", "", []gedcom.Node{}),
-				}),
-				gedcom.NewFamilyNode(nil, "F1", []gedcom.Node{}),
-			},
-		},
+		doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
+			gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+				gedcom.NewNameNode(nil, "Joe /Bloggs/", "", []gedcom.Node{}),
+			}),
+			gedcom.NewFamilyNode(nil, "F1", []gedcom.Node{}),
+		}),
 		individuals: gedcom.IndividualNodes{
 			gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewNameNode(nil, "Joe /Bloggs/", "", []gedcom.Node{}),
@@ -82,14 +76,12 @@ var documentTests = []struct {
 		},
 	},
 	{
-		doc: &gedcom.Document{
-			Nodes: []gedcom.Node{
-				gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-					gedcom.NewNameNode(nil, "Joe /Bloggs/", "", []gedcom.Node{}),
-				}),
-				gedcom.NewFamilyNode(nil, "F3", []gedcom.Node{}),
-			},
-		},
+		doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
+			gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+				gedcom.NewNameNode(nil, "Joe /Bloggs/", "", []gedcom.Node{}),
+			}),
+			gedcom.NewFamilyNode(nil, "F3", []gedcom.Node{}),
+		}),
 		individuals: gedcom.IndividualNodes{
 			gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewNameNode(nil, "Joe /Bloggs/", "", []gedcom.Node{}),
@@ -135,7 +127,7 @@ func TestNewDocumentFromString(t *testing.T) {
 	}{
 		{
 			"",
-			&gedcom.Document{},
+			gedcom.NewDocument(),
 			nil,
 		},
 		{
@@ -170,5 +162,47 @@ func TestNewDocumentFromString(t *testing.T) {
 func TestNewDocument(t *testing.T) {
 	doc := gedcom.NewDocument()
 
-	assert.Len(t, doc.Nodes, 0)
+	assert.Len(t, doc.Nodes(), 0)
+}
+
+func TestDocument_AddNode(t *testing.T) {
+	t.Run("One", func(t *testing.T) {
+		doc := gedcom.NewDocument()
+		nameNode := gedcom.NewNameNode(doc, "foo", "", nil)
+
+		doc.AddNode(nameNode)
+
+		assert.Equal(t, doc.Nodes(), []gedcom.Node{nameNode})
+	})
+
+	t.Run("Two", func(t *testing.T) {
+		doc := gedcom.NewDocument()
+		nameNode1 := gedcom.NewNameNode(doc, "foo", "", nil)
+		nameNode2 := gedcom.NewNameNode(doc, "foo", "", nil)
+
+		doc.AddNode(nameNode1)
+		doc.AddNode(nameNode2)
+
+		assert.Equal(t, doc.Nodes(), []gedcom.Node{nameNode1, nameNode2})
+	})
+
+	t.Run("Duplicate", func(t *testing.T) {
+		doc := gedcom.NewDocument()
+		nameNode := gedcom.NewNameNode(doc, "foo", "", nil)
+
+		doc.AddNode(nameNode)
+		doc.AddNode(nameNode)
+
+		assert.Equal(t, doc.Nodes(), []gedcom.Node{nameNode, nameNode})
+	})
+
+	t.Run("Nil", func(t *testing.T) {
+		doc := gedcom.NewDocument()
+		nameNode := gedcom.NewNameNode(doc, "foo", "", nil)
+
+		doc.AddNode(nil)
+		doc.AddNode(nameNode)
+
+		assert.Equal(t, doc.Nodes(), []gedcom.Node{nameNode})
+	})
 }
