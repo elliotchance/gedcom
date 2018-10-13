@@ -62,7 +62,7 @@ func (dec *Decoder) Decode() (*Document, error) {
 
 		// Add a root node to the document.
 		if indent == 0 {
-			document.Nodes = append(document.Nodes, node)
+			document.AddNode(node)
 
 			// There can be multiple root nodes so make sure we always reset all
 			// indent pointers.

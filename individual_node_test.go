@@ -369,12 +369,10 @@ func getDocument() *gedcom.Document {
 		gedcom.NewNodeWithChildren(nil, gedcom.TagChild, "@P6@", "", nil),
 	})
 
-	return &gedcom.Document{
-		Nodes: []gedcom.Node{
-			p1, p2, p3, p4, p5, p6, p7, p8,
-			f1, f2, f3, f4,
-		},
-	}
+	return gedcom.NewDocumentWithNodes([]gedcom.Node{
+		p1, p2, p3, p4, p5, p6, p7, p8,
+		f1, f2, f3, f4,
+	})
 }
 
 func TestIndividualNode_Parents(t *testing.T) {
@@ -424,7 +422,7 @@ func TestIndividualNode_Parents(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(gedcom.Pointer(test.node), func(t *testing.T) {
-			for _, n := range doc.Nodes {
+			for _, n := range doc.Nodes() {
 				n.SetDocument(doc)
 			}
 			assert.Equal(t, test.node.Parents(), test.parents)
@@ -432,7 +430,8 @@ func TestIndividualNode_Parents(t *testing.T) {
 	}
 }
 
-func TestIndividualNode_SpouseChildren(t *testing.T) {
+func
+TestIndividualNode_SpouseChildren(t *testing.T) {
 	doc := getDocument()
 
 	var tests = []struct {
@@ -503,7 +502,7 @@ func TestIndividualNode_SpouseChildren(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(gedcom.Pointer(test.node), func(t *testing.T) {
-			for _, n := range doc.Nodes {
+			for _, n := range doc.Nodes() {
 				n.SetDocument(doc)
 			}
 			assert.Equal(t, test.expected, test.node.SpouseChildren())
@@ -511,7 +510,8 @@ func TestIndividualNode_SpouseChildren(t *testing.T) {
 	}
 }
 
-func TestIndividualNode_LDSBaptisms(t *testing.T) {
+func
+TestIndividualNode_LDSBaptisms(t *testing.T) {
 	var tests = []struct {
 		node     *gedcom.IndividualNode
 		baptisms []gedcom.Node
@@ -571,7 +571,8 @@ func TestIndividualNode_LDSBaptisms(t *testing.T) {
 	}
 }
 
-func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
+func
+TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 	var tests = []struct {
 		node     *gedcom.IndividualNode
 		expected *gedcom.DateNode
@@ -681,7 +682,8 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 	}
 }
 
-func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
+func
+TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 	var tests = []struct {
 		node     *gedcom.IndividualNode
 		expected *gedcom.DateNode
@@ -1030,17 +1032,18 @@ func TestIndividualNode_Similarity(t *testing.T) {
 	}
 }
 
-func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
+func
+TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 	var tests = []struct {
 		doc      *gedcom.Document
 		expected gedcom.SurroundingSimilarity
 	}{
 		// Empty individuals.
 		{
-			doc: document(
+			doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
 				individual("P1", "", "", ""),
 				individual("P2", "", "", ""),
-			),
+			}),
 			expected: gedcom.SurroundingSimilarity{
 				ParentsSimilarity:    0.5,
 				IndividualSimilarity: 0.25,
@@ -1051,10 +1054,10 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 
 		// Only matching individuals, but they are exact matches.
 		{
-			doc: document(
+			doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
 				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
 				individual("P2", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
-			),
+			}),
 			expected: gedcom.SurroundingSimilarity{
 				ParentsSimilarity:    0.5,
 				IndividualSimilarity: 1.0,
@@ -1065,10 +1068,10 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 
 		// Only matching individuals, but they are similar matches.
 		{
-			doc: document(
+			doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
 				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
 				individual("P2", "Elliot /Chance/", "Abt. 1843", "Abt. 1910"),
-			),
+			}),
 			expected: gedcom.SurroundingSimilarity{
 				ParentsSimilarity:    0.5,
 				IndividualSimilarity: 0.7433558199873285,
@@ -1079,10 +1082,10 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 
 		// Only matching individuals and they are way off.
 		{
-			doc: document(
+			doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
 				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
 				individual("P2", "Joe /Bloggs/", "1945", "2000"),
-			),
+			}),
 			expected: gedcom.SurroundingSimilarity{
 				ParentsSimilarity:    0.5,
 				IndividualSimilarity: 0.20128205128205132,
@@ -1093,7 +1096,7 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 
 		// Parents and individuals match exactly.
 		{
-			doc: document(
+			doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
 				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
 				individual("P2", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
 				individual("P3", "John /Smith/", "4 Jan 1803", "17 Mar 1877"),
@@ -1102,7 +1105,7 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 				individual("P6", "Jane /Doe/", "3 Mar 1803", "14 June 1877"),
 				family("F1", "P3", "P4", "P1"),
 				family("F2", "P5", "P6", "P2"),
-			),
+			}),
 			expected: gedcom.SurroundingSimilarity{
 				ParentsSimilarity:    1.0,
 				IndividualSimilarity: 1.0,
@@ -1113,7 +1116,7 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 
 		// Parents and individuals are very similar.
 		{
-			doc: document(
+			doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
 				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
 				individual("P2", "Elliot /Chaunce/", "4 Jan 1843", "17 Mar 1907"),
 				individual("P3", "John /Smith/", "4 Jan 1803", "17 Mar 1877"),
@@ -1122,7 +1125,7 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 				individual("P6", "Jane /Doe/", "3 Mar 1803", "14 June 1877"),
 				family("F1", "P3", "P4", "P1"),
 				family("F2", "P5", "P6", "P2"),
-			),
+			}),
 			expected: gedcom.SurroundingSimilarity{
 				ParentsSimilarity:    0.9981481481481481,
 				IndividualSimilarity: 0.9950549450549451,
@@ -1133,7 +1136,7 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 
 		// One parent is missing, otherwise exactly the same.
 		{
-			doc: document(
+			doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
 				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
 				individual("P2", "Elliot /Chaunce/", "4 Jan 1843", "17 Mar 1907"),
 				individual("P3", "John /Smith/", "4 Jan 1803", "17 Mar 1877"),
@@ -1142,7 +1145,7 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 				individual("P6", "Jane /Doe/", "3 Mar 1803", "14 June 1877"),
 				family("F1", "P3", "", "P1"),
 				family("F2", "P5", "P6", "P2"),
-			),
+			}),
 			expected: gedcom.SurroundingSimilarity{
 				ParentsSimilarity:    0.75,
 				IndividualSimilarity: 0.9950549450549451,
@@ -1153,7 +1156,7 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 
 		// Both parents are missing on one side, otherwise exactly the same.
 		{
-			doc: document(
+			doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
 				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
 				individual("P2", "Elliot /Chaunce/", "4 Jan 1843", "17 Mar 1907"),
 				individual("P3", "John /Smith/", "4 Jan 1803", "17 Mar 1877"),
@@ -1162,7 +1165,7 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 				individual("P6", "Jane /Doe/", "3 Mar 1803", "14 June 1877"),
 				family("F1", "", "", "P1"),
 				family("F2", "P5", "P6", "P2"),
-			),
+			}),
 			expected: gedcom.SurroundingSimilarity{
 				ParentsSimilarity:    0.5,
 				IndividualSimilarity: 0.9950549450549451,
@@ -1173,7 +1176,7 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 
 		// Parents, individual and spouses match exactly.
 		{
-			doc: document(
+			doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
 				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
 				individual("P2", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
 				individual("P3", "John /Smith/", "4 Jan 1803", "17 Mar 1877"),
@@ -1186,7 +1189,7 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 				family("F2", "P5", "P6", "P2"),
 				family("F3", "P1", "P7"),
 				family("F4", "P2", "P8"),
-			),
+			}),
 			expected: gedcom.SurroundingSimilarity{
 				ParentsSimilarity:    1.0,
 				IndividualSimilarity: 1.0,
@@ -1199,7 +1202,7 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 	options := gedcom.NewSimilarityOptions()
 	for _, test := range tests {
 		t.Run("", func(t *testing.T) {
-			for _, n := range test.doc.Nodes {
+			for _, n := range test.doc.Nodes() {
 				n.SetDocument(test.doc)
 			}
 
@@ -1251,43 +1254,43 @@ func family(pointer, husband, wife string, children ...string) *gedcom.FamilyNod
 	return gedcom.NewFamilyNode(nil, pointer, nodes)
 }
 
-func document(nodes ...gedcom.Node) *gedcom.Document {
-	return &gedcom.Document{
-		Nodes: nodes,
-	}
-}
-
-func TestIndividualNode_Name(t *testing.T) {
+func
+TestIndividualNode_Name(t *testing.T) {
 	Name := tf.Function(t, (*gedcom.IndividualNode).Name)
 
 	Name((*gedcom.IndividualNode)(nil)).Returns((*gedcom.NameNode)(nil))
 }
 
-func TestIndividualNode_Spouses(t *testing.T) {
+func
+TestIndividualNode_Spouses(t *testing.T) {
 	Spouses := tf.Function(t, (*gedcom.IndividualNode).Spouses)
 
 	Spouses((*gedcom.IndividualNode)(nil)).Returns((gedcom.IndividualNodes)(nil))
 }
 
-func TestIndividualNode_Families(t *testing.T) {
+func
+TestIndividualNode_Families(t *testing.T) {
 	Families := tf.Function(t, (*gedcom.IndividualNode).Families)
 
 	Families((*gedcom.IndividualNode)(nil)).Returns(([]*gedcom.FamilyNode)(nil))
 }
 
-func TestIndividualNode_FamilyWithSpouse(t *testing.T) {
+func
+TestIndividualNode_FamilyWithSpouse(t *testing.T) {
 	FamilyWithSpouse := tf.Function(t, (*gedcom.IndividualNode).FamilyWithSpouse)
 
 	FamilyWithSpouse((*gedcom.IndividualNode)(nil), (*gedcom.IndividualNode)(nil)).Returns((*gedcom.FamilyNode)(nil))
 }
 
-func TestIndividualNode_FamilyWithUnknownSpouse(t *testing.T) {
+func
+TestIndividualNode_FamilyWithUnknownSpouse(t *testing.T) {
 	FamilyWithUnknownSpouse := tf.Function(t, (*gedcom.IndividualNode).FamilyWithUnknownSpouse)
 
 	FamilyWithUnknownSpouse((*gedcom.IndividualNode)(nil)).Returns((*gedcom.FamilyNode)(nil))
 }
 
-func TestIndividualNode_IsLiving(t *testing.T) {
+func
+TestIndividualNode_IsLiving(t *testing.T) {
 	IsLiving := tf.Function(t, (*gedcom.IndividualNode).IsLiving)
 
 	IsLiving(nil).Returns(false)
@@ -1332,13 +1335,15 @@ func TestIndividualNode_IsLiving(t *testing.T) {
 	})).Returns(true)
 }
 
-func TestIndividualNode_Children(t *testing.T) {
+func
+TestIndividualNode_Children(t *testing.T) {
 	Children := tf.Function(t, (*gedcom.IndividualNode).Children)
 
 	Children((*gedcom.IndividualNode)(nil)).Returns(gedcom.IndividualNodes{})
 }
 
-func TestIndividualNode_AllEvents(t *testing.T) {
+func
+TestIndividualNode_AllEvents(t *testing.T) {
 	var tests = []struct {
 		node   *gedcom.IndividualNode
 		events []gedcom.Node

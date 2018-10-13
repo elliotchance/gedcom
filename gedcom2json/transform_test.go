@@ -11,15 +11,13 @@ var transformTests = []struct {
 	expected []interface{}
 }{
 	{
-		doc:      &gedcom.Document{},
+		doc:      gedcom.NewDocument(),
 		expected: []interface{}{},
 	},
 	{
-		doc: &gedcom.Document{
-			Nodes: []gedcom.Node{
-				gedcom.NewNode(nil, gedcom.TagVersion, "5.5", ""),
-			},
-		},
+		doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
+			gedcom.NewNode(nil, gedcom.TagVersion, "5.5", ""),
+		}),
 		expected: []interface{}{
 			map[string]interface{}{
 				"tag": "VERS",
@@ -28,13 +26,11 @@ var transformTests = []struct {
 		},
 	},
 	{
-		doc: &gedcom.Document{
-			Nodes: []gedcom.Node{
-				gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-					gedcom.NewNameNode(nil, "Joe /Bloggs/", "", []gedcom.Node{}),
-				}),
-			},
-		},
+		doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
+			gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+				gedcom.NewNameNode(nil, "Joe /Bloggs/", "", []gedcom.Node{}),
+			}),
+		}),
 		expected: []interface{}{
 			map[string]interface{}{
 				"tag": "INDI",

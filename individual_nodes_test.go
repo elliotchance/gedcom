@@ -350,38 +350,38 @@ func TestIndividualNodes_Compare(t *testing.T) {
 		want       []gedcom.IndividualComparison
 	}{
 		{
-			doc1: document(),
-			doc2: document(),
+			doc1: gedcom.NewDocument(),
+			doc2: gedcom.NewDocument(),
 			min:  0.0,
 			want: []gedcom.IndividualComparison{},
 		},
 		{
-			doc1: document(elliot),
-			doc2: document(),
+			doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot}),
+			doc2: gedcom.NewDocument(),
 			min:  0.0,
 			want: []gedcom.IndividualComparison{
 				{elliot, nil, gedcom.SurroundingSimilarity{}},
 			},
 		},
 		{
-			doc1: document(),
-			doc2: document(elliot),
+			doc1: gedcom.NewDocument(),
+			doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot}),
 			min:  0.0,
 			want: []gedcom.IndividualComparison{
 				{nil, elliot, gedcom.SurroundingSimilarity{}},
 			},
 		},
 		{
-			doc1: document(elliot),
-			doc2: document(elliot),
+			doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot}),
+			doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot}),
 			min:  0.0,
 			want: []gedcom.IndividualComparison{
 				{elliot, elliot, gedcom.SurroundingSimilarity{0.5, 1.0, 1.0, 1.0}},
 			},
 		},
 		{
-			doc1: document(elliot, john, jane),
-			doc2: document(jane, elliot, john),
+			doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot, john, jane}),
+			doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{jane, elliot, john}),
 			min:  0.0,
 			want: []gedcom.IndividualComparison{
 				{elliot, elliot, gedcom.SurroundingSimilarity{0.5, 1.0, 1.0, 1.0}},
@@ -390,8 +390,8 @@ func TestIndividualNodes_Compare(t *testing.T) {
 			},
 		},
 		{
-			doc1: document(elliot, jane),
-			doc2: document(jane, john),
+			doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot, jane}),
+			doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{jane, john}),
 			min:  0.0,
 			want: []gedcom.IndividualComparison{
 				// elliot and john match because the minimumSimilarity is so
@@ -401,8 +401,8 @@ func TestIndividualNodes_Compare(t *testing.T) {
 			},
 		},
 		{
-			doc1: document(elliot, jane),
-			doc2: document(jane, john),
+			doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot, jane}),
+			doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{jane, john}),
 			min:  0.75,
 			want: []gedcom.IndividualComparison{
 				{jane, jane, gedcom.SurroundingSimilarity{0.5, 1.0, 1.0, 1.0}},
@@ -411,8 +411,8 @@ func TestIndividualNodes_Compare(t *testing.T) {
 			},
 		},
 		{
-			doc1: document(elliot, jane),
-			doc2: document(bob, john),
+			doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot, jane}),
+			doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{bob, john}),
 			min:  0.9,
 			want: []gedcom.IndividualComparison{
 				{elliot, nil, gedcom.SurroundingSimilarity{}},
@@ -425,10 +425,10 @@ func TestIndividualNodes_Compare(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run("", func(t *testing.T) {
-			for _, n := range test.doc1.Nodes {
+			for _, n := range test.doc1.Nodes() {
 				n.SetDocument(test.doc1)
 			}
-			for _, n := range test.doc2.Nodes {
+			for _, n := range test.doc2.Nodes() {
 				n.SetDocument(test.doc2)
 			}
 
