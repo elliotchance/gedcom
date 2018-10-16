@@ -24,23 +24,40 @@ func newDiffPage(comparisons []gedcom.IndividualComparison, options *gedcom.Simi
 	}
 }
 
+func (c *diffPage) sortByName(i, j int) bool {
+	a := c.comparisons[i].Left
+	b := c.comparisons[j].Left
+
+	if a == nil {
+		a = c.comparisons[i].Right
+	}
+
+	if b == nil {
+		b = c.comparisons[j].Right
+	}
+
+	return a.Name().String() < b.Name().String()
+}
+
 func (c *diffPage) String() string {
 	rows := []fmt.Stringer{}
 
-	sort.SliceStable(c.comparisons, func(i, j int) bool {
-		a := c.comparisons[i].Left
-		b := c.comparisons[j].Left
+	if optionSortSimilarities {
+		sort.SliceStable(c.comparisons, func(i, j int) bool {
+			a := c.comparisons[i].Similarity.WeightedSimilarity(c.options)
+			b := c.comparisons[j].Similarity.WeightedSimilarity(c.options)
 
-		if a == nil {
-			a = c.comparisons[i].Right
-		}
+			if a != b {
+				// Greater than because we want the highest matches up the top.
+				return a > b
+			}
 
-		if b == nil {
-			b = c.comparisons[j].Right
-		}
-
-		return a.Name().String() < b.Name().String()
-	})
+			// Fallback to sorting by name for non-matches
+			return c.sortByName(i, j)
+		})
+	} else {
+		sort.SliceStable(c.comparisons, c.sortByName)
+	}
 
 	for _, comparison := range c.comparisons {
 		// Same as below.
@@ -68,12 +85,22 @@ func (c *diffPage) String() string {
 			continue
 		}
 
-		leftNameAndDates := html.NewIndividualNameAndDates(comparison.Left, true, "")
-		rightNameAndDates := html.NewIndividualNameAndDates(comparison.Right, true, "")
-		rows = append(rows, html.NewTableRow(
-			html.NewTableCell(leftNameAndDates).Class(leftClass),
-			html.NewTableCell(rightNameAndDates).Class(rightClass),
-		))
+		leftNameAndDates := html.NewIndividualNameAndDatesLink(comparison.Left, true, "")
+		rightNameAndDates := html.NewIndividualNameAndDatesLink(comparison.Right, true, "")
+
+		left := html.NewTableCell(leftNameAndDates).Class(leftClass)
+		right := html.NewTableCell(rightNameAndDates).Class(rightClass)
+
+		middle := html.NewTableCell(html.NewText(""))
+		if weightedSimilarity != 0 {
+			similarityString := fmt.Sprintf("%.2f%%", weightedSimilarity*100)
+			middle = html.NewTableCell(html.NewText(similarityString)).
+				Class("text-center " + leftClass)
+		}
+
+		tableRow := html.NewTableRow(left, middle, right)
+
+		rows = append(rows, tableRow)
 	}
 
 	// Individual pages
@@ -88,8 +115,8 @@ func (c *diffPage) String() string {
 			continue
 		}
 
-		components = append(components,
-			newIndividualCompare(comparison, c.filterFlags))
+		compare := newIndividualCompare(comparison, c.filterFlags)
+		components = append(components, compare)
 	}
 
 	return html.NewPage(

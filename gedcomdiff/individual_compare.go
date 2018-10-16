@@ -147,7 +147,20 @@ func (c *individualCompare) String() string {
 		}
 	}
 
+	leftAnchor := ""
+	rightAnchor := ""
+
+	if c.comparison.Left != nil {
+		leftAnchor = c.comparison.Left.Pointer()
+	}
+
+	if c.comparison.Right != nil {
+		rightAnchor = c.comparison.Right.Pointer()
+	}
+
 	return html.NewComponents(
+		html.NewAnchor(leftAnchor),
+		html.NewAnchor(rightAnchor),
 		html.NewBigTitle(1, name),
 		html.NewSpace(),
 		html.NewTable("", tableRows...),

@@ -22,7 +22,7 @@ func (c *IndividualNameAndDates) String() string {
 	name := NewIndividualName(c.individual, c.showLiving, c.unknownText).String()
 	dates := NewIndividualDates(c.individual, c.showLiving).String()
 
-	if name == c.unknownText || dates == "()" {
+	if name == c.unknownText || dates == "" {
 		return name
 	}
 
