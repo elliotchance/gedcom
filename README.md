@@ -8,25 +8,23 @@ github.com/elliotchance/gedcom
 `gedcom` is an advanced Go-style library for encoding, decoding, traversing,
 exporting and diffing GEDCOM files.
 
-   * [Project Goals](#project-goals)
-   * [Installation](#installation)
-   * [GEDCOM Document](#gedcom-document)
-      * [Decoding](#decoding)
-      * [Encoding](#encoding)
-      * [Traversing a Document](#traversing-a-document)
-   * [Comparing &amp; Diffing](#comparing--diffing)
-      * [Nodes](#nodes)
-   * [Nodes](#nodes-1)
-      * [Dates](#dates)
-      * [Equality](#equality)
-      * [Filtering](#filtering)
-      * [Names](#names)
-   * [Using the Checksum File](#using-the-checksum-file)
-   * [Exporting](#exporting)
-      * [HTML](#html)
-      * [JSON](#json)
-      * [Text](#text)
-         * [Comparing Output](#comparing-output)
+- [Project Goals](#project-goals)
+- [Installation](#installation)
+- [Command Line Tools](#command-line-tools)
+  * [Comparing GEDCOM Files](#comparing-gedcom-files)
+  * [Rendering as HTML](#rendering-as-html)
+  * [Converting to JSON](#converting-to-json)
+  * [Converting to Text](#converting-to-text)
+  * [Using the Checksum File](#using-the-checksum-file)
+- [Library](#library)
+  * [Decoding a Document](#decoding-a-document)
+  * [Encoding a Document](#encoding-a-document)
+  * [Traversing a Document](#traversing-a-document)
+  * [Comparing & Diffing Nodes](#comparing---diffing-nodes)
+  * [Dates](#dates)
+  * [Node Equality](#node-equality)
+  * [Tree Walking & Filtering](#tree-walking---filtering)
+  * [Individual Names](#individual-names)
 
 
 Project Goals
@@ -62,11 +60,127 @@ dep ensure
 ```
 
 
-GEDCOM Document
-===============
+Command Line Tools
+==================
 
-Decoding
---------
+Comparing GEDCOM Files
+----------------------
+
+The `gedcomdiff` CLI tool will generate a HTML report when comparing two GEDCOM
+files. There are lots of configurable options, but the most basic usage is:
+
+```bash
+gedcomdiff -left-gedcom file1.ged -right-gedcom file2.ged
+```
+
+Rendering as HTML
+-----------------
+
+`gedcom2html` converts a GEDCOM file to a directory of HTML files. This produces
+a pretty output that looks like this:
+[http://dechauncy.family](http://dechauncy.family)
+
+```txt
+Usage of gedcom2html:
+  -gedcom string
+    	Input GEDCOM file.
+  -output-dir string
+    	Output directory. It will use the current directory if output-dir is not provided. Output files will only be added or replaced. Existing files will not be deleted. (default ".")
+```
+
+Converting to JSON
+------------------
+
+`gedcom2json` is a subpackage and binary that converts a GEDCOM file to a JSON
+structure. It offers several options for the output:
+
+```
+Usage of gedcom2json:
+  -exclude-tags string
+    	Comma-separated list of tags to ignore.
+  -gedcom string
+    	Input GEDCOM file.
+  -no-pointers
+    	Do not include Pointer values ("ptr" attribute) in the output JSON. This is useful to activate when comparing GEDCOM files that have had pointers generated from different sources.
+  -only-official-tags
+    	Only include tags from the GEDCOM standard in the output.
+  -only-tags string
+    	Only include these tags in the output.
+  -pretty-json
+    	Pretty print JSON.
+  -pretty-tags
+    	Output tags with their descriptive name instead of their raw tag value. For example, "BIRT" would be output as "Birth".
+  -single-name
+    	When there are multiple names for an individual this will return the first of the name nodes only.
+  -string-name
+    	Convert NAME tags to a string (instead of the object parts).
+  -tag-keys
+    	Use tags (pretty or raw) as object keys rather than arrays.
+```
+
+Converting to Text
+------------------
+
+`gedcom2text` is a subpackage and binary that converts a GEDCOM file to a simple
+text output (or split into individual files) that is ideal for easily reading
+(by a person) and designed to be as friendly as possible when using diff tools.
+
+```
+Usage of gedcom2text:
+  -gedcom string
+    	Input GEDCOM file.
+  -no-change-times
+    	Do not change timestamps.
+  -no-empty-deaths
+    	Do not include Death node if there are no visible details.
+  -no-places
+    	Do not include places.
+  -no-sources
+    	Do not include sources.
+  -only-official-tags
+    	Only output official GEDCOM tags.
+  -single-name
+    	Only output the primary name.
+  -split-dir string
+    	Split the individuals into separate files in this directory.
+```
+
+Using the Checksum File
+-----------------------
+
+The `-checksum` option for `gedcom2html` generates a file called `checksum.csv`.
+This file contains the file name and SHA-1 checksum like:
+
+```
+amos-adams.html,b0538fb8186a50c4079c902fec2b4ba0af843061
+massachusetts-united-states.html,79db811c089e8ab5653d34551e6540cb2ea2c947
+```
+
+The lines are ordered by the file name so the output is ideal for comparison.
+
+Here is an example of using the previous and current checksum file to generate
+sync commands:
+
+```bash
+join -a 1 -a 2 -t, -o 0.1,1.2,2.2 /old/checksum.csv /new/checksum.csv | \
+    awk -F, '$2 == $3 { next } { print $3 == "" \
+        ? "rm /some/folder/" $1 \
+        : "cp" " " $1 " /some/folder/" $1 }'
+```
+
+Will produce commands like:
+
+```
+cp abos-adams.html /some/folder/abos-adams.html
+rm /some/folder/massachusetts-united-states.html
+```
+
+
+Library
+=======
+
+Decoding a Document
+-------------------
 
 Decoding a GEDCOM stream:
 
@@ -89,8 +203,8 @@ if err != nil {
 }
 ```
 
-Encoding
---------
+Encoding a Document
+-------------------
 
 ```go
 buf := bytes.NewBufferString("")
@@ -125,11 +239,9 @@ types, such as names, dates, families and more. See
 [godoc](https://godoc.org/github.com/elliotchance/gedcom) for a complete list of
 API methods.
 
-Comparing & Diffing
-===================
 
-Nodes
------
+Comparing & Diffing Nodes
+-------------------------
 
 The [`CompareNodes`][1] recursively compares two nodes. For example:
 
@@ -161,9 +273,6 @@ L  2 PLAC England
  R 1 NAME J. /Smith/
 ```
 
-Nodes
-=====
-
 Dates
 -----
 
@@ -186,8 +295,8 @@ date range into a number for easier distance and comparison measurements.
 4. Algorithms for calculating the similarity of dates on a configurable
 parabola.
 
-Equality
---------
+Node Equality
+-------------
 
 [`Node.Equals`][9] performs a shallow comparison between two nodes. The
 implementation is different depending on the types of nodes being compared. You
@@ -199,8 +308,8 @@ in nodes.
 
 [`DeepEqual`][10] tests if left and right are recursively equal.
 
-Filtering
----------
+Tree Walking & Filtering
+------------------------
 
 The [`Filter`][4] function recursively removes or manipulates nodes with a
 [`FilterFunction`][5]:
@@ -227,8 +336,8 @@ Filter functions:
 3. [`SimpleNameFilter`][12]
 4. [`WhitelistTagFilter`][6]
 
-Names
------
+Individual Names
+----------------
 
 A [`NameNode`][14] represents all the parts that make up a single name. An
 individual may have more than one name, each one would be represented by a
@@ -257,125 +366,6 @@ name.Format("%f %L")      // Bob SMITH
 name.Format("%f %m (%l)") // Bob (Smith)
 ```
 
-
-Using the Checksum File
-=======================
-
-The `-checksum` option for `gedcom2html` generates a file called `checksum.csv`.
-This file contains the file name and SHA-1 checksum like:
-
-```
-amos-adams.html,b0538fb8186a50c4079c902fec2b4ba0af843061
-massachusetts-united-states.html,79db811c089e8ab5653d34551e6540cb2ea2c947
-```
-
-The lines are ordered by the file name so the output is ideal for comparison.
-
-Here is an example of using the previous and current checksum file to generate
-sync commands:
-
-```bash
-join -a 1 -a 2 -t, -o 0.1,1.2,2.2 /old/checksum.csv /new/checksum.csv | \
-    awk -F, '$2 == $3 { next } { print $3 == "" \
-        ? "rm /some/folder/" $1 \
-        : "cp" " " $1 " /some/folder/" $1 }'
-```
-
-Will produce commands like:
-
-```
-cp abos-adams.html /some/folder/abos-adams.html
-rm /some/folder/massachusetts-united-states.html
-```
-
-
-Exporting
-=========
-
-HTML
-----
-
-`gedcom2html` converts a GEDCOM file to a directory of HTML files. This produces
-a pretty output that looks like this:
-[http://dechauncy.family](http://dechauncy.family)
-
-```txt
-Usage of gedcom2html:
-  -gedcom string
-    	Input GEDCOM file.
-  -output-dir string
-    	Output directory. It will use the current directory if output-dir is not provided. Output files will only be added or replaced. Existing files will not be deleted. (default ".")
-```
-
-JSON
-----
-
-`gedcom2json` is a subpackage and binary that converts a GEDCOM file to a JSON
-structure. It offers several options for the output:
-
-```
-Usage of gedcom2json:
-  -exclude-tags string
-    	Comma-separated list of tags to ignore.
-  -gedcom string
-    	Input GEDCOM file.
-  -no-pointers
-    	Do not include Pointer values ("ptr" attribute) in the output JSON. This is useful to activate when comparing GEDCOM files that have had pointers generated from different sources.
-  -only-official-tags
-    	Only include tags from the GEDCOM standard in the output.
-  -only-tags string
-    	Only include these tags in the output.
-  -pretty-json
-    	Pretty print JSON.
-  -pretty-tags
-    	Output tags with their descriptive name instead of their raw tag value. For example, "BIRT" would be output as "Birth".
-  -single-name
-    	When there are multiple names for an individual this will return the first of the name nodes only.
-  -string-name
-    	Convert NAME tags to a string (instead of the object parts).
-  -tag-keys
-    	Use tags (pretty or raw) as object keys rather than arrays.
-```
-
-Text
-----
-
-`gedcom2text` is a subpackage and binary that converts a GEDCOM file to a simple
-text output (or split into individual files) that is ideal for easily reading
-(by a person) and designed to be as friendly as possible when using diff tools.
-
-```
-Usage of gedcom2text:
-  -gedcom string
-    	Input GEDCOM file.
-  -no-change-times
-    	Do not change timestamps.
-  -no-empty-deaths
-    	Do not include Death node if there are no visible details.
-  -no-places
-    	Do not include places.
-  -no-sources
-    	Do not include sources.
-  -only-official-tags
-    	Only output official GEDCOM tags.
-  -single-name
-    	Only output the primary name.
-  -split-dir string
-    	Split the individuals into separate files in this directory.
-```
-
-### Comparing Output
-
-Here is an example to compare two large GEDCOM files:
-
-```bash
-gedcom2text -gedcom file1.ged -no-sources -only-official-tags -split-dir out1
-gedcom2text -gedcom file2.ged -no-sources -only-official-tags -split-dir out2
-diff -bur out1/ out2/
-```
-
-You can (and probably should) also use
-[more pretty diffing tools](https://en.wikipedia.org/wiki/Comparison_of_file_comparison_tools).
 
 [1]: https://godoc.org/github.com/elliotchance/gedcom#CompareNodes
 [2]: https://godoc.org/github.com/elliotchance/gedcom#NodeDiff
