@@ -48,7 +48,9 @@ func JaroWinkler(a, b string, boostThreshold float64, prefixSize int) float64 {
 		return j
 	}
 
-	prefixSize = minInt(prefixSize, len(a), len(b))
+	aLen := len(a)
+	bLen := len(b)
+	prefixSize = minInt(prefixSize, aLen, bLen)
 
 	var prefixMatch float64
 	for i := 0; i < prefixSize; i++ {
@@ -68,18 +70,21 @@ func minInt(values ...int) int {
 
 // jaro was copied from the same place as JaroWinkler.
 func jaro(a, b string) float64 {
-	la := float64(len(a))
+	aLen := len(a)
+	la := float64(aLen)
 	lb := float64(len(b))
 
 	// match range = max(len(a), len(b)) / 2 - 1
-	matchRange := int(math.Floor(math.Max(la, lb)/2.0)) - 1
-	matchRange = int(math.Max(0, float64(matchRange-1)))
+	lAvg := math.Max(la, lb) / 2.0
+	matchRange := math.Floor(lAvg) - 2
+	matchRange = math.Max(0, matchRange)
+
 	var matches, halfs float64
 	transposed := make([]bool, len(b))
 
-	for i := 0; i < len(a); i++ {
-		start := int(math.Max(0, float64(i-matchRange)))
-		end := int(math.Min(lb-1, float64(i+matchRange)))
+	for i := 0; i < aLen; i++ {
+		start := int(math.Max(0, float64(i)-matchRange))
+		end := int(math.Min(lb-1, float64(i)+matchRange))
 
 		for j := start; j <= end; j++ {
 			if transposed[j] {
@@ -101,9 +106,27 @@ func jaro(a, b string) float64 {
 		return 0
 	}
 
-	transposes := math.Floor(float64(halfs / 2))
+	transposes := math.Floor(halfs / 2)
+	aMatches := matches / la
+	bMatches := matches / lb
+	cMatches := (matches - transposes) / matches
 
-	return ((matches / la) + (matches / lb) + (matches-transposes)/matches) / 3.0
+	return avg(aMatches, bMatches, cMatches)
+}
+
+func sum(numbers ...float64) (total float64) {
+	for _, number := range numbers {
+		total += number
+	}
+
+	return
+}
+
+func avg(numbers ...float64) float64 {
+	total := sum(numbers...)
+	count := float64(len(numbers))
+
+	return total / count
 }
 
 var alnumRegexp = regexp.MustCompile("[^a-z0-9 ]")
@@ -116,5 +139,8 @@ func StringSimilarity(a, b string, boostThreshold float64, prefixSize int) float
 	a = alnumRegexp.ReplaceAllString(strings.ToLower(a), "")
 	b = alnumRegexp.ReplaceAllString(strings.ToLower(b), "")
 
-	return JaroWinkler(CleanSpace(a), CleanSpace(b), boostThreshold, prefixSize)
+	cleanA := CleanSpace(a)
+	cleanB := CleanSpace(b)
+
+	return JaroWinkler(cleanA, cleanB, boostThreshold, prefixSize)
 }

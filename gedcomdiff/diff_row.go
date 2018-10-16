@@ -58,8 +58,8 @@ func (c *diffRow) String() string {
 	}
 
 	return html.NewTableRow(
-		html.NewStyledTableCell("", "", html.NewText(c.name)),
-		html.NewStyledTableCell("width: 40%", leftClass, html.NewText(left)),
-		html.NewStyledTableCell("width: 40%", rightClass, html.NewText(right)),
+		html.NewTableCell(html.NewText(c.name)),
+		html.NewTableCell(html.NewText(left)).Class(leftClass).Style("width: 40%"),
+		html.NewTableCell(html.NewText(right)).Class(rightClass).Style("width: 40%"),
 	).String()
 }

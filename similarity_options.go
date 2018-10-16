@@ -65,6 +65,7 @@ func NewSimilarityOptions() *SimilarityOptions {
 // String renders the options as a comma-separated string.
 func (options SimilarityOptions) String() string {
 	s := fmt.Sprintf("%#v", options)
+	sLen := len(s)
 
-	return s[25 : len(s)-1]
+	return s[25 : sLen-1]
 }

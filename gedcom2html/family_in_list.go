@@ -24,13 +24,12 @@ func (c *familyInList) String() string {
 		date = n.Value()
 	}
 
-	return html.Sprintf(`
-		<tr>
-			<td>%s</td>
-			<td nowrap="nowrap" class="text-center">%s</td>
-			<td>%s</td>
-		</tr>`,
-		newIndividualLink(c.document, c.family.Husband()),
-		date,
-		newIndividualLink(c.document, c.family.Wife()))
+	husband := newIndividualLink(c.document, c.family.Husband())
+	wife := newIndividualLink(c.document, c.family.Wife())
+
+	return html.NewTableRow(
+		html.NewTableCell(husband),
+		html.NewTableCell(html.NewText(date)).Class("text-center").NoWrap(),
+		html.NewTableCell(wife),
+	).String()
 }

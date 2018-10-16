@@ -22,6 +22,7 @@ func (c *placeLink) String() string {
 		return ""
 	}
 
-	return html.Sprintf(`<a href="%s">%s%s</a>`,
-		pagePlace(c.document, c.place), newOcticon("location", ""), c.place)
+	text := newOcticon("location", "").String() + c.place
+
+	return html.NewLink(text, pagePlace(c.document, c.place)).String()
 }

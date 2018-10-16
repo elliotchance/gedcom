@@ -63,6 +63,7 @@ func TestNodesWithTag(t *testing.T) {
 }
 
 func TestNodesWithTagPath(t *testing.T) {
+	// ghost:ignore
 	tests := []struct {
 		node    gedcom.Node
 		tagPath []gedcom.Tag
@@ -177,6 +178,7 @@ func TestHasNestedNode(t *testing.T) {
 	surname := gedcom.NewNodeWithChildren(nil, gedcom.TagSurname, "", "", nil)
 	givenName := gedcom.NewNodeWithChildren(nil, gedcom.TagGivenName, "", "", nil)
 
+	// ghost:ignore
 	tests := []struct {
 		node       gedcom.Node
 		lookingFor gedcom.Node

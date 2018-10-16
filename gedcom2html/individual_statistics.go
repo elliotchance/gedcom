@@ -27,11 +27,11 @@ func (c *individualStatistics) String() string {
 		}
 	}
 
-	s := html.NewComponents(
-		newKeyedTableRow("Total", html.NewNumber(total).String(), true),
-		newKeyedTableRow("Living", html.NewNumber(living).String(), true),
-		newKeyedTableRow("Dead", html.NewNumber(total-living).String(), true),
-	)
+	totalRow := newKeyedTableRow("Total", html.NewNumber(total).String(), true)
+	livingRow := newKeyedTableRow("Living", html.NewNumber(living).String(), true)
+	deadRow := newKeyedTableRow("Dead", html.NewNumber(total-living).String(), true)
+
+	s := html.NewComponents(totalRow, livingRow, deadRow)
 
 	return newCard("Individuals", noBadgeCount, html.NewTable("", s)).String()
 }

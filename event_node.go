@@ -31,7 +31,11 @@ func (node *EventNode) Dates() []*DateNode {
 // If either node is nil (including both) or if the right side is not a
 // EventNode then false is always returned.
 func (node *EventNode) Equals(node2 Node) bool {
-	if IsNil(node) || IsNil(node2) {
+	if IsNil(node) {
+		return false
+	}
+
+	if IsNil(node2) {
 		return false
 	}
 

@@ -55,7 +55,11 @@ type Node interface {
 // specific node types (such as DateNode) use SimpleNode as an instance variable
 // and that would cause a nil pointer panic.
 func IsNil(node Node) bool {
-	return node == nil || reflect.ValueOf(node).IsNil()
+	if node == nil {
+		return true
+	}
+
+	return reflect.ValueOf(node).IsNil()
 }
 
 // NodeGedcom is the recursive version of GedcomLine. It will render a node and
@@ -107,7 +111,11 @@ func NodeGedcom(node Node) string {
 // appear the same number of times on the opposite side for the DeepEqual to be
 // true.
 func DeepEqual(left, right Node) bool {
-	if IsNil(left) || IsNil(right) {
+	if IsNil(left) {
+		return false
+	}
+
+	if IsNil(right) {
 		return false
 	}
 
@@ -115,14 +123,19 @@ func DeepEqual(left, right Node) bool {
 		return false
 	}
 
-	if len(left.Nodes()) != len(right.Nodes()) {
+	leftNodes := left.Nodes()
+	rightNodes := right.Nodes()
+	leftNodesLen := len(leftNodes)
+	rightNodesLen := len(rightNodes)
+
+	if leftNodesLen != rightNodesLen {
 		return false
 	}
 
 	matches := map[int]bool{}
-	for _, leftChild := range left.Nodes() {
+	for _, leftChild := range leftNodes {
 		foundMatch := false
-		for i, rightChild := range right.Nodes() {
+		for i, rightChild := range rightNodes {
 			if !matches[i] && DeepEqual(leftChild, rightChild) {
 				matches[i] = true
 				foundMatch = true

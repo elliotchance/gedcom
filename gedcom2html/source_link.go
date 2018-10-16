@@ -16,7 +16,8 @@ func newSourceLink(source *gedcom.SourceNode) *sourceLink {
 }
 
 func (c *sourceLink) String() string {
-	return html.Sprintf(`
-		<a href="%s">%s</a>`,
-		pageSource(c.source), c.source.Title())
+	text := c.source.Title()
+	destination := pageSource(c.source)
+
+	return html.NewLink(text, destination).String()
 }

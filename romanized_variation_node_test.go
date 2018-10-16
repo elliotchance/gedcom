@@ -21,6 +21,7 @@ func TestNewRomanizedVariationNode(t *testing.T) {
 }
 
 func TestRomanizedVariationNode_Type(t *testing.T) {
+	// ghost:ignore
 	var tests = []struct {
 		node     *gedcom.RomanizedVariationNode
 		expected *gedcom.TypeNode

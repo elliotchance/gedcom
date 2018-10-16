@@ -127,6 +127,7 @@ func TestPlaceNode_Country(t *testing.T) {
 }
 
 func TestPlaceNode_Format(t *testing.T) {
+	// ghost:ignore
 	var tests = []struct {
 		node     *gedcom.PlaceNode
 		expected *gedcom.FormatNode
@@ -173,6 +174,7 @@ func TestPlaceNode_Format(t *testing.T) {
 }
 
 func TestPlaceNode_PhoneticVariations(t *testing.T) {
+	// ghost:ignore
 	var tests = []struct {
 		node     *gedcom.PlaceNode
 		expected []*gedcom.PhoneticVariationNode
@@ -227,6 +229,7 @@ func TestPlaceNode_PhoneticVariations(t *testing.T) {
 }
 
 func TestPlaceNode_RomanizedVariations(t *testing.T) {
+	// ghost:ignore
 	var tests = []struct {
 		node     *gedcom.PlaceNode
 		expected []*gedcom.RomanizedVariationNode
@@ -281,6 +284,7 @@ func TestPlaceNode_RomanizedVariations(t *testing.T) {
 }
 
 func TestPlaceNode_Map(t *testing.T) {
+	// ghost:ignore
 	var tests = []struct {
 		node     *gedcom.PlaceNode
 		expected *gedcom.MapNode
@@ -327,6 +331,7 @@ func TestPlaceNode_Map(t *testing.T) {
 }
 
 func TestPlaceNode_Notes(t *testing.T) {
+	// ghost:ignore
 	var tests = []struct {
 		node     *gedcom.PlaceNode
 		expected []*gedcom.NoteNode

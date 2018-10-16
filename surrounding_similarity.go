@@ -40,8 +40,10 @@ type SurroundingSimilarity struct {
 //   ChildrenSimilarity: ~6.7%
 //
 func (s SurroundingSimilarity) WeightedSimilarity(options *SimilarityOptions) float64 {
-	return (s.IndividualSimilarity * options.IndividualWeight) +
-		(s.ParentsSimilarity * options.ParentsWeight) +
-		(s.SpousesSimilarity * options.SpousesWeight) +
-		(s.ChildrenSimilarity * options.ChildrenWeight)
+	individual := s.IndividualSimilarity * options.IndividualWeight
+	parents := s.ParentsSimilarity * options.ParentsWeight
+	spouses := s.SpousesSimilarity * options.SpousesWeight
+	children := s.ChildrenSimilarity * options.ChildrenWeight
+
+	return individual + parents + spouses + children
 }

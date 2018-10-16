@@ -154,8 +154,9 @@ func transformNode(node gedcom.Node, options TransformOptions) map[string]interf
 		m["tag"] = node.Tag().Tag()
 	}
 
-	if node.Pointer() != "" && !options.NoPointers {
-		m["ptr"] = node.Pointer()
+	pointer := node.Pointer()
+	if pointer != "" && !options.NoPointers {
+		m["ptr"] = pointer
 	}
 
 	if node.Tag().Is(gedcom.TagName) && options.StringName {

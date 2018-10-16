@@ -77,7 +77,9 @@ func surnameStartsWith(individual *gedcom.IndividualNode, letter rune) bool {
 	}
 
 	lowerName := strings.ToLower(name)
-	return rune(lowerName[0]) == letter
+	firstLetter := rune(lowerName[0])
+
+	return firstLetter == letter
 }
 
 func individualForNode(node gedcom.Node) *gedcom.IndividualNode {

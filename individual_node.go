@@ -620,3 +620,32 @@ func (node *IndividualNode) AllEvents() (nodes []Node) {
 
 	return
 }
+
+// Birth returns the first values for the date and place of the birth events.
+func (node *IndividualNode) Birth() (*DateNode, *PlaceNode) {
+	birthNodes := Compound(node.Births())
+
+	return DateAndPlace(birthNodes...)
+}
+
+// Death returns the first values for the date and place of the death events.
+func (node *IndividualNode) Death() (*DateNode, *PlaceNode) {
+	deathNodes := Compound(node.Deaths())
+
+	return DateAndPlace(deathNodes...)
+}
+
+// Baptism returns the first values for the date and place of the baptism
+// events.
+func (node *IndividualNode) Baptism() (*DateNode, *PlaceNode) {
+	baptismNodes := Compound(node.Baptisms())
+
+	return DateAndPlace(baptismNodes...)
+}
+
+// Burial returns the first values for the date and place of the burial events.
+func (node *IndividualNode) Burial() (*DateNode, *PlaceNode) {
+	burialNodes := Compound(node.Burials())
+
+	return DateAndPlace(burialNodes...)
+}

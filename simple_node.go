@@ -70,13 +70,25 @@ func (node *SimpleNode) Document() *Document {
 // 4. A node is considered to have the same value (and therefore be equal) is
 // both nodes share the all of the same tag, value and pointer.
 func (node *SimpleNode) Equals(node2 Node) bool {
-	if node == nil || IsNil(node2) {
+	if node == nil {
 		return false
 	}
 
-	return node.tag == node2.Tag() &&
-		node.value == node2.Value() &&
-		node.pointer == node2.Pointer()
+	if IsNil(node2) {
+		return false
+	}
+
+	tag := node2.Tag()
+	if node.tag != tag {
+		return false
+	}
+
+	value := node2.Value()
+	if node.value != value {
+		return false
+	}
+
+	return node.pointer == node2.Pointer()
 }
 
 // If the node is nil the invocation will not have any effect.

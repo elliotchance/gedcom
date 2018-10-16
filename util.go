@@ -7,8 +7,11 @@ import (
 )
 
 func valueToPointer(val string) string {
-	if len(val) > 2 && val[0] == '@' && val[len(val)-1] == '@' {
-		return val[1 : len(val)-1]
+	valLen := len(val)
+	firstCharIsAt := val[0] == '@'
+	lastCharIsAt := val[valLen-1] == '@'
+	if valLen > 2 && firstCharIsAt && lastCharIsAt {
+		return val[1 : valLen-1]
 	}
 
 	return ""
@@ -162,24 +165,15 @@ func String(node Node) string {
 	return node.String()
 }
 
-// Places returns the shallow PlaceNodes for each of the provided nodes.
-func Places(nodes ...Node) (places []*PlaceNode) {
-	for _, node := range nodes {
-		for _, n := range NodesWithTag(node, TagPlace) {
-			places = append(places, n.(*PlaceNode))
-		}
-	}
-
-	return
-}
-
 func maxInt64(values ...int64) (r int64) {
-	if len(values) == 0 {
+	valuesLen := len(values)
+
+	if valuesLen == 0 {
 		return
 	}
 
 	r = values[0]
-	for i := 1; i < len(values); i++ {
+	for i := 1; i < valuesLen; i++ {
 		if values[i] > r {
 			r = values[i]
 		}
@@ -189,14 +183,37 @@ func maxInt64(values ...int64) (r int64) {
 }
 
 func maxInt(values ...int) (r int) {
-	if len(values) == 0 {
+	valuesLen := len(values)
+
+	if valuesLen == 0 {
 		return
 	}
 
 	r = values[0]
-	for i := 1; i < len(values); i++ {
+	for i := 1; i < valuesLen; i++ {
 		if values[i] > r {
 			r = values[i]
+		}
+	}
+
+	return
+}
+
+// DateAndPlace is a convenience method for fetching a date and place from a
+// list of nodes.
+//
+// If multiple dates and places exist it will choose the first respective one.
+func DateAndPlace(nodes ...Node) (date *DateNode, place *PlaceNode) {
+	for _, node := range nodes {
+		dates := Dates(node.(Node))
+		places := Places(node.(Node))
+
+		if date == nil && len(dates) > 0 {
+			date = dates[0]
+		}
+
+		if place == nil && len(places) > 0 {
+			place = places[0]
 		}
 	}
 

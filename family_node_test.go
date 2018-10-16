@@ -70,6 +70,7 @@ func TestFamilyNode_Wife(t *testing.T) {
 }
 
 func TestFamilyNode_Similarity(t *testing.T) {
+	// ghost:ignore
 	var tests = []struct {
 		doc      *gedcom.Document
 		expected float64

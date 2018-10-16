@@ -19,15 +19,29 @@ func newIndividualNameAndSex(individual *gedcom.IndividualNode) *individualNameA
 
 func (c *individualNameAndSex) String() string {
 	primaryName := c.individual.Names()[0]
+	title := primaryName.Title()
+	prefix := primaryName.Prefix()
+	name := primaryName.GivenName()
+	surnamePrefix := primaryName.SurnamePrefix()
+	surname := primaryName.Surname()
+	suffix := primaryName.Suffix()
+
+	titleRow := newKeyedTableRow("Title", title, title != "")
+	prefixRow := newKeyedTableRow("Prefix", prefix, prefix != "")
+	givenNameRow := newKeyedTableRow("Given Name", name, name != "")
+	surnamePrefixRow := newKeyedTableRow("Surname Prefix", surnamePrefix, surnamePrefix != "")
+	surnameRow := newKeyedTableRow("Surname", surname, surname != "")
+	suffixRow := newKeyedTableRow("Suffix", suffix, suffix != "")
+	sexRow := newKeyedTableRow("Sex", newSexBadge(c.individual.Sex()).String(), true)
 
 	s := html.NewComponents(
-		newKeyedTableRow("Title", primaryName.Title(), primaryName.Title() != ""),
-		newKeyedTableRow("Prefix", primaryName.Prefix(), primaryName.Prefix() != ""),
-		newKeyedTableRow("Given Name", primaryName.GivenName(), primaryName.GivenName() != ""),
-		newKeyedTableRow("Surname Prefix", primaryName.SurnamePrefix(), primaryName.SurnamePrefix() != ""),
-		newKeyedTableRow("Surname", primaryName.Surname(), primaryName.Surname() != ""),
-		newKeyedTableRow("Suffix", primaryName.Suffix(), primaryName.Suffix() != ""),
-		newKeyedTableRow("Sex", newSexBadge(c.individual.Sex()).String(), true),
+		titleRow,
+		prefixRow,
+		givenNameRow,
+		surnamePrefixRow,
+		surnameRow,
+		suffixRow,
+		sexRow,
 	)
 
 	return newCard("Name & Sex", noBadgeCount, html.NewTable("", s)).String()

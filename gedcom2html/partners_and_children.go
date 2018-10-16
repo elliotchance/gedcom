@@ -21,9 +21,11 @@ func newPartnersAndChildren(document *gedcom.Document, individual *gedcom.Indivi
 }
 
 func (c *partnersAndChildren) String() string {
+	column := html.NewColumn(html.EntireRow,
+		html.NewHeading(2, "", "Spouses & Children"))
+
 	rows := []fmt.Stringer{
-		html.NewRow(html.NewColumn(html.EntireRow,
-			html.NewHeading(2, "", "Spouses & Children"))),
+		html.NewRow(column),
 	}
 
 	// Find children of known spouses.

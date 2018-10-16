@@ -21,7 +21,8 @@ func NewEncoder(w io.Writer, document *Document) *Encoder {
 }
 
 func (enc *Encoder) renderNode(indent int, node Node) error {
-	_, err := enc.w.Write([]byte(GedcomLine(indent, node) + "\n"))
+	gedcomLine := GedcomLine(indent, node) + "\n"
+	_, err := enc.w.Write([]byte(gedcomLine))
 	if err != nil {
 		return err
 	}

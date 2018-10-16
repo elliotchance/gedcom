@@ -41,7 +41,9 @@ func getIndexLetters(document *gedcom.Document) []rune {
 
 func getIndexLetter(individual *gedcom.IndividualNode) rune {
 	name := strings.ToLower(individual.Name().String())
-	if name == "" || name[0] < 'a' || name[0] > 'z' {
+
+	switch {
+	case name == "", name[0] < 'a', name[0] > 'z':
 		name = "#"
 	}
 

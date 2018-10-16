@@ -139,15 +139,18 @@ type individualSimilarity struct {
 // The options.MaxYears allows the error margin on dates to be adjusted. See
 // DefaultMaxYearsForSimilarity for more information.
 func (nodes IndividualNodes) Similarity(other IndividualNodes, options *SimilarityOptions) float64 {
+	nodesLen := float64(len(nodes))
+	otherLen := float64(len(other))
+
 	// We have to catch this because otherwise it would lead to a divide-by-zero
 	// at the end.
-	if len(nodes) == 0 && len(other) == 0 {
+	if nodesLen == 0 && otherLen == 0 {
 		return 1
 	}
 
 	// 0.5 is actually the same value that would be returned in all cases if the
 	// logic were to fall through.
-	if len(nodes) == 0 || len(other) == 0 {
+	if nodesLen == 0 || otherLen == 0 {
 		return 0.5
 	}
 
@@ -194,14 +197,14 @@ func (nodes IndividualNodes) Similarity(other IndividualNodes, options *Similari
 		total += s.similarity
 	}
 
-	wantedLength := len(nodes)
-	if len(other) > wantedLength {
-		wantedLength = len(other)
+	if otherLen > nodesLen {
+		nodesLen = otherLen
 	}
 
-	total += 0.5 * float64(wantedLength-len(winners))
+	winnersLength := float64(len(winners))
+	total += 0.5 * (nodesLen - winnersLength)
 
-	return total / float64(wantedLength)
+	return total / nodesLen
 }
 
 // IndividualComparison is the result of two compared individuals.
@@ -287,13 +290,16 @@ func (o *IndividualNodesCompareOptions) jobs() int {
 func (nodes IndividualNodes) Compare(other IndividualNodes, options *IndividualNodesCompareOptions) []IndividualComparison {
 	// Calculate all the similarities of the matrix.
 	similarities := []IndividualComparison{}
+
+	// ghost:ignore
 	total := int64(len(nodes)) * int64(len(other))
 
 	jobs := make(chan IndividualComparison, 100)
 	results := make(chan IndividualComparison, 100)
 
 	// Start workers.
-	for w := 1; w <= options.jobs(); w++ {
+	numberOfJobs := options.jobs()
+	for w := 1; w <= numberOfJobs; w++ {
 		go nodes.compareWorker(options.SimilarityOptions, jobs, results)
 	}
 

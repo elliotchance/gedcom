@@ -21,6 +21,7 @@ func TestNewPhoneticVariationNode(t *testing.T) {
 }
 
 func TestPhoneticVariationNode_Type(t *testing.T) {
+	// ghost:ignore
 	var tests = []struct {
 		node     *gedcom.PhoneticVariationNode
 		expected *gedcom.TypeNode

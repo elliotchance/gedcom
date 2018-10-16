@@ -147,8 +147,10 @@ func (date Date) String() string {
 		year = strconv.Itoa(date.Year)
 	}
 
-	return CleanSpace(fmt.Sprintf("%s %s %s %s",
-		date.Constraint.String(), day, monthName, year))
+	rawDate := fmt.Sprintf("%s %s %s %s",
+		date.Constraint.String(), day, monthName, year)
+
+	return CleanSpace(rawDate)
 }
 
 // Is compares two dates. Dates are only considered to be the same if the day,
@@ -157,8 +159,19 @@ func (date Date) String() string {
 // The IsEndOfRange property is not used as part of the comparison because it
 // only affects the behaviour of Time().
 func (date Date) Is(date2 Date) bool {
-	return date.Day == date2.Day && date.Month == date2.Month &&
-		date.Year == date2.Year && date.Constraint == date2.Constraint
+	if date.Day != date2.Day {
+		return false
+	}
+
+	if date.Month != date2.Month {
+		return false
+	}
+
+	if date.Year != date2.Year {
+		return false
+	}
+
+	return date.Constraint == date2.Constraint
 }
 
 // Years returns the number of years of a date as a floating-point. It can be
@@ -185,7 +198,11 @@ func (date Date) Is(date2 Date) bool {
 // ("Bef.", "Aft.", etc). If this property is important to you will need to take
 // it into account in an appropriate way.
 func (date Date) Years() float64 {
-	if date.Day != 0 && date.Month != 0 && date.Year != 0 {
+	hasDay := date.Day != 0
+	hasMonth := date.Month != 0
+	hasYear := date.Year != 0
+
+	if hasDay && hasMonth && hasYear {
 		// Calculate the total number of days in this year so we can take into
 		// account leap years. The easiest way to do this is by going to the
 		// first day of the next year then moving back one day.
@@ -201,7 +218,7 @@ func (date Date) Years() float64 {
 		return float64(t.Year()) + fractional
 	}
 
-	if date.Month != 0 && date.Year != 0 {
+	if hasMonth && hasYear {
 		start := Date{
 			Day:   1,
 			Month: date.Month,
@@ -222,7 +239,7 @@ func (date Date) Years() float64 {
 		return (start + end) / 2
 	}
 
-	if date.Year != 0 {
+	if hasYear {
 		return float64(date.Year) + 0.5
 	}
 
@@ -232,7 +249,11 @@ func (date Date) Years() float64 {
 // IsZero returns true if the day, month and year are not provided. No other
 // attributes are taken into consideration.
 func (date Date) IsZero() bool {
-	return date.Day == 0 && date.Month == 0 && date.Year == 0
+	zeroDay := date.Day == 0
+	zeroMonth := date.Month == 0
+	zeroYear := date.Year == 0
+
+	return zeroDay && zeroMonth && zeroYear
 }
 
 // Equals compares two dates.
@@ -264,7 +285,11 @@ func (date Date) IsZero() bool {
 //
 // D. Never a match.
 func (date Date) Equals(date2 Date) bool {
-	if date.IsZero() || date2.IsZero() {
+	if date.IsZero() {
+		return false
+	}
+
+	if date2.IsZero() {
 		return false
 	}
 
@@ -284,19 +309,31 @@ func (date Date) Equals(date2 Date) bool {
 
 // See Equals.
 func (date Date) equalsA(date2 Date) bool {
-	return date.Day == date2.Day &&
-		date.Month == date2.Month &&
-		date.Year == date2.Year
+	if date.Day != date2.Day {
+		return false
+	}
+
+	if date.Month != date2.Month {
+		return false
+	}
+
+	return date.Year == date2.Year
 }
 
 // See Equals.
 func (date Date) equalsB(date2 Date) bool {
-	return date.Years() > date2.Years()
+	leftYears := date.Years()
+	rightYears := date2.Years()
+
+	return leftYears > rightYears
 }
 
 // See Equals.
 func (date Date) equalsC(date2 Date) bool {
-	return date.Years() < date2.Years()
+	leftYears := date.Years()
+	rightYears := date2.Years()
+
+	return leftYears < rightYears
 }
 
 // See Equals.

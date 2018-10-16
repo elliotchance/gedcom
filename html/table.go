@@ -16,6 +16,8 @@ func NewTable(tableClass string, content ...fmt.Stringer) *Table {
 }
 
 func (c *Table) String() string {
+	components := NewComponents(c.content...).String()
+
 	return Sprintf(`<table class="table %s">%s</table>`,
-		c.tableClass, NewComponents(c.content...).String())
+		c.tableClass, components)
 }

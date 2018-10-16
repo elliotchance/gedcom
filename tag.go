@@ -741,7 +741,9 @@ func (tag Tag) String() string {
 
 // IsOfficial returns true if the tag is part of the GEDCOM 5.5 standard.
 func (tag Tag) IsOfficial() bool {
-	if len(tag.tag) == 0 {
+	tagLen := len(tag.tag)
+
+	if tagLen == 0 {
 		return false
 	}
 

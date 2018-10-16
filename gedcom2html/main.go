@@ -32,6 +32,7 @@ var (
 
 func main() {
 	flag.StringVar(&optionGedcomFile, "gedcom", "", "Input GEDCOM file.")
+	// ghost:ignore
 	flag.StringVar(&optionOutputDir, "output-dir", ".", "Output directory. It"+
 		" will use the current directory if output-dir is not provided. "+
 		"Output files will only be added or replaced. Existing files will not"+
@@ -171,6 +172,7 @@ func createFile(name string, contents fmt.Stringer) {
 		log.Fatal(err)
 	}
 
+	// ghost:ignore
 	out.Write([]byte(contents.String()))
 
 	out.Close()

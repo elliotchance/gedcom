@@ -88,6 +88,7 @@ func TestIndividualNode_Sex(t *testing.T) {
 }
 
 func TestIndividualNode_Births(t *testing.T) {
+	// ghost:ignore
 	var tests = []struct {
 		node   *gedcom.IndividualNode
 		births []*gedcom.BirthNode
@@ -142,6 +143,7 @@ func TestIndividualNode_Births(t *testing.T) {
 }
 
 func TestIndividualNode_Baptisms(t *testing.T) {
+	// ghost:ignore
 	var tests = []struct {
 		node     *gedcom.IndividualNode
 		baptisms []*gedcom.BaptismNode
@@ -202,6 +204,7 @@ func TestIndividualNode_Baptisms(t *testing.T) {
 }
 
 func TestIndividualNode_Deaths(t *testing.T) {
+	// ghost:ignore
 	var tests = []struct {
 		node   *gedcom.IndividualNode
 		deaths []*gedcom.DeathNode
@@ -256,6 +259,7 @@ func TestIndividualNode_Deaths(t *testing.T) {
 }
 
 func TestIndividualNode_Burials(t *testing.T) {
+	// ghost:ignore
 	var tests = []struct {
 		node    *gedcom.IndividualNode
 		burials []*gedcom.BurialNode
@@ -510,6 +514,7 @@ func TestIndividualNode_SpouseChildren(t *testing.T) {
 }
 
 func TestIndividualNode_LDSBaptisms(t *testing.T) {
+	// ghost:ignore
 	var tests = []struct {
 		node     *gedcom.IndividualNode
 		baptisms []gedcom.Node
@@ -570,6 +575,7 @@ func TestIndividualNode_LDSBaptisms(t *testing.T) {
 }
 
 func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
+	// ghost:ignore
 	var tests = []struct {
 		node     *gedcom.IndividualNode
 		expected *gedcom.DateNode
@@ -680,6 +686,7 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 }
 
 func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
+	// ghost:ignore
 	var tests = []struct {
 		node     *gedcom.IndividualNode
 		expected *gedcom.DateNode
@@ -808,6 +815,7 @@ func buried(value string) gedcom.Node {
 }
 
 func TestIndividualNode_Similarity(t *testing.T) {
+	// ghost:ignore
 	var tests = []struct {
 		a, b     *gedcom.IndividualNode
 		expected float64
@@ -1029,6 +1037,7 @@ func TestIndividualNode_Similarity(t *testing.T) {
 }
 
 func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
+	// ghost:ignore
 	var tests = []struct {
 		doc      *gedcom.Document
 		expected gedcom.SurroundingSimilarity
@@ -1331,6 +1340,7 @@ func TestIndividualNode_Children(t *testing.T) {
 }
 
 func TestIndividualNode_AllEvents(t *testing.T) {
+	// ghost:ignore
 	var tests = []struct {
 		node   *gedcom.IndividualNode
 		events []gedcom.Node
@@ -1389,4 +1399,92 @@ func TestIndividualNode_AllEvents(t *testing.T) {
 			assert.Equal(t, test.node.AllEvents(), test.events)
 		})
 	}
+}
+
+func TestIndividualNode_Birth(t *testing.T) {
+	date3Sep1953 := gedcom.NewDateNode(nil, "3 Sep 1953", "", nil)
+	place1 := gedcom.NewPlaceNode(nil, "Australia", "", nil)
+
+	individual := gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+			date3Sep1953,
+		}),
+		gedcom.NewDeathNode(nil, "", "", []gedcom.Node{
+			gedcom.NewPlaceNode(nil, "United Kingdom", "", nil),
+		}),
+		gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+			place1,
+		}),
+	})
+
+	date, place := individual.Birth()
+
+	assert.Equal(t, date3Sep1953, date)
+	assert.Equal(t, place1, place)
+}
+
+func TestIndividualNode_Death(t *testing.T) {
+	date3Sep1953 := gedcom.NewDateNode(nil, "3 Sep 1953", "", nil)
+	place1 := gedcom.NewPlaceNode(nil, "Australia", "", nil)
+
+	individual := gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewDeathNode(nil, "", "", []gedcom.Node{
+			date3Sep1953,
+		}),
+		gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+			gedcom.NewPlaceNode(nil, "United Kingdom", "", nil),
+		}),
+		gedcom.NewDeathNode(nil, "", "", []gedcom.Node{
+			place1,
+		}),
+	})
+
+	date, place := individual.Death()
+
+	assert.Equal(t, date3Sep1953, date)
+	assert.Equal(t, place1, place)
+}
+
+func TestIndividualNode_Baptism(t *testing.T) {
+	date3Sep1953 := gedcom.NewDateNode(nil, "3 Sep 1953", "", nil)
+	place1 := gedcom.NewPlaceNode(nil, "Australia", "", nil)
+
+	individual := gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewBaptismNode(nil, "", "", []gedcom.Node{
+			date3Sep1953,
+		}),
+		gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+			gedcom.NewPlaceNode(nil, "United Kingdom", "", nil),
+		}),
+		gedcom.NewBaptismNode(nil, "", "", []gedcom.Node{
+			place1,
+		}),
+	})
+
+	date, place := individual.Baptism()
+
+	assert.Equal(t, date3Sep1953, date)
+	assert.Equal(t, place1, place)
+}
+
+func TestIndividualNode_Burial(t *testing.T) {
+	date3Sep1953 := gedcom.NewDateNode(nil, "3 Sep 1953", "", nil)
+	place1 := gedcom.NewPlaceNode(nil, "Australia", "", nil)
+
+	individual := gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewBurialNode(nil, "", "", []gedcom.Node{
+			date3Sep1953,
+		}),
+		gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+			gedcom.NewPlaceNode(nil, "United Kingdom", "", nil),
+		}),
+		gedcom.NewBurialNode(nil, "", "", []gedcom.Node{
+			place1,
+		}),
+	})
+
+	date, place := individual.Burial()
+
+	assert.Equal(t, date3Sep1953, date)
+	assert.Equal(t, place1, place)
 }

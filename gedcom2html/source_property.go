@@ -18,11 +18,14 @@ func newSourceProperty(document *gedcom.Document, node gedcom.Node) *sourcePrope
 }
 
 func (c *sourceProperty) String() string {
+	tag := c.node.Tag().String()
+	value := c.node.Value()
+
 	s := html.Sprintf(`
 		<tr>
 			<th nowrap="nowrap">%s</th>
 			<td>%s</td>
-		</tr>`, c.node.Tag().String(), c.node.Value())
+		</tr>`, tag, value)
 
 	for _, node := range c.node.Nodes() {
 		s += newSourceProperty(c.document, node).String()

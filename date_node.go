@@ -189,7 +189,9 @@ func parseMonthName(parts []string, monthPos int) (string, error) {
 		return "", errors.New("cannot parse month")
 	}
 
-	return CleanSpace(strings.ToLower(parts[monthPos])), nil
+	monthName := strings.ToLower(parts[monthPos])
+
+	return CleanSpace(monthName), nil
 }
 
 var dateRegexp = regexp.MustCompile(
@@ -202,9 +204,11 @@ func parseDateParts(dateString string, isEndOfRange bool) Date {
 	// Place holders for the locations of each regexp group.
 	constraintPos, dayPos, monthPos, yearPos := 1, 2, 3, 4
 
-	// Could not match the regexp or month is unknown.
 	monthName, err := parseMonthName(parts, monthPos)
-	if len(parts) == 0 || err != nil {
+
+	switch {
+	case len(parts) == 0, // Could not match the regexp.
+		err != nil: // The month is unknown.
 		return Date{
 			IsEndOfRange: isEndOfRange,
 		}
@@ -294,7 +298,7 @@ func (node *DateNode) String() string {
 		return startDate.String()
 	}
 
-	return fmt.Sprintf("Bet. %s and %s", startDate.String(), endDate.String())
+	return fmt.Sprintf("Bet. %s and %s", startDate, endDate)
 }
 
 // Years works in a similar way to Date.Years() but also takes into
@@ -309,9 +313,16 @@ func (node *DateNode) String() string {
 // the returned value is an approximation and should not be used in date
 // calculations.
 func (node *DateNode) Years() float64 {
+	start, end := node.DateRangeYears()
+
+	return (start + end) / 2.0
+}
+
+// DateRangeYears returns the Years values for the DateRange.
+func (node *DateNode) DateRangeYears() (float64, float64) {
 	start, end := node.DateRange()
 
-	return (start.Years() + end.Years()) / 2.0
+	return start.Years(), end.Years()
 }
 
 // Similarity returns a value from 0.0 to 1.0 to identify how similar two dates
@@ -349,7 +360,10 @@ func (node *DateNode) Similarity(node2 *DateNode, maxYears float64) float64 {
 		return 0.5
 	}
 
-	similarity := math.Pow((node.Years()-node2.Years())/maxYears, 2)
+	leftYears := node.Years()
+	rightYears := node2.Years()
+	yearsApart := leftYears - rightYears
+	similarity := math.Pow(yearsApart/maxYears, 2)
 
 	// When one date is invalid the similarity will go asymptotic.
 	if similarity > 1 {
@@ -371,7 +385,10 @@ func (node *DateNode) Similarity(node2 *DateNode, maxYears float64) float64 {
 // The comparisons of dates is quite complicated. See the documentation for
 // Date.Equals for a full explanation.
 func (node *DateNode) Equals(node2 Node) bool {
-	if IsNil(node) || IsNil(node2) {
+	leftIsNil := IsNil(node)
+	rightIsNil := IsNil(node2)
+
+	if leftIsNil || rightIsNil {
 		return false
 	}
 

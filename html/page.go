@@ -22,6 +22,9 @@ func NewPage(title string, body fmt.Stringer, googleAnalyticsID string) *Page {
 }
 
 func (c *Page) String() string {
+	googleAnalytics := newGoogleAnalytics(c.googleAnalyticsID)
+	footer := NewFooter()
+
 	return Sprintf(`
     <html>
 	<head>
@@ -47,5 +50,5 @@ func (c *Page) String() string {
 		</div>
 	</body>
 	</html>
-	`, newGoogleAnalytics(c.googleAnalyticsID), c.title, c.body, NewFooter())
+	`, googleAnalytics, c.title, c.body, footer)
 }

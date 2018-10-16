@@ -25,10 +25,8 @@ func (c *surnameInList) String() string {
 		}
 	}
 
-	return html.Sprintf(`
-		<tr>
-			<td>%s</td>
-			<td>%s</td>
-		</tr>`,
-		newSurnameLink(c.surname), html.NewNumber(count))
+	return html.NewTableRow(
+		html.NewTableCell(newSurnameLink(c.surname)),
+		html.NewTableCell(html.NewNumber(count)),
+	).String()
 }
