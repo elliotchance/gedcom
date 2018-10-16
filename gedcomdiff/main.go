@@ -22,6 +22,7 @@ var (
 	optionJobs                      int
 	optionMinimumSimilarity         float64
 	optionMinimumWeightedSimilarity float64
+	optionSortSimilarities          bool
 )
 
 var filterFlags = &util.FilterFlags{}
@@ -137,6 +138,10 @@ func parseCLIFlags() {
 
 			This value must be between 0 and 1 and should be set to the same
 			value as "minimum-weighted-similarity" if you are unsure.`))
+
+	flag.BoolVar(&optionSortSimilarities, "sort-similarities", false,
+		CLIDescription(`Sort the individuals by similarity (highest first)
+			rather than by name.`))
 
 	filterFlags.SetupCLI()
 
