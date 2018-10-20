@@ -12,42 +12,57 @@ import (
 	"strings"
 )
 
+// These are used for optionShow. If you update these options you will also
+// need to adjust validateOptions.
+const (
+	optionShowAll         = "all" // default
+	optionShowOnlyMatches = "only-matches"
+	optionShowSubset      = "subset"
+)
+
+// These are used for optionSort. If you update these options you will also
+// need to adjust validateOptions.
+const (
+	optionSortWrittenName       = "written-name" // default
+	optionSortHighestSimilarity = "highest-similarity"
+)
+
 var (
 	optionLeftGedcomFile            string
 	optionRightGedcomFile           string
 	optionOutputFile                string
-	optionSubset                    bool
+	optionShow                      string // see optionShow constants.
 	optionGoogleAnalyticsID         string
 	optionProgress                  bool
 	optionJobs                      int
 	optionMinimumSimilarity         float64
 	optionMinimumWeightedSimilarity float64
-	optionSortSimilarities          bool
+	optionSort                      string // see optionSort constants.
 )
 
 var filterFlags = &util.FilterFlags{}
+
+func check(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 func main() {
 	parseCLIFlags()
 
 	leftGedcom, err := gedcom.NewDocumentFromGEDCOMFile(optionLeftGedcomFile)
-	if err != nil {
-		log.Fatal(err)
-	}
+	check(err)
 
 	rightGedcom, err := gedcom.NewDocumentFromGEDCOMFile(optionRightGedcomFile)
-	if err != nil {
-		log.Fatal(err)
-	}
+	check(err)
 
 	// Run compare.
 	leftIndividuals := leftGedcom.Individuals()
 	rightIndividuals := rightGedcom.Individuals()
 
 	out, err := os.Create(optionOutputFile)
-	if err != nil {
-		log.Fatal(err)
-	}
+	check(err)
 
 	var comparisons []gedcom.IndividualComparison
 
@@ -101,10 +116,20 @@ func parseCLIFlags() {
 
 	flag.StringVar(&optionOutputFile, "output", "", "Output file.")
 
-	flag.BoolVar(&optionSubset, "subset", false, CLIDescription(`When -subset is
-		enabled the right side will be considered a smaller part of the larger
+	flag.StringVar(&optionShow, "show", optionShowAll, CLIDescription(`
+		The "-show" option controls which individuals are shown in the output:
+
+		"all": Default. Show all individuals from both files.
+
+		"only-matches": Only show individuals that match in both files. You can
+		control the threshold with the "-minimum-weighted-similarity" and
+		"-minimum-similarity" options. This is useful when comparing trees that
+		are unlikely to have many matches.
+
+		"subset": The right side will be considered a smaller part of the larger
 		left side. This means that individuals that entirely exist on the left
-		side will not be included.`))
+		side will not be shown. This is useful when comparing a smaller part of
+		a tree with a larger tree.`))
 
 	flag.StringVar(&optionGoogleAnalyticsID, "google-analytics-id", "",
 		"The Google Analytics ID, like 'UA-78454410-2'.")
@@ -139,13 +164,51 @@ func parseCLIFlags() {
 			This value must be between 0 and 1 and should be set to the same
 			value as "minimum-weighted-similarity" if you are unsure.`))
 
-	flag.BoolVar(&optionSortSimilarities, "sort-similarities", false,
-		CLIDescription(`Sort the individuals by similarity (highest first)
-			rather than by name.`))
+	flag.StringVar(&optionSort, "sort", optionSort, CLIDescription(`
+			Controls how the individuals are sorted in the output:
+
+			"written-name": Default. Sort individuals by written their written
+			name.
+
+			"highest-similarity": Sort the individuals by their match
+			similarity. Highest matches will appear first.`))
 
 	filterFlags.SetupCLI()
 
 	flag.Parse()
+
+	validateOptions()
+}
+
+func validateOptions() {
+	optionShowValues := []string{
+		optionShowAll,
+		optionShowSubset,
+		optionShowOnlyMatches,
+	}
+
+	if !stringInList(optionShow, optionShowValues) {
+		log.Fatalf(`invalid "-show" value: %s`, optionShow)
+	}
+
+	optionSortValues := []string{
+		optionSortWrittenName,
+		optionSortHighestSimilarity,
+	}
+
+	if !stringInList(optionSort, optionSortValues) {
+		log.Fatalf(`invalid "-sort" value: %s`, optionSort)
+	}
+}
+
+func stringInList(s string, list []string) bool {
+	for _, item := range list {
+		if s == item {
+			return true
+		}
+	}
+
+	return false
 }
 
 func CLIDescription(s string) (r string) {
@@ -159,7 +222,7 @@ func CLIDescription(s string) (r string) {
 		}
 	}
 
-	return WrapToMargin(r, 80)
+	return WrapToMargin(strings.TrimSpace(r), 80)
 }
 
 func WrapToMargin(s string, width int) (r string) {
