@@ -1,8 +1,8 @@
 package html
 
 import (
-	"github.com/elliotchance/gedcom"
 	"fmt"
+	"github.com/elliotchance/gedcom"
 )
 
 type IndividualNameAndDatesLink struct {

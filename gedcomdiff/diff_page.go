@@ -24,7 +24,7 @@ func newDiffPage(comparisons []gedcom.IndividualComparison, options *gedcom.Simi
 	}
 }
 
-func (c *diffPage) sortByName(i, j int) bool {
+func (c *diffPage) sortByWrittenName(i, j int) bool {
 	a := c.comparisons[i].Left
 	b := c.comparisons[j].Left
 
@@ -39,29 +39,38 @@ func (c *diffPage) sortByName(i, j int) bool {
 	return a.Name().String() < b.Name().String()
 }
 
+func (c *diffPage) sortByHighestSimilarity(i, j int) bool {
+	a := c.comparisons[i].Similarity.WeightedSimilarity(c.options)
+	b := c.comparisons[j].Similarity.WeightedSimilarity(c.options)
+
+	if a != b {
+		// Greater than because we want the highest matches up the top.
+		return a > b
+	}
+
+	// Fallback to sorting by name for non-matches
+	return c.sortByWrittenName(i, j)
+}
+
+func (c *diffPage) sortComparisons() {
+	sortFns := map[string]func(*diffPage, int, int) bool{
+		optionSortWrittenName:       (*diffPage).sortByWrittenName,
+		optionSortHighestSimilarity: (*diffPage).sortByHighestSimilarity,
+	}
+
+	sortFn := sortFns[optionSort]
+	sort.SliceStable(c.comparisons, func(i, j int) bool {
+		return sortFn(c, i, j)
+	})
+}
+
 func (c *diffPage) String() string {
 	rows := []fmt.Stringer{}
 
-	if optionSortSimilarities {
-		sort.SliceStable(c.comparisons, func(i, j int) bool {
-			a := c.comparisons[i].Similarity.WeightedSimilarity(c.options)
-			b := c.comparisons[j].Similarity.WeightedSimilarity(c.options)
-
-			if a != b {
-				// Greater than because we want the highest matches up the top.
-				return a > b
-			}
-
-			// Fallback to sorting by name for non-matches
-			return c.sortByName(i, j)
-		})
-	} else {
-		sort.SliceStable(c.comparisons, c.sortByName)
-	}
+	c.sortComparisons()
 
 	for _, comparison := range c.comparisons {
-		// Same as below.
-		if optionSubset && gedcom.IsNil(comparison.Right) {
+		if shouldSkip(comparison) {
 			continue
 		}
 
@@ -110,8 +119,7 @@ func (c *diffPage) String() string {
 		html.NewTable("", rows...),
 	}
 	for _, comparison := range c.comparisons {
-		// Same as above.
-		if optionSubset && gedcom.IsNil(comparison.Right) {
+		if shouldSkip(comparison) {
 			continue
 		}
 
@@ -124,4 +132,23 @@ func (c *diffPage) String() string {
 		html.NewComponents(components...),
 		c.googleAnalyticsID,
 	).String()
+}
+
+func shouldSkip(comparison gedcom.IndividualComparison) bool {
+	switch optionShow {
+	case optionShowAll:
+		// Do nothing, we want to show all.
+
+	case optionShowSubset:
+		if gedcom.IsNil(comparison.Right) {
+			return true
+		}
+
+	case optionShowOnlyMatches:
+		if gedcom.IsNil(comparison.Left) || gedcom.IsNil(comparison.Right) {
+			return true
+		}
+	}
+
+	return false
 }
