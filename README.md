@@ -334,7 +334,8 @@ Filter functions:
 1. [`BlacklistTagFilter`][7]
 2. [`OfficialTagFilter`][8]
 3. [`SimpleNameFilter`][12]
-4. [`WhitelistTagFilter`][6]
+4. [`SingleNameFilter`][16]
+5. [`WhitelistTagFilter`][6]
 
 Individual Names
 ----------------
@@ -382,3 +383,4 @@ name.Format("%f %m (%l)") // Bob (Smith)
 [13]: https://godoc.org/github.com/elliotchance/gedcom#NameNode.Format
 [14]: https://godoc.org/github.com/elliotchance/gedcom#NameNode
 [15]: https://github.com/elliotchance/gedcom/releases
+[16]: https://godoc.org/github.com/elliotchance/gedcom#SingleNameFilter

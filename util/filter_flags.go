@@ -16,33 +16,49 @@ type FilterFlags struct {
 	NoObjects    bool
 	NoLabels     bool
 	NoCensuses   bool
+	ExcludeTags  []string
 
 	// Only official tags.
 	OnlyOfficial bool
 
-	// When comparing, hide lines that are equal on both sides.
-	HideEqual bool
-
 	// Condense NAME nodes to a simple string.
 	SimpleNames bool
+
+	// Only use the first name.
+	SingleName bool
+}
+
+func NewFilterFlags() *FilterFlags {
+	return &FilterFlags{}
 }
 
 func (ff *FilterFlags) SetupCLI() {
-	flag.BoolVar(&ff.NoPlaces, "no-places", false, "Exclude places.")
-	flag.BoolVar(&ff.NoEvents, "no-events", false, "Exclude events.")
-	flag.BoolVar(&ff.NoResidences, "no-residences", false, "Exclude residence events.")
-	flag.BoolVar(&ff.NoSources, "no-sources", false, "Exclude sources.")
-	flag.BoolVar(&ff.NoMaps, "no-maps", false, "Exclude maps (locations).")
-	flag.BoolVar(&ff.NoChanges, "no-changes", false, "Exclude change timestamps.")
-	flag.BoolVar(&ff.NoObjects, "no-objects", false, "Exclude objects.")
-	flag.BoolVar(&ff.NoLabels, "no-labels", false, "Exclude labels.")
-	flag.BoolVar(&ff.NoCensuses, "no-censuses", false, "Exclude censuses.")
+	flag.BoolVar(&ff.NoPlaces, "no-places", false, CLIDescription(`
+		Exclude places. This is the same as "-exclude PLAC".`))
+	flag.BoolVar(&ff.NoEvents, "no-events", false, CLIDescription(`
+		Exclude events. This is the same as "-exclude EVEN".`))
+	flag.BoolVar(&ff.NoResidences, "no-residences", false, CLIDescription(`
+		Exclude residence events. This is the same as "-exclude RESI".`))
+	flag.BoolVar(&ff.NoSources, "no-sources", false, CLIDescription(`
+		Exclude sources. This is the same as "-exclude SOUR".`))
+	flag.BoolVar(&ff.NoMaps, "no-maps", false, CLIDescription(`
+		Exclude maps (locations). This is the same as "-exclude MAP".`))
+	flag.BoolVar(&ff.NoChanges, "no-changes", false, CLIDescription(`
+		Exclude change timestamps. This is the same as "-exclude CHAN".`))
+	flag.BoolVar(&ff.NoObjects, "no-objects", false, CLIDescription(`
+		Exclude objects. This is the same as "-exclude OBJ".`))
+	flag.BoolVar(&ff.NoLabels, "no-labels", false, CLIDescription(`
+		Exclude labels. This is the same as "-exclude LABL".`))
+	flag.BoolVar(&ff.NoCensuses, "no-censuses", false, CLIDescription(`
+		Exclude censuses. This is the same as "-exclude CENS".`))
 
-	flag.BoolVar(&ff.OnlyOfficial, "only-official", false, "Only include official GEDCOM tags.")
+	flag.BoolVar(&ff.OnlyOfficial, "only-official", false, CLIDescription(`
+		Only include official GEDCOM tags.`))
 
-	flag.BoolVar(&ff.HideEqual, "hide-equal", false, "Hide equal values.")
-
-	flag.BoolVar(&ff.SimpleNames, "simple-names", false, "Simplify names.")
+	flag.BoolVar(&ff.SimpleNames, "simple-names", false, CLIDescription(`
+		Simplify names.`))
+	flag.BoolVar(&ff.SingleName, "single-name", false, CLIDescription(`
+		Only use the first name for an individual.`))
 }
 
 func (ff *FilterFlags) FilterFunctions() []gedcom.FilterFunction {
@@ -58,7 +74,14 @@ func (ff *FilterFlags) FilterFunctions() []gedcom.FilterFunction {
 		&ff.NoCensuses:   gedcom.TagCensus,
 	}
 
-	blacklistTags := []gedcom.Tag{gedcom.TagFamilyChild, gedcom.TagFamilySpouse}
+	blacklistTags := []gedcom.Tag{}
+
+	for _, tagName := range ff.ExcludeTags {
+		tag := gedcom.TagFromString(tagName)
+
+		blacklistTags = append(blacklistTags, tag)
+	}
+
 	for k, v := range m {
 		if *k {
 			blacklistTags = append(blacklistTags, v)
@@ -77,7 +100,19 @@ func (ff *FilterFlags) FilterFunctions() []gedcom.FilterFunction {
 		filters = append(filters, gedcom.SimpleNameFilter())
 	}
 
+	if ff.SingleName {
+		filters = append(filters, gedcom.SingleNameFilter())
+	}
+
 	return filters
+}
+
+func (ff *FilterFlags) AddExcludeTag(tag string) {
+	if StringSliceContains(ff.ExcludeTags, tag) {
+		return
+	}
+
+	ff.ExcludeTags = append(ff.ExcludeTags, tag)
 }
 
 func (ff *FilterFlags) Filter(node gedcom.Node) gedcom.Node {

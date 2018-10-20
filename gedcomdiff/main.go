@@ -9,7 +9,6 @@ import (
 	"github.com/elliotchance/gedcom/util"
 	"log"
 	"os"
-	"strings"
 )
 
 // These are used for optionShow. If you update these options you will also
@@ -38,9 +37,12 @@ var (
 	optionMinimumSimilarity         float64
 	optionMinimumWeightedSimilarity float64
 	optionSort                      string // see optionSort constants.
+
+	// When comparing, hide lines that are equal on both sides.
+	optionHideEqual bool
 )
 
-var filterFlags = &util.FilterFlags{}
+var filterFlags = util.NewFilterFlags()
 
 func check(err error) {
 	if err != nil {
@@ -116,7 +118,7 @@ func parseCLIFlags() {
 
 	flag.StringVar(&optionOutputFile, "output", "", "Output file.")
 
-	flag.StringVar(&optionShow, "show", optionShowAll, CLIDescription(`
+	flag.StringVar(&optionShow, "show", optionShowAll, util.CLIDescription(`
 		The "-show" option controls which individuals are shown in the output:
 
 		"all": Default. Show all individuals from both files.
@@ -136,15 +138,15 @@ func parseCLIFlags() {
 
 	flag.BoolVar(&optionProgress, "progress", false, "Show progress bar.")
 
-	flag.IntVar(&optionJobs, "jobs", 1, CLIDescription(`Number of jobs to run in
-		parallel. If you are comparing large trees this will make the process
-		faster but will consume more CPU.`))
+	flag.IntVar(&optionJobs, "jobs", 1, util.CLIDescription(`Number of jobs to
+		run in parallel. If you are comparing large trees this will make the
+		process faster but will consume more CPU.`))
 
 	flag.Float64Var(&optionMinimumWeightedSimilarity,
 		"minimum-weighted-similarity", gedcom.DefaultMinimumSimilarity,
-		CLIDescription(`The weighted minimum similarity is the threshold for
-			whether two individuals should be the seen as the same person when
-			the surrounding immediate family is taken into consideration.
+		util.CLIDescription(`The weighted minimum similarity is the threshold
+			for whether two individuals should be the seen as the same person
+			when the surrounding immediate family is taken into consideration.
 
 			This value must be between 0 and 1 and is the primary way to adjust
 			the sensitivity of matches. It is best to also set
@@ -157,14 +159,15 @@ func parseCLIFlags() {
 
 	flag.Float64Var(&optionMinimumSimilarity,
 		"minimum-similarity", gedcom.DefaultMinimumSimilarity,
-		CLIDescription(`The minimum similarity is the threshold for matching
-			individuals as the same person. This is used to compare only the
-			individual (not surrounding family) like spouses and children.
+		util.CLIDescription(`The minimum similarity is the threshold for
+			matching individuals as the same person. This is used to compare
+			only the individual (not surrounding family) like spouses and
+			children.
 
 			This value must be between 0 and 1 and should be set to the same
 			value as "minimum-weighted-similarity" if you are unsure.`))
 
-	flag.StringVar(&optionSort, "sort", optionSort, CLIDescription(`
+	flag.StringVar(&optionSort, "sort", optionSort, util.CLIDescription(`
 			Controls how the individuals are sorted in the output:
 
 			"written-name": Default. Sort individuals by written their written
@@ -173,6 +176,11 @@ func parseCLIFlags() {
 			"highest-similarity": Sort the individuals by their match
 			similarity. Highest matches will appear first.`))
 
+	flag.BoolVar(&optionHideEqual, "hide-equal", false, util.CLIDescription(`
+		Hide equal values.`))
+
+	filterFlags.AddExcludeTag(gedcom.TagFamilyChild.Tag())
+	filterFlags.AddExcludeTag(gedcom.TagFamilySpouse.Tag())
 	filterFlags.SetupCLI()
 
 	flag.Parse()
@@ -187,7 +195,7 @@ func validateOptions() {
 		optionShowOnlyMatches,
 	}
 
-	if !stringInList(optionShow, optionShowValues) {
+	if !util.StringSliceContains(optionShowValues, optionShow) {
 		log.Fatalf(`invalid "-show" value: %s`, optionShow)
 	}
 
@@ -196,56 +204,7 @@ func validateOptions() {
 		optionSortHighestSimilarity,
 	}
 
-	if !stringInList(optionSort, optionSortValues) {
+	if !util.StringSliceContains(optionSortValues, optionSort) {
 		log.Fatalf(`invalid "-sort" value: %s`, optionSort)
 	}
-}
-
-func stringInList(s string, list []string) bool {
-	for _, item := range list {
-		if s == item {
-			return true
-		}
-	}
-
-	return false
-}
-
-func CLIDescription(s string) (r string) {
-	lines := strings.Split(s, "\n")
-
-	for _, line := range lines {
-		if strings.TrimSpace(line) == "" {
-			r += "\n\n"
-		} else {
-			r += strings.Replace(line, "\t", "", -1) + " "
-		}
-	}
-
-	return WrapToMargin(strings.TrimSpace(r), 80)
-}
-
-func WrapToMargin(s string, width int) (r string) {
-	lines := strings.Split(s, "\n")
-
-	for _, line := range lines {
-		words := strings.Split(line, " ")
-		newLine := ""
-
-		for _, word := range words {
-			if len(newLine)+len(word)+1 > width {
-				r += strings.TrimSpace(newLine) + "\n"
-				newLine = word
-			} else {
-				newLine += " " + word
-			}
-		}
-
-		r += strings.TrimSpace(newLine) + "\n"
-	}
-
-	// Remove last new line
-	r = r[:len(r)-1]
-
-	return
 }
