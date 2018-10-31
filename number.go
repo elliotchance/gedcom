@@ -1,8 +1,8 @@
 package gedcom
 
 import (
-	"strings"
 	"fmt"
+	"strings"
 )
 
 // Number can be used to transform a number into another representation.

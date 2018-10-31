@@ -19,7 +19,7 @@ func NewEventNode(document *Document, value, pointer string, children []Node) *E
 // any significance for the importance of the dates.
 //
 // If the node is nil the result will also be nil.
-func (node *EventNode) Dates() []*DateNode {
+func (node *EventNode) Dates() DateNodes {
 	return Dates(node)
 }
 
@@ -57,7 +57,7 @@ func (node *EventNode) Equals(node2 Node) bool {
 
 // Years returns the Years value of the minimum date node in the node.
 func (node *EventNode) Years() float64 {
-	if min := MinimumDateNode(node.Dates()); min != nil {
+	if min := node.Dates().Minimum(); min != nil {
 		return Years(min)
 	}
 

@@ -22,7 +22,7 @@ func (c *placeEvent) String() string {
 	description := c.node.Tag().String()
 	person := ""
 
-	d := gedcom.MinimumDateNode(gedcom.Dates(c.node))
+	d := gedcom.Dates(c.node).Minimum()
 
 	if d != nil {
 		date = d.Value()

@@ -18,7 +18,7 @@ func NewDeathNode(document *Document, value, pointer string, children []Node) *D
 // any significance for the importance of the dates.
 //
 // If the node is nil the result will also be nil.
-func (node *DeathNode) Dates() []*DateNode {
+func (node *DeathNode) Dates() DateNodes {
 	return Dates(node)
 }
 

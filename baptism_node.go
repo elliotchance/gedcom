@@ -20,7 +20,7 @@ func NewBaptismNode(document *Document, value, pointer string, children []Node) 
 // any significance for the importance of the dates.
 //
 // If the node is nil the result will also be nil.
-func (node *BaptismNode) Dates() []*DateNode {
+func (node *BaptismNode) Dates() DateNodes {
 	return Dates(node)
 }
 

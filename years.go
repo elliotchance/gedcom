@@ -16,7 +16,7 @@ func Years(v interface{}) float64 {
 	}
 
 	if d, ok := v.(Node); ok {
-		return Years(MinimumDateNode(Dates(d)))
+		return Years(Dates(d).Minimum())
 	}
 
 	return 0
