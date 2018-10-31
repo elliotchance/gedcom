@@ -1,11 +1,12 @@
 package gedcom_test
 
 import (
-	"testing"
-
+	"fmt"
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/tf"
 	"github.com/stretchr/testify/assert"
+	"strings"
+	"testing"
 )
 
 var individualTests = []struct {
@@ -1487,4 +1488,148 @@ func TestIndividualNode_Burial(t *testing.T) {
 
 	assert.Equal(t, date3Sep1953, date)
 	assert.Equal(t, place1, place)
+}
+
+func TestIndividualNode_AgeAt(t *testing.T) {
+	tests := []struct {
+		individual string
+		event      string
+		start      string
+		end        string
+	}{
+		{
+			// No dates at all.
+			individual: " - ",
+			event:      "",
+			start:      "= ?",
+			end:        "= ?",
+		},
+		{
+			// Event does not have any dates.
+			individual: "3 Sep 1945 - 2 Mar 2001",
+			event:      "",
+			start:      "= ?",
+			end:        "= ?",
+		},
+		{
+			// Missing birth date for individual.
+			individual: " - 2 Mar 2001",
+			event:      "3 Sep 1945",
+			start:      "= ?",
+			end:        "= ?",
+		},
+		{
+			// Approximate birth date makes the age an estimate.
+			individual: "Abt. 1934 - 2 Mar 2001",
+			event:      "3 Sep 1945",
+			start:      "1945 - 1934 = ~10.7",
+			end:        "1945 - 1934 = ~11.7",
+		},
+		{
+			// Non-exact birth date makes the age an estimate.
+			individual: "1934 - 2 Mar 2001",
+			event:      "3 Sep 1945",
+			start:      "1945 - 1934 = ~10.7",
+			end:        "1945 - 1934 = ~11.7",
+		},
+		{
+			// Event has an exact date. This is the best case scenario.
+			individual: "3 Sep 1945 - 2 Mar 2001",
+			event:      "12 Jan 1973",
+			start:      "1973 - 1945 = 27.4",
+			end:        "1973 - 1945 = 27.4",
+		},
+		{
+			// Event has multiple exact dates. We must assume the min and max
+			// dates create a possible range.
+			individual: "3 Sep 1945 - 2 Mar 2001",
+			event:      "12 Jan 1973, 14 Nov 1970, 7 Dec 1975",
+			start:      "1970 - 1945 = 25.2",
+			end:        "1975 - 1945 = 30.3",
+		},
+		{
+			// Like the previous example we have several dates but not all of
+			// them are exact.
+			individual: "3 Sep 1945 - 2 Mar 2001",
+			event:      "Abt. Mar 1973, After 14 Nov 1970, Abt. 1975",
+			start:      "1970 - 1945 = ~25.2",
+			end:        "1975 - 1945 = ~30.3",
+		},
+		{
+			// There are two date ranges that partially overlap each other to
+			// create a single larger range.
+			individual: "3 Sep 1945 - 2 Mar 2001",
+			event:      "Between 1965 and 1969, Between 1963 and 1967",
+			start:      "1963 - 1945 = ~17.3",
+			end:        "1969 - 1945 = ~24.3",
+		},
+		{
+			// One of the dates is invalid.
+			individual: "3 Sep 1945 - 2 Mar 2001",
+			event:      "foo bar, Between 1963 and 1967",
+			start:      "1963 - 1945 = ~17.3",
+			end:        "1967 - 1945 = ~22.3",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run("", func(t *testing.T) {
+			individualParts := strings.Split(test.individual, "-")
+			individual := gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+					gedcom.NewDateNode(nil, individualParts[0], "", nil),
+				}),
+				gedcom.NewDeathNode(nil, "", "", []gedcom.Node{
+					gedcom.NewDateNode(nil, individualParts[1], "", nil),
+				}),
+			})
+
+			eventDates := []gedcom.Node{}
+			if test.event != "" {
+				for _, dateString := range strings.Split(test.event, ",") {
+					dateNode := gedcom.NewDateNode(nil, dateString, "", nil)
+					eventDates = append(eventDates, dateNode)
+				}
+			}
+
+			event := gedcom.NewResidenceNode(nil, "", "", eventDates)
+
+			startYears, startIsEstimate, startIsKnown := parseAgeYears(test.start)
+			endYears, endIsEstimate, endIsKnown := parseAgeYears(test.end)
+
+			start, end := individual.AgeAt(event)
+
+			if startIsKnown {
+				assertAge(t, start, startYears, startIsEstimate, gedcom.AgeConstraintLiving)
+			} else {
+				assert.False(t, start.IsKnown, "start is known")
+			}
+
+			if endIsKnown {
+				assertAge(t, end, endYears, endIsEstimate, gedcom.AgeConstraintLiving)
+			} else {
+				assert.False(t, end.IsKnown, "end is known")
+			}
+		})
+	}
+}
+
+func parseAgeYears(s string) (years float64, isEstimate, isKnown bool) {
+	isKnown = true
+	value := strings.Split(s, "=")[1]
+	value = strings.TrimSpace(value)
+
+	if value[0] == '~' {
+		isEstimate = true
+		value = value[1:]
+	}
+
+	if value[0] == '?' {
+		isKnown = false
+		return
+	}
+
+	fmt.Sscanf(value, "%f", &years)
+
+	return
 }

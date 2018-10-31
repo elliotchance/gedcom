@@ -38,6 +38,16 @@ func TestDates(t *testing.T) {
 			gedcom.NewNameNode(nil, "foo bar", "", nil),
 			nil,
 		},
+		{
+			gedcom.NewNameNode(nil, "foo bar", "", []gedcom.Node{
+				gedcom.NewDateNode(nil, "bar baz", "", nil),
+				gedcom.NewDateNode(nil, "3 Sep 1981", "", nil),
+			}),
+			[]*gedcom.DateNode{
+				gedcom.NewDateNode(nil, "bar baz", "", nil),
+				gedcom.NewDateNode(nil, "3 Sep 1981", "", nil),
+			},
+		},
 	}
 
 	for _, test := range tests {

@@ -401,3 +401,31 @@ func (node *DateNode) Equals(node2 Node) bool {
 
 	return false
 }
+
+// IsValid returns true only when the node is not nil and the start and end date
+// are non-zero.
+//
+// A "zero date" (Date.IsZero) is a date that is missing the year, month and
+// day. Even if there is other associated information this date is considered to
+// be useless for most purposes.
+//
+// It is safe and completely valid to use IsValid on a nil node.
+func (node *DateNode) IsValid() bool {
+	if node == nil {
+		return false
+	}
+
+	start, end := node.DateRange()
+
+	return !start.IsZero() && !end.IsZero()
+}
+
+// IsExact will return true if the date range represents a single day with an
+// exact constraint.
+//
+// See Date.IsExact for more information.
+func (node *DateNode) IsExact() bool {
+	start, end := node.DateRange()
+
+	return start.IsExact() && end.IsExact()
+}

@@ -97,14 +97,6 @@ func TestNumber_LowerRoman(t *testing.T) {
 	}
 }
 
-func assertError(t *testing.T, expected, actual error) {
-	if expected == nil {
-		assert.NoError(t, actual)
-	} else {
-		assert.EqualError(t, expected, actual.Error())
-	}
-}
-
 func TestNumber_Int(t *testing.T) {
 	for number := range numberTests {
 		t.Run(fmt.Sprintf("%d", number), func(t *testing.T) {

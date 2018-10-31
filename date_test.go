@@ -5,6 +5,7 @@ import (
 	"github.com/elliotchance/tf"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
 
 func TestDate_Time(t *testing.T) {
@@ -253,4 +254,27 @@ func TestDate_IsZero(t *testing.T) {
 	IsZero(gedcom.Date{0, 0, 0, false, gedcom.DateConstraintExact}).Returns(true)
 	IsZero(gedcom.Date{0, 0, 0, true, gedcom.DateConstraintExact}).Returns(true)
 	IsZero(gedcom.Date{0, 0, 0, false, gedcom.DateConstraintAfter}).Returns(true)
+}
+
+func TestNewDateWithTime(t *testing.T) {
+	NewDateWithTime := tf.Function(t, gedcom.NewDateWithTime)
+	tm, err := time.Parse(time.UnixDate, "Mon Jan 2 15:04:05 MST 2006")
+	assert.NoError(t, err)
+
+	NewDateWithTime(time.Time{}, false).Returns(gedcom.Date{})
+	NewDateWithTime(time.Time{}, true).Returns(gedcom.Date{})
+	NewDateWithTime(tm, false).Returns(
+		gedcom.Date{2, time.January, 2006, false, gedcom.DateConstraintExact})
+	NewDateWithTime(tm, true).Returns(
+		gedcom.Date{2, time.January, 2006, true, gedcom.DateConstraintExact})
+}
+
+func TestNewDateRangeWithNow(t *testing.T) {
+	NewDateRangeWithNow := tf.Function(t, gedcom.NewDateRangeWithNow)
+	now := time.Now()
+
+	NewDateRangeWithNow().Returns(
+		gedcom.Date{now.Day(), now.Month(), now.Year(), false, gedcom.DateConstraintExact},
+		gedcom.Date{now.Day(), now.Month(), now.Year(), true, gedcom.DateConstraintExact},
+	)
 }

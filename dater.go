@@ -9,6 +9,8 @@ type Dater interface {
 // Dates returns the shallow DateNodes.
 //
 // Dates is safe to use with nil nodes.
+//
+// Dates will always return all dates, even dates that are invalid.
 func Dates(node Node) (result DateNodes) {
 	if IsNil(node) {
 		return

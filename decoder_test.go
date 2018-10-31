@@ -224,31 +224,6 @@ func TestDecoder_Decode(t *testing.T) {
 	})
 }
 
-func assertNodeEqual(t *testing.T, expected, actual gedcom.Node, msgAndArgs ...interface{}) {
-	if gedcom.IsNil(expected) || gedcom.IsNil(actual) {
-		assert.True(t, gedcom.IsNil(expected))
-		assert.True(t, gedcom.IsNil(actual))
-	} else {
-		assert.True(t, expected.Equals(actual), msgAndArgs...)
-	}
-}
-
-func assertDocumentEqual(t *testing.T, expected, actual *gedcom.Document, msgAndArgs ...interface{}) {
-	assert.Equal(t, expected.String(), actual.String(), msgAndArgs...)
-
-	if !assert.Equal(t, len(expected.Nodes()), len(actual.Nodes()), msgAndArgs...) {
-		return
-	}
-
-	for i, n := range expected.Nodes() {
-		assertNodeEqual(t, n, actual.Nodes()[i])
-		//assert.Equal(t, n, actual.Nodes()[i], msgAndArgs...)
-	}
-
-	assert.Equal(t, expected.MaxLivingAge, actual.MaxLivingAge, msgAndArgs...)
-	assert.Equal(t, expected.HasBOM, actual.HasBOM, msgAndArgs...)
-}
-
 func trimSpaces(s string) string {
 	s = strings.TrimSpace(s)
 	s = strings.Replace(s, "\r", "\n", -1)
