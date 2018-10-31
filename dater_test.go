@@ -9,7 +9,7 @@ import (
 func TestDates(t *testing.T) {
 	tests := []struct {
 		nodes gedcom.Node
-		want  []*gedcom.DateNode
+		want  gedcom.DateNodes
 	}{
 		{nil, nil},
 		{
@@ -20,7 +20,7 @@ func TestDates(t *testing.T) {
 			gedcom.NewNameNode(nil, "foo bar", "", []gedcom.Node{
 				gedcom.NewDateNode(nil, "2 Sep 1981", "", nil),
 			}),
-			[]*gedcom.DateNode{
+			gedcom.DateNodes{
 				gedcom.NewDateNode(nil, "2 Sep 1981", "", nil),
 			},
 		},
@@ -29,7 +29,7 @@ func TestDates(t *testing.T) {
 				gedcom.NewDateNode(nil, "2 Sep 1981", "", nil),
 				gedcom.NewDateNode(nil, "3 Sep 1981", "", nil),
 			}),
-			[]*gedcom.DateNode{
+			gedcom.DateNodes{
 				gedcom.NewDateNode(nil, "2 Sep 1981", "", nil),
 				gedcom.NewDateNode(nil, "3 Sep 1981", "", nil),
 			},

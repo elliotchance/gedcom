@@ -19,7 +19,7 @@ func NewBurialNode(document *Document, value, pointer string, children []Node) *
 // any significance for the importance of the dates.
 //
 // If the node is nil the result will also be nil.
-func (node *BurialNode) Dates() []*DateNode {
+func (node *BurialNode) Dates() DateNodes {
 	return Dates(node)
 }
 

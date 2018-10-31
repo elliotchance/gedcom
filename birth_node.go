@@ -18,7 +18,7 @@ func NewBirthNode(document *Document, value, pointer string, children []Node) *B
 // any significance for the importance of the dates.
 //
 // If the node is nil the result will also be nil.
-func (node *BirthNode) Dates() []*DateNode {
+func (node *BirthNode) Dates() DateNodes {
 	return Dates(node)
 }
 

@@ -3,13 +3,13 @@ package gedcom
 // Dater is implemented by nodes that are reasonably expected to have dates
 // associated with them, such as events.
 type Dater interface {
-	Dates() []*DateNode
+	Dates() DateNodes
 }
 
 // Dates returns the shallow DateNodes.
 //
 // Dates is safe to use with nil nodes.
-func Dates(node Node) (result []*DateNode) {
+func Dates(node Node) (result DateNodes) {
 	if IsNil(node) {
 		return
 	}
