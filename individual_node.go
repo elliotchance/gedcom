@@ -649,3 +649,97 @@ func (node *IndividualNode) Burial() (*DateNode, *PlaceNode) {
 
 	return DateAndPlace(burialNodes...)
 }
+
+// Age returns the best estimate minimum and maximum age of the individual if
+// they are still living or their approximate age range at the time of their
+// death.
+//
+// Age will use EstimatedBirthDate which will allow it to be more resilient if a
+// birth date is strictly missing but this means that the value returned from
+// Age may not always be exact. See IsEstimate and other fields returned in
+// either Age return values.
+//
+// If the birth or death date is a range, such as "Between 1945 and 1947" the
+// minimum and maximum possible ages will be returned.
+//
+// If the birth or death date is not an exact value then the ages will be
+// estimates. See Age.IsEstimate.
+//
+// If no estimated birth date can be determined then Age.IsKnown will be false.
+//
+// IsLiving will be used to determine if the individual is still living which
+// includes a maximum possible age when no death elements exist. However, in the
+// case that the individual is not living then EstimatedDeathDate will be used
+// to try and estimate the age at the time of death instead of simply using the
+// maximum possible age (which is 100 by default).
+func (node *IndividualNode) Age() (Age, Age) {
+	return node.ageAt(NewDateRangeWithNow())
+}
+
+// AgeAt follows the same logic as Age but uses an event as the comparison
+// instead of the current time.
+//
+// If there is more than one date associated with the event or a date contains a
+// range the minimum and maximum values will be used to return the full range.
+func (node *IndividualNode) AgeAt(event Node) (Age, Age) {
+	dates := Dates(event).StripZero()
+
+	if len(dates) > 0 {
+		minimumEventDate := dates.Minimum()
+		maximumEventDate := dates.Maximum()
+		start := minimumEventDate.StartDate()
+		end := maximumEventDate.EndDate()
+
+		return node.ageAt(start, end)
+	}
+
+	// We cannot determine the date of the event so we would not know what age
+	// they were at the time.
+	return NewUnknownAge(), NewUnknownAge()
+}
+
+func (node *IndividualNode) ageAt(start, end Date) (Age, Age) {
+	estimatedBirthDate := node.EstimatedBirthDate()
+
+	if !estimatedBirthDate.IsValid() {
+		return NewUnknownAge(), NewUnknownAge()
+	}
+
+	estimatedDeathDate := node.EstimatedDeathDate()
+	estimatedDeathDateEnd := estimatedDeathDate.EndDate()
+	startDurationSinceBirth := start.Time().Sub(estimatedBirthDate.StartDate().Time())
+	endDurationSinceBirth := end.Time().Sub(estimatedBirthDate.StartDate().Time())
+
+	startConstraint := constraintBetweenAges(
+		estimatedBirthDate.StartDate(),
+		estimatedDeathDateEnd,
+		startDurationSinceBirth,
+	)
+
+	startAge := NewAge(
+		startDurationSinceBirth,
+		!start.IsExact() || !estimatedBirthDate.IsExact(),
+		startConstraint,
+	)
+
+	constraint := constraintBetweenAges(
+		estimatedBirthDate.StartDate(),
+		estimatedDeathDateEnd,
+		endDurationSinceBirth,
+	)
+
+	endAge := NewAge(
+		end.Time().Sub(estimatedBirthDate.EndDate().Time()),
+		!end.IsExact() || !estimatedBirthDate.IsExact(),
+		constraint,
+	)
+
+	// There are some cases where the endAge can be before the startAge in some
+	// combinations of constraints. If this is the case we swap them to make the
+	// output more sensible.
+	if startAge.IsAfter(endAge) {
+		startAge, endAge = endAge, startAge
+	}
+
+	return startAge, endAge
+}

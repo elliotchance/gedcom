@@ -67,6 +67,41 @@ type Date struct {
 	Constraint DateConstraint
 }
 
+// NewDateWithTime creates a new Date with the provided time.Time.
+//
+// It is important to note that a Date only has a resolution of a single day and
+// does not take into account timezone information.
+//
+// The isEndOfRange must be provided to signal if the Date returned represents
+// the start or end of the day since the minimum resolution is one day.
+//
+// The returned Date will have an Exact constraint.
+//
+// If t IsZero then a zero Date will be returned (see Date.IsZero).
+func NewDateWithTime(t time.Time, isEndOfRange bool) Date {
+	if t.IsZero() {
+		return Date{}
+	}
+
+	return Date{
+		Day:          t.Day(),
+		Month:        t.Month(),
+		Year:         t.Year(),
+		IsEndOfRange: isEndOfRange,
+		Constraint:   DateConstraintExact,
+	}
+}
+
+// NewDateWithNow creates a two Dates that represents the the start and end of
+// the current day. See NewDateWithTime for implementation details.
+func NewDateRangeWithNow() (Date, Date) {
+	now := time.Now()
+	start := NewDateWithTime(now, false)
+	end := NewDateWithTime(now, true)
+
+	return start, end
+}
+
 func (date Date) safeParse(s string) time.Time {
 	d, err := time.Parse("_2 1 2006", s)
 	if err != nil {
@@ -339,4 +374,12 @@ func (date Date) equalsC(date2 Date) bool {
 // See Equals.
 func (date Date) equalsD(date2 Date) bool {
 	return false
+}
+
+// IsExact will return true all parts of the date are complete and the date
+// constraint is exact.
+//
+// This is to say that is points to a specific day.
+func (date Date) IsExact() bool {
+	return date.Day != 0 && date.Constraint == DateConstraintExact
 }

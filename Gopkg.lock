@@ -10,14 +10,14 @@
 [[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
-  revision = "346938d642f2ec3594ed81d874461961cd0faa76"
-  version = "v1.1.0"
+  revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
+  version = "v1.1.1"
 
 [[projects]]
   name = "github.com/elliotchance/tf"
   packages = ["."]
-  revision = "95d8f61b444eb7261c2a72f54059df6e613f5990"
-  version = "v1.3.0"
+  revision = "e761b3dfec90f49b2e9f57a06c3cda5a500b710c"
+  version = "v1.5.0"
 
 [[projects]]
   name = "github.com/mattn/go-colorable"
@@ -47,7 +47,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "fa43e7bc11baaae89f3f902b2b4d832b68234844"
+  revision = "8e24a49d80f82323e1c4db1b5da3e0f31171a151"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -107,6 +107,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4d67400c78c129b249d5e6c72d43d7ffa7e3ae05a9fb6f63540a20af63bcde37"
+  inputs-digest = "852a181d3fa5af228f4a53f8d631383680f324c42e674626a3444de4ce8ee941"
   solver-name = "gps-cdcl"
   solver-version = 1
