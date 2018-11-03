@@ -158,7 +158,7 @@ func Pointer(node Node) string {
 // String is a safe way to fetch the String() from a node. If the node is nil
 // then an empty string will be returned.
 func String(node Node) string {
-	if node == nil {
+	if IsNil(node) {
 		return ""
 	}
 

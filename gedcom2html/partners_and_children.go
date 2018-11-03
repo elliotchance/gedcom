@@ -106,7 +106,7 @@ func partnerSection(family *gedcom.FamilyNode, c *partnersAndChildren, columns [
 		if len(columns) == 4 {
 			rows = append(rows, html.NewRow(columns...))
 			columns = []*html.Column{
-				html.NewColumn(html.QuarterRow, newEmpty()),
+				html.NewColumn(html.QuarterRow, html.NewEmpty()),
 			}
 		}
 	}

@@ -23,11 +23,11 @@ func (c *individualInList) String() string {
 	birthDate, birthPlace := c.individual.Birth()
 	deathDate, deathPlace := c.individual.Death()
 
-	birthPlaceName := prettyPlaceName(birthPlace.String())
-	deathPlaceName := prettyPlaceName(deathPlace.String())
+	birthPlaceName := prettyPlaceName(gedcom.String(birthPlace))
+	deathPlaceName := prettyPlaceName(gedcom.String(deathPlace))
 
-	birthDateText := html.NewText(birthDate.String())
-	deathDateText := html.NewText(deathDate.String())
+	birthDateText := html.NewText(gedcom.String(birthDate))
+	deathDateText := html.NewText(gedcom.String(deathDate))
 
 	link := newIndividualLink(c.document, c.individual)
 	birthPlaceLink := newPlaceLink(c.document, birthPlaceName)

@@ -6,6 +6,7 @@ type TableCell struct {
 	content      fmt.Stringer
 	class, style string
 	noWrap       bool
+	isHeader     bool
 }
 
 func NewTableCell(content fmt.Stringer) *TableCell {
@@ -32,8 +33,19 @@ func (c *TableCell) Style(style string) *TableCell {
 	return c
 }
 
+func (c *TableCell) Header() *TableCell {
+	c.isHeader = true
+
+	return c
+}
+
 func (c *TableCell) String() string {
-	tag := `<td scope="col"`
+	htmlTag := "td"
+	if c.isHeader {
+		htmlTag = "th"
+	}
+
+	tag := fmt.Sprintf(`<%s scope="col"`, htmlTag)
 
 	if c.class != "" {
 		tag += fmt.Sprintf(` class="%s"`, c.class)
@@ -47,5 +59,5 @@ func (c *TableCell) String() string {
 		tag += fmt.Sprintf(` style="%s"`, c.style)
 	}
 
-	return fmt.Sprintf(`%s>%s</td>`, tag, c.content)
+	return fmt.Sprintf(`%s>%s</%s>`, tag, c.content, htmlTag)
 }

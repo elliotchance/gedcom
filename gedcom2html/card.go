@@ -26,7 +26,7 @@ func newCard(title string, count int, body fmt.Stringer) *card {
 }
 
 func (c *card) String() string {
-	var count fmt.Stringer = newEmpty()
+	var count fmt.Stringer = html.NewEmpty()
 	if c.count != noBadgeCount {
 		count = newBadgePill("secondary", "float-right", strconv.Itoa(c.count))
 	}

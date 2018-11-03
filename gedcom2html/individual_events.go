@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html"
+	"sort"
 )
 
 // individualEvents is the table of events show in the "Events" section of the
@@ -23,15 +24,13 @@ func newIndividualEvents(document *gedcom.Document, individual *gedcom.Individua
 func (c *individualEvents) String() string {
 	events := []fmt.Stringer{}
 
-	birth := gedcom.First(c.individual.Births())
-	birthDate := gedcom.First(gedcom.Dates(birth))
-	birthPlace := gedcom.First(gedcom.Places(birth))
-	birthDateString := gedcom.String(birthDate)
-	birthPlaceString := gedcom.String(birthPlace)
+	for _, event := range c.individual.AllEvents() {
+		date := gedcom.String(gedcom.First(gedcom.Dates(event)))
+		place := gedcom.String(gedcom.First(gedcom.Places(event)))
 
-	event := newIndividualEvent("Birth", birthDateString, birthPlaceString, "",
-		c.document)
-	events = append(events, event)
+		e := newIndividualEvent(date, place, html.NewEmpty(), c.individual, event)
+		events = append(events, e)
+	}
 
 	for _, family := range c.individual.Families() {
 		marriage := gedcom.First(gedcom.NodesWithTag(family, gedcom.TagMarriage))
@@ -49,43 +48,48 @@ func (c *individualEvents) String() string {
 			place = p.Value()
 		}
 
-		description := ""
+		var description fmt.Stringer = html.NewEmpty()
 		if family.Husband().Is(c.individual) {
-			description = "<em>Unknown</em>"
+			description = html.NewHTML("<em>Unknown</em>")
 
 			if wife := family.Wife(); wife != nil {
-				description = newIndividualLink(c.document, wife).String()
+				description = newIndividualLink(c.document, wife)
 			}
 		}
 
 		if family.Wife().Is(c.individual) {
-			description = "<em>Unknown</em>"
+			description = html.NewHTML("<em>Unknown</em>")
 
 			if husband := family.Husband(); husband != nil {
-				description = newIndividualLink(c.document, husband).String()
+				description = newIndividualLink(c.document, husband)
 			}
 		}
 
 		// Empty description means that the individual is a child so this is not
 		// an event we want to show.
-		if description != "" {
-			event := newIndividualEvent("Marriage", date.Value(), place,
-				description, c.document)
+		if _, ok := description.(*html.Empty); !ok {
+			event := newIndividualEvent(date.Value(), place,
+				description, c.individual, marriage)
 			events = append(events, event)
 		}
 	}
 
-	death := gedcom.First(c.individual.Deaths())
-	deathDate := gedcom.First(gedcom.Dates(death))
-	deathPlace := gedcom.First(gedcom.Places(death))
-	deathDateString := gedcom.String(deathDate)
-	deathPlaceString := gedcom.String(deathPlace)
+	// Sort events by age.
+	sort.Slice(events, func(i, j int) bool {
+		a := events[i].(*individualEvent)
+		b := events[j].(*individualEvent)
 
-	individualEvent := newIndividualEvent("Death", deathDateString, deathPlaceString, "",
-		c.document)
-	events = append(events, individualEvent)
+		if !a.event.Tag().Is(b.event.Tag()) {
+			return a.event.Tag().SortValue() < b.event.Tag().SortValue()
+		}
 
-	tableHead := html.NewTableHead("Type", "Date", "Place", "Description")
+		aStart, _ := c.individual.AgeAt(a.event)
+		bStart, _ := c.individual.AgeAt(b.event)
+
+		return aStart.Years() < bStart.Years()
+	})
+
+	tableHead := html.NewTableHead("Age", "Type", "Date", "Place", "Description")
 	components := html.NewComponents(events...)
 	s := html.NewTable("text-center", tableHead, components)
 
