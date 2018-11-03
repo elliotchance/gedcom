@@ -1,6 +1,9 @@
 package gedcom
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 // Year is an approximation for the duration of a year.
 //
@@ -74,6 +77,17 @@ func (age Age) IsAfter(age2 Age) bool {
 	return age.Age > age2.Age
 }
 
+// Years returns the approximate amount of years.
+//
+// The value is approximate because a year is both a variable amount of time and
+// has to be combined with a point in time to be practical.
+//
+// Years can be used when 1 month resolution is enough. However, it's not
+// recommended to use this for calculations. Instead use the Age value.
+func (age Age) Years() float64 {
+	return float64(age.Age) / float64(Year)
+}
+
 func constraintBetweenAges(estimatedBirthDate, estimatedDeathDate Date, age time.Duration) AgeConstraint {
 	if age < 0 {
 		return AgeConstraintBeforeBirth
@@ -88,4 +102,37 @@ func constraintBetweenAges(estimatedBirthDate, estimatedDeathDate Date, age time
 	}
 
 	return AgeConstraintLiving
+}
+
+// String returns an age in one of the following forms:
+//
+//   unknown     -- if IsKnown is false
+//   20y         -- living age is very close to the whole year
+//   20y 5m      -- living age with 5 months
+//   ~ 25y       -- if IsEstimated is true
+//   ~ 22y 11m   -- same as above
+//
+// String will not consider the age constraint.
+//
+// A special case is 0. When the age duration is zero (or less than half of one
+// month) the estimate marker ("~") will not be shown because this would not
+// make sense.
+func (age Age) String() string {
+	if !age.IsKnown {
+		return "unknown"
+	}
+
+	years := int(age.Years())
+	months := int((age.Years() - float64(years)) * 12)
+
+	estimateSign := ""
+	if age.IsEstimate && years+months > 0 {
+		estimateSign = "~ "
+	}
+
+	if months == 0 {
+		return fmt.Sprintf("%s%dy", estimateSign, years)
+	}
+
+	return fmt.Sprintf("%s%dy %dm", estimateSign, years, months)
 }

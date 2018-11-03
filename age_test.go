@@ -1,10 +1,11 @@
 package gedcom_test
 
 import (
-	"github.com/elliotchance/gedcom"
-	"github.com/elliotchance/tf"
 	"testing"
 	"time"
+
+	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/tf"
 )
 
 func TestNewUnknownAge(t *testing.T) {
@@ -75,4 +76,41 @@ func TestAge_IsAfter(t *testing.T) {
 
 	IsAfter(gedcom.NewAgeWithYears(30, false, gedcom.AgeConstraintLiving),
 		gedcom.NewAgeWithYears(30, false, gedcom.AgeConstraintLiving)).False()
+}
+
+func TestAge_String(t *testing.T) {
+	String := tf.Function(t, gedcom.Age.String)
+
+	String(gedcom.NewUnknownAge()).Returns("unknown")
+
+	String(gedcom.NewAgeWithYears(20, false, gedcom.AgeConstraintLiving)).Returns("20y")
+	String(gedcom.NewAgeWithYears(20.5, false, gedcom.AgeConstraintLiving)).Returns("20y 6m")
+	String(gedcom.NewAgeWithYears(20.01, false, gedcom.AgeConstraintLiving)).Returns("20y")
+
+	String(gedcom.NewAgeWithYears(21, true, gedcom.AgeConstraintLiving)).Returns("~ 21y")
+	String(gedcom.NewAgeWithYears(22.5, true, gedcom.AgeConstraintLiving)).Returns("~ 22y 6m")
+	String(gedcom.NewAgeWithYears(23.01, true, gedcom.AgeConstraintLiving)).Returns("~ 23y")
+
+	String(gedcom.NewAgeWithYears(22.5, true, gedcom.AgeConstraintUnknown)).Returns("~ 22y 6m")
+	String(gedcom.NewAgeWithYears(22.5, true, gedcom.AgeConstraintBeforeBirth)).Returns("~ 22y 6m")
+	String(gedcom.NewAgeWithYears(22.5, true, gedcom.AgeConstraintAfterDeath)).Returns("~ 22y 6m")
+
+	String(gedcom.NewAgeWithYears(0.0, false, gedcom.AgeConstraintLiving)).Returns("0y")
+	String(gedcom.NewAgeWithYears(0.0, true, gedcom.AgeConstraintLiving)).Returns("0y")
+}
+
+func TestAge_Years(t *testing.T) {
+	Years := tf.Function(t, gedcom.Age.Years)
+
+	Years(gedcom.NewUnknownAge()).Returns(0)
+
+	Years(gedcom.NewAgeWithYears(23.5, false, gedcom.AgeConstraintUnknown)).Returns(23.5)
+	Years(gedcom.NewAgeWithYears(23.5, false, gedcom.AgeConstraintLiving)).Returns(23.5)
+	Years(gedcom.NewAgeWithYears(23.5, false, gedcom.AgeConstraintBeforeBirth)).Returns(23.5)
+	Years(gedcom.NewAgeWithYears(23.5, false, gedcom.AgeConstraintAfterDeath)).Returns(23.5)
+
+	Years(gedcom.NewAgeWithYears(24.5, true, gedcom.AgeConstraintUnknown)).Returns(24.5)
+	Years(gedcom.NewAgeWithYears(24.5, true, gedcom.AgeConstraintLiving)).Returns(24.5)
+	Years(gedcom.NewAgeWithYears(24.5, true, gedcom.AgeConstraintBeforeBirth)).Returns(24.5)
+	Years(gedcom.NewAgeWithYears(24.5, true, gedcom.AgeConstraintAfterDeath)).Returns(24.5)
 }
