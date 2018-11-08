@@ -1,5 +1,7 @@
 package gedcom
 
+import "encoding/json"
+
 // SimpleNode is used as the default node type when there is no more appropriate
 // or specific type to use.
 type SimpleNode struct {
@@ -124,4 +126,24 @@ func (node *SimpleNode) String() string {
 	}
 
 	return node.value
+}
+
+func (node *SimpleNode) MarshalJSON() ([]byte, error) {
+	m := map[string]interface{}{
+		"Tag": node.Tag().Tag(),
+	}
+
+	if node.Value() != "" {
+		m["Value"] = node.Value()
+	}
+
+	if node.Pointer() != "" {
+		m["Pointer"] = node.Pointer()
+	}
+
+	if len(node.Nodes()) > 0 {
+		m["Nodes"] = node.Nodes()
+	}
+
+	return json.Marshal(m)
 }
