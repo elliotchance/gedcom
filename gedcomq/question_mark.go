@@ -30,11 +30,13 @@ type QuestionMark struct{}
 //     "Length"
 //   ]
 //
-func (e *QuestionMark) Evaluate(input interface{}) (interface{}, error) {
+func (e *QuestionMark) Evaluate(engine *Engine, input interface{}) (interface{}, error) {
 	in := reflect.TypeOf(input)
 
 	if in.Kind() == reflect.Slice {
-		return e.Evaluate(reflect.Zero(TypeOfSliceElement(input)).Interface())
+		value := reflect.Zero(TypeOfSliceElement(input)).Interface()
+
+		return e.Evaluate(engine, value)
 	}
 
 	if in.Kind() != reflect.Ptr {

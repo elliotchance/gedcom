@@ -5,16 +5,13 @@ import (
 
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/tf"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestEngine_Start(t *testing.T) {
 	Start := tf.Function(t, (*Engine).Evaluate)
 
 	parser := NewParser()
-	emptyEngine := parser.ParseString("")
-	individualsEngine := parser.ParseString(".Individuals")
-	individualNameEngine := parser.ParseString(".Individuals | .Name")
-	individualNameStringEngine := parser.ParseString(".Individuals | .Name | .String")
 
 	document := gedcom.NewDocumentWithNodes([]gedcom.Node{
 		gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
@@ -25,24 +22,56 @@ func TestEngine_Start(t *testing.T) {
 		}),
 	})
 
-	Start(emptyEngine, document).Returns(document, nil)
+	engine, err := parser.ParseString("")
+	assert.Nil(t, engine)
+	assert.EqualError(t, err, "expected variable name or expressions")
 
-	Start(individualsEngine, document).Returns(gedcom.IndividualNodes{
-		gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+	engine, err = parser.ParseString(".Individuals")
+	if assert.NoError(t, err) {
+		Start(engine, document).Returns(gedcom.IndividualNodes{
+			gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+				gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
+			}),
+			gedcom.NewIndividualNode(nil, "", "P2", []gedcom.Node{
+				gedcom.NewNameNode(nil, "Dina /Wyche/", "", nil),
+			}),
+		}, nil)
+	}
+
+	engine, err = parser.ParseString(".Individuals | .Name")
+	if assert.NoError(t, err) {
+		Start(engine, document).Returns([]*gedcom.NameNode{
 			gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
-		}),
-		gedcom.NewIndividualNode(nil, "", "P2", []gedcom.Node{
 			gedcom.NewNameNode(nil, "Dina /Wyche/", "", nil),
-		}),
-	}, nil)
+		}, nil)
+	}
 
-	Start(individualNameEngine, document).Returns([]*gedcom.NameNode{
-		gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
-		gedcom.NewNameNode(nil, "Dina /Wyche/", "", nil),
-	}, nil)
+	engine, err = parser.ParseString(".Individuals | .Name | .String")
+	if assert.NoError(t, err) {
+		Start(engine, document).Returns([]string{
+			"Elliot Chance",
+			"Dina Wyche",
+		}, nil)
+	}
 
-	Start(individualNameStringEngine, document).Returns([]string{
-		"Elliot Chance",
-		"Dina Wyche",
-	}, nil)
+	engine, err = parser.ParseString("Names are .Individuals | .Name; Names | .String")
+	if assert.NoError(t, err) {
+		Start(engine, document).Returns([]string{
+			"Elliot Chance",
+			"Dina Wyche",
+		}, nil)
+	}
+
+	engine, err = parser.ParseString("Names is .Individuals | .Name; Names")
+	if assert.NoError(t, err) {
+		Start(engine, document).Returns([]*gedcom.NameNode{
+			gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
+			gedcom.NewNameNode(nil, "Dina /Wyche/", "", nil),
+		}, nil)
+	}
+
+	engine, err = parser.ParseString("Names is .Individuals | .Name; BadVariable")
+	if assert.NoError(t, err) {
+		Start(engine, document).Errors("no such variable BadVariable")
+	}
 }

@@ -111,4 +111,36 @@
 //     "Length"
 //   ]
 //
+// Variables
+//
+// Variables allow more complex logic to be processed in separate discreet
+// steps. It also applies in cases where the logic would normally be duplicated
+// if it couldn't be referenced from multiple places.
+//
+// Variable are defined in on of the two forms:
+//
+//   Events are .Individuals | .AllEvents
+//   Name is .Individual | .Name
+//
+// The keywords "are" and "is" do exactly the same thing. They are both offered
+// to make the semantics of reading the expression easier.
+//
+// Variables can then be references in separate expressions. For example the
+// following:
+//
+//   .Individuals | .Name | .String
+//
+// Could also be written as:
+//
+//   Names are .Individuals | .Name; Names | .String
+//
+// Or even more verbosely as:
+//
+//   Indi is .Individuals; Names are Indi | .Name; Names | .String
+//
+// The semicolon (;) is used to separate variable definitions. The result
+// returned will always be the return value of the last statement.
+//
+// Available variables will be shown as options with the special Question Mark
+// function.
 package main

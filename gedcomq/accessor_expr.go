@@ -5,13 +5,13 @@ import (
 	"reflect"
 )
 
-// Accessor is used to fetch the value of a property or to invoke a method.
+// AccessorExpr is used to fetch the value of a property or to invoke a method.
 //
 // The simplest form is ".Foo" where Foo could be a property or method.
 //
 // When an accessor is used on a slice the accessor is performed on each
 // element, generating a new slice of that returned type.
-type Accessor struct {
+type AccessorExpr struct {
 	Query string
 }
 
@@ -21,7 +21,7 @@ type Accessor struct {
 //
 // It will return an error if a property or method could not be found by that
 // name.
-func (e *Accessor) Evaluate(input interface{}) (interface{}, error) {
+func (e *AccessorExpr) Evaluate(engine *Engine, input interface{}) (interface{}, error) {
 	in := reflect.ValueOf(input)
 	accessor := e.Query[1:]
 
@@ -36,7 +36,7 @@ func (e *Accessor) Evaluate(input interface{}) (interface{}, error) {
 		results := reflect.MakeSlice(reflect.SliceOf(returnType), 0, 0)
 
 		for i := 0; i < in.Len(); i++ {
-			result, err := e.Evaluate(in.Index(i).Interface())
+			result, err := e.Evaluate(engine, in.Index(i).Interface())
 			if err != nil {
 				return nil, err
 			}
@@ -57,7 +57,7 @@ func (e *Accessor) Evaluate(input interface{}) (interface{}, error) {
 	return input, nil
 }
 
-func (e *Accessor) evaluateAccessor(accessor string, input interface{}) (r interface{}, err error) {
+func (e *AccessorExpr) evaluateAccessor(accessor string, input interface{}) (r interface{}, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("cannot use .%s on %s", accessor, getType(input))
@@ -78,7 +78,7 @@ func (e *Accessor) evaluateAccessor(accessor string, input interface{}) (r inter
 		getType(input), accessor)
 }
 
-func (e *Accessor) getReturnType(accessor string, input interface{}) reflect.Type {
+func (e *AccessorExpr) getReturnType(accessor string, input interface{}) reflect.Type {
 	method, field := e.getMethodOrField(accessor, input)
 
 	switch {
@@ -92,7 +92,7 @@ func (e *Accessor) getReturnType(accessor string, input interface{}) reflect.Typ
 	return nil
 }
 
-func (e *Accessor) getMethodOrField(accessor string, input interface{}) (*reflect.Value, *reflect.Value) {
+func (e *AccessorExpr) getMethodOrField(accessor string, input interface{}) (*reflect.Value, *reflect.Value) {
 	method := e.getMethod(accessor, input)
 
 	if method != nil {
@@ -104,7 +104,7 @@ func (e *Accessor) getMethodOrField(accessor string, input interface{}) (*reflec
 	return nil, field
 }
 
-func (e *Accessor) getMethod(accessor string, input interface{}) *reflect.Value {
+func (e *AccessorExpr) getMethod(accessor string, input interface{}) *reflect.Value {
 	defer func() {
 		// The nil return value will be handled higher up.
 		recover()
@@ -130,7 +130,7 @@ func (e *Accessor) getMethod(accessor string, input interface{}) *reflect.Value 
 	return nil
 }
 
-func (e *Accessor) getField(accessor string, input interface{}) *reflect.Value {
+func (e *AccessorExpr) getField(accessor string, input interface{}) *reflect.Value {
 	defer func() {
 		// The nil return value will be handled higher up.
 		recover()

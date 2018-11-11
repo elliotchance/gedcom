@@ -16,7 +16,10 @@ func main() {
 	parseCLIFlags()
 
 	parser := NewParser()
-	engine := parser.ParseString(flag.Arg(0))
+	engine, err := parser.ParseString(flag.Arg(0))
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	doc, err := gedcom.NewDocumentFromGEDCOMFile(optionGedcomFile)
 	if err != nil {
