@@ -6,5 +6,5 @@ type Expression interface {
 	// Evaluate should only be run once and is likely to alter the value of
 	// input. This means expressions can only be safely run once and previous
 	// input values cannot be reused.
-	Evaluate(input interface{}) (interface{}, error)
+	Evaluate(engine *Engine, input interface{}) (interface{}, error)
 }

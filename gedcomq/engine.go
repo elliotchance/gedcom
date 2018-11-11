@@ -1,27 +1,42 @@
 package main
 
-import "github.com/elliotchance/gedcom"
+import (
+	"github.com/elliotchance/gedcom"
+	"fmt"
+)
 
 // Engine is the compiled query. It is able to evaluate the entire query.
 type Engine struct {
-	// Expressions are separated by pipes. The result of each evaluated
-	// expressions is used as the input to the next expressions. The input value
-	// for the first expression is the gedcom.Document.
-	Expressions []Expression
+	Variables []*Variable
+}
+
+func NewEngine() *Engine {
+	return &Engine{
+		Variables: []*Variable{},
+	}
 }
 
 // Evaluate executes all of the expressions and returns the final result.
 func (e *Engine) Evaluate(document *gedcom.Document) (interface{}, error) {
-	var result interface{} = document
-	var err error
-
-	for _, expression := range e.Expressions {
-		result, err = expression.Evaluate(result)
+	for _, variable := range e.Variables {
+		_, err := variable.Evaluate(e, document)
 
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	return result, nil
+	lastVariable := e.Variables[len(e.Variables)-1]
+
+	return lastVariable.Result, nil
+}
+
+func (e *Engine) VariableByName(name string) (*Variable, error) {
+	for _, variable := range e.Variables {
+		if variable.Name == name {
+			return variable, nil
+		}
+	}
+
+	return nil, fmt.Errorf("no such variable %s", name)
 }
