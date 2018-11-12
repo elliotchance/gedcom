@@ -24,7 +24,7 @@ func TestEngine_Start(t *testing.T) {
 
 	engine, err := parser.ParseString("")
 	assert.Nil(t, engine)
-	assert.EqualError(t, err, "expected variable name or expressions")
+	assert.EqualError(t, err, "expected expression")
 
 	engine, err = parser.ParseString(".Individuals")
 	if assert.NoError(t, err) {
@@ -73,5 +73,54 @@ func TestEngine_Start(t *testing.T) {
 	engine, err = parser.ParseString("Names is .Individuals | .Name; BadVariable")
 	if assert.NoError(t, err) {
 		Start(engine, document).Errors("no such variable BadVariable")
+	}
+
+	engine, err = parser.ParseString("?")
+	if assert.NoError(t, err) {
+		Start(engine, document).Returns([]string{
+			".AddNode",
+			".Families",
+			".Individuals",
+			".NodeByPointer",
+			".Nodes",
+			".Places",
+			".Sources",
+			".String",
+			"?",
+			"Length",
+		}, nil)
+	}
+
+	engine, err = parser.ParseString("Names is .Individuals | .Name; ?")
+	if assert.NoError(t, err) {
+		Start(engine, document).Returns([]string{
+			".AddNode",
+			".Families",
+			".Individuals",
+			".NodeByPointer",
+			".Nodes",
+			".Places",
+			".Sources",
+			".String",
+			"?",
+			"Length",
+			"Names",
+		}, nil)
+	}
+
+	engine, err = parser.ParseString(".Individuals | .Name; ?")
+	if assert.NoError(t, err) {
+		Start(engine, document).Returns([]string{
+			".AddNode",
+			".Families",
+			".Individuals",
+			".NodeByPointer",
+			".Nodes",
+			".Places",
+			".Sources",
+			".String",
+			"?",
+			"Length",
+		}, nil)
 	}
 }

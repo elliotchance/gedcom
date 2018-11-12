@@ -15,82 +15,93 @@ func NewParser() *Parser {
 }
 
 // ParseString returns a new Engine by parsing the query string.
-func (p *Parser) ParseString(q string) (*Engine, error) {
-	engine := NewEngine()
+func (p *Parser) ParseString(q string) (engine *Engine, err error) {
+	engine = &Engine{}
 	p.tokens = NewTokenizer().TokenizeString(q)
 
-	variable, err := p.consumeVariable()
+	engine.Statements, err = p.consumeStatements()
 	if err != nil {
 		return nil, err
 	}
 
-	engine.Variables = append(engine.Variables, variable)
-
-	for {
-		if _, err := p.tokens.Consume(TokenEOF); err == nil {
-			break
-		}
-
-		_, err := p.tokens.Consume(TokenSemiColon)
-		if err != nil {
-			return nil, err
-		}
-
-		variable, err := p.consumeVariable()
-		if err != nil {
-			return nil, err
-		}
-
-		engine.Variables = append(engine.Variables, variable)
+	if _, err := p.tokens.Consume(TokenEOF); err != nil {
+		return nil, err
 	}
 
 	return engine, nil
 }
 
-func (p *Parser) consumeVariable() (v *Variable, err error) {
-	if v, err = p.consumeNamedVariable(); err == nil {
-		return
+//   Statements := Statement NextStatement
+//               | Statement
+func (p *Parser) consumeStatements() (statements []*Statement, err error) {
+	defer p.tokens.Rollback(p.tokens.Position, &err)
+
+	statement, err := p.consumeStatement()
+	if err != nil {
+		return nil, err
 	}
 
-	if v, err = p.consumeUnnamedVariable(); err == nil {
-		return
+	statements = append(statements, statement)
+
+	for {
+		statement, err := p.consumeNextStatement()
+		if err != nil {
+			break
+		}
+
+		statements = append(statements, statement)
 	}
-
-	return nil, errors.New("expected variable name or expressions")
-}
-
-func (p *Parser) consumeNamedVariable() (variable *Variable, err error) {
-	variable = &Variable{}
-	var tokens []Token
-
-	tokens, err = p.tokens.Consume(TokenWord, TokenIs)
-	if err == nil {
-		variable.Name = tokens[0].Value
-		variable.Expressions, err = p.consumeExpressions()
-
-		return
-	}
-
-	tokens, err = p.tokens.Consume(TokenWord, TokenAre)
-	if err == nil {
-		variable.Name = tokens[0].Value
-		variable.Expressions, err = p.consumeExpressions()
-
-		return
-	}
-
-	return nil, errors.New("expected Variable")
-}
-
-func (p *Parser) consumeUnnamedVariable() (variable *Variable, err error) {
-	variable = &Variable{}
-	variable.Expressions, err = p.consumeExpressions()
 
 	return
 }
 
-func (p *Parser) consumeExpressions() ([]Expression, error) {
-	expressions := []Expression{}
+//   NextStatement := ";" Statement
+func (p *Parser) consumeNextStatement() (_ *Statement, err error) {
+	defer p.tokens.Rollback(p.tokens.Position, &err)
+
+	_, err = p.tokens.Consume(TokenSemiColon)
+	if err != nil {
+		return nil, err
+	}
+
+	return p.consumeStatement()
+}
+
+//   Statement := word [ are | is ] Expressions
+//              | Expressions
+func (p *Parser) consumeStatement() (statement *Statement, err error) {
+	defer p.tokens.Rollback(p.tokens.Position, &err)
+
+	statement = &Statement{}
+
+	if t, err := p.tokens.Consume(TokenWord, TokenAre); err == nil {
+		statement.VariableName = t[0].Value
+	}
+
+	if t, err := p.tokens.Consume(TokenWord, TokenIs); err == nil {
+		statement.VariableName = t[0].Value
+	}
+
+	statement.Expressions, err = p.consumeExpressions()
+
+	return
+}
+
+//   NextExpression := "|" Expression
+func (p *Parser) consumeNextExpression() (_ Expression, err error) {
+	defer p.tokens.Rollback(p.tokens.Position, &err)
+
+	_, err = p.tokens.Consume(TokenPipe)
+	if err != nil {
+		return nil, err
+	}
+
+	return p.consumeExpression()
+}
+
+//   Expressions := Expression NextExpression*
+func (p *Parser) consumeExpressions() (expressions []Expression, err error) {
+	defer p.tokens.Rollback(p.tokens.Position, &err)
 
 	v, err := p.consumeExpression()
 	if err != nil {
@@ -100,44 +111,42 @@ func (p *Parser) consumeExpressions() ([]Expression, error) {
 	expressions = append(expressions, v)
 
 	for {
-		if _, err := p.tokens.Consume(TokenEOF); err == nil {
-			break
-		}
-
-		if _, err := p.tokens.Peek(TokenSemiColon); err == nil {
-			break
-		}
-
-		_, err := p.tokens.Consume(TokenPipe)
+		v, err := p.consumeNextExpression()
 		if err != nil {
-			return nil, err
-		}
-
-		v, err := p.consumeExpression()
-		if err != nil {
-			return nil, err
+			break
 		}
 
 		expressions = append(expressions, v)
 	}
 
-	return expressions, nil
+	return
 }
 
-func (p *Parser) consumeExpression() (Expression, error) {
-	if v, err := p.consumeAccessor(); err == nil {
-		return v, nil
+//   Expression := Accessor | Word | QuestionMark
+func (p *Parser) consumeExpression() (expression Expression, err error) {
+	defer p.tokens.Rollback(p.tokens.Position, &err)
+
+	if expression, err = p.consumeAccessor(); err == nil {
+		return expression, nil
 	}
 
-	if v, err := p.consumeWord(); err == nil {
-		return v, nil
+	if expression, err = p.consumeWord(); err == nil {
+		return expression, nil
 	}
 
-	return nil, errors.New("expected accessor, function or variable")
+	if expression, err = p.consumeQuestionMark(); err == nil {
+		return expression, nil
+	}
+
+	return nil, errors.New("expected expression")
 }
 
-func (p *Parser) consumeAccessor() (*AccessorExpr, error) {
-	t, err := p.tokens.Consume(TokenAccessor)
+//   Accessor := accessor
+func (p *Parser) consumeAccessor() (expr *AccessorExpr, err error) {
+	defer p.tokens.Rollback(p.tokens.Position, &err)
+
+	var t []Token
+	t, err = p.tokens.Consume(TokenAccessor)
 	if err != nil {
 		return nil, err
 	}
@@ -147,8 +156,12 @@ func (p *Parser) consumeAccessor() (*AccessorExpr, error) {
 	}, nil
 }
 
-func (p *Parser) consumeWord() (Expression, error) {
-	t, err := p.tokens.Consume(TokenWord)
+//   Word := word
+func (p *Parser) consumeWord() (expr Expression, err error) {
+	defer p.tokens.Rollback(p.tokens.Position, &err)
+
+	var t []Token
+	t, err = p.tokens.Consume(TokenWord)
 	if err != nil {
 		return nil, err
 	}
@@ -159,5 +172,17 @@ func (p *Parser) consumeWord() (Expression, error) {
 	}
 
 	// Variable
-	return &VariableExpr{VariableName: t[0].Value}, nil
+	return &VariableExpr{Name: t[0].Value}, nil
+}
+
+//   QuestionMark := "?"
+func (p *Parser) consumeQuestionMark() (expr *QuestionMarkExpr, err error) {
+	defer p.tokens.Rollback(p.tokens.Position, &err)
+
+	_, err = p.tokens.Consume(TokenQuestionMark)
+	if err != nil {
+		return nil, err
+	}
+
+	return &QuestionMarkExpr{}, nil
 }

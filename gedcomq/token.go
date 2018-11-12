@@ -9,13 +9,14 @@ import (
 type TokenKind string
 
 const (
-	TokenEOF       = TokenKind("EOF")
-	TokenAccessor  = TokenKind("Accessor")
-	TokenPipe      = TokenKind("Pipe")
-	TokenWord      = TokenKind("Word")
-	TokenIs        = TokenKind("Is")
-	TokenAre       = TokenKind("Are")
-	TokenSemiColon = TokenKind("SemiColon")
+	TokenEOF          = TokenKind("EOF")
+	TokenAccessor     = TokenKind("accessor")
+	TokenPipe         = TokenKind("|")
+	TokenWord         = TokenKind("word")
+	TokenIs           = TokenKind("is")
+	TokenAre          = TokenKind("are")
+	TokenSemiColon    = TokenKind(";")
+	TokenQuestionMark = TokenKind("?")
 )
 
 var TokenRegexp = []struct {
@@ -24,6 +25,7 @@ var TokenRegexp = []struct {
 }{
 	{regexp.MustCompile(`^\|$`), TokenPipe},
 	{regexp.MustCompile(`^;$`), TokenSemiColon},
+	{regexp.MustCompile(`^\?$`), TokenQuestionMark},
 	{regexp.MustCompile(`^is$`), TokenIs},
 	{regexp.MustCompile(`^are$`), TokenAre},
 	{regexp.MustCompile(`^\.[A-Z][a-zA-Z0-9_]*$`), TokenAccessor},
@@ -107,12 +109,8 @@ func (t *Tokens) Consume(expected ...TokenKind) (tokens []Token, err error) {
 	return
 }
 
-func (t *Tokens) Peek(expected ...TokenKind) (tokens []Token, err error) {
-	originalPosition := t.Position
-
-	defer func() {
-		t.Position = originalPosition
-	}()
-
-	return t.Consume(expected...)
+func (t *Tokens) Rollback(position int, err *error) {
+	if *err != nil {
+		t.Position = position
+	}
 }

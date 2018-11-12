@@ -19,7 +19,7 @@ func (ms MyStruct) Baz() []string {
 
 func TestAccessorExpr_Evaluate(t *testing.T) {
 	Evaluate := tf.NamedFunction(t, "Accessor_Evaluate", (*AccessorExpr).Evaluate)
-	engine := NewEngine()
+	engine := &Engine{}
 
 	ms1 := &MyStruct{Property: 123}
 	ms2 := MyStruct{Property: 456}

@@ -7,33 +7,27 @@ import (
 
 // Engine is the compiled query. It is able to evaluate the entire query.
 type Engine struct {
-	Variables []*Variable
-}
-
-func NewEngine() *Engine {
-	return &Engine{
-		Variables: []*Variable{},
-	}
+	Statements []*Statement
 }
 
 // Evaluate executes all of the expressions and returns the final result.
 func (e *Engine) Evaluate(document *gedcom.Document) (interface{}, error) {
-	for _, variable := range e.Variables {
-		_, err := variable.Evaluate(e, document)
+	for _, statement := range e.Statements {
+		_, err := statement.Evaluate(e, document)
 
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	lastVariable := e.Variables[len(e.Variables)-1]
+	lastStatement := e.Statements[len(e.Statements)-1]
 
-	return lastVariable.Result, nil
+	return lastStatement.Evaluate(e, document)
 }
 
-func (e *Engine) VariableByName(name string) (*Variable, error) {
-	for _, variable := range e.Variables {
-		if variable.Name == name {
+func (e *Engine) StatementByVariableName(name string) (*Statement, error) {
+	for _, variable := range e.Statements {
+		if variable.VariableName == name {
 			return variable, nil
 		}
 	}

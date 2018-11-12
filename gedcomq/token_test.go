@@ -43,6 +43,10 @@ func TestTokenizer_TokenizeString(t *testing.T) {
 		{TokenAre, "are"},
 		{TokenAccessor, ".Individuals"},
 	}})
+	TokenizeString(tz, "Foo ?").Returns(&Tokens{Tokens: []Token{
+		{TokenWord, "Foo"},
+		{TokenQuestionMark, "?"},
+	}})
 }
 
 func TestTokens_Consume(t *testing.T) {
@@ -74,7 +78,7 @@ func TestTokens_Consume(t *testing.T) {
 			".Foo | Bar",
 			[]TokenKind{TokenAccessor, TokenAccessor},
 			[]Token{{TokenAccessor, ".Foo"}},
-			errors.New("expected Accessor but found Pipe"),
+			errors.New("expected accessor but found |"),
 		},
 		{
 			"Bar; Baz",
@@ -83,6 +87,16 @@ func TestTokens_Consume(t *testing.T) {
 				{TokenWord, "Bar"},
 				{TokenSemiColon, ";"},
 				{TokenWord, "Baz"},
+			},
+			nil,
+		},
+		{
+			".Foo | ?",
+			[]TokenKind{TokenAccessor, TokenPipe, TokenQuestionMark},
+			[]Token{
+				{TokenAccessor, ".Foo"},
+				{TokenPipe, "|"},
+				{TokenQuestionMark, "?"},
 			},
 			nil,
 		},

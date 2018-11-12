@@ -17,10 +17,10 @@ func TestParser_ParseString(t *testing.T) {
 	ParseString := tf.Function(t, (*Parser).ParseString)
 	parser := NewParser()
 
-	ParseString(parser, "").Returns(nil, errors.New("expected variable name or expressions"))
+	ParseString(parser, "").Returns(nil, errors.New("expected expression"))
 
 	ParseString(parser, ".Individuals").Returns(&Engine{
-		Variables: []*Variable{
+		Statements: []*Statement{
 			{
 				Expressions: []Expression{
 					&AccessorExpr{Query: ".Individuals"},
@@ -30,7 +30,7 @@ func TestParser_ParseString(t *testing.T) {
 	}, nil)
 
 	ParseString(parser, ".Individuals | .Name").Returns(&Engine{
-		Variables: []*Variable{
+		Statements: []*Statement{
 			{
 				Expressions: []Expression{
 					&AccessorExpr{Query: ".Individuals"},
@@ -41,9 +41,9 @@ func TestParser_ParseString(t *testing.T) {
 	}, nil)
 
 	ParseString(parser, "Foo is .Individuals | .Name").Returns(&Engine{
-		Variables: []*Variable{
+		Statements: []*Statement{
 			{
-				Name: "Foo",
+				VariableName: "Foo",
 				Expressions: []Expression{
 					&AccessorExpr{Query: ".Individuals"},
 					&AccessorExpr{Query: ".Name"},
@@ -53,9 +53,9 @@ func TestParser_ParseString(t *testing.T) {
 	}, nil)
 
 	ParseString(parser, "Bar are .Individuals | .Name").Returns(&Engine{
-		Variables: []*Variable{
+		Statements: []*Statement{
 			{
-				Name: "Bar",
+				VariableName: "Bar",
 				Expressions: []Expression{
 					&AccessorExpr{Query: ".Individuals"},
 					&AccessorExpr{Query: ".Name"},
@@ -63,4 +63,7 @@ func TestParser_ParseString(t *testing.T) {
 			},
 		},
 	}, nil)
+
+	ParseString(parser, "Foo Bar").Returns(nil,
+		errors.New("expected EOF but found word"))
 }

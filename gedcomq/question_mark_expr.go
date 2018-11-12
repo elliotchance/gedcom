@@ -5,8 +5,8 @@ import (
 	"sort"
 )
 
-// QuestionMark ("?") is a special function. See Evaluate.
-type QuestionMark struct{}
+// QuestionMarkExpr ("?") is a special function. See Evaluate.
+type QuestionMarkExpr struct{}
 
 // "?" is a special function that can be used to show all of the possible next
 // functions and accessors. This is useful when exploring data by creating the
@@ -30,7 +30,7 @@ type QuestionMark struct{}
 //     "Length"
 //   ]
 //
-func (e *QuestionMark) Evaluate(engine *Engine, input interface{}) (interface{}, error) {
+func (e *QuestionMarkExpr) Evaluate(engine *Engine, input interface{}) (interface{}, error) {
 	in := reflect.TypeOf(input)
 
 	if in.Kind() == reflect.Slice {
@@ -44,13 +44,23 @@ func (e *QuestionMark) Evaluate(engine *Engine, input interface{}) (interface{},
 	}
 
 	options := []string{}
+
+	// Accessors
 	for i := 0; i < in.NumMethod(); i++ {
 		methodName := "." + in.Method(i).Name
 		options = append(options, methodName)
 	}
 
+	// Functions
 	for function := range Functions {
 		options = append(options, function)
+	}
+
+	// Variables
+	for _, statement := range engine.Statements {
+		if statement.VariableName != "" {
+			options = append(options, statement.VariableName)
+		}
 	}
 
 	sort.Strings(options)
