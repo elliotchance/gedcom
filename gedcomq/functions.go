@@ -4,6 +4,6 @@ package main
 //
 // See "Functions" in the package documentation for usage and examples.
 var Functions = map[string]Expression{
-	"?":      &QuestionMark{},
-	"Length": &Length{},
+	"?":      &QuestionMarkExpr{},
+	"Length": &LengthExpr{},
 }

@@ -1,11 +1,11 @@
 package main
 
 type VariableExpr struct {
-	VariableName string
+	Name string
 }
 
 func (e *VariableExpr) Evaluate(engine *Engine, input interface{}) (interface{}, error) {
-	v, err := engine.VariableByName(e.VariableName)
+	v, err := engine.StatementByVariableName(e.Name)
 	if err != nil {
 		return nil, err
 	}
