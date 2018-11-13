@@ -1,5 +1,13 @@
-// Package gedcom2text is a command line tool for converting GEDCOM to a
-// human-readable text format.
+// Gedcom2text converts a GEDCOM file to a human-readable text format.
+//
+// Usage
+//
+//   gedcom2text -gedcom file.ged
+//
+// You can view the full list of options using:
+//
+//   gedcom2text -help
+//
 package main
 
 import (
