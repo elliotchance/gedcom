@@ -1,5 +1,5 @@
-// Package gedcomtune is used to calculate the ideal weights and similarities
-// for the main gedcom package.
+// Gedcomtune is used to calculate the ideal weights and similarities for the
+// main gedcom package.
 //
 // It works by comparing two GEDCOM files that are mostly the same, but must
 // have the same pointers for individuals. It uses tries to calculate the best

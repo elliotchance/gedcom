@@ -1,5 +1,13 @@
-// Package gedcomdiff is a command line tool for comparing GEDCOM files and
-// producing a HTML report.
+// Gedcomdiff is a tool for comparing GEDCOM files and producing a HTML report.
+//
+// Usage
+//
+//   gedcomdiff -left-gedcom file1.ged -right-gedcom file2.ged
+//
+// For a complete list of options use:
+//
+//   gedcomdiff -help
+//
 package main
 
 import (
