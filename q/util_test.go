@@ -1,4 +1,4 @@
-package main
+package q_test
 
 import (
 	"github.com/elliotchance/gedcom"
@@ -6,10 +6,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
+	"github.com/elliotchance/gedcom/q"
 )
 
 func TestTypeOfSliceElement(t *testing.T) {
-	TypeOfSliceElement := tf.Function(t, TypeOfSliceElement)
+	TypeOfSliceElement := tf.Function(t, q.TypeOfSliceElement)
 
 	TypeOfSliceElement([]string{"foo", "bar"}).Returns(reflect.TypeOf(""))
 	TypeOfSliceElement([]int{1, 2, 3}).Returns(reflect.TypeOf(0))
@@ -22,13 +23,13 @@ func TestTypeOfSliceElement(t *testing.T) {
 }
 
 func TestValueToPointer(t *testing.T) {
-	actual := ValueToPointer(reflect.ValueOf(3.5))
+	actual := q.ValueToPointer(reflect.ValueOf(3.5))
 	assert.Equal(t, *actual.Interface().(*float64), 3.5)
 
-	actual = ValueToPointer(reflect.ValueOf(123))
+	actual = q.ValueToPointer(reflect.ValueOf(123))
 	assert.Equal(t, *actual.Interface().(*int), 123)
 
 	a := "foo"
-	actual = ValueToPointer(reflect.ValueOf(&a))
+	actual = q.ValueToPointer(reflect.ValueOf(&a))
 	assert.Equal(t, *actual.Interface().(*string), "foo")
 }

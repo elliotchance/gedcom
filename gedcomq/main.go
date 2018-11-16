@@ -151,6 +151,7 @@ import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
 	"log"
+	"github.com/elliotchance/gedcom/q"
 )
 
 var (
@@ -160,7 +161,7 @@ var (
 func main() {
 	parseCLIFlags()
 
-	parser := NewParser()
+	parser := q.NewParser()
 	engine, err := parser.ParseString(flag.Arg(0))
 	if err != nil {
 		log.Fatal(err)

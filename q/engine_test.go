@@ -1,4 +1,4 @@
-package main
+package q_test
 
 import (
 	"testing"
@@ -6,12 +6,13 @@ import (
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/tf"
 	"github.com/stretchr/testify/assert"
+	"github.com/elliotchance/gedcom/q"
 )
 
 func TestEngine_Start(t *testing.T) {
-	Start := tf.Function(t, (*Engine).Evaluate)
+	Start := tf.Function(t, (*q.Engine).Evaluate)
 
-	parser := NewParser()
+	parser := q.NewParser()
 
 	document := gedcom.NewDocumentWithNodes([]gedcom.Node{
 		gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{

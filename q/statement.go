@@ -1,4 +1,4 @@
-package main
+package q
 
 import "github.com/elliotchance/gedcom"
 
