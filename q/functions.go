@@ -1,4 +1,4 @@
-package main
+package q
 
 // Functions is a map of available functions.
 //

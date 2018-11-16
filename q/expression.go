@@ -1,4 +1,4 @@
-package main
+package q
 
 // Expression is a single operation. Expressions can be chained together with a
 // pipe (|) in the query.

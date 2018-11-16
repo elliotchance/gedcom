@@ -1,4 +1,4 @@
-package main
+package q
 
 type VariableExpr struct {
 	Name string
