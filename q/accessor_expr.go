@@ -21,7 +21,7 @@ type AccessorExpr struct {
 //
 // It will return an error if a property or method could not be found by that
 // name.
-func (e *AccessorExpr) Evaluate(engine *Engine, input interface{}) (interface{}, error) {
+func (e *AccessorExpr) Evaluate(engine *Engine, input interface{}, args []interface{}) (interface{}, error) {
 	in := reflect.ValueOf(input)
 	accessor := e.Query[1:]
 
@@ -36,7 +36,7 @@ func (e *AccessorExpr) Evaluate(engine *Engine, input interface{}) (interface{},
 		results := reflect.MakeSlice(reflect.SliceOf(returnType), 0, 0)
 
 		for i := 0; i < in.Len(); i++ {
-			result, err := e.Evaluate(engine, in.Index(i).Interface())
+			result, err := e.Evaluate(engine, in.Index(i).Interface(), nil)
 			if err != nil {
 				return nil, err
 			}

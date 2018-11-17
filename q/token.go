@@ -1,9 +1,9 @@
 package q
 
 import (
+	"fmt"
 	"regexp"
 	"unicode"
-	"fmt"
 )
 
 type TokenKind string
@@ -17,6 +17,9 @@ const (
 	TokenAre          = TokenKind("are")
 	TokenSemiColon    = TokenKind(";")
 	TokenQuestionMark = TokenKind("?")
+	TokenOpenBracket  = TokenKind("(")
+	TokenCloseBracket = TokenKind(")")
+	TokenNumber       = TokenKind("number")
 )
 
 var TokenRegexp = []struct {
@@ -26,10 +29,13 @@ var TokenRegexp = []struct {
 	{regexp.MustCompile(`^\|$`), TokenPipe},
 	{regexp.MustCompile(`^;$`), TokenSemiColon},
 	{regexp.MustCompile(`^\?$`), TokenQuestionMark},
+	{regexp.MustCompile(`^\($`), TokenOpenBracket},
+	{regexp.MustCompile(`^\)$`), TokenCloseBracket},
 	{regexp.MustCompile(`^is$`), TokenIs},
 	{regexp.MustCompile(`^are$`), TokenAre},
 	{regexp.MustCompile(`^\.[A-Z][a-zA-Z0-9_]*$`), TokenAccessor},
 	{regexp.MustCompile(`^[A-Z][a-zA-Z0-9_]*$`), TokenWord},
+	{regexp.MustCompile(`^[0-9]+$`), TokenNumber},
 }
 
 type Token struct {

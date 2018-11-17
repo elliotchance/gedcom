@@ -3,10 +3,10 @@ package q_test
 import (
 	"testing"
 
-	"github.com/elliotchance/tf"
-	"github.com/stretchr/testify/assert"
 	"errors"
 	"github.com/elliotchance/gedcom/q"
+	"github.com/elliotchance/tf"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTokenizer_TokenizeString(t *testing.T) {
@@ -99,6 +99,28 @@ func TestTokens_Consume(t *testing.T) {
 				{q.TokenPipe, "|"},
 				{q.TokenQuestionMark, "?"},
 			},
+			nil,
+		},
+		{
+			"First(13)",
+			[]q.TokenKind{
+				q.TokenWord,
+				q.TokenOpenBracket,
+				q.TokenNumber,
+				q.TokenCloseBracket,
+			},
+			[]q.Token{
+				{q.TokenWord, "First"},
+				{q.TokenOpenBracket, "("},
+				{q.TokenNumber, "13"},
+				{q.TokenCloseBracket, ")"},
+			},
+			nil,
+		},
+		{
+			"",
+			[]q.TokenKind{q.TokenEOF},
+			[]q.Token{{q.TokenEOF, ""}},
 			nil,
 		},
 	} {

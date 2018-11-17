@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/q"
 	"github.com/elliotchance/tf"
 	"github.com/stretchr/testify/assert"
-	"github.com/elliotchance/gedcom/q"
 )
 
 func TestEngine_Start(t *testing.T) {
@@ -88,6 +88,8 @@ func TestEngine_Start(t *testing.T) {
 			".Sources",
 			".String",
 			"?",
+			"First",
+			"Last",
 			"Length",
 		}, nil)
 	}
@@ -104,6 +106,8 @@ func TestEngine_Start(t *testing.T) {
 			".Sources",
 			".String",
 			"?",
+			"First",
+			"Last",
 			"Length",
 			"Names",
 		}, nil)
@@ -121,7 +125,24 @@ func TestEngine_Start(t *testing.T) {
 			".Sources",
 			".String",
 			"?",
+			"First",
+			"Last",
 			"Length",
+		}, nil)
+	}
+
+	engine, err = parser.ParseString(".Individuals | .Name | First(1)")
+	if assert.NoError(t, err) {
+		Start(engine, document).Returns([]*gedcom.NameNode{
+			gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
+		}, nil)
+	}
+
+	engine, err = parser.ParseString(".Individuals | .Name | Last(23)")
+	if assert.NoError(t, err) {
+		Start(engine, document).Returns([]*gedcom.NameNode{
+			gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
+			gedcom.NewNameNode(nil, "Dina /Wyche/", "", nil),
 		}, nil)
 	}
 }

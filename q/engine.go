@@ -1,8 +1,8 @@
 package q
 
 import (
-	"github.com/elliotchance/gedcom"
 	"fmt"
+	"github.com/elliotchance/gedcom"
 )
 
 // Engine is the compiled query. It is able to evaluate the entire query.
