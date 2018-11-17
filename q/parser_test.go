@@ -3,8 +3,8 @@ package q
 import (
 	"testing"
 
-	"github.com/elliotchance/tf"
 	"errors"
+	"github.com/elliotchance/tf"
 )
 
 func TestNewParser(t *testing.T) {

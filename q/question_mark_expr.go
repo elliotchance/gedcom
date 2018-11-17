@@ -30,13 +30,13 @@ type QuestionMarkExpr struct{}
 //     "Length"
 //   ]
 //
-func (e *QuestionMarkExpr) Evaluate(engine *Engine, input interface{}) (interface{}, error) {
+func (e *QuestionMarkExpr) Evaluate(engine *Engine, input interface{}, args []interface{}) (interface{}, error) {
 	in := reflect.TypeOf(input)
 
 	if in.Kind() == reflect.Slice {
 		value := reflect.Zero(TypeOfSliceElement(input)).Interface()
 
-		return e.Evaluate(engine, value)
+		return e.Evaluate(engine, value, nil)
 	}
 
 	if in.Kind() != reflect.Ptr {

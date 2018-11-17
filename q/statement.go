@@ -23,7 +23,7 @@ type Statement struct {
 	// access these directly, but instead it's safe to called Evaluate many
 	// times.
 	result interface{}
-	error error
+	error  error
 }
 
 // Evaluate executes all of the expressions and returns the final result.
@@ -39,7 +39,7 @@ func (v *Statement) Evaluate(engine *Engine, document *gedcom.Document) (interfa
 	v.result = document
 
 	for _, expression := range v.Expressions {
-		v.result, v.error = expression.Evaluate(engine, v.result)
+		v.result, v.error = expression.Evaluate(engine, v.result, nil)
 
 		if v.error != nil {
 			return nil, v.error

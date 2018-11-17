@@ -2,11 +2,11 @@ package q_test
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/q"
 	"github.com/elliotchance/tf"
 	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
-	"github.com/elliotchance/gedcom/q"
 )
 
 func TestTypeOfSliceElement(t *testing.T) {

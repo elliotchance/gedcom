@@ -1,9 +1,9 @@
 package q_test
 
 import (
+	"github.com/elliotchance/gedcom/q"
 	"github.com/elliotchance/tf"
 	"testing"
-	"github.com/elliotchance/gedcom/q"
 )
 
 type MyStruct struct {
@@ -25,17 +25,23 @@ func TestAccessorExpr_Evaluate(t *testing.T) {
 	ms1 := &MyStruct{Property: 123}
 	ms2 := MyStruct{Property: 456}
 
-	Evaluate(&q.AccessorExpr{Query: ".Foo"}, engine, ms1).Returns("bar", nil)
-	Evaluate(&q.AccessorExpr{Query: ".Foo"}, engine, ms2).Returns("bar", nil)
+	Evaluate(&q.AccessorExpr{Query: ".Foo"}, engine, ms1, nil).
+		Returns("bar", nil)
+	Evaluate(&q.AccessorExpr{Query: ".Foo"}, engine, ms2, nil).
+		Returns("bar", nil)
 
-	Evaluate(&q.AccessorExpr{Query: ".Baz"}, engine, ms1).Returns([]string{"qux", "quux"}, nil)
-	Evaluate(&q.AccessorExpr{Query: ".Baz"}, engine, ms2).Returns([]string{"qux", "quux"}, nil)
+	Evaluate(&q.AccessorExpr{Query: ".Baz"}, engine, ms1, nil).
+		Returns([]string{"qux", "quux"}, nil)
+	Evaluate(&q.AccessorExpr{Query: ".Baz"}, engine, ms2, nil).
+		Returns([]string{"qux", "quux"}, nil)
 
-	Evaluate(&q.AccessorExpr{Query: ".Property"}, engine, ms1).Returns(123, nil)
-	Evaluate(&q.AccessorExpr{Query: ".Property"}, engine, ms2).Returns(456, nil)
+	Evaluate(&q.AccessorExpr{Query: ".Property"}, engine, ms1, nil).
+		Returns(123, nil)
+	Evaluate(&q.AccessorExpr{Query: ".Property"}, engine, ms2, nil).
+		Returns(456, nil)
 
-	Evaluate(&q.AccessorExpr{Query: ".Missing"}, engine, ms1).
+	Evaluate(&q.AccessorExpr{Query: ".Missing"}, engine, ms1, nil).
 		Errors(`MyStruct does not have a method or property named "Missing"`)
-	Evaluate(&q.AccessorExpr{Query: ".Missing"}, engine, ms2).
+	Evaluate(&q.AccessorExpr{Query: ".Missing"}, engine, ms2, nil).
 		Errors(`MyStruct does not have a method or property named "Missing"`)
 }

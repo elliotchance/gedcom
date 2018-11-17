@@ -2,6 +2,7 @@ package q
 
 import (
 	"errors"
+	"github.com/elliotchance/gedcom"
 )
 
 // Parser converts the query string into an Engine that can be evaluated.
@@ -130,7 +131,7 @@ func (p *Parser) consumeExpression() (expression Expression, err error) {
 		return expression, nil
 	}
 
-	if expression, err = p.consumeWord(); err == nil {
+	if expression, err = p.consumeVariableOrFunction(); err == nil {
 		return expression, nil
 	}
 
@@ -156,8 +157,8 @@ func (p *Parser) consumeAccessor() (expr *AccessorExpr, err error) {
 	}, nil
 }
 
-//   Word := word
-func (p *Parser) consumeWord() (expr Expression, err error) {
+//   VariableOrFunction := word [ "(" number ")" ]
+func (p *Parser) consumeVariableOrFunction() (expr Expression, err error) {
 	defer p.tokens.Rollback(p.tokens.Position, &err)
 
 	var t []Token
@@ -166,9 +167,15 @@ func (p *Parser) consumeWord() (expr Expression, err error) {
 		return nil, err
 	}
 
+	args := []interface{}{}
+	if t2, err := p.tokens.Consume(TokenOpenBracket, TokenNumber, TokenCloseBracket); err == nil {
+		// An error here is not possible because number only consumes digits.
+		args = []interface{}{gedcom.Atoi(t2[1].Value)}
+	}
+
 	// Function
 	if v, ok := Functions[t[0].Value]; ok {
-		return v, nil
+		return &CallExpr{v, args}, nil
 	}
 
 	// Variable
