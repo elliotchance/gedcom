@@ -162,10 +162,75 @@
 // Available variables will be shown as options with the special Question Mark
 // function.
 //
+// Objects
+//
+// Custom objects can be constructed on one more items. For example:
+//
+//   .Individuals | { name: .Name | .String, born: .Birth | .String }
+//
+// May output something similar to:
+//
+//   [
+//     {
+//       "born": "1863",
+//       "name": "Charles W Chauncey"
+//     },
+//     {
+//       "born": "12 Dec 1859",
+//       "name": "Lucy Alcott Chauncey"
+//     },
+//     {
+//       "born": "1831",
+//       "name": "Sarah Taylor"
+//     }
+//   ]
+//
+// It's also worth noting that object can contain zero key-value pairs, such as:
+//
+//   .Individuals | {}
+//
+// This would output (using the same individuals in the previous example):
+//
+//   [
+//     {},
+//     {},
+//     {}
+//   ]
+//
+// Also see the Examples below.
+//
 // Examples
 //
 // Count all individuals in a document:
 //
 //   .Individuals | Length
+//
+// result:
+//
+//   3401
+//
+// Retrieve the basic details of the first 3 individuals:
+//
+//   .Individuals | First(3) | { name: .Name | .String, born: .Birth | .String, died: .Death | .String}
+//
+// result:
+//
+//   [
+//     {
+//       "born": "6 Dec 1636",
+//       "died": "2 Dec 1713",
+//       "name": "Gershom Bulkeley"
+//     },
+//     {
+//       "born": "5 Nov 1592",
+//       "died": "19 Feb 1672",
+//       "name": "Charles Chauncey"
+//     },
+//     {
+//       "born": "1408",
+//       "died": "7 May 1479",
+//       "name": "John Chauncy Esq."
+//     },
+//   ]
 //
 package q

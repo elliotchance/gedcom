@@ -68,24 +68,61 @@ func (p *Parser) consumeNextStatement() (_ *Statement, err error) {
 	return p.consumeStatement()
 }
 
-//   Statement := word [ are | is ] Expressions
-//              | Expressions
+//   AreOrIs := "are" | "is"
+func (p *Parser) consumeAreOrIs() (err error) {
+	defer p.tokens.Rollback(p.tokens.Position, &err)
+
+	t, err := p.tokens.Consume(TokenWord)
+	if err == nil && (t[0].Value == "are" || t[0].Value == "is") {
+		return
+	}
+
+	return err
+}
+
+//   Statement := NamedStatement | UnnamedStatement
 func (p *Parser) consumeStatement() (statement *Statement, err error) {
 	defer p.tokens.Rollback(p.tokens.Position, &err)
 
-	statement = &Statement{}
-
-	if t, err := p.tokens.Consume(TokenWord, TokenAre); err == nil {
-		statement.VariableName = t[0].Value
+	if s, err := p.consumeNamedStatement(); err == nil {
+		return s, nil
 	}
 
-	if t, err := p.tokens.Consume(TokenWord, TokenIs); err == nil {
-		statement.VariableName = t[0].Value
+	return p.consumeUnnamedStatement()
+}
+
+//   NamedStatement := word AreOrIs Expressions
+func (p *Parser) consumeNamedStatement() (statement *Statement, err error) {
+	defer p.tokens.Rollback(p.tokens.Position, &err)
+
+	t, err := p.tokens.Consume(TokenWord)
+	if err != nil {
+		return nil, err
 	}
 
-	statement.Expressions, err = p.consumeExpressions()
+	err = p.consumeAreOrIs()
+	if err != nil {
+		return nil, err
+	}
 
-	return
+	exprs, err := p.consumeExpressions()
+	if err != nil {
+		return nil, err
+	}
+
+	return &Statement{VariableName: t[0].Value, Expressions: exprs}, nil
+}
+
+//   UnnamedStatement := Expressions
+func (p *Parser) consumeUnnamedStatement() (statement *Statement, err error) {
+	defer p.tokens.Rollback(p.tokens.Position, &err)
+
+	exprs, err := p.consumeExpressions()
+	if err != nil {
+		return nil, err
+	}
+
+	return &Statement{Expressions: exprs}, nil
 }
 
 //   NextExpression := "|" Expression
@@ -100,7 +137,7 @@ func (p *Parser) consumeNextExpression() (_ Expression, err error) {
 	return p.consumeExpression()
 }
 
-//   Expressions := Expression NextExpression*
+//   Expressions := Expression NextExpression...
 func (p *Parser) consumeExpressions() (expressions []Expression, err error) {
 	defer p.tokens.Rollback(p.tokens.Position, &err)
 
@@ -136,6 +173,10 @@ func (p *Parser) consumeExpression() (expression Expression, err error) {
 	}
 
 	if expression, err = p.consumeQuestionMark(); err == nil {
+		return expression, nil
+	}
+
+	if expression, err = p.consumeObject(); err == nil {
 		return expression, nil
 	}
 
@@ -192,4 +233,96 @@ func (p *Parser) consumeQuestionMark() (expr *QuestionMarkExpr, err error) {
 	}
 
 	return &QuestionMarkExpr{}, nil
+}
+
+//   Object := ObjectWithoutKeys | ObjectWithKeys
+func (p *Parser) consumeObject() (expr Expression, err error) {
+	defer p.tokens.Rollback(p.tokens.Position, &err)
+
+	if e, err := p.consumeObjectWithoutKeys(); err == nil {
+		return e, nil
+	}
+
+	return p.consumeObjectWithKeys()
+}
+
+//   KeyValues := KeyValue
+func (p *Parser) consumeKeyValue() (key string, value *Statement, err error) {
+	defer p.tokens.Rollback(p.tokens.Position, &err)
+
+	t, err := p.tokens.Consume(TokenWord, TokenColon)
+	if err != nil {
+		return "", nil, err
+	}
+
+	value, err = p.consumeStatement()
+	if err != nil {
+		return "", nil, err
+	}
+
+	return t[0].Value, value, nil
+}
+
+//   ObjectWithoutKeys := "{" "}"
+func (p *Parser) consumeObjectWithoutKeys() (expr Expression, err error) {
+	defer p.tokens.Rollback(p.tokens.Position, &err)
+
+	_, err = p.tokens.Consume(TokenOpenCurly, TokenCloseCurly)
+
+	return &ObjectExpr{}, err
+}
+
+//   ObjectWithKeys := "{" KeyValues "}"
+func (p *Parser) consumeObjectWithKeys() (expr Expression, err error) {
+	defer p.tokens.Rollback(p.tokens.Position, &err)
+
+	_, err = p.tokens.Consume(TokenOpenCurly)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := p.consumeKeyValues()
+	if err != nil {
+		return nil, err
+	}
+
+	if _, err = p.tokens.Consume(TokenCloseCurly); err != nil {
+		return nil, err
+	}
+
+	return &ObjectExpr{Data: data}, nil
+}
+
+//   KeyValues := KeyValue NextKeyValue...
+func (p *Parser) consumeKeyValues() (data map[string]*Statement, err error) {
+	defer p.tokens.Rollback(p.tokens.Position, &err)
+
+	key, value, err := p.consumeKeyValue()
+	if err != nil {
+		return nil, err
+	}
+
+	data = map[string]*Statement{key: value}
+
+	for {
+		key, value, err := p.consumeNextKeyValue()
+		if err != nil {
+			break
+		}
+
+		data[key] = value
+	}
+
+	return data, nil
+}
+
+//   NextKeyValue := "," KeyValue
+func (p *Parser) consumeNextKeyValue() (key string, value *Statement, err error) {
+	defer p.tokens.Rollback(p.tokens.Position, &err)
+
+	if _, err = p.tokens.Consume(TokenComma); err != nil {
+		return "", nil, err
+	}
+
+	return p.consumeKeyValue()
 }

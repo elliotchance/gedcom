@@ -36,12 +36,12 @@ func TestTokenizer_TokenizeString(t *testing.T) {
 	}})
 	TokenizeString(tz, "Foo is .Individuals").Returns(&q.Tokens{Tokens: []q.Token{
 		{q.TokenWord, "Foo"},
-		{q.TokenIs, "is"},
+		{q.TokenWord, "is"},
 		{q.TokenAccessor, ".Individuals"},
 	}})
 	TokenizeString(tz, "Foo are .Individuals").Returns(&q.Tokens{Tokens: []q.Token{
 		{q.TokenWord, "Foo"},
-		{q.TokenAre, "are"},
+		{q.TokenWord, "are"},
 		{q.TokenAccessor, ".Individuals"},
 	}})
 	TokenizeString(tz, "Foo ?").Returns(&q.Tokens{Tokens: []q.Token{
@@ -121,6 +121,42 @@ func TestTokens_Consume(t *testing.T) {
 			"",
 			[]q.TokenKind{q.TokenEOF},
 			[]q.Token{{q.TokenEOF, ""}},
+			nil,
+		},
+		{
+			"{foo:bar}",
+			[]q.TokenKind{
+				q.TokenOpenCurly,
+				q.TokenWord,
+				q.TokenColon,
+				q.TokenWord,
+				q.TokenCloseCurly,
+			},
+			[]q.Token{
+				{q.TokenOpenCurly, "{"},
+				{q.TokenWord, "foo"},
+				{q.TokenColon, ":"},
+				{q.TokenWord, "bar"},
+				{q.TokenCloseCurly, "}"},
+			},
+			nil,
+		},
+		{
+			"foo, bar, baz",
+			[]q.TokenKind{
+				q.TokenWord,
+				q.TokenComma,
+				q.TokenWord,
+				q.TokenComma,
+				q.TokenWord,
+			},
+			[]q.Token{
+				{q.TokenWord, "foo"},
+				{q.TokenComma, ","},
+				{q.TokenWord, "bar"},
+				{q.TokenComma, ","},
+				{q.TokenWord, "baz"},
+			},
 			nil,
 		},
 	} {

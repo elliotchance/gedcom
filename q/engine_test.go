@@ -145,4 +145,48 @@ func TestEngine_Start(t *testing.T) {
 			gedcom.NewNameNode(nil, "Dina /Wyche/", "", nil),
 		}, nil)
 	}
+
+	engine, err = parser.ParseString(".Individuals | {}")
+	if assert.NoError(t, err) {
+		Start(engine, document).Returns([]map[string]interface{}{
+			{},
+			{},
+		}, nil)
+	}
+
+	engine, err = parser.ParseString(".Individuals | { name: .Name }")
+	if assert.NoError(t, err) {
+		Start(engine, document).Returns([]map[string]interface{}{
+			{"name": gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil)},
+			{"name": gedcom.NewNameNode(nil, "Dina /Wyche/", "", nil)},
+		}, nil)
+	}
+
+	engine, err = parser.ParseString(".Individuals | { name: .Name, age: .Age }")
+	if assert.NoError(t, err) {
+		Start(engine, document).Returns([]map[string]interface{}{
+			{
+				"name": gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
+				"age":  gedcom.Age{},
+			},
+			{
+				"name": gedcom.NewNameNode(nil, "Dina /Wyche/", "", nil),
+				"age":  gedcom.Age{},
+			},
+		}, nil)
+	}
+
+	engine, err = parser.ParseString(".Individuals | { name: .Name | .String, age: .Age }")
+	if assert.NoError(t, err) {
+		Start(engine, document).Returns([]map[string]interface{}{
+			{
+				"name": "Elliot Chance",
+				"age":  gedcom.Age{},
+			},
+			{
+				"name": "Dina Wyche",
+				"age":  gedcom.Age{},
+			},
+		}, nil)
+	}
 }

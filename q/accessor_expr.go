@@ -25,6 +25,10 @@ func (e *AccessorExpr) Evaluate(engine *Engine, input interface{}, args []interf
 	in := reflect.ValueOf(input)
 	accessor := e.Query[1:]
 
+	if input == nil {
+		return nil, nil
+	}
+
 	// If it is a slice we need to Evaluate each one.
 	if in.Kind() == reflect.Slice {
 		t := TypeOfSliceElement(input)

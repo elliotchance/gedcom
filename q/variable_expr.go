@@ -10,5 +10,5 @@ func (e *VariableExpr) Evaluate(engine *Engine, input interface{}, args []interf
 		return nil, err
 	}
 
-	return v.Evaluate(engine, nil)
+	return v.Evaluate(engine, input)
 }

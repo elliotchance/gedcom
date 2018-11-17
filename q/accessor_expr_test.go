@@ -25,6 +25,11 @@ func TestAccessorExpr_Evaluate(t *testing.T) {
 	ms1 := &MyStruct{Property: 123}
 	ms2 := MyStruct{Property: 456}
 
+	Evaluate(&q.AccessorExpr{Query: ".Foo"}, engine, nil, nil).
+		Returns(nil, nil)
+	Evaluate(&q.AccessorExpr{Query: ".Foo"}, engine, (*MyStruct)(nil), nil).
+		Returns("bar", nil)
+
 	Evaluate(&q.AccessorExpr{Query: ".Foo"}, engine, ms1, nil).
 		Returns("bar", nil)
 	Evaluate(&q.AccessorExpr{Query: ".Foo"}, engine, ms2, nil).

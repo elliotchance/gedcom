@@ -66,4 +66,53 @@ func TestParser_ParseString(t *testing.T) {
 
 	ParseString(parser, "Foo Bar").Returns(nil,
 		errors.New("expected EOF but found word"))
+
+	ParseString(parser, "{}").Returns(&Engine{
+		Statements: []*Statement{
+			{
+				VariableName: "",
+				Expressions: []Expression{
+					&ObjectExpr{},
+				},
+			},
+		},
+	}, nil)
+
+	ParseString(parser, "{ foo: .OK }").Returns(&Engine{
+		Statements: []*Statement{
+			{
+				Expressions: []Expression{
+					&ObjectExpr{Data: map[string]*Statement{
+						"foo": {
+							Expressions: []Expression{
+								&AccessorExpr{Query: ".OK"},
+							},
+						},
+					}},
+				},
+			},
+		},
+	}, nil)
+
+	ParseString(parser, "{ foo: .OK, bar: .Yes }").Returns(&Engine{
+		Statements: []*Statement{
+			{
+				VariableName: "",
+				Expressions: []Expression{
+					&ObjectExpr{Data: map[string]*Statement{
+						"foo": {
+							Expressions: []Expression{
+								&AccessorExpr{Query: ".OK"},
+							},
+						},
+						"bar": {
+							Expressions: []Expression{
+								&AccessorExpr{Query: ".Yes"},
+							},
+						},
+					}},
+				},
+			},
+		},
+	}, nil)
 }
