@@ -39,19 +39,16 @@ func (e *LastExpr) Evaluate(engine *Engine, input interface{}, args []interface{
 		return nil, nil
 	}
 
-	len := in.Len()
-
 	if args[0].(int) == 0 {
 		return in.Slice(0, 0).Interface(), nil
 	}
 
-	start := len - args[0].(int)
-	end := len - args[0].(int) + 1
+	l := in.Len()
+	start := l - args[0].(int)
 
 	if start < 0 {
 		start = 0
-		end = len
 	}
 
-	return in.Slice(start, end).Interface(), nil
+	return in.Slice(start, l).Interface(), nil
 }

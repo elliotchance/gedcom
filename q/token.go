@@ -13,13 +13,15 @@ const (
 	TokenAccessor     = TokenKind("accessor")
 	TokenPipe         = TokenKind("|")
 	TokenWord         = TokenKind("word")
-	TokenIs           = TokenKind("is")
-	TokenAre          = TokenKind("are")
 	TokenSemiColon    = TokenKind(";")
 	TokenQuestionMark = TokenKind("?")
 	TokenOpenBracket  = TokenKind("(")
 	TokenCloseBracket = TokenKind(")")
 	TokenNumber       = TokenKind("number")
+	TokenOpenCurly    = TokenKind("{")
+	TokenCloseCurly   = TokenKind("}")
+	TokenColon        = TokenKind(":")
+	TokenComma        = TokenKind(",")
 )
 
 var TokenRegexp = []struct {
@@ -31,10 +33,12 @@ var TokenRegexp = []struct {
 	{regexp.MustCompile(`^\?$`), TokenQuestionMark},
 	{regexp.MustCompile(`^\($`), TokenOpenBracket},
 	{regexp.MustCompile(`^\)$`), TokenCloseBracket},
-	{regexp.MustCompile(`^is$`), TokenIs},
-	{regexp.MustCompile(`^are$`), TokenAre},
-	{regexp.MustCompile(`^\.[A-Z][a-zA-Z0-9_]*$`), TokenAccessor},
-	{regexp.MustCompile(`^[A-Z][a-zA-Z0-9_]*$`), TokenWord},
+	{regexp.MustCompile(`^\{$`), TokenOpenCurly},
+	{regexp.MustCompile(`^\}$`), TokenCloseCurly},
+	{regexp.MustCompile(`^:$`), TokenColon},
+	{regexp.MustCompile(`^,$`), TokenComma},
+	{regexp.MustCompile(`^\.[a-zA-Z0-9_]*$`), TokenAccessor},
+	{regexp.MustCompile(`^[a-zA-Z_][a-zA-Z0-9_]*$`), TokenWord},
 	{regexp.MustCompile(`^[0-9]+$`), TokenNumber},
 }
 

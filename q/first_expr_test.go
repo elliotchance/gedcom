@@ -27,6 +27,8 @@ func TestFirstExpr_Evaluate(t *testing.T) {
 		Returns([]int{}, nil)
 	Evaluate(&q.FirstExpr{}, engine, []int{1, 2, 3}, []interface{}{1}).
 		Returns([]int{1}, nil)
+	Evaluate(&q.FirstExpr{}, engine, []int{1, 2, 3}, []interface{}{2}).
+		Returns([]int{1, 2}, nil)
 	Evaluate(&q.FirstExpr{}, engine, []int{1, 2, 3}, []interface{}{5}).
 		Returns([]int{1, 2, 3}, nil)
 	Evaluate(&q.FirstExpr{}, engine, []int{1, 2, 3}, []interface{}{}).

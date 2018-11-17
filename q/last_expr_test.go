@@ -31,6 +31,10 @@ func TestLastExpr_Evaluate(t *testing.T) {
 		Returns([]int{}, nil)
 	Evaluate(&q.LastExpr{}, engine, []int{1, 2, 3}, []interface{}{1}).
 		Returns([]int{3}, nil)
+	Evaluate(&q.LastExpr{}, engine, []int{1, 2, 3}, []interface{}{2}).
+		Returns([]int{2, 3}, nil)
+	Evaluate(&q.LastExpr{}, engine, []int{1, 2, 3}, []interface{}{3}).
+		Returns([]int{1, 2, 3}, nil)
 	Evaluate(&q.LastExpr{}, engine, []int{1, 2, 3}, []interface{}{5}).
 		Returns([]int{1, 2, 3}, nil)
 	Evaluate(&q.LastExpr{}, engine, []int{1, 2, 3}, []interface{}{}).
