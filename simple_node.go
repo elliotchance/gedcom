@@ -129,6 +129,12 @@ func (node *SimpleNode) String() string {
 }
 
 func (node *SimpleNode) MarshalJSON() ([]byte, error) {
+	m := node.ObjectMap()
+
+	return json.Marshal(m)
+}
+
+func (node *SimpleNode) ObjectMap() map[string]interface{} {
 	m := map[string]interface{}{
 		"Tag": node.Tag().Tag(),
 	}
@@ -145,5 +151,5 @@ func (node *SimpleNode) MarshalJSON() ([]byte, error) {
 		m["Nodes"] = node.Nodes()
 	}
 
-	return json.Marshal(m)
+	return m
 }

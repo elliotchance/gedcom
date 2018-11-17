@@ -11,16 +11,17 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
-	"fmt"
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/q"
+	"github.com/elliotchance/gedcom/util"
 	"log"
+	"os"
 )
 
 var (
 	optionGedcomFile string
+	optionFormat     string
 )
 
 func main() {
@@ -42,16 +43,32 @@ func main() {
 		log.Fatal(err)
 	}
 
-	data, err := json.Marshal(result)
-	if err != nil {
-		log.Fatal(err)
+	output(result)
+}
+
+func output(result interface{}) {
+	var formatter q.Formatter
+
+	switch optionFormat {
+	case "json":
+		formatter = &q.JSONFormatter{os.Stdout}
+	case "pretty-json":
+		formatter = &q.PrettyJSONFormatter{os.Stdout}
+	case "csv":
+		formatter = &q.CSVFormatter{os.Stdout}
+	default:
+		log.Panicf("unsupported format: %s", optionFormat)
 	}
 
-	fmt.Println(string(data))
+	formatter.Write(result)
 }
 
 func parseCLIFlags() {
-	flag.StringVar(&optionGedcomFile, "gedcom", "", "GEDCOM file.")
+	flag.StringVar(&optionGedcomFile, "gedcom", "", util.CLIDescription(`
+		Path to the GEDCOM file (required).`))
+	flag.StringVar(&optionFormat, "format", "json", util.CLIDescription(`
+		Output format, can be one of the following: "json", "pretty-json" or
+		"csv".`))
 
 	flag.Parse()
 }

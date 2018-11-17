@@ -199,6 +199,14 @@
 //
 // Also see the Examples below.
 //
+// Outputting In Other Formats
+//
+// There are several formatters (see Formatter interface) that allow the result
+// of a query to be output in different ways. Such as pretty json or CSV.
+//
+// This can be controlled with the "-format" option with gedcomq, or by
+// instantiating one of the formatter instances in your own code.
+//
 // Examples
 //
 // Count all individuals in a document:
