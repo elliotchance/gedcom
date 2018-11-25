@@ -10,7 +10,7 @@ type LengthExpr struct{}
 // Evaluate returns an integer with the number of items in the slice. This value
 // will be 0 or more. If the input is not a slice then 1 will always be
 // returned.
-func (e *LengthExpr) Evaluate(engine *Engine, input interface{}, args []interface{}) (interface{}, error) {
+func (e *LengthExpr) Evaluate(engine *Engine, input interface{}, args []*Statement) (interface{}, error) {
 	in := reflect.ValueOf(input)
 
 	if in.Kind() == reflect.Slice {

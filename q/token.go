@@ -3,31 +3,44 @@ package q
 import (
 	"fmt"
 	"regexp"
-	"unicode"
 )
 
 type TokenKind string
 
 const (
-	TokenEOF          = TokenKind("EOF")
-	TokenAccessor     = TokenKind("accessor")
+	// Special
+	TokenEOF = TokenKind("EOF")
+
+	// Ignored
+	TokenWhitespace = TokenKind("whitespace")
+
+	// Words
+	TokenAccessor = TokenKind("accessor")
+	TokenWord     = TokenKind("word")
+	TokenNumber   = TokenKind("number")
+	TokenString   = TokenKind("string")
+
+	// Operators
 	TokenPipe         = TokenKind("|")
-	TokenWord         = TokenKind("word")
 	TokenSemiColon    = TokenKind(";")
 	TokenQuestionMark = TokenKind("?")
 	TokenOpenBracket  = TokenKind("(")
 	TokenCloseBracket = TokenKind(")")
-	TokenNumber       = TokenKind("number")
 	TokenOpenCurly    = TokenKind("{")
 	TokenCloseCurly   = TokenKind("}")
 	TokenColon        = TokenKind(":")
 	TokenComma        = TokenKind(",")
+	TokenEqual        = TokenKind("=")
+	TokenNot          = TokenKind("!")
+	TokenGreaterThan  = TokenKind(">")
+	TokenLessThan     = TokenKind("<")
 )
 
 var TokenRegexp = []struct {
 	re   *regexp.Regexp
 	kind TokenKind
 }{
+	{regexp.MustCompile(`^\s+$`), TokenWhitespace},
 	{regexp.MustCompile(`^\|$`), TokenPipe},
 	{regexp.MustCompile(`^;$`), TokenSemiColon},
 	{regexp.MustCompile(`^\?$`), TokenQuestionMark},
@@ -37,6 +50,11 @@ var TokenRegexp = []struct {
 	{regexp.MustCompile(`^\}$`), TokenCloseCurly},
 	{regexp.MustCompile(`^:$`), TokenColon},
 	{regexp.MustCompile(`^,$`), TokenComma},
+	{regexp.MustCompile(`^!$`), TokenNot},
+	{regexp.MustCompile(`^=$`), TokenEqual},
+	{regexp.MustCompile(`^>$`), TokenGreaterThan},
+	{regexp.MustCompile(`^<$`), TokenLessThan},
+	{regexp.MustCompile(`^".*"$`), TokenString},
 	{regexp.MustCompile(`^\.[a-zA-Z0-9_]*$`), TokenAccessor},
 	{regexp.MustCompile(`^[a-zA-Z_][a-zA-Z0-9_]*$`), TokenWord},
 	{regexp.MustCompile(`^[0-9]+$`), TokenNumber},
@@ -59,11 +77,6 @@ func (t *Tokenizer) TokenizeString(s string) *Tokens {
 
 Begin:
 	for i := 0; i < len(s); i++ {
-		// Ignore whitespace.
-		if unicode.IsSpace(rune(s[i])) {
-			continue
-		}
-
 		buf = append(buf, s[i])
 
 		// Try to match a token. At this point it may be possible to match
@@ -77,11 +90,15 @@ Begin:
 					buf = append(buf, s[i+1])
 				}
 
-				token := Token{
-					Kind:  test.kind,
-					Value: string(buf),
+				if test.kind != TokenWhitespace {
+					token := Token{
+						Kind:  test.kind,
+						Value: string(buf),
+					}
+
+					tokens = append(tokens, token)
 				}
-				tokens = append(tokens, token)
+
 				buf = nil
 				continue Begin
 			}

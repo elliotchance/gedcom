@@ -91,6 +91,7 @@ func TestEngine_Start(t *testing.T) {
 			"First",
 			"Last",
 			"Length",
+			"Only",
 		}, nil)
 	}
 
@@ -110,6 +111,7 @@ func TestEngine_Start(t *testing.T) {
 			"Last",
 			"Length",
 			"Names",
+			"Only",
 		}, nil)
 	}
 
@@ -128,6 +130,7 @@ func TestEngine_Start(t *testing.T) {
 			"First",
 			"Last",
 			"Length",
+			"Only",
 		}, nil)
 	}
 

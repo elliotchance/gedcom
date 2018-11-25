@@ -8,4 +8,5 @@ var Functions = map[string]Expression{
 	"First":  &FirstExpr{},
 	"Last":   &LastExpr{},
 	"Length": &LengthExpr{},
+	"Only":   &OnlyExpr{},
 }

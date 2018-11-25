@@ -3,6 +3,7 @@ package q
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 )
 
 // FirstExpr is a function. See Evaluate.
@@ -17,7 +18,7 @@ type FirstExpr struct{}
 //
 // There must be exactly one argument and it must be 0 or greater. If the number
 // is greater than the length of the slice all elements are returned.
-func (e *FirstExpr) Evaluate(engine *Engine, input interface{}, args []interface{}) (interface{}, error) {
+func (e *FirstExpr) Evaluate(engine *Engine, input interface{}, args []*Statement) (interface{}, error) {
 	in := reflect.ValueOf(input)
 
 	if len(args) != 1 {
@@ -39,7 +40,16 @@ func (e *FirstExpr) Evaluate(engine *Engine, input interface{}, args []interface
 		return nil, nil
 	}
 
-	max := args[0].(int)
+	result, err := args[0].Evaluate(engine, input)
+	if err != nil {
+		return nil, err
+	}
+
+	max, err := strconv.Atoi(fmt.Sprintf("%v", result))
+	if err != nil {
+		return nil, err
+	}
+
 	if len := in.Len(); max >= len {
 		max = len
 	}

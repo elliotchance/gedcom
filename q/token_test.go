@@ -48,6 +48,16 @@ func TestTokenizer_TokenizeString(t *testing.T) {
 		{q.TokenWord, "Foo"},
 		{q.TokenQuestionMark, "?"},
 	}})
+
+	for _, operator := range q.Operators {
+		expectedTokens := []q.Token{}
+		for _, token := range operator.Tokens {
+			expectedTokens = append(expectedTokens, q.Token{token, string(token)})
+		}
+
+		TokenizeString(tz, operator.Name).
+			Returns(&q.Tokens{Tokens: expectedTokens})
+	}
 }
 
 func TestTokens_Consume(t *testing.T) {

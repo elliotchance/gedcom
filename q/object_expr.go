@@ -7,7 +7,7 @@ type ObjectExpr struct {
 	Data map[string]*Statement
 }
 
-func (e *ObjectExpr) Evaluate(engine *Engine, input interface{}, args []interface{}) (interface{}, error) {
+func (e *ObjectExpr) Evaluate(engine *Engine, input interface{}, args []*Statement) (interface{}, error) {
 	in := reflect.ValueOf(input)
 
 	// If it is a slice we need to Evaluate each one.

@@ -2,7 +2,6 @@ package q
 
 import (
 	"errors"
-	"github.com/elliotchance/gedcom"
 )
 
 // Parser converts the query string into an Engine that can be evaluated.
@@ -160,27 +159,79 @@ func (p *Parser) consumeExpressions() (expressions []Expression, err error) {
 	return
 }
 
-//   Expression := Accessor | Word | QuestionMark
+//   Expression := Accessor | Word | QuestionMark | BinaryExpression
 func (p *Parser) consumeExpression() (expression Expression, err error) {
 	defer p.tokens.Rollback(p.tokens.Position, &err)
 
+	if expression, err = p.consumeConstant(); err == nil {
+		goto end
+	}
+
 	if expression, err = p.consumeAccessor(); err == nil {
-		return expression, nil
+		goto end
 	}
 
 	if expression, err = p.consumeVariableOrFunction(); err == nil {
-		return expression, nil
+		goto end
 	}
 
 	if expression, err = p.consumeQuestionMark(); err == nil {
-		return expression, nil
+		goto end
 	}
 
 	if expression, err = p.consumeObject(); err == nil {
-		return expression, nil
+		goto end
 	}
 
 	return nil, errors.New("expected expression")
+
+end:
+	if op, err := p.consumeOperator(); err == nil {
+		if right, err := p.consumeExpression(); err == nil {
+			return &BinaryExpr{
+				Left:     expression,
+				Operator: op,
+				Right:    right,
+			}, nil
+		}
+	}
+
+	return expression, nil
+}
+
+//   Constant := number | string
+func (p *Parser) consumeConstant() (_ *ConstantExpr, err error) {
+	defer p.tokens.Rollback(p.tokens.Position, &err)
+
+	t, err := p.tokens.Consume(TokenNumber)
+	if err == nil {
+		return &ConstantExpr{Value: t[0].Value}, err
+	}
+
+	t, err = p.tokens.Consume(TokenString)
+	if err == nil {
+		// Trim off "".
+		return &ConstantExpr{Value: t[0].Value[1 : len(t[0].Value)-1]}, err
+	}
+
+	return nil, errors.New("no constant found")
+}
+
+//   Operator := "=" | "!=" | ">" | "<" | ">=" | "<="
+func (p *Parser) consumeOperator() (_ string, err error) {
+	defer p.tokens.Rollback(p.tokens.Position, &err)
+
+	for _, operator := range Operators {
+		originalPosition := p.tokens.Position
+		_, err := p.tokens.Consume(operator.Tokens...)
+		if err == nil {
+			return operator.Name, nil
+		} else {
+			p.tokens.Position = originalPosition
+		}
+	}
+
+	return "", errors.New("operator expected")
 }
 
 //   Accessor := accessor
@@ -208,11 +259,8 @@ func (p *Parser) consumeVariableOrFunction() (expr Expression, err error) {
 		return nil, err
 	}
 
-	args := []interface{}{}
-	if t2, err := p.tokens.Consume(TokenOpenBracket, TokenNumber, TokenCloseBracket); err == nil {
-		// An error here is not possible because number only consumes digits.
-		args = []interface{}{gedcom.Atoi(t2[1].Value)}
-	}
+	// Ignore error because function args are optional.
+	args, _ := p.consumeFunctionArgs()
 
 	// Function
 	if v, ok := Functions[t[0].Value]; ok {
@@ -221,6 +269,28 @@ func (p *Parser) consumeVariableOrFunction() (expr Expression, err error) {
 
 	// Variable
 	return &VariableExpr{Name: t[0].Value}, nil
+}
+
+//   FunctionArgs := "(" Statement ")"
+func (p *Parser) consumeFunctionArgs() (args []*Statement, err error) {
+	defer p.tokens.Rollback(p.tokens.Position, &err)
+
+	_, err = p.tokens.Consume(TokenOpenBracket)
+	if err != nil {
+		return nil, err
+	}
+
+	statement, err := p.consumeStatement()
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = p.tokens.Consume(TokenCloseBracket)
+	if err != nil {
+		return nil, err
+	}
+
+	return []*Statement{statement}, nil
 }
 
 //   QuestionMark := "?"
