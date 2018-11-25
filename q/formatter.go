@@ -27,7 +27,7 @@ func (f *JSONFormatter) Write(result interface{}) error {
 		return err
 	}
 
-	_, err = f.Writer.Write(data)
+	_, err = f.Writer.Write(append(data, '\n'))
 
 	return err
 }
@@ -42,7 +42,7 @@ func (f *PrettyJSONFormatter) Write(result interface{}) error {
 		return err
 	}
 
-	_, err = f.Writer.Write(data)
+	_, err = f.Writer.Write(append(data, '\n'))
 
 	return err
 }

@@ -2,7 +2,9 @@ package q
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
+	"strconv"
 )
 
 // LastExpr is a function. See Evaluate.
@@ -17,7 +19,7 @@ type LastExpr struct{}
 //
 // There must be exactly one argument and it must be 0 or greater. If the number
 // is greater than the length of the slice all elements are returned.
-func (e *LastExpr) Evaluate(engine *Engine, input interface{}, args []interface{}) (interface{}, error) {
+func (e *LastExpr) Evaluate(engine *Engine, input interface{}, args []*Statement) (interface{}, error) {
 	in := reflect.ValueOf(input)
 
 	if len(args) != 1 {
@@ -39,12 +41,22 @@ func (e *LastExpr) Evaluate(engine *Engine, input interface{}, args []interface{
 		return nil, nil
 	}
 
-	if args[0].(int) == 0 {
+	result, err := args[0].Evaluate(engine, input)
+	if err != nil {
+		return nil, err
+	}
+
+	x, err := strconv.Atoi(fmt.Sprintf("%v", result))
+	if err != nil {
+		return nil, err
+	}
+
+	if x == 0 {
 		return in.Slice(0, 0).Interface(), nil
 	}
 
 	l := in.Len()
-	start := l - args[0].(int)
+	start := l - x
 
 	if start < 0 {
 		start = 0

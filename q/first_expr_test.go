@@ -13,33 +13,39 @@ func TestFirstExpr_Evaluate(t *testing.T) {
 
 	err := errors.New("function First() must take a single argument")
 
-	Evaluate(&q.FirstExpr{}, engine, nil, []interface{}{0}).Returns(nil, nil)
-	Evaluate(&q.FirstExpr{}, engine, nil, []interface{}{1}).Returns(nil, nil)
-	Evaluate(&q.FirstExpr{}, engine, nil, []interface{}{5}).Returns(nil, nil)
-	Evaluate(&q.FirstExpr{}, engine, nil, []interface{}{}).Returns(nil, err)
+	argNil := []*q.Statement{}
+	arg0 := []*q.Statement{{Expressions: []q.Expression{&q.ConstantExpr{Value: "0"}}}}
+	arg1 := []*q.Statement{{Expressions: []q.Expression{&q.ConstantExpr{Value: "1"}}}}
+	arg2 := []*q.Statement{{Expressions: []q.Expression{&q.ConstantExpr{Value: "2"}}}}
+	arg5 := []*q.Statement{{Expressions: []q.Expression{&q.ConstantExpr{Value: "5"}}}}
 
-	Evaluate(&q.FirstExpr{}, engine, ([]int)(nil), []interface{}{0}).Returns(nil, nil)
-	Evaluate(&q.FirstExpr{}, engine, ([]string)(nil), []interface{}{1}).Returns(nil, nil)
-	Evaluate(&q.FirstExpr{}, engine, ([]MyStruct)(nil), []interface{}{5}).Returns(nil, nil)
-	Evaluate(&q.FirstExpr{}, engine, ([]string)(nil), []interface{}{}).Returns(nil, err)
+	Evaluate(&q.FirstExpr{}, engine, nil, arg0).Returns(nil, nil)
+	Evaluate(&q.FirstExpr{}, engine, nil, arg1).Returns(nil, nil)
+	Evaluate(&q.FirstExpr{}, engine, nil, arg5).Returns(nil, nil)
+	Evaluate(&q.FirstExpr{}, engine, nil, argNil).Returns(nil, err)
 
-	Evaluate(&q.FirstExpr{}, engine, []int{1, 2, 3}, []interface{}{0}).
+	Evaluate(&q.FirstExpr{}, engine, ([]int)(nil), arg0).Returns(nil, nil)
+	Evaluate(&q.FirstExpr{}, engine, ([]string)(nil), arg1).Returns(nil, nil)
+	Evaluate(&q.FirstExpr{}, engine, ([]MyStruct)(nil), arg5).Returns(nil, nil)
+	Evaluate(&q.FirstExpr{}, engine, ([]string)(nil), argNil).Returns(nil, err)
+
+	Evaluate(&q.FirstExpr{}, engine, []int{1, 2, 3}, arg0).
 		Returns([]int{}, nil)
-	Evaluate(&q.FirstExpr{}, engine, []int{1, 2, 3}, []interface{}{1}).
+	Evaluate(&q.FirstExpr{}, engine, []int{1, 2, 3}, arg1).
 		Returns([]int{1}, nil)
-	Evaluate(&q.FirstExpr{}, engine, []int{1, 2, 3}, []interface{}{2}).
+	Evaluate(&q.FirstExpr{}, engine, []int{1, 2, 3}, arg2).
 		Returns([]int{1, 2}, nil)
-	Evaluate(&q.FirstExpr{}, engine, []int{1, 2, 3}, []interface{}{5}).
+	Evaluate(&q.FirstExpr{}, engine, []int{1, 2, 3}, arg5).
 		Returns([]int{1, 2, 3}, nil)
-	Evaluate(&q.FirstExpr{}, engine, []int{1, 2, 3}, []interface{}{}).
+	Evaluate(&q.FirstExpr{}, engine, []int{1, 2, 3}, argNil).
 		Returns(nil, err)
 
-	Evaluate(&q.LengthExpr{}, engine, "foo bar", []interface{}{0}).
+	Evaluate(&q.LengthExpr{}, engine, "foo bar", arg0).
 		Returns([]string{}, nil)
-	Evaluate(&q.LengthExpr{}, engine, "foo bar", []interface{}{1}).
+	Evaluate(&q.LengthExpr{}, engine, "foo bar", arg1).
 		Returns([]string{"foo bar"}, nil)
-	Evaluate(&q.LengthExpr{}, engine, "foo bar", []interface{}{5}).
+	Evaluate(&q.LengthExpr{}, engine, "foo bar", arg5).
 		Returns([]string{"foo bar"}, nil)
-	Evaluate(&q.LengthExpr{}, engine, "foo bar", []interface{}{}).
+	Evaluate(&q.LengthExpr{}, engine, "foo bar", argNil).
 		Returns(nil, err)
 }

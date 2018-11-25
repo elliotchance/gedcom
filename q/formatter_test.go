@@ -19,8 +19,8 @@ var formatterTests = []struct {
 }{
 	{
 		result:       nil,
-		asJSON:       []byte("null"),
-		asPrettyJSON: []byte("null"),
+		asJSON:       []byte("null\n"),
+		asPrettyJSON: []byte("null\n"),
 		asCSV:        []byte(nil),
 		csvHeader:    nil,
 		csvError:     errors.New("not a slice"),
@@ -30,7 +30,8 @@ var formatterTests = []struct {
 			gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
 			gedcom.NewNameNode(nil, "Dina /Wyche/", "", nil),
 		},
-		asJSON: []byte(`[{"Tag":"NAME","Value":"Elliot /Chance/"},{"Tag":"NAME","Value":"Dina /Wyche/"}]`),
+		asJSON: []byte(`[{"Tag":"NAME","Value":"Elliot /Chance/"},{"Tag":"NAME","Value":"Dina /Wyche/"}]
+`),
 		asPrettyJSON: []byte(`[
   {
     "Tag": "NAME",
@@ -40,7 +41,8 @@ var formatterTests = []struct {
     "Tag": "NAME",
     "Value": "Dina /Wyche/"
   }
-]`),
+]
+`),
 		asCSV: []byte(`Tag,Value
 NAME,Elliot /Chance/
 NAME,Dina /Wyche/
@@ -53,7 +55,8 @@ NAME,Dina /Wyche/
 			{"foo": "bar,", "baz": 123},
 			{"foo": 4.56, "baz": `q"ux`},
 		},
-		asJSON: []byte(`[{"baz":123,"foo":"bar,"},{"baz":"q\"ux","foo":4.56}]`),
+		asJSON: []byte(`[{"baz":123,"foo":"bar,"},{"baz":"q\"ux","foo":4.56}]
+`),
 		asPrettyJSON: []byte(`[
   {
     "baz": 123,
@@ -63,7 +66,8 @@ NAME,Dina /Wyche/
     "baz": "q\"ux",
     "foo": 4.56
   }
-]`),
+]
+`),
 		asCSV: []byte(`baz,foo
 123,"bar,"
 "q""ux",4.56
