@@ -153,3 +153,15 @@ func (node *SimpleNode) ObjectMap() map[string]interface{} {
 
 	return m
 }
+
+// ShallowCopy returns a new node that has the same properties as the input node
+// without any children.
+//
+// If the input node is nil then nil is also returned.
+func (node *SimpleNode) ShallowCopy() Node {
+	if IsNil(node) {
+		return nil
+	}
+
+	return NewNode(node.Document(), node.Tag(), node.Value(), node.Pointer())
+}
