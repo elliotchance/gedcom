@@ -1,6 +1,10 @@
 package gedcom
 
-import "encoding/json"
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+)
 
 // SimpleNode is used as the default node type when there is no more appropriate
 // or specific type to use.
@@ -164,4 +168,52 @@ func (node *SimpleNode) ShallowCopy() Node {
 	}
 
 	return NewNode(node.Document(), node.Tag(), node.Value(), node.Pointer())
+}
+
+// GEDCOMString is the recursive version of GEDCOMLine. It will render a node
+// and all of its children (if any) as a multi-line GEDCOM string.
+//
+// GEDCOMString will not work with a nil value. You can use the package
+// GEDCOMString function to gracefully handle nils.
+//
+// The indent will only be included if it is at least 0. If you want to use
+// GEDCOMString to compare the string values of nodes or exclude the indent you
+// should use the NoIndent constant.
+func (node *SimpleNode) GEDCOMString(indent int) string {
+	document := NewDocumentWithNodes([]Node{node})
+
+	return document.GEDCOMString(indent)
+}
+
+// GEDCOMLine converts a node into its single line GEDCOM value. It is used
+// several places including the actual Encoder.
+//
+// GEDCOMLine, as the name would suggest, does not handle children. You can use
+// GEDCOMString if you need the child nodes as well.
+//
+// GEDCOMLine will not work with a nil value. You can use the package GEDCOMLine
+// function to gracefully handle nils.
+//
+// The indent will only be included if it is at least 0. If you want to use
+// GEDCOMLine to compare the string values of nodes or exclude the indent you
+// should use the NoIndent constant.
+func (node *SimpleNode) GEDCOMLine(indent int) string {
+	buf := bytes.NewBufferString("")
+
+	if indent >= 0 {
+		buf.WriteString(fmt.Sprintf("%d ", indent))
+	}
+
+	if p := node.Pointer(); p != "" {
+		buf.WriteString(fmt.Sprintf("@%s@ ", p))
+	}
+
+	buf.WriteString(node.Tag().Tag())
+
+	if v := node.Value(); v != "" {
+		buf.WriteByte(' ')
+		buf.WriteString(v)
+	}
+
+	return buf.String()
 }

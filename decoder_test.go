@@ -241,6 +241,15 @@ func TestDocument_String(t *testing.T) {
 	}
 }
 
+func TestDocument_GEDCOMString(t *testing.T) {
+	for expected, actual := range tests {
+		t.Run("", func(t *testing.T) {
+			newGed := actual.GEDCOMString(0)
+			assert.Equal(t, trimSpaces(expected), trimSpaces(newGed), expected)
+		})
+	}
+}
+
 func TestNewNode(t *testing.T) {
 	const p = "pointer"
 	const v = "value"
@@ -276,4 +285,14 @@ func TestNewNode(t *testing.T) {
 			assert.Equal(t, test.expected, gedcom.NewNode(nil, test.tag, v, p))
 		})
 	}
+
+	t.Run("ImplementsGEDCOMStringer", func(t *testing.T) {
+		node := gedcom.NewDateNode(nil, "", "", nil)
+		assert.Implements(t, (*gedcom.GEDCOMStringer)(nil), node)
+	})
+
+	t.Run("ImplementsGEDCOMLiner", func(t *testing.T) {
+		node := gedcom.NewDateNode(nil, "", "", nil)
+		assert.Implements(t, (*gedcom.GEDCOMLiner)(nil), node)
+	})
 }

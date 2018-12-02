@@ -162,7 +162,13 @@ func TestNewDocumentFromString(t *testing.T) {
 func TestNewDocument(t *testing.T) {
 	doc := gedcom.NewDocument()
 
-	assert.Len(t, doc.Nodes(), 0)
+	t.Run("StartsWithZeroNodes", func(t *testing.T) {
+		assert.Len(t, doc.Nodes(), 0)
+	})
+
+	t.Run("ImplementsGEDCOMStringer", func(t *testing.T) {
+		assert.Implements(t, (*gedcom.GEDCOMStringer)(nil), doc)
+	})
 }
 
 func TestDocument_AddNode(t *testing.T) {
