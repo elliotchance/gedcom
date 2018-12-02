@@ -555,10 +555,6 @@ func (node *IndividualNode) Similarity(other *IndividualNode, options *Similarit
 // It is done this way as to not skew the results if any particular parent is
 // unknown or the child is connected to a different spouse.
 //
-// doc1 and doc2 are used as the Documents for the current and other node
-// respectively. If the two IndividualNodes come from the same Document you must
-// specify the same Document for both values.
-//
 // The options.MaxYears allows the error margin on dates to be adjusted. See
 // DefaultMaxYearsForSimilarity for more information.
 //

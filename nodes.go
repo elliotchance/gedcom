@@ -5,6 +5,12 @@ import (
 	"sync"
 )
 
+// Noder allows an instance to have child nodes.
+type Noder interface {
+	// Nodes returns any child nodes.
+	Nodes() []Node
+}
+
 // nodeCache is used by NodesWithTag. Even though the lookup of child tags are
 // fairly inexpensive it happens a lot and its common for the same paths to be
 // looked up many time. Especially when doing larger task like comparing GEDCOM
@@ -117,4 +123,15 @@ func CastNodes(nodes []Node, t interface{}) interface{} {
 
 func castNodesWithTag(node Node, tag Tag, t interface{}) interface{} {
 	return CastNodes(NodesWithTag(node, tag), t)
+}
+
+// Nodes is the safer alternative to using Nodes() directly on the instance.
+//
+// If n is nil then nil will also be returned.
+func Nodes(n Noder) []Node {
+	if IsNil(n) {
+		return nil
+	}
+
+	return n.Nodes()
 }

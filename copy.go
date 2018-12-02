@@ -1,3 +1,15 @@
+// Copying
+//
+// All nodes (since they implement the Node interface) also implement the
+// NodeCopier interface which provides the ShallowCopy() function.
+//
+// A shallow copy returns a new node with all the same properties, but no
+// children.
+//
+// On the other hand there is a DeepCopy function which returns a new node with
+// all recursive children also copied. This ensures that the new returned node
+// can be manipulated without affecting the original node or any of its
+// children.
 package gedcom
 
 type NodeCopier interface {

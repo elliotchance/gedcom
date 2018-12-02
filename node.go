@@ -1,3 +1,14 @@
+// Equality
+//
+// Node.Equals performs a shallow comparison between two nodes. The
+// implementation is different depending on the types of nodes being compared.
+// You should see the specific documentation for the Node.
+//
+// Equality is not to be confused with the Is function seen on some of the
+// nodes, such as Date.Is. The Is function is used to compare exact raw values
+// in nodes.
+//
+// DeepEqual tests if left and right are recursively equal.
 package gedcom
 
 import (
@@ -8,6 +19,7 @@ import (
 type Node interface {
 	fmt.Stringer
 	NodeCopier
+	Noder
 
 	// The node itself.
 	Tag() Tag
@@ -17,9 +29,6 @@ type Node interface {
 	// Document.
 	Document() *Document
 	SetDocument(document *Document)
-
-	// Nodes returns any child nodes.
-	Nodes() []Node
 
 	// AddNode will add a child to this node.
 	//
@@ -64,7 +73,7 @@ type Node interface {
 // As a side node IsNil cannot be part of the Node interface because more
 // specific node types (such as DateNode) use SimpleNode as an instance variable
 // and that would cause a nil pointer panic.
-func IsNil(node Node) bool {
+func IsNil(node interface{}) bool {
 	if node == nil {
 		return true
 	}
