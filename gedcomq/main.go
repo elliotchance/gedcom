@@ -56,6 +56,8 @@ func output(result interface{}) {
 		formatter = &q.PrettyJSONFormatter{os.Stdout}
 	case "csv":
 		formatter = &q.CSVFormatter{os.Stdout}
+	case "gedcom":
+		formatter = &q.GEDCOMFormatter{os.Stdout}
 	default:
 		log.Panicf("unsupported format: %s", optionFormat)
 	}
@@ -67,8 +69,8 @@ func parseCLIFlags() {
 	flag.StringVar(&optionGedcomFile, "gedcom", "", util.CLIDescription(`
 		Path to the GEDCOM file (required).`))
 	flag.StringVar(&optionFormat, "format", "json", util.CLIDescription(`
-		Output format, can be one of the following: "json", "pretty-json" or
-		"csv".`))
+		Output format, can be one of the following: "json", "pretty-json",
+		"gedcom" or "csv".`))
 
 	flag.Parse()
 }
