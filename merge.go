@@ -140,7 +140,7 @@ func MergeNodeSlices(left, right []Node, mergeFn MergeFunction) []Node {
 	// already been replaced with a merged one. This gives us the same
 	// guarantees for the items on the right.
 
-	alreadyMerged := []Node{}
+	alreadyMerged := NodeSet{}
 
 	for len(right) > 0 {
 		found := false
@@ -149,10 +149,8 @@ func MergeNodeSlices(left, right []Node, mergeFn MergeFunction) []Node {
 			node := newSlice[i]
 
 			// Skip any nodes that were previously marked as merged.
-			for _, n := range alreadyMerged {
-				if n == node {
-					goto next
-				}
+			if alreadyMerged.Has(node) {
+				goto next
 			}
 
 			for j, node2 := range right {
@@ -171,7 +169,7 @@ func MergeNodeSlices(left, right []Node, mergeFn MergeFunction) []Node {
 					// Record the fact that this new node has been merged so it
 					// will be avoided next time, even in the case of a merge
 					// candidate.
-					alreadyMerged = append(alreadyMerged, merged)
+					alreadyMerged.Add(merged)
 
 					found = true
 					break
@@ -184,7 +182,7 @@ func MergeNodeSlices(left, right []Node, mergeFn MergeFunction) []Node {
 			// See the comment above about why we need to mark the new right
 			// node as already merged.
 			newNode := DeepCopy(right[0])
-			alreadyMerged = append(alreadyMerged, newNode)
+			alreadyMerged.Add(newNode)
 
 			newSlice = append(newSlice, newNode)
 			right = right[1:]
