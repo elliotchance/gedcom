@@ -264,7 +264,9 @@ func TestCompareNodes(t *testing.T) {
 	for _, test := range tests {
 		t.Run("", func(t *testing.T) {
 			actual := gedcom.CompareNodes(test.left, test.right)
-			assert.Equal(t, test.expected.String(), actual.String())
+			expected := test.expected.String()
+			actualString := actual.String()
+			assert.Equal(t, expected, actualString)
 		})
 	}
 }
@@ -481,7 +483,7 @@ func TestNodeDiff_LeftNode(t *testing.T) {
 1 BURI
 2 DATE 1943
 1 NAME John /Smith/
-`, gedcom.NodeGedcom(d.LeftNode()))
+`, gedcom.GEDCOMString(d.LeftNode(), 0))
 }
 
 func TestNodeDiff_RightNode(t *testing.T) {
@@ -509,5 +511,5 @@ func TestNodeDiff_RightNode(t *testing.T) {
 1 BURI
 2 DATE Abt. 1943
 1 NAME John /Smith/
-`, gedcom.NodeGedcom(d.RightNode()))
+`, gedcom.GEDCOMString(d.RightNode(), 0))
 }

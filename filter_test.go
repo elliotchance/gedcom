@@ -123,7 +123,8 @@ func TestFilter(t *testing.T) {
 		},
 	} {
 		t.Run("", func(t *testing.T) {
-			result := gedcom.NodeGedcom(gedcom.Filter(root, test.filter))
+			node := gedcom.Filter(root, test.filter)
+			result := gedcom.GEDCOMString(node, 0)
 			assert.Equal(t, test.expected, result)
 		})
 	}
@@ -163,7 +164,7 @@ func TestWhitelistTagFilter(t *testing.T) {
 	} {
 		t.Run("", func(t *testing.T) {
 			filter := gedcom.WhitelistTagFilter(test.tags...)
-			result := gedcom.NodeGedcom(gedcom.Filter(root, filter))
+			result := gedcom.GEDCOMString(gedcom.Filter(root, filter), 0)
 			assert.Equal(t, test.expected, result)
 		})
 	}
@@ -206,7 +207,7 @@ func TestBlacklistTagFilter(t *testing.T) {
 	} {
 		t.Run("", func(t *testing.T) {
 			filter := gedcom.BlacklistTagFilter(test.tags...)
-			result := gedcom.NodeGedcom(gedcom.Filter(root, filter))
+			result := gedcom.GEDCOMString(gedcom.Filter(root, filter), 0)
 			assert.Equal(t, test.expected, result)
 		})
 	}
@@ -234,7 +235,7 @@ func TestOfficialTagFilter(t *testing.T) {
 	} {
 		t.Run("", func(t *testing.T) {
 			filter := gedcom.OfficialTagFilter()
-			result := gedcom.NodeGedcom(gedcom.Filter(root, filter))
+			result := gedcom.GEDCOMString(gedcom.Filter(root, filter), 0)
 			assert.Equal(t, test.expected, result)
 		})
 	}
@@ -293,7 +294,7 @@ func TestSimpleNameFilter(t *testing.T) {
 	} {
 		t.Run("", func(t *testing.T) {
 			filter := gedcom.SimpleNameFilter()
-			result := gedcom.NodeGedcom(gedcom.Filter(test.root, filter))
+			result := gedcom.GEDCOMString(gedcom.Filter(test.root, filter), 0)
 			assert.Equal(t, test.expected, result)
 		})
 	}

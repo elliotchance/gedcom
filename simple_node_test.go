@@ -103,3 +103,34 @@ func TestSimpleNode_String(t *testing.T) {
 
 	String((*gedcom.SimpleNode)(nil)).Returns("")
 }
+
+func TestSimpleNode_GEDCOMString(t *testing.T) {
+	root := gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+		gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
+		gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+			gedcom.NewDateNode(nil, "6 MAY 1989", "", nil),
+		}),
+	})
+
+	assert.Equal(t, root.GEDCOMString(0), `0 @P1@ INDI
+1 NAME Elliot /Chance/
+1 BIRT
+2 DATE 6 MAY 1989
+`)
+}
+
+func TestSimpleNode_GEDCOMLine(t *testing.T) {
+	GEDCOMLine := tf.NamedFunction(t, "SimpleNode_GEDCOMLine",
+		(*gedcom.SimpleNode).GEDCOMLine)
+
+	GEDCOMLine(gedcom.NewBirthNode(nil, "foo", "72", nil).SimpleNode, 0).
+		Returns("0 @72@ BIRT foo")
+
+	GEDCOMLine(gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "bar", "baz", nil).(*gedcom.DeathNode).SimpleNode, 3).Returns("3 @baz@ DEAT bar")
+
+	GEDCOMLine(gedcom.NewDateNode(nil, "3 SEP 1945", "", nil).SimpleNode, 2).
+		Returns("2 DATE 3 SEP 1945")
+
+	GEDCOMLine(gedcom.NewBirthNode(nil, "foo", "72", nil).SimpleNode, -1).
+		Returns("@72@ BIRT foo")
+}

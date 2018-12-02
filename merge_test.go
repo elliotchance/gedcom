@@ -98,7 +98,8 @@ func TestMergeNodes(t *testing.T) {
 
 			if test.error == "" {
 				assert.NoError(t, err)
-				assert.Equal(t, gedcom.NodeGedcom(test.expected), gedcom.NodeGedcom(actual))
+				assert.Equal(t, gedcom.GEDCOMString(test.expected, 0),
+					gedcom.GEDCOMString(actual, 0))
 			} else {
 				assert.EqualError(t, err, test.error)
 				assert.Nil(t, actual)

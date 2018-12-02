@@ -58,13 +58,26 @@ type Document struct {
 }
 
 // String will render the entire GEDCOM document.
+//
+// It is a shorthand for the more proper GEDCOMString() function.
 func (doc *Document) String() string {
+	return doc.GEDCOMString(0)
+}
+
+// GEDCOMString will render the entire GEDCOM document.
+func (doc *Document) GEDCOMString(indent int) string {
+	if doc == nil {
+		return ""
+	}
+
 	buf := bytes.NewBufferString("")
 
 	encoder := NewEncoder(buf, doc)
+	encoder.startIndent = indent
+
 	err := encoder.Encode()
 	if err != nil {
-		panic(err)
+		return ""
 	}
 
 	return buf.String()

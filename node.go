@@ -20,6 +20,8 @@ type Node interface {
 	fmt.Stringer
 	NodeCopier
 	Noder
+	GEDCOMLiner
+	GEDCOMStringer
 
 	// The node itself.
 	Tag() Tag
@@ -79,28 +81,6 @@ func IsNil(node interface{}) bool {
 	}
 
 	return reflect.ValueOf(node).IsNil()
-}
-
-// NodeGedcom is the recursive version of GedcomLine. It will render a node and
-// all of its children (if any) as a multi-line GEDCOM data.
-//
-// Unlike rendering a Document, the root node will have a depth of 0 (like the
-// root nodes of a Document) which means that you will almost certainly not be
-// able to use the returned GEDCOM data as a whole of part of GEDCOM file.
-//
-// That being said, you should be able to parse this data as a Document and
-// retain the same nested node structure originally encoded.
-//
-// This function is mostly useful for debugging and displaying complex nodes in
-// the understandable and consistent form of GEDCOM data.
-func NodeGedcom(node Node) string {
-	if IsNil(node) {
-		return ""
-	}
-
-	document := NewDocumentWithNodes([]Node{node})
-
-	return document.String()
 }
 
 // DeepEqual tests if left and right are recursively equal.

@@ -186,8 +186,8 @@ func (nd *NodeDiff) traverse(n Node, isLeft bool) {
 }
 
 func (nd *NodeDiff) lrLine(indent int) string {
-	left := GedcomLine(indent, nd.Left)
-	right := GedcomLine(indent, nd.Right)
+	left := GEDCOMLine(nd.Left, indent)
+	right := GEDCOMLine(nd.Right, indent)
 
 	if IsNil(nd.Left) {
 		return fmt.Sprintf(" R %s", right)

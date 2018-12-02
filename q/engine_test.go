@@ -81,6 +81,7 @@ func TestEngine_Start(t *testing.T) {
 		Start(engine, document).Returns([]string{
 			".AddNode",
 			".Families",
+			".GEDCOMString",
 			".Individuals",
 			".NodeByPointer",
 			".Nodes",
@@ -100,6 +101,7 @@ func TestEngine_Start(t *testing.T) {
 		Start(engine, document).Returns([]string{
 			".AddNode",
 			".Families",
+			".GEDCOMString",
 			".Individuals",
 			".NodeByPointer",
 			".Nodes",
@@ -120,6 +122,7 @@ func TestEngine_Start(t *testing.T) {
 		Start(engine, document).Returns([]string{
 			".AddNode",
 			".Families",
+			".GEDCOMString",
 			".Individuals",
 			".NodeByPointer",
 			".Nodes",
