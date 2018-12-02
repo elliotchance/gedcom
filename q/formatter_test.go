@@ -10,12 +10,22 @@ import (
 )
 
 var formatterTests = []struct {
-	result       interface{}
-	asJSON       []byte
+	result interface{}
+
+	// json
+	asJSON []byte
+
+	// pretty-json
 	asPrettyJSON []byte
-	asCSV        []byte
-	csvHeader    []string
-	csvError     error
+
+	// csv
+	asCSV     []byte
+	csvHeader []string
+	csvError  error
+
+	// gedcom
+	asGEDCOM    []byte
+	gedcomError error
 }{
 	{
 		result:       nil,
@@ -49,6 +59,32 @@ NAME,Dina /Wyche/
 `),
 		csvHeader: []string{"Tag", "Value"},
 		csvError:  nil,
+		asGEDCOM:  []byte("0 NAME Elliot /Chance/\n0 NAME Dina /Wyche/\n"),
+	},
+	{
+		result: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+			gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
+			gedcom.NewNameNode(nil, "Dina /Wyche/", "", nil),
+		}),
+		asJSON: []byte(`{"Nodes":[{"Tag":"NAME","Value":"Elliot /Chance/"},{"Tag":"NAME","Value":"Dina /Wyche/"}],"Pointer":"P1","Tag":"INDI"}
+`),
+		asPrettyJSON: []byte(`{
+  "Nodes": [
+    {
+      "Tag": "NAME",
+      "Value": "Elliot /Chance/"
+    },
+    {
+      "Tag": "NAME",
+      "Value": "Dina /Wyche/"
+    }
+  ],
+  "Pointer": "P1",
+  "Tag": "INDI"
+}
+`),
+		csvError: errors.New("not a slice"),
+		asGEDCOM: []byte("0 @P1@ INDI\n1 NAME Elliot /Chance/\n1 NAME Dina /Wyche/\n"),
 	},
 	{
 		result: []map[string]interface{}{
@@ -72,8 +108,9 @@ NAME,Dina /Wyche/
 123,"bar,"
 "q""ux",4.56
 `),
-		csvHeader: []string{"baz", "foo"},
-		csvError:  nil,
+		csvHeader:   []string{"baz", "foo"},
+		csvError:    nil,
+		gedcomError: errors.New("map[string]interface {} does not implement gedcom.GEDCOMStringer"),
 	},
 }
 
@@ -132,6 +169,24 @@ func TestCSVFormatter_Header(t *testing.T) {
 			}
 
 			assert.Equal(t, test.csvHeader, header)
+		})
+	}
+}
+
+func TestGEDCOMFormatter_Write(t *testing.T) {
+	for _, test := range formatterTests {
+		t.Run("", func(t *testing.T) {
+			buffer := bytes.Buffer{}
+			formatter := &q.GEDCOMFormatter{&buffer}
+			err := formatter.Write(test.result)
+
+			if test.gedcomError == nil {
+				assert.NoError(t, err)
+			} else {
+				assert.Error(t, err, test.gedcomError)
+			}
+
+			assert.Equal(t, test.asGEDCOM, buffer.Bytes())
 		})
 	}
 }
