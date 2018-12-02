@@ -1,6 +1,8 @@
 package util
 
-import "strings"
+import (
+	"strings"
+)
 
 func CLIDescription(s string) (r string) {
 	lines := strings.Split(s, "\n")
@@ -39,4 +41,25 @@ func WrapToMargin(s string, width int) (r string) {
 	r = r[:len(r)-1]
 
 	return
+}
+
+// CLIStringSlice is used to accept multiple values from a CLI argument like:
+//
+//   -foo value1 -foo value2
+//
+// Usage:
+//
+//   var foos CLIStringSlice
+//   flag.Var(&foos, "foo", "Some description for this param.")
+//
+type CLIStringSlice []string
+
+func (i *CLIStringSlice) String() string {
+	return strings.Join(*i, ";")
+}
+
+func (i *CLIStringSlice) Set(value string) error {
+	*i = append(*i, value)
+
+	return nil
 }

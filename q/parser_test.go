@@ -183,4 +183,54 @@ func TestParser_ParseString(t *testing.T) {
 			},
 		},
 	}, nil)
+
+	ParseString(parser, `Combine(.Individuals, .Individuals)`).Returns(&q.Engine{
+		Statements: []*q.Statement{
+			{
+				Expressions: []q.Expression{
+					&q.CallExpr{
+						Function: &q.CombineExpr{},
+						Args: []*q.Statement{
+							{
+								Expressions: []q.Expression{
+									&q.AccessorExpr{Query: ".Individuals"},
+								},
+							},
+							{
+								Expressions: []q.Expression{
+									&q.AccessorExpr{Query: ".Individuals"},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}, nil)
+
+	ParseString(parser, `Combine(.Individuals | .Names, .Individuals | .Names)`).Returns(&q.Engine{
+		Statements: []*q.Statement{
+			{
+				Expressions: []q.Expression{
+					&q.CallExpr{
+						Function: &q.CombineExpr{},
+						Args: []*q.Statement{
+							{
+								Expressions: []q.Expression{
+									&q.AccessorExpr{Query: ".Individuals"},
+									&q.AccessorExpr{Query: ".Names"},
+								},
+							},
+							{
+								Expressions: []q.Expression{
+									&q.AccessorExpr{Query: ".Individuals"},
+									&q.AccessorExpr{Query: ".Names"},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}, nil)
 }
