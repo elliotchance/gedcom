@@ -74,6 +74,10 @@
 // Some functions are provided as part of the gedcomq language that exist
 // outside of the gedcom package:
 //
+//   Combine(Slices...)
+//
+// Combine will combine multiple slices of the same type into a single slice.
+//
 //   First(number)
 //
 // First returns up to the number of elements in a slice.

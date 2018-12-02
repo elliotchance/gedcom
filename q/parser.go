@@ -19,7 +19,7 @@ func (p *Parser) ParseString(q string) (engine *Engine, err error) {
 	engine = &Engine{}
 	p.tokens = NewTokenizer().TokenizeString(q)
 
-	engine.Statements, err = p.consumeStatements()
+	engine.Statements, err = p.consumeStatements(TokenSemiColon)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (p *Parser) ParseString(q string) (engine *Engine, err error) {
 
 //   Statements := Statement NextStatement
 //               | Statement
-func (p *Parser) consumeStatements() (statements []*Statement, err error) {
+func (p *Parser) consumeStatements(separator TokenKind) (statements []*Statement, err error) {
 	defer p.tokens.Rollback(p.tokens.Position, &err)
 
 	statement, err := p.consumeStatement()
@@ -44,7 +44,7 @@ func (p *Parser) consumeStatements() (statements []*Statement, err error) {
 	statements = append(statements, statement)
 
 	for {
-		statement, err := p.consumeNextStatement()
+		statement, err := p.consumeNextStatement(separator)
 		if err != nil {
 			break
 		}
@@ -55,11 +55,11 @@ func (p *Parser) consumeStatements() (statements []*Statement, err error) {
 	return
 }
 
-//   NextStatement := ";" Statement
-func (p *Parser) consumeNextStatement() (_ *Statement, err error) {
+//   NextStatement := separator Statement
+func (p *Parser) consumeNextStatement(separator TokenKind) (_ *Statement, err error) {
 	defer p.tokens.Rollback(p.tokens.Position, &err)
 
-	_, err = p.tokens.Consume(TokenSemiColon)
+	_, err = p.tokens.Consume(separator)
 	if err != nil {
 		return nil, err
 	}
@@ -271,7 +271,7 @@ func (p *Parser) consumeVariableOrFunction() (expr Expression, err error) {
 	return &VariableExpr{Name: t[0].Value}, nil
 }
 
-//   FunctionArgs := "(" Statement ")"
+//   FunctionArgs := "(" Statements ")"
 func (p *Parser) consumeFunctionArgs() (args []*Statement, err error) {
 	defer p.tokens.Rollback(p.tokens.Position, &err)
 
@@ -280,7 +280,7 @@ func (p *Parser) consumeFunctionArgs() (args []*Statement, err error) {
 		return nil, err
 	}
 
-	statement, err := p.consumeStatement()
+	statements, err := p.consumeStatements(TokenComma)
 	if err != nil {
 		return nil, err
 	}
@@ -290,7 +290,7 @@ func (p *Parser) consumeFunctionArgs() (args []*Statement, err error) {
 		return nil, err
 	}
 
-	return []*Statement{statement}, nil
+	return statements, nil
 }
 
 //   QuestionMark := "?"

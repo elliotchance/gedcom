@@ -20,8 +20,8 @@ import (
 )
 
 var (
-	optionGedcomFile string
-	optionFormat     string
+	optionGedcomFiles util.CLIStringSlice
+	optionFormat      string
 )
 
 func main() {
@@ -33,12 +33,22 @@ func main() {
 		log.Fatal(err)
 	}
 
-	doc, err := gedcom.NewDocumentFromGEDCOMFile(optionGedcomFile)
-	if err != nil {
-		log.Fatal(err)
+	docs := []*gedcom.Document{}
+
+	for _, gedcomFile := range optionGedcomFiles {
+		doc, err := gedcom.NewDocumentFromGEDCOMFile(gedcomFile)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		docs = append(docs, doc)
 	}
 
-	result, err := engine.Evaluate(doc)
+	if len(docs) == 0 {
+		log.Fatal("you must provide at least one gedcom file")
+	}
+
+	result, err := engine.Evaluate(docs)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -66,8 +76,10 @@ func output(result interface{}) {
 }
 
 func parseCLIFlags() {
-	flag.StringVar(&optionGedcomFile, "gedcom", "", util.CLIDescription(`
-		Path to the GEDCOM file (required).`))
+	flag.Var(&optionGedcomFiles, "gedcom", util.CLIDescription(`
+		Path to the GEDCOM file. You may specify more than one document by
+		providing -gedcom with an argument multiple times. You must provide at
+		least one document.`))
 	flag.StringVar(&optionFormat, "format", "json", util.CLIDescription(`
 		Output format, can be one of the following: "json", "pretty-json",
 		"gedcom" or "csv".`))

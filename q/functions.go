@@ -4,9 +4,10 @@ package q
 //
 // See "Functions" in the package documentation for usage and examples.
 var Functions = map[string]Expression{
-	"?":      &QuestionMarkExpr{},
-	"First":  &FirstExpr{},
-	"Last":   &LastExpr{},
-	"Length": &LengthExpr{},
-	"Only":   &OnlyExpr{},
+	"?":       &QuestionMarkExpr{},
+	"Combine": &CombineExpr{},
+	"First":   &FirstExpr{},
+	"Last":    &LastExpr{},
+	"Length":  &LengthExpr{},
+	"Only":    &OnlyExpr{},
 }

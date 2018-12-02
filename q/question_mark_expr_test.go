@@ -6,11 +6,33 @@ import (
 	"testing"
 )
 
+var documentChoices = []string{
+	".AddNode",
+	".Families",
+	".GEDCOMString",
+	".Individuals",
+	".NodeByPointer",
+	".Nodes",
+	".Places",
+	".Sources",
+	".String",
+}
+
+var functionAndVariableChoices = []string{
+	"?",
+	"Combine",
+	"First",
+	"Last",
+	"Length",
+	"Only",
+}
+
 func TestQuestionMarkExpr_Evaluate(t *testing.T) {
-	Evaluate := tf.NamedFunction(t, "QuestionMarkExpr_Evaluate", (*q.QuestionMarkExpr).Evaluate)
+	Evaluate := tf.NamedFunction(t, "QuestionMarkExpr_Evaluate",
+		(*q.QuestionMarkExpr).Evaluate)
 	engine := &q.Engine{}
 
-	expected := []string{".Baz", ".Foo", "?", "First", "Last", "Length", "Only"}
+	expected := append([]string{".Baz", ".Foo"}, functionAndVariableChoices...)
 
 	Evaluate(&q.QuestionMarkExpr{}, engine, &MyStruct{}, nil).
 		Returns(expected, nil)
