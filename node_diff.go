@@ -1,3 +1,30 @@
+// Comparing and Diffing
+//
+// CompareNodes recursively compares two nodes. For example:
+//
+//   0 INDI @P3@           |  0 INDI @P4@
+//   1 NAME John /Smith/   |  1 NAME J. /Smith/
+//   1 BIRT                |  1 BIRT
+//   2 DATE 3 SEP 1943     |  2 DATE Abt. Sep 1943
+//   1 DEAT                |  1 BIRT
+//   2 PLAC England        |  2 DATE 3 SEP 1943
+//   1 BIRT                |  1 DEAT
+//   2 DATE Abt. Oct 1943  |  2 DATE Aft. 2001
+//                         |  2 PLAC Surry, England
+//
+// Produces a *NodeDiff than can be rendered with the String method:
+//
+//   LR 0 INDI @P3@
+//   L  1 NAME John /Smith/
+//   LR 1 BIRT
+//   L  2 DATE Abt. Oct 1943
+//   LR 2 DATE 3 SEP 1943
+//    R 2 DATE Abt. Sep 1943
+//   LR 1 DEAT
+//   L  2 PLAC England
+//    R 2 DATE Aft. 2001
+//    R 2 PLAC Surry, England
+//    R 1 NAME J. /Smith/
 package gedcom
 
 import (

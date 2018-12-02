@@ -1,3 +1,29 @@
+// Dates
+//
+// Dates in GEDCOM files can be very complex as they can cater for many
+// scenarios:
+//
+// 1. Incomplete, like "Dec 1943"
+//
+// 2. Anchored, like "Aft. 3 Sep 2003" or "Before 1923"
+//
+// 3. Ranges, like "Bet. 4 Apr 1823 and 8 Apr 1823"
+//
+// This package provides a very rich API for dealing with all kind of dates in a
+// meaningful and sensible way. Some notable features include:
+//
+// 1. All dates, even though that specify an specific day have a minimum and
+// maximum value that are their true bounds. This is especially important for
+// larger date ranges like the whole month of "Jun 1945".
+//
+// 2. Upper and lower bounds of dates can be converted to the native Go
+// time.Time object.
+//
+// 3. There is a Years function that provides a convenient way to normalise a
+// date range into a number for easier distance and comparison measurements.
+//
+// 4. Algorithms for calculating the similarity of dates on a configurable
+// parabola.
 package gedcom
 
 import (

@@ -1,3 +1,27 @@
+// Individual Names
+//
+// A NameNode represents all the parts that make up a single name. An individual
+// may have more than one name, each one would be represented by a NameNode.
+//
+// Apart from functions to extract name parts there is also Format which works
+// similar to `fmt.Printf` where placeholders represent different components of
+// the name:
+//
+//   %% "%"
+//   %f GivenName
+//   %l Surname
+//   %m SurnamePrefix
+//   %p Prefix
+//   %s Suffix
+//   %t Title
+//
+// Each of the letters may be in upper case to convert the name part to upper
+// case also. Whitespace before, after and between name components will be
+// removed:
+//
+//   name.Format("%l, %f")     // "Smith, Bob"
+//   name.Format("%f %L")      // "Bob SMITH"
+//   name.Format("%f %m (%l)") // "Bob (Smith)"
 package gedcom
 
 import (

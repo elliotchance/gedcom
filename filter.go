@@ -1,3 +1,23 @@
+// Filtering and Tree Walking
+//
+// The Filter function recursively removes or manipulates nodes with a
+// FilterFunction:
+//
+//   newNodes := gedcom.Filter(node, func (node gedcom.Node) (gedcom.Node, bool) {
+//     if node.Tag().Is(gedcom.TagIndividual) {
+//       // false means it will not traverse children, since an
+//       // individual can never be inside of another individual.
+//       return node, false
+//     }
+//
+//     return nil, false
+//   })
+//
+//   // Remove all tags that are not official.
+//   newNodes := gedcom.Filter(node, gedcom.OfficialTagFilter())
+//
+// Some examples of Filter functions include BlacklistTagFilter,
+// OfficialTagFilter, SimpleNameFilter and WhitelistTagFilter.
 package gedcom
 
 // FilterFunction is used with the Filter function.

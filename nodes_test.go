@@ -267,3 +267,25 @@ func TestCastNodes(t *testing.T) {
 	CastNodes([]gedcom.Node{name}, (*gedcom.NameNode)(nil)).
 		Returns([]*gedcom.NameNode{name})
 }
+
+func TestNodes(t *testing.T) {
+	Nodes := tf.Function(t, gedcom.Nodes)
+
+	Nodes(nil).Returns(nil)
+
+	Nodes(gedcom.NewBirthNode(nil, "", "", nil)).Returns(nil)
+
+	Nodes(gedcom.NewBirthNode(nil, "", "", []gedcom.Node{})).Returns([]gedcom.Node{})
+
+	Nodes(gedcom.NewDocument()).Returns(nil)
+
+	Nodes(gedcom.NewDocumentWithNodes(nil)).Returns(nil)
+
+	Nodes(gedcom.NewDocumentWithNodes([]gedcom.Node{})).Returns([]gedcom.Node{})
+
+	Nodes(gedcom.NewDocumentWithNodes([]gedcom.Node{
+		gedcom.NewBirthNode(nil, "", "", nil),
+	})).Returns([]gedcom.Node{
+		gedcom.NewBirthNode(nil, "", "", nil),
+	})
+}

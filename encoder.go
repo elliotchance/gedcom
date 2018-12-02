@@ -1,3 +1,17 @@
+// Encoding a Document
+//
+//   buf := bytes.NewBufferString("")
+//
+//   encoder := NewEncoder(buf, doc)
+//   err := encoder.Encode()
+//   if err != nil {
+//     panic(err)
+//   }
+//
+// If you need the GEDCOM data as a string you can simply using fmt.Stringer:
+//
+//   data := document.String()
+//
 package gedcom
 
 import (

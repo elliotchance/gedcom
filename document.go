@@ -1,3 +1,14 @@
+// Traversing a Document
+//
+// On top of the raw document is a powerful API that takes care of the complex
+// traversing of the Document. Here is a simple example:
+//
+//   for _, individual := range document.Individuals() {
+//     fmt.Println(individual.Name().String())
+//   }
+//
+// Some of the nodes in a GEDCOM file have been replaced with more function rich
+// types, such as names, dates, families and more.
 package gedcom
 
 import (

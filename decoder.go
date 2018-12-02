@@ -1,3 +1,22 @@
+// Decoding a Document
+//
+// Decoding a GEDCOM stream:
+//
+//   ged := "0 HEAD\n1 CHAR UTF-8"
+//
+//   decoder := gedcom.NewDecoder(strings.NewReader(ged))
+//   document, err := decoder.Decode()
+//   if err != nil {
+//     panic(err)
+//   }
+//
+// If you are reading from a file you can use NewDocumentFromGEDCOMFile:
+//
+//   document, err := gedcom.NewDocumentFromGEDCOMFile("family.ged")
+//   if err != nil {
+//       panic(err)
+//   }
+//
 package gedcom
 
 import (
