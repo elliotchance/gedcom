@@ -567,8 +567,52 @@ func (node *IndividualNode) SurroundingSimilarity(other *IndividualNode, options
 	// Individual, spouse and children similarity only needs to be calculated
 	// once. The parents similarity will be calculated from the matrix below.
 	individualSimilarity := node.Similarity(other, options)
+
+	// Comparing individuals is extremely expensive because of the matrix of
+	// comparisons and the individual comparisons themselves need to utilise a
+	// lot of surrounding data.
+	//
+	// The individual similarity weight is by far the greatest, at 80% by
+	// default. This means we can in most cases avoid calculating the parents,
+	// spouses and children if we know that even in the perfect case the result
+	// similarity would not be above the minimum threshold.
+	//
+	// Consider the formula:
+	//
+	//   (IndividualSimilarity * IndividualWeight) +
+	//   (ParentsSimilarity * ParentsWeight) +
+	//   (SpousesSimilarity * SpousesWeight) +
+	//   (ChildrenSimilarity * ChildrenWeight) > MinimumWeight
+	//
+	// Isolating the individual similarity (which is the only thing we have
+	// calculated):
+	//
+	//   (IndividualSimilarity * IndividualWeight) >
+	//   MinimumWeight -
+	//   (ParentsSimilarity * ParentsWeight) -
+	//   (SpousesSimilarity * SpousesWeight) -
+	//   (ChildrenSimilarity * ChildrenWeight)
+	//
+	// Now, lets assume that we have perfect matches (1.0) for all other
+	// elements:
+	//
+	//   (IndividualSimilarity * IndividualWeight) >
+	//   MinimumWeight - ParentsWeight - SpousesWeight - ChildrenWeight
+	//
+	// If that statement is not true, there is no need to proceed because the
+	// individuals will never be considered a match given the MinimumWeight.
+	//
+	// A higher MinimumWeight means that less work will actually need to be done
+	// because there will be less possible candidates.
+	if (individualSimilarity * options.IndividualWeight) <=
+		options.MinimumWeightedSimilarity-options.ParentsWeight-options.SpousesWeight-options.ChildrenWeight {
+
+		return NewSurroundingSimilarity(0, 0, 0, 0)
+	}
+
 	spousesSimilarity := node.Spouses().Similarity(other.Spouses(), options)
 	childrenSimilarity := node.Children().Similarity(other.Children(), options)
+
 	s = NewSurroundingSimilarity(
 		0.0, // Parents. Filled in later.
 		individualSimilarity,
