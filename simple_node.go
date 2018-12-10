@@ -217,3 +217,10 @@ func (node *SimpleNode) GEDCOMLine(indent int) string {
 
 	return buf.String()
 }
+
+// SetNodes replaces all of the child nodes.
+//
+// You can use SetNodes(nil) to remove all child nodes.
+func (node *SimpleNode) SetNodes(nodes []Node) {
+	node.children = nodes
+}

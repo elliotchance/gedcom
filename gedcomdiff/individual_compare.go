@@ -8,11 +8,11 @@ import (
 )
 
 type individualCompare struct {
-	comparison  gedcom.IndividualComparison
+	comparison  *gedcom.IndividualComparison
 	filterFlags *util.FilterFlags
 }
 
-func newIndividualCompare(comparison gedcom.IndividualComparison, filterFlags *util.FilterFlags) *individualCompare {
+func newIndividualCompare(comparison *gedcom.IndividualComparison, filterFlags *util.FilterFlags) *individualCompare {
 	return &individualCompare{
 		comparison:  comparison,
 		filterFlags: filterFlags,
@@ -83,10 +83,7 @@ func (c *individualCompare) String() string {
 		}
 	}
 
-	options := gedcom.NewSimilarityOptions()
-	compareOptions := &gedcom.IndividualNodesCompareOptions{
-		SimilarityOptions: options,
-	}
+	compareOptions := gedcom.NewIndividualNodesCompareOptions()
 	for _, parents := range leftParents.Compare(rightParents, compareOptions) {
 		var row *diffRow
 		name := "Parent"

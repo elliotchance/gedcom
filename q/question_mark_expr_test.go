@@ -14,6 +14,7 @@ var documentChoices = []string{
 	".NodeByPointer",
 	".Nodes",
 	".Places",
+	".SetNodes",
 	".Sources",
 	".String",
 }

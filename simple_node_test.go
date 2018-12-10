@@ -134,3 +134,18 @@ func TestSimpleNode_GEDCOMLine(t *testing.T) {
 	GEDCOMLine(gedcom.NewBirthNode(nil, "foo", "72", nil).SimpleNode, -1).
 		Returns("@72@ BIRT foo")
 }
+
+func TestSimpleNode_SetNodes(t *testing.T) {
+	birth := gedcom.NewBirthNode(nil, "foo", "72", nil)
+	assert.Nil(t, birth.Nodes())
+
+	birth.SetNodes([]gedcom.Node{
+		gedcom.NewDateNode(nil, "3 SEP 1945", "", nil),
+	})
+	assert.Equal(t, []gedcom.Node{
+		gedcom.NewDateNode(nil, "3 SEP 1945", "", nil),
+	}, birth.Nodes())
+
+	birth.SetNodes(nil)
+	assert.Nil(t, birth.Nodes())
+}

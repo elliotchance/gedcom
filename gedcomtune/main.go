@@ -253,9 +253,10 @@ func startCPUProfiler() {
 }
 
 func run(gedcom1, gedcom2 *gedcom.Document, idealScore int, options *gedcom.SimilarityOptions) {
-	comparisons := gedcom1.Individuals().Compare(gedcom2.Individuals(), &gedcom.IndividualNodesCompareOptions{
-		SimilarityOptions: options,
-	})
+	compareOptions := gedcom.NewIndividualNodesCompareOptions()
+	compareOptions.SimilarityOptions = options
+
+	comparisons := gedcom1.Individuals().Compare(gedcom2.Individuals(), compareOptions)
 
 	score := 0.0
 	for _, comparison := range comparisons {

@@ -71,18 +71,17 @@ func main() {
 	out, err := os.Create(optionOutputFile)
 	check(err)
 
-	var comparisons []gedcom.IndividualComparison
+	var comparisons gedcom.IndividualComparisons
 
 	similarityOptions := gedcom.NewSimilarityOptions()
 	similarityOptions.MinimumWeightedSimilarity = optionMinimumWeightedSimilarity
 	similarityOptions.MinimumSimilarity = optionMinimumSimilarity
 
-	compareOptions := &gedcom.IndividualNodesCompareOptions{
-		SimilarityOptions: similarityOptions,
-		Notifier:          make(chan gedcom.CompareProgress),
-		NotifierStep:      100,
-		Jobs:              optionJobs,
-	}
+	compareOptions := gedcom.NewIndividualNodesCompareOptions()
+	compareOptions.SimilarityOptions = similarityOptions
+	compareOptions.Notifier = make(chan gedcom.CompareProgress)
+	compareOptions.NotifierStep = 100
+	compareOptions.Jobs = optionJobs
 
 	if optionProgress {
 		go func() {
