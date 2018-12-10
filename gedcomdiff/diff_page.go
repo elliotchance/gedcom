@@ -10,17 +10,17 @@ import (
 
 type diffPage struct {
 	comparisons       gedcom.IndividualComparisons
-	options           *gedcom.SimilarityOptions
 	filterFlags       *util.FilterFlags
 	googleAnalyticsID string
+	optionSort        string
 }
 
-func newDiffPage(comparisons gedcom.IndividualComparisons, options *gedcom.SimilarityOptions, filterFlags *util.FilterFlags, googleAnalyticsID string) *diffPage {
+func newDiffPage(comparisons gedcom.IndividualComparisons, filterFlags *util.FilterFlags, googleAnalyticsID string, optionSort string) *diffPage {
 	return &diffPage{
 		comparisons:       comparisons,
-		options:           options,
 		filterFlags:       filterFlags,
 		googleAnalyticsID: googleAnalyticsID,
+		optionSort:        optionSort,
 	}
 }
 
@@ -40,8 +40,8 @@ func (c *diffPage) sortByWrittenName(i, j int) bool {
 }
 
 func (c *diffPage) sortByHighestSimilarity(i, j int) bool {
-	a := c.comparisons[i].Similarity.WeightedSimilarity()
-	b := c.comparisons[j].Similarity.WeightedSimilarity()
+	a := c.weightedSimilarity(c.comparisons[i])
+	b := c.weightedSimilarity(c.comparisons[j])
 
 	if a != b {
 		// Greater than because we want the highest matches up the top.
@@ -58,10 +58,20 @@ func (c *diffPage) sortComparisons() {
 		optionSortHighestSimilarity: (*diffPage).sortByHighestSimilarity,
 	}
 
-	sortFn := sortFns[optionSort]
+	sortFn := sortFns[c.optionSort]
 	sort.SliceStable(c.comparisons, func(i, j int) bool {
 		return sortFn(c, i, j)
 	})
+}
+
+func (c *diffPage) weightedSimilarity(comparison *gedcom.IndividualComparison) float64 {
+	s := comparison.Similarity
+
+	if s != nil {
+		return s.WeightedSimilarity()
+	}
+
+	return 0.0
 }
 
 func (c *diffPage) String() string {
@@ -74,7 +84,7 @@ func (c *diffPage) String() string {
 			continue
 		}
 
-		weightedSimilarity := comparison.Similarity.WeightedSimilarity()
+		weightedSimilarity := c.weightedSimilarity(comparison)
 
 		leftClass := ""
 		rightClass := ""

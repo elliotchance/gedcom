@@ -105,8 +105,7 @@ func main() {
 		comparisons = leftIndividuals.Compare(rightIndividuals, compareOptions)
 	}
 
-	page := newDiffPage(comparisons, compareOptions.SimilarityOptions,
-		filterFlags, optionGoogleAnalyticsID)
+	page := newDiffPage(comparisons, filterFlags, optionGoogleAnalyticsID, optionSort)
 
 	pageString := page.String()
 	out.Write([]byte(pageString))
