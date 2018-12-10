@@ -1039,27 +1039,38 @@ func TestIndividualNode_Similarity(t *testing.T) {
 
 func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 	// ghost:ignore
-	var tests = []struct {
+	var tests = map[string]struct {
 		doc      *gedcom.Document
 		expected *gedcom.SurroundingSimilarity
 	}{
-		// Empty individuals.
-		{
+		"EmptyIndividuals": {
 			doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
 				individual("P1", "", "", ""),
 				individual("P2", "", "", ""),
 			}),
+
+			// These are the real values, but they are not calculated because
+			// the weighted similarity would be less than the minimum threshold.
+			//
+			//   expected: &gedcom.SurroundingSimilarity{
+			//     ParentsSimilarity:    0.5,
+			//     IndividualSimilarity: 0.25,
+			//     SpousesSimilarity:    1.0,
+			//     ChildrenSimilarity:   1.0,
+			//     Options:              gedcom.NewSimilarityOptions(),
+			//   },
+			//
 			expected: &gedcom.SurroundingSimilarity{
-				ParentsSimilarity:    0.5,
-				IndividualSimilarity: 0.25,
-				SpousesSimilarity:    1.0,
-				ChildrenSimilarity:   1.0,
+				ParentsSimilarity:    0.0,
+				IndividualSimilarity: 0.0,
+				SpousesSimilarity:    0.0,
+				ChildrenSimilarity:   0.0,
 				Options:              gedcom.NewSimilarityOptions(),
 			},
 		},
 
 		// Only matching individuals, but they are exact matches.
-		{
+		"Matching1": {
 			doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
 				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
 				individual("P2", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
@@ -1074,7 +1085,7 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 		},
 
 		// Only matching individuals, but they are similar matches.
-		{
+		"Matching2": {
 			doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
 				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
 				individual("P2", "Elliot /Chance/", "Abt. 1843", "Abt. 1910"),
@@ -1089,22 +1100,34 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 		},
 
 		// Only matching individuals and they are way off.
-		{
+		"Matching3": {
 			doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
 				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
 				individual("P2", "Joe /Bloggs/", "1945", "2000"),
 			}),
+
+			// These are the real values, but they are not calculated because
+			// the weighted similarity would be less than the minimum threshold.
+			//
+			//   expected: &gedcom.SurroundingSimilarity{
+			//     ParentsSimilarity:    0.5,
+			//     IndividualSimilarity: 0.20128205128205132,
+			//     SpousesSimilarity:    1.0,
+			//     ChildrenSimilarity:   1.0,
+			//     Options:              gedcom.NewSimilarityOptions(),
+			//   },
+			//
 			expected: &gedcom.SurroundingSimilarity{
-				ParentsSimilarity:    0.5,
-				IndividualSimilarity: 0.20128205128205132,
-				SpousesSimilarity:    1.0,
-				ChildrenSimilarity:   1.0,
+				ParentsSimilarity:    0.0,
+				IndividualSimilarity: 0.0,
+				SpousesSimilarity:    0.0,
+				ChildrenSimilarity:   0.0,
 				Options:              gedcom.NewSimilarityOptions(),
 			},
 		},
 
 		// Parents and individuals match exactly.
-		{
+		"Parents1": {
 			doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
 				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
 				individual("P2", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
@@ -1125,7 +1148,7 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 		},
 
 		// Parents and individuals are very similar.
-		{
+		"Parents2": {
 			doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
 				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
 				individual("P2", "Elliot /Chaunce/", "4 Jan 1843", "17 Mar 1907"),
@@ -1146,7 +1169,7 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 		},
 
 		// One parent is missing, otherwise exactly the same.
-		{
+		"Parents3": {
 			doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
 				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
 				individual("P2", "Elliot /Chaunce/", "4 Jan 1843", "17 Mar 1907"),
@@ -1167,7 +1190,7 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 		},
 
 		// Both parents are missing on one side, otherwise exactly the same.
-		{
+		"Parents4": {
 			doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
 				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
 				individual("P2", "Elliot /Chaunce/", "4 Jan 1843", "17 Mar 1907"),
@@ -1188,7 +1211,7 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 		},
 
 		// Parents, individual and spouses match exactly.
-		{
+		"Parents5": {
 			doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
 				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
 				individual("P2", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
@@ -1214,8 +1237,8 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 	}
 
 	options := gedcom.NewSimilarityOptions()
-	for _, test := range tests {
-		t.Run("", func(t *testing.T) {
+	for testName, test := range tests {
+		t.Run(testName, func(t *testing.T) {
 			for _, n := range test.doc.Nodes() {
 				n.SetDocument(test.doc)
 			}

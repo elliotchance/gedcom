@@ -476,7 +476,10 @@ func TestIndividualBySurroundingSimilarityMergeFunction(t *testing.T) {
 			right: gedcom.NewIndividualNode(doc, "", "", []gedcom.Node{
 				gedcom.NewNameNode(doc, "Jane /Doe/", "", nil),
 			}),
-			similarity: 0.6253333333333334,
+
+			// It would be 0.6253333333333334. However, because its below the
+			// minimum threshold it doesn't bother calculating the real value.
+			similarity: 0.0,
 		},
 	} {
 		t.Run(testName, func(t *testing.T) {
