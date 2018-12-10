@@ -1,5 +1,7 @@
 package gedcom
 
+import "fmt"
+
 // SurroundingSimilarity describes different aspects of the similarity of an
 // individual by its immediate relationships; parents, spouses and children.
 type SurroundingSimilarity struct {
@@ -29,6 +31,23 @@ type SurroundingSimilarity struct {
 	// It is done this way as to not skew the results if any particular parent
 	// is unknown or the child is connected to a different spouse.
 	ChildrenSimilarity float64
+
+	// Options affects the weights and other aspects of the normalised
+	// similarity metrics.
+	Options *SimilarityOptions
+}
+
+// NewSurroundingSimilarity creates a surrounding similarity using default
+// similarity options. You can modify or replace the Options after
+// instantiation.
+func NewSurroundingSimilarity(parentsSimilarity, individualSimilarity, spousesSimilarity, childrenSimilarity float64) *SurroundingSimilarity {
+	return &SurroundingSimilarity{
+		ParentsSimilarity:    parentsSimilarity,
+		IndividualSimilarity: individualSimilarity,
+		SpousesSimilarity:    spousesSimilarity,
+		ChildrenSimilarity:   childrenSimilarity,
+		Options:              NewSimilarityOptions(),
+	}
 }
 
 // WeightedSimilarity calculates a single similarity from all of the similarity
@@ -39,11 +58,18 @@ type SurroundingSimilarity struct {
 //   SpousesSimilarity: ~6.7%
 //   ChildrenSimilarity: ~6.7%
 //
-func (s SurroundingSimilarity) WeightedSimilarity(options *SimilarityOptions) float64 {
-	individual := s.IndividualSimilarity * options.IndividualWeight
-	parents := s.ParentsSimilarity * options.ParentsWeight
-	spouses := s.SpousesSimilarity * options.SpousesWeight
-	children := s.ChildrenSimilarity * options.ChildrenWeight
+func (s SurroundingSimilarity) WeightedSimilarity() float64 {
+	individual := s.IndividualSimilarity * s.Options.IndividualWeight
+	parents := s.ParentsSimilarity * s.Options.ParentsWeight
+	spouses := s.SpousesSimilarity * s.Options.SpousesWeight
+	children := s.ChildrenSimilarity * s.Options.ChildrenWeight
 
 	return individual + parents + spouses + children
+}
+
+// String returns the WeightedSimilarity -- a number between 0.0 and 1.0.
+//
+// The WeightedSimilarity is affected by Options.
+func (s SurroundingSimilarity) String() string {
+	return fmt.Sprintf("%f", s.WeightedSimilarity())
 }

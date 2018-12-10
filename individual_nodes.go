@@ -1,7 +1,9 @@
 package gedcom
 
 import (
+	"fmt"
 	"sort"
+	"strings"
 )
 
 // DefaultMinimumSimilarity is a sensible value to provide to the
@@ -214,7 +216,26 @@ type IndividualComparison struct {
 
 	// Similarity will only contain a usable value if Left and Right are not
 	// nil. Otherwise, Similarity may contain any unexpected value.
-	Similarity SurroundingSimilarity
+	Similarity *SurroundingSimilarity
+}
+
+// IndividualComparisons is a slice of IndividualComparison instances.
+type IndividualComparisons []*IndividualComparison
+
+// String returns each comparison string on its own like, like:
+//
+//   John Smith <-> John H Smith (0.833333)
+//   Jane Doe <-> (none) (?)
+//   (none) <-> Joe Bloggs (?)
+//
+func (comparisons IndividualComparisons) String() string {
+	lines := []string{}
+
+	for _, comparison := range comparisons {
+		lines = append(lines, comparison.String())
+	}
+
+	return strings.Join(lines, "\n")
 }
 
 // CompareProgress contains information about the progress of a Comparison.
@@ -224,15 +245,17 @@ type CompareProgress struct {
 
 // IndividualNodesCompareOptions provides more optional attributes for
 // IndividualNodes.Compare.
+//
+// You should use NewIndividualNodesCompareOptions to start with sensible
+// defaults.
 type IndividualNodesCompareOptions struct {
 	// Options controls the weights of the comparisons. See SimilarityOptions
 	// for more information. Any matches below MinimumSimilarity will not be
 	// used.
 	//
-	// Since this can take a long time to run with a lot of individuals there is an
-	// optional notifier channel that can be listened to for progress updates. Or
-	// pass nil to ignore this feature.
-	//
+	// Since this can take a long time to run with a lot of individuals there is
+	// an optional notifier channel that can be listened to for progress
+	// updates. Or pass nil to ignore this feature.
 	SimilarityOptions *SimilarityOptions
 
 	// Notifier will be sent progress updates throughout the comparison if it is
@@ -255,6 +278,15 @@ type IndividualNodesCompareOptions struct {
 	// It is important to note that the parallelism is still bound by
 	// GOMAXPROCS.
 	Jobs int
+}
+
+// NewIndividualNodesCompareOptions creates sensible defaults for
+// IndividualNodesCompareOptions. In the majority of cases you will not need to
+// change any further options.
+func NewIndividualNodesCompareOptions() *IndividualNodesCompareOptions {
+	return &IndividualNodesCompareOptions{
+		SimilarityOptions: NewSimilarityOptions(),
+	}
 }
 
 func (o *IndividualNodesCompareOptions) end() {
@@ -287,15 +319,15 @@ func (o *IndividualNodesCompareOptions) jobs() int {
 // Likewise all Right's will be unique and only belong to the other set.
 //
 // See IndividualNodesCompareOptions for more options.
-func (nodes IndividualNodes) Compare(other IndividualNodes, options *IndividualNodesCompareOptions) []IndividualComparison {
+func (nodes IndividualNodes) Compare(other IndividualNodes, options *IndividualNodesCompareOptions) IndividualComparisons {
 	// Calculate all the similarities of the matrix.
-	similarities := []IndividualComparison{}
+	similarities := IndividualComparisons{}
 
 	// ghost:ignore
 	total := int64(len(nodes)) * int64(len(other))
 
-	jobs := make(chan IndividualComparison, 100)
-	results := make(chan IndividualComparison, 100)
+	jobs := make(chan *IndividualComparison, 100)
+	results := make(chan *IndividualComparison, 100)
 
 	// Start workers.
 	numberOfJobs := options.jobs()
@@ -307,7 +339,7 @@ func (nodes IndividualNodes) Compare(other IndividualNodes, options *IndividualN
 	go func() {
 		for _, a := range nodes {
 			for _, b := range other {
-				jobs <- IndividualComparison{
+				jobs <- &IndividualComparison{
 					Left:  a,
 					Right: b,
 				}
@@ -337,18 +369,17 @@ func (nodes IndividualNodes) Compare(other IndividualNodes, options *IndividualN
 
 	// Sort by similarity.
 	sort.SliceStable(similarities, func(i, j int) bool {
-		similarityOptions := options.SimilarityOptions
-
-		return similarities[i].Similarity.WeightedSimilarity(similarityOptions) >
-			similarities[j].Similarity.WeightedSimilarity(similarityOptions)
+		return similarities[i].Similarity.WeightedSimilarity() >
+			similarities[j].Similarity.WeightedSimilarity()
 	})
 
 	// Find the winners.
 	found := map[*IndividualNode]bool{}
-	winners := []IndividualComparison{}
+	winners := IndividualComparisons{}
 	for _, s := range similarities {
 		// Once we have gone below the acceptable similarity we can bail out.
-		if s.Similarity.WeightedSimilarity(options.SimilarityOptions) < options.SimilarityOptions.MinimumWeightedSimilarity {
+		minWS := options.SimilarityOptions.MinimumWeightedSimilarity
+		if s.Similarity.WeightedSimilarity() < minWS {
 			break
 		}
 
@@ -365,7 +396,7 @@ func (nodes IndividualNodes) Compare(other IndividualNodes, options *IndividualN
 	// All of the remaining need to be added.
 	for _, left := range nodes {
 		if !found[left] {
-			winners = append(winners, IndividualComparison{
+			winners = append(winners, &IndividualComparison{
 				Left: left,
 			})
 		}
@@ -373,7 +404,7 @@ func (nodes IndividualNodes) Compare(other IndividualNodes, options *IndividualN
 
 	for _, right := range other {
 		if !found[right] {
-			winners = append(winners, IndividualComparison{
+			winners = append(winners, &IndividualComparison{
 				Right: right,
 			})
 		}
@@ -384,9 +415,94 @@ func (nodes IndividualNodes) Compare(other IndividualNodes, options *IndividualN
 	return winners
 }
 
-func (nodes IndividualNodes) compareWorker(similarityOptions *SimilarityOptions, jobs <-chan IndividualComparison, results chan<- IndividualComparison) {
+func (nodes IndividualNodes) compareWorker(similarityOptions *SimilarityOptions, jobs <-chan *IndividualComparison, results chan<- *IndividualComparison) {
 	for j := range jobs {
 		j.Similarity = j.Left.SurroundingSimilarity(j.Right, similarityOptions)
 		results <- j
 	}
+}
+
+// Merge uses the expensive but more accurate Compare algorithm to determine the
+// best way to merge two slices of individuals.
+//
+// Merge relies exclusively on the logic of Compare so there's no need to repeat
+// those details here.
+//
+// Any individuals that do not match on either side will be appended to the end.
+func (nodes IndividualNodes) Merge(other IndividualNodes, options *IndividualNodesCompareOptions) (IndividualNodes, error) {
+	comparisons := nodes.Compare(other, options)
+	merged := IndividualNodes{}
+
+	for _, comparison := range comparisons {
+		left := comparison.Left
+		right := comparison.Right
+
+		switch {
+		case left != nil && right != nil:
+			node, err := MergeNodes(left, right)
+			if err != nil {
+				return nil, err
+			}
+
+			merged = append(merged, node.(*IndividualNode))
+
+		case left != nil:
+			merged = append(merged, left)
+
+		case right != nil:
+			merged = append(merged, right)
+		}
+	}
+
+	return merged, nil
+}
+
+// Nodes returns a slice containing the same individuals.
+//
+// Individuals that are manipulated will affect the original individuals.
+func (nodes IndividualNodes) Nodes() (ns []Node) {
+	for _, individual := range nodes {
+		ns = append(ns, individual)
+	}
+
+	return
+}
+
+// GEDCOMString returns the GEDCOM for all individuals. See GEDCOMStringer for
+// more details.
+func (nodes IndividualNodes) GEDCOMString(indent int) string {
+	return NewDocumentWithNodes(nodes.Nodes()).GEDCOMString(0)
+}
+
+func (nodes IndividualNodes) String() string {
+	s := []string{}
+
+	for _, individual := range nodes {
+		s = append(s, individual.String())
+	}
+
+	return strings.Join(s, "\n")
+}
+
+func (c IndividualComparison) stringOrDefault(s fmt.Stringer, def string) string {
+	if IsNil(s) {
+		return def
+	}
+
+	return s.String()
+}
+
+// String returns the comparison in a human-readable format, like one of:
+//
+//   John Smith <-> John H Smith (0.833333)
+//   Jane Doe <-> (none) (?)
+//   (none) <-> Joe Bloggs (?)
+//
+func (c IndividualComparison) String() string {
+	return fmt.Sprintf(
+		"%s <-> %s (%s)",
+		c.stringOrDefault(c.Left, "(none)"),
+		c.stringOrDefault(c.Right, "(none)"),
+		c.stringOrDefault(c.Similarity, "?"),
+	)
 }

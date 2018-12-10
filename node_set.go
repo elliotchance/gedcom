@@ -16,7 +16,7 @@ func (ns NodeSet) Add(node Node) {
 	ns[node] = true
 }
 
-// Has returned true if a node exists in the set.
+// Has returns true if a node exists in the set.
 func (ns NodeSet) Has(node Node) bool {
 	_, ok := ns[node]
 

@@ -184,7 +184,7 @@ func (doc *Document) Sources() []*SourceNode {
 //
 // If the node already exists it will be added again. This will cause problems
 // with duplicate references.
-func (doc *Document) AddNode(node Node) *Document {
+func (doc *Document) AddNode(node Node) {
 	if !IsNil(node) {
 		doc.nodes = append(doc.nodes, node)
 
@@ -195,8 +195,6 @@ func (doc *Document) AddNode(node Node) *Document {
 			doc.pointerCache.Store(pointer, node)
 		}
 	}
-
-	return doc
 }
 
 // Nodes returns the root nodes for the document.
@@ -246,4 +244,36 @@ func NewDocumentWithNodes(nodes []Node) *Document {
 	document.buildPointerCache()
 
 	return document
+}
+
+func (doc *Document) nonIndividuals() []Node {
+	nodes := []Node{}
+
+	for _, node := range doc.Nodes() {
+		if _, ok := node.(*IndividualNode); !ok {
+			nodes = append(nodes, node)
+		}
+	}
+
+	return nodes
+}
+
+func (doc *Document) SetNodes(nodes []Node) {
+	doc.nodes = nodes
+}
+
+func individuals(doc *Document) IndividualNodes {
+	if doc == nil {
+		return nil
+	}
+
+	return doc.Individuals()
+}
+
+func nonIndividuals(doc *Document) []Node {
+	if doc == nil {
+		return nil
+	}
+
+	return doc.nonIndividuals()
 }

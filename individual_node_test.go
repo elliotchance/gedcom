@@ -1041,7 +1041,7 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 	// ghost:ignore
 	var tests = []struct {
 		doc      *gedcom.Document
-		expected gedcom.SurroundingSimilarity
+		expected *gedcom.SurroundingSimilarity
 	}{
 		// Empty individuals.
 		{
@@ -1049,11 +1049,12 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 				individual("P1", "", "", ""),
 				individual("P2", "", "", ""),
 			}),
-			expected: gedcom.SurroundingSimilarity{
+			expected: &gedcom.SurroundingSimilarity{
 				ParentsSimilarity:    0.5,
 				IndividualSimilarity: 0.25,
 				SpousesSimilarity:    1.0,
 				ChildrenSimilarity:   1.0,
+				Options:              gedcom.NewSimilarityOptions(),
 			},
 		},
 
@@ -1063,11 +1064,12 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
 				individual("P2", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
 			}),
-			expected: gedcom.SurroundingSimilarity{
+			expected: &gedcom.SurroundingSimilarity{
 				ParentsSimilarity:    0.5,
 				IndividualSimilarity: 1.0,
 				SpousesSimilarity:    1.0,
 				ChildrenSimilarity:   1.0,
+				Options:              gedcom.NewSimilarityOptions(),
 			},
 		},
 
@@ -1077,11 +1079,12 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
 				individual("P2", "Elliot /Chance/", "Abt. 1843", "Abt. 1910"),
 			}),
-			expected: gedcom.SurroundingSimilarity{
+			expected: &gedcom.SurroundingSimilarity{
 				ParentsSimilarity:    0.5,
 				IndividualSimilarity: 0.7433558199873285,
 				SpousesSimilarity:    1.0,
 				ChildrenSimilarity:   1.0,
+				Options:              gedcom.NewSimilarityOptions(),
 			},
 		},
 
@@ -1091,11 +1094,12 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 				individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907"),
 				individual("P2", "Joe /Bloggs/", "1945", "2000"),
 			}),
-			expected: gedcom.SurroundingSimilarity{
+			expected: &gedcom.SurroundingSimilarity{
 				ParentsSimilarity:    0.5,
 				IndividualSimilarity: 0.20128205128205132,
 				SpousesSimilarity:    1.0,
 				ChildrenSimilarity:   1.0,
+				Options:              gedcom.NewSimilarityOptions(),
 			},
 		},
 
@@ -1111,11 +1115,12 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 				family("F1", "P3", "P4", "P1"),
 				family("F2", "P5", "P6", "P2"),
 			}),
-			expected: gedcom.SurroundingSimilarity{
+			expected: &gedcom.SurroundingSimilarity{
 				ParentsSimilarity:    1.0,
 				IndividualSimilarity: 1.0,
 				SpousesSimilarity:    1.0,
 				ChildrenSimilarity:   1.0,
+				Options:              gedcom.NewSimilarityOptions(),
 			},
 		},
 
@@ -1131,11 +1136,12 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 				family("F1", "P3", "P4", "P1"),
 				family("F2", "P5", "P6", "P2"),
 			}),
-			expected: gedcom.SurroundingSimilarity{
+			expected: &gedcom.SurroundingSimilarity{
 				ParentsSimilarity:    0.9981481481481481,
 				IndividualSimilarity: 0.9950549450549451,
 				SpousesSimilarity:    1.0,
 				ChildrenSimilarity:   1.0,
+				Options:              gedcom.NewSimilarityOptions(),
 			},
 		},
 
@@ -1151,11 +1157,12 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 				family("F1", "P3", "", "P1"),
 				family("F2", "P5", "P6", "P2"),
 			}),
-			expected: gedcom.SurroundingSimilarity{
+			expected: &gedcom.SurroundingSimilarity{
 				ParentsSimilarity:    0.75,
 				IndividualSimilarity: 0.9950549450549451,
 				SpousesSimilarity:    1.0,
 				ChildrenSimilarity:   1.0,
+				Options:              gedcom.NewSimilarityOptions(),
 			},
 		},
 
@@ -1171,11 +1178,12 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 				family("F1", "", "", "P1"),
 				family("F2", "P5", "P6", "P2"),
 			}),
-			expected: gedcom.SurroundingSimilarity{
+			expected: &gedcom.SurroundingSimilarity{
 				ParentsSimilarity:    0.5,
 				IndividualSimilarity: 0.9950549450549451,
 				SpousesSimilarity:    1.0,
 				ChildrenSimilarity:   1.0,
+				Options:              gedcom.NewSimilarityOptions(),
 			},
 		},
 
@@ -1195,11 +1203,12 @@ func TestIndividualNode_SurroundingSimilarity(t *testing.T) {
 				family("F3", "P1", "P7"),
 				family("F4", "P2", "P8"),
 			}),
-			expected: gedcom.SurroundingSimilarity{
+			expected: &gedcom.SurroundingSimilarity{
 				ParentsSimilarity:    1.0,
 				IndividualSimilarity: 1.0,
 				SpousesSimilarity:    1.0,
 				ChildrenSimilarity:   1.0,
+				Options:              gedcom.NewSimilarityOptions(),
 			},
 		},
 	}
@@ -1632,4 +1641,113 @@ func parseAgeYears(s string) (years float64, isEstimate, isKnown bool) {
 	fmt.Sscanf(value, "%f", &years)
 
 	return
+}
+
+func TestIndividualNode_String(t *testing.T) {
+	String := tf.NamedFunction(t, "IndividualNode_String", (*gedcom.IndividualNode).String)
+
+	String(gedcom.NewIndividualNode(nil, "", "", nil)).
+		Returns("(no name)")
+
+	String(gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewNameNode(nil, "", "", nil),
+	})).Returns("(no name)")
+
+	String(gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
+	})).Returns("Elliot Chance")
+
+	String(gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
+		gedcom.NewBirthNode(nil, "", "", nil),
+	})).Returns("Elliot Chance")
+
+	String(gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
+		gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+			gedcom.NewDateNode(nil, "3 Apr 1983", "", nil),
+		}),
+	})).Returns("Elliot Chance (b. 3 Apr 1983)")
+
+	String(gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
+		gedcom.NewDeathNode(nil, "", "", nil),
+	})).Returns("Elliot Chance")
+
+	String(gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
+		gedcom.NewDeathNode(nil, "", "", []gedcom.Node{
+			gedcom.NewDateNode(nil, "19 Nov 2007", "", nil),
+		}),
+	})).Returns("Elliot Chance (d. 19 Nov 2007)")
+
+	String(gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewNameNode(nil, "John /Smith/", "", nil),
+		gedcom.NewDeathNode(nil, "", "", nil),
+		gedcom.NewBirthNode(nil, "", "", nil),
+	})).Returns("John Smith")
+
+	String(gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewNameNode(nil, "John /Smith/", "", nil),
+		gedcom.NewDeathNode(nil, "", "", []gedcom.Node{
+			gedcom.NewDateNode(nil, "19 Nov 2007", "", nil),
+		}),
+		gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+			gedcom.NewDateNode(nil, "7 Aug 1971", "", nil),
+		}),
+	})).Returns("John Smith (b. 7 Aug 1971, d. 19 Nov 2007)")
+
+	String(gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewNameNode(nil, "Jane /Doe/", "", nil),
+		gedcom.NewBaptismNode(nil, "", "", []gedcom.Node{
+			gedcom.NewDateNode(nil, "14 Jun 2007", "", nil),
+		}),
+	})).Returns("Jane Doe (bap. 14 Jun 2007)")
+
+	String(gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewNameNode(nil, "Jane /Doe/", "", nil),
+		gedcom.NewBaptismNode(nil, "", "", []gedcom.Node{
+			gedcom.NewDateNode(nil, "14 Jun 2007", "", nil),
+		}),
+		gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+			gedcom.NewDateNode(nil, "7 Jun 2007", "", nil),
+		}),
+	})).Returns("Jane Doe (b. 7 Jun 2007)")
+
+	String(gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewNameNode(nil, "Jane /Doe/", "", nil),
+		gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+			gedcom.NewDateNode(nil, "7 Jun 2007", "", nil),
+		}),
+		gedcom.NewBaptismNode(nil, "", "", []gedcom.Node{
+			gedcom.NewDateNode(nil, "14 Jun 2007", "", nil),
+		}),
+	})).Returns("Jane Doe (b. 7 Jun 2007)")
+
+	String(gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewNameNode(nil, "Jane /Doe/", "", nil),
+		gedcom.NewBurialNode(nil, "", "", []gedcom.Node{
+			gedcom.NewDateNode(nil, "14 Jun 2007", "", nil),
+		}),
+	})).Returns("Jane Doe (bur. 14 Jun 2007)")
+
+	String(gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewNameNode(nil, "Jane /Doe/", "", nil),
+		gedcom.NewBurialNode(nil, "", "", []gedcom.Node{
+			gedcom.NewDateNode(nil, "14 Jun 2007", "", nil),
+		}),
+		gedcom.NewDeathNode(nil, "", "", []gedcom.Node{
+			gedcom.NewDateNode(nil, "7 Jun 2007", "", nil),
+		}),
+	})).Returns("Jane Doe (d. 7 Jun 2007)")
+
+	String(gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewNameNode(nil, "Jane /Doe/", "", nil),
+		gedcom.NewDeathNode(nil, "", "", []gedcom.Node{
+			gedcom.NewDateNode(nil, "7 Jun 2007", "", nil),
+		}),
+		gedcom.NewBurialNode(nil, "", "", []gedcom.Node{
+			gedcom.NewDateNode(nil, "14 Jun 2007", "", nil),
+		}),
+	})).Returns("Jane Doe (d. 7 Jun 2007)")
 }

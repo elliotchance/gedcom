@@ -25,6 +25,9 @@
 // - IndividualBySurroundingSimilarityMergeFunction creates a MergeFunction that
 // will merge individuals if their surrounding similarity is at least
 // minimumSimilarity.
+//
+// - EqualityMergeFunction is a MergeFunction that will return a merged node if
+// the node are considered equal (with Equals).
 package gedcom
 
 import (
@@ -71,9 +74,9 @@ func MergeNodes(left, right Node) (Node, error) {
 	for _, child := range right.Nodes() {
 		for _, n := range r.Nodes() {
 			if n.Equals(child) {
-				for _, child2 := range child.Nodes() {
-					n.AddNode(child2)
-				}
+				newNodes := MergeNodeSlices(child.Nodes(), n.Nodes(),
+					EqualityMergeFunction)
+				n.SetNodes(newNodes)
 				goto next
 			}
 		}
@@ -117,6 +120,13 @@ func MergeNodes(left, right Node) (Node, error) {
 // same goes for all of the elements in the right slice.
 func MergeNodeSlices(left, right []Node, mergeFn MergeFunction) []Node {
 	newSlice := []Node{}
+
+	// Be careful to duplicate the right slice. I'm not sure why this is
+	// necessary but the unit tests that reuse mergeDocumentsTests will fail if
+	// we do not have this.
+	newRight := make([]Node, len(right))
+	copy(newRight, right)
+	right = newRight
 
 	// We start by adding all of the items on the left.
 	for _, node := range left {
@@ -201,10 +211,41 @@ func MergeNodeSlices(left, right []Node, mergeFn MergeFunction) []Node {
 //
 // The result document will have a deep copy of all nodes. So it's safe to
 // manipulate the nodes without affecting the original nodes.
+//
+// Individuals will not be merged amongst each other, only appended to the final
+// document. To merge similar individuals see MergeDocumentsAndIndividuals.
 func MergeDocuments(left, right *Document, mergeFn MergeFunction) *Document {
 	newNodes := MergeNodeSlices(Nodes(left), Nodes(right), mergeFn)
 
 	return NewDocumentWithNodes(newNodes)
+}
+
+// MergeDocumentsAndIndividuals merges two documents while also merging similar
+// individuals.
+//
+// The MergeFunction must not be nil, but may return nil. It will only be used
+// for nodes that are not individuals. See MergeFunction for usage.
+//
+// The options must be provided, see
+func MergeDocumentsAndIndividuals(left, right *Document, mergeFn MergeFunction, options *IndividualNodesCompareOptions) (*Document, error) {
+	// Merge individuals.
+	leftIndividuals := individuals(left)
+	rightIndividuals := individuals(right)
+
+	mergedIndividuals, err := leftIndividuals.Merge(rightIndividuals, options)
+	if err != nil {
+		return nil, err
+	}
+
+	// Merge non-individuals.
+	leftOther := nonIndividuals(left)
+	rightOther := nonIndividuals(right)
+
+	mergedOther := MergeNodeSlices(leftOther, rightOther, mergeFn)
+
+	allNodes := append(mergedIndividuals.Nodes(), mergedOther...)
+
+	return NewDocumentWithNodes(allNodes), nil
 }
 
 // IndividualBySurroundingSimilarityMergeFunction creates a MergeFunction that
@@ -228,7 +269,7 @@ func IndividualBySurroundingSimilarityMergeFunction(minimumSimilarity float64, o
 
 		similarity := leftIndividual.SurroundingSimilarity(rightIndividual, options)
 
-		if similarity.WeightedSimilarity(options) > minimumSimilarity {
+		if similarity.WeightedSimilarity() > minimumSimilarity {
 			// Ignore the error here because left and right must be the same
 			// type.
 			mergedIndividuals, _ := MergeNodes(left, right)
@@ -239,4 +280,20 @@ func IndividualBySurroundingSimilarityMergeFunction(minimumSimilarity float64, o
 		// Do not merge.
 		return nil
 	}
+}
+
+// EqualityMergeFunction is a MergeFunction that will return a merged node if
+// the node are considered equal (with Equals). This is probably the most
+// generic case when doing general merges.
+func EqualityMergeFunction(left, right Node) Node {
+	if left.Equals(right) {
+		merged, err := MergeNodes(left, right)
+		if err != nil {
+			return nil
+		}
+
+		return merged
+	}
+
+	return nil
 }

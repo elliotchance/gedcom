@@ -1,6 +1,8 @@
 package gedcom
 
 import (
+	"fmt"
+	"strings"
 	"time"
 )
 
@@ -561,12 +563,19 @@ func (node *IndividualNode) Similarity(other *IndividualNode, options *Similarit
 // The options.MinimumSimilarity is used when comparing slices of individuals.
 // In this case that means for the spouses and children. A higher value makes
 // the matching more strict. See DefaultMinimumSimilarity for more information.
-func (node *IndividualNode) SurroundingSimilarity(other *IndividualNode, options *SimilarityOptions) (s SurroundingSimilarity) {
+func (node *IndividualNode) SurroundingSimilarity(other *IndividualNode, options *SimilarityOptions) (s *SurroundingSimilarity) {
 	// Individual, spouse and children similarity only needs to be calculated
 	// once. The parents similarity will be calculated from the matrix below.
-	s.IndividualSimilarity = node.Similarity(other, options)
-	s.SpousesSimilarity = node.Spouses().Similarity(other.Spouses(), options)
-	s.ChildrenSimilarity = node.Children().Similarity(other.Children(), options)
+	individualSimilarity := node.Similarity(other, options)
+	spousesSimilarity := node.Spouses().Similarity(other.Spouses(), options)
+	childrenSimilarity := node.Children().Similarity(other.Children(), options)
+	s = NewSurroundingSimilarity(
+		0.0, // Parents. Filled in later.
+		individualSimilarity,
+		spousesSimilarity,
+		childrenSimilarity,
+	)
+	s.Options = options
 
 	didFindParents := false
 	for _, parents1 := range node.Parents() {
@@ -738,4 +747,40 @@ func (node *IndividualNode) ageAt(start, end Date) (Age, Age) {
 	}
 
 	return startAge, endAge
+}
+
+// String returns a human-readable representation of the individual like:
+//
+//   (no name) (b. Aft. 1983)
+//   Bob Smith (b. 1943)
+//   John Chance
+//   Jane Doe (b. 3 Apr 1923, bur. Abt. 1943)
+//
+// Ideally it will use birth (b.) and death (d.) if available. However, it will
+// fall back to the baptism (bap.) or burial (bur.) respectively.
+func (node *IndividualNode) String() string {
+	name := String(node.Name())
+	if name == "" {
+		name = "(no name)"
+	}
+
+	dateParts := []string{}
+
+	if birth, _ := node.Birth(); birth != nil {
+		dateParts = append(dateParts, fmt.Sprintf("b. %s", birth.String()))
+	} else if baptism, _ := node.Baptism(); baptism != nil {
+		dateParts = append(dateParts, fmt.Sprintf("bap. %s", baptism.String()))
+	}
+
+	if death, _ := node.Death(); death != nil {
+		dateParts = append(dateParts, fmt.Sprintf("d. %s", death.String()))
+	} else if burial, _ := node.Burial(); burial != nil {
+		dateParts = append(dateParts, fmt.Sprintf("bur. %s", burial.String()))
+	}
+
+	if len(dateParts) == 0 {
+		return name
+	}
+
+	return fmt.Sprintf("%s (%s)", name, strings.Join(dateParts, ", "))
 }
