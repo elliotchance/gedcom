@@ -25,6 +25,7 @@ var functionAndVariableChoices = []string{
 	"First",
 	"Last",
 	"Length",
+	"MergeDocumentsAndIndividuals",
 	"Only",
 }
 

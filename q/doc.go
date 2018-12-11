@@ -109,6 +109,10 @@
 // This value will be 0 or more. If the input is not a slice then 1 will always
 // be returned.
 //
+//   MergeDocumentsAndIndividuals(doc1, doc2)
+//
+// Merges two documents while also merging similar individuals.
+//
 //   Only(condition)
 //
 // The Only function returns a new slice that only contains the entities that
@@ -350,5 +354,10 @@
 //       "name": "Sir Robert Temple Armstrong"
 //     },
 //   ]
+//
+// Merge two GEDCOM files (full command):
+//
+//   gedcomq -gedcom file1.ged -gedcom file2.ged -format gedcom \
+//     'MergeDocumentsAndIndividuals(Document1, Document2)' > merged.ged
 //
 package q
