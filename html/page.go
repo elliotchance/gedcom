@@ -23,7 +23,7 @@ func NewPage(title string, body fmt.Stringer, googleAnalyticsID string) *Page {
 
 func (c *Page) String() string {
 	googleAnalytics := newGoogleAnalytics(c.googleAnalyticsID)
-	footer := NewFooter()
+	footer := NewFooterRow()
 
 	return Sprintf(`
     <html>
