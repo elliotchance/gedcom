@@ -1,6 +1,9 @@
 package html
 
-import "html"
+import (
+	"strings"
+	"html"
+)
 
 // Text allows text to be rendered on the page.
 type Text struct {
@@ -14,5 +17,8 @@ func NewText(s string) *Text {
 }
 
 func (c *Text) String() string {
-	return html.EscapeString(c.s)
+	s := strings.Replace(c.s, "&nbsp;", "~~space~~", -1)
+	s = html.EscapeString(s)
+
+	return strings.Replace(s, "~~space~~", "&nbsp;", -1)
 }
