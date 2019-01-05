@@ -1,9 +1,9 @@
 package html_test
 
 import (
+	html "github.com/elliotchance/gedcom/html"
 	"github.com/elliotchance/tf"
 	"testing"
-	html "github.com/elliotchance/gedcom/html"
 )
 
 func TestText_String(t *testing.T) {

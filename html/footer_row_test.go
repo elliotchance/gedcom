@@ -1,9 +1,9 @@
 package html_test
 
 import (
-	"testing"
 	"github.com/elliotchance/gedcom/html"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestFooterRow_String(t *testing.T) {

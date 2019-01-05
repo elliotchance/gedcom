@@ -1,8 +1,8 @@
 package html
 
 import (
-	"strings"
 	"html"
+	"strings"
 )
 
 // Text allows text to be rendered on the page.

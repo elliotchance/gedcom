@@ -2,9 +2,9 @@ package html_test
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 	"github.com/elliotchance/tf"
 	"testing"
-	"github.com/elliotchance/gedcom/html"
 )
 
 func TestAge_String(t *testing.T) {
