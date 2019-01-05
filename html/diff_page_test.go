@@ -1,9 +1,10 @@
-package main
+package html_test
 
 import (
 	"testing"
 
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 	"github.com/elliotchance/gedcom/util"
 	"github.com/stretchr/testify/assert"
 )
@@ -62,7 +63,8 @@ func TestDiffPage_String(t *testing.T) {
 	filterFlags := &util.FilterFlags{}
 	googleAnalyticsID := ""
 
-	component := newDiffPage(comparisons, filterFlags, googleAnalyticsID, optionSortHighestSimilarity)
+	component := html.NewDiffPage(comparisons, filterFlags, googleAnalyticsID,
+		html.DiffPageShowAll, html.DiffPageSortHighestSimilarity)
 
 	assert.Contains(t, component.String(), "<html>")
 	assert.Contains(t, component.String(), "<title>Comparison</title>")

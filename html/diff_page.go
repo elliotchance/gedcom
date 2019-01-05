@@ -1,30 +1,46 @@
-package main
+package html
 
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
-	"github.com/elliotchance/gedcom/html"
 	"github.com/elliotchance/gedcom/util"
 	"sort"
 )
 
-type diffPage struct {
+// These are used for optionShow. If you update these options you will also
+// need to adjust validateOptions.
+const (
+	DiffPageShowAll         = "all" // default
+	DiffPageShowOnlyMatches = "only-matches"
+	DiffPageShowSubset      = "subset"
+)
+
+// These are used for optionSort. If you update these options you will also
+// need to adjust validateOptions.
+const (
+	DiffPageSortWrittenName       = "written-name" // default
+	DiffPageSortHighestSimilarity = "highest-similarity"
+)
+
+type DiffPage struct {
 	comparisons       gedcom.IndividualComparisons
 	filterFlags       *util.FilterFlags
 	googleAnalyticsID string
-	optionSort        string
+	sort              string
+	show              string
 }
 
-func newDiffPage(comparisons gedcom.IndividualComparisons, filterFlags *util.FilterFlags, googleAnalyticsID string, optionSort string) *diffPage {
-	return &diffPage{
+func NewDiffPage(comparisons gedcom.IndividualComparisons, filterFlags *util.FilterFlags, googleAnalyticsID string, show, sort string) *DiffPage {
+	return &DiffPage{
 		comparisons:       comparisons,
 		filterFlags:       filterFlags,
 		googleAnalyticsID: googleAnalyticsID,
-		optionSort:        optionSort,
+		show:              show,
+		sort:              sort,
 	}
 }
 
-func (c *diffPage) sortByWrittenName(i, j int) bool {
+func (c *DiffPage) sortByWrittenName(i, j int) bool {
 	a := c.comparisons[i].Left
 	b := c.comparisons[j].Left
 
@@ -39,7 +55,7 @@ func (c *diffPage) sortByWrittenName(i, j int) bool {
 	return a.Name().String() < b.Name().String()
 }
 
-func (c *diffPage) sortByHighestSimilarity(i, j int) bool {
+func (c *DiffPage) sortByHighestSimilarity(i, j int) bool {
 	a := c.weightedSimilarity(c.comparisons[i])
 	b := c.weightedSimilarity(c.comparisons[j])
 
@@ -52,19 +68,19 @@ func (c *diffPage) sortByHighestSimilarity(i, j int) bool {
 	return c.sortByWrittenName(i, j)
 }
 
-func (c *diffPage) sortComparisons() {
-	sortFns := map[string]func(*diffPage, int, int) bool{
-		optionSortWrittenName:       (*diffPage).sortByWrittenName,
-		optionSortHighestSimilarity: (*diffPage).sortByHighestSimilarity,
+func (c *DiffPage) sortComparisons() {
+	sortFns := map[string]func(*DiffPage, int, int) bool{
+		DiffPageSortWrittenName:       (*DiffPage).sortByWrittenName,
+		DiffPageSortHighestSimilarity: (*DiffPage).sortByHighestSimilarity,
 	}
 
-	sortFn := sortFns[c.optionSort]
+	sortFn := sortFns[c.sort]
 	sort.SliceStable(c.comparisons, func(i, j int) bool {
 		return sortFn(c, i, j)
 	})
 }
 
-func (c *diffPage) weightedSimilarity(comparison *gedcom.IndividualComparison) float64 {
+func (c *DiffPage) weightedSimilarity(comparison *gedcom.IndividualComparison) float64 {
 	s := comparison.Similarity
 
 	if s != nil {
@@ -74,13 +90,13 @@ func (c *diffPage) weightedSimilarity(comparison *gedcom.IndividualComparison) f
 	return 0.0
 }
 
-func (c *diffPage) String() string {
+func (c *DiffPage) String() string {
 	rows := []fmt.Stringer{}
 
 	c.sortComparisons()
 
 	for _, comparison := range c.comparisons {
-		if shouldSkip(comparison) {
+		if c.shouldSkip(comparison) {
 			continue
 		}
 
@@ -104,32 +120,32 @@ func (c *diffPage) String() string {
 			continue
 		}
 
-		leftNameAndDates := html.NewIndividualNameAndDatesLink(comparison.Left, true, "")
-		rightNameAndDates := html.NewIndividualNameAndDatesLink(comparison.Right, true, "")
+		leftNameAndDates := NewIndividualNameAndDatesLink(comparison.Left, true, "")
+		rightNameAndDates := NewIndividualNameAndDatesLink(comparison.Right, true, "")
 
-		left := html.NewTableCell(leftNameAndDates).Class(leftClass)
-		right := html.NewTableCell(rightNameAndDates).Class(rightClass)
+		left := NewTableCell(leftNameAndDates).Class(leftClass)
+		right := NewTableCell(rightNameAndDates).Class(rightClass)
 
-		middle := html.NewTableCell(html.NewText(""))
+		middle := NewTableCell(NewText(""))
 		if weightedSimilarity != 0 {
 			similarityString := fmt.Sprintf("%.2f%%", weightedSimilarity*100)
-			middle = html.NewTableCell(html.NewText(similarityString)).
+			middle = NewTableCell(NewText(similarityString)).
 				Class("text-center " + leftClass)
 		}
 
-		tableRow := html.NewTableRow(left, middle, right)
+		tableRow := NewTableRow(left, middle, right)
 
 		rows = append(rows, tableRow)
 	}
 
 	// Individual pages
 	components := []fmt.Stringer{
-		html.NewBigTitle(1, "Individuals"),
-		html.NewSpace(),
-		html.NewTable("", rows...),
+		NewBigTitle(1, "Individuals"),
+		NewSpace(),
+		NewTable("", rows...),
 	}
 	for _, comparison := range c.comparisons {
-		if shouldSkip(comparison) {
+		if c.shouldSkip(comparison) {
 			continue
 		}
 
@@ -137,24 +153,24 @@ func (c *diffPage) String() string {
 		components = append(components, compare)
 	}
 
-	return html.NewPage(
+	return NewPage(
 		"Comparison",
-		html.NewComponents(components...),
+		NewComponents(components...),
 		c.googleAnalyticsID,
 	).String()
 }
 
-func shouldSkip(comparison *gedcom.IndividualComparison) bool {
-	switch optionShow {
-	case optionShowAll:
+func (c *DiffPage) shouldSkip(comparison *gedcom.IndividualComparison) bool {
+	switch c.show {
+	case DiffPageShowAll:
 		// Do nothing, we want to show all.
 
-	case optionShowSubset:
+	case DiffPageShowSubset:
 		if gedcom.IsNil(comparison.Right) {
 			return true
 		}
 
-	case optionShowOnlyMatches:
+	case DiffPageShowOnlyMatches:
 		if gedcom.IsNil(comparison.Left) || gedcom.IsNil(comparison.Right) {
 			return true
 		}

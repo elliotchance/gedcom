@@ -1,9 +1,9 @@
 package html_test
 
 import (
+	"github.com/elliotchance/gedcom/html"
 	"github.com/elliotchance/tf"
 	"testing"
-	"github.com/elliotchance/gedcom/html"
 )
 
 func TestAnchor_String(t *testing.T) {

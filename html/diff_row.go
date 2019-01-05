@@ -1,25 +1,24 @@
-package main
+package html
 
 import (
 	"github.com/elliotchance/gedcom"
-	"github.com/elliotchance/gedcom/html"
 )
 
-type diffRow struct {
+type DiffRow struct {
 	name     string
 	nd       *gedcom.NodeDiff
 	hideSame bool
 }
 
-func newDiffRow(name string, nd *gedcom.NodeDiff, hideSame bool) *diffRow {
-	return &diffRow{
+func NewDiffRow(name string, nd *gedcom.NodeDiff, hideSame bool) *DiffRow {
+	return &DiffRow{
 		name:     name,
 		nd:       nd,
 		hideSame: hideSame,
 	}
 }
 
-func (c *diffRow) String() string {
+func (c *DiffRow) String() string {
 	if c.hideSame {
 		if c.nd.IsDeepEqual() {
 			return ""
@@ -57,9 +56,9 @@ func (c *diffRow) String() string {
 		right = c.nd.Right.Value()
 	}
 
-	return html.NewTableRow(
-		html.NewTableCell(html.NewText(c.name)),
-		html.NewTableCell(html.NewText(left)).Class(leftClass).Style("width: 40%"),
-		html.NewTableCell(html.NewText(right)).Class(rightClass).Style("width: 40%"),
+	return NewTableRow(
+		NewTableCell(NewText(c.name)),
+		NewTableCell(NewText(left)).Class(leftClass).Style("width: 40%"),
+		NewTableCell(NewText(right)).Class(rightClass).Style("width: 40%"),
 	).String()
 }

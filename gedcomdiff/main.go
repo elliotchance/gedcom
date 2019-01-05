@@ -14,24 +14,10 @@ import (
 	"flag"
 	"github.com/cheggaaa/pb"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 	"github.com/elliotchance/gedcom/util"
 	"log"
 	"os"
-)
-
-// These are used for optionShow. If you update these options you will also
-// need to adjust validateOptions.
-const (
-	optionShowAll         = "all" // default
-	optionShowOnlyMatches = "only-matches"
-	optionShowSubset      = "subset"
-)
-
-// These are used for optionSort. If you update these options you will also
-// need to adjust validateOptions.
-const (
-	optionSortWrittenName       = "written-name" // default
-	optionSortHighestSimilarity = "highest-similarity"
 )
 
 var (
@@ -105,7 +91,7 @@ func main() {
 		comparisons = leftIndividuals.Compare(rightIndividuals, compareOptions)
 	}
 
-	page := newDiffPage(comparisons, filterFlags, optionGoogleAnalyticsID, optionSort)
+	page := html.NewDiffPage(comparisons, filterFlags, optionGoogleAnalyticsID, optionShow, optionSort)
 
 	pageString := page.String()
 	out.Write([]byte(pageString))
@@ -121,7 +107,7 @@ func parseCLIFlags() {
 
 	flag.StringVar(&optionOutputFile, "output", "", "Output file.")
 
-	flag.StringVar(&optionShow, "show", optionShowAll, util.CLIDescription(`
+	flag.StringVar(&optionShow, "show", html.DiffPageShowAll, util.CLIDescription(`
 		The "-show" option controls which individuals are shown in the output:
 
 		"all": Default. Show all individuals from both files.
@@ -187,9 +173,9 @@ func parseCLIFlags() {
 
 func validateOptions() {
 	optionShowValues := []string{
-		optionShowAll,
-		optionShowSubset,
-		optionShowOnlyMatches,
+		html.DiffPageShowAll,
+		html.DiffPageShowSubset,
+		html.DiffPageShowOnlyMatches,
 	}
 
 	if !util.StringSliceContains(optionShowValues, optionShow) {
@@ -197,8 +183,8 @@ func validateOptions() {
 	}
 
 	optionSortValues := []string{
-		optionSortWrittenName,
-		optionSortHighestSimilarity,
+		html.DiffPageSortWrittenName,
+		html.DiffPageSortHighestSimilarity,
 	}
 
 	if !util.StringSliceContains(optionSortValues, optionSort) {

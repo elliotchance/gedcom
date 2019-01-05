@@ -1,9 +1,8 @@
-package main
+package html
 
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
-	"github.com/elliotchance/gedcom/html"
 	"github.com/elliotchance/gedcom/util"
 )
 
@@ -21,7 +20,7 @@ func newIndividualCompare(comparison *gedcom.IndividualComparison, filterFlags *
 
 func (c *individualCompare) appendChildren(nd *gedcom.NodeDiff, prefix string) []fmt.Stringer {
 	title := prefix + nd.Tag().String()
-	row := newDiffRow(title, nd, c.filterFlags.HideEqual)
+	row := NewDiffRow(title, nd, c.filterFlags.HideEqual)
 	tableRows := []fmt.Stringer{row}
 
 	for _, child := range nd.Children {
@@ -38,10 +37,10 @@ func (c *individualCompare) String() string {
 
 	name := ""
 	if n := left; n != nil {
-		name = html.NewIndividualNameAndDates(n, true, "").String()
+		name = NewIndividualNameAndDates(n, true, "").String()
 	}
 	if n := right; name == "" && n != nil {
-		name = html.NewIndividualNameAndDates(n, true, "").String()
+		name = NewIndividualNameAndDates(n, true, "").String()
 	}
 
 	if !gedcom.IsNil(left) {
@@ -85,23 +84,23 @@ func (c *individualCompare) String() string {
 
 	compareOptions := gedcom.NewIndividualNodesCompareOptions()
 	for _, parents := range leftParents.Compare(rightParents, compareOptions) {
-		var row *diffRow
+		var row *DiffRow
 		name := "Parent"
 
 		switch {
 		case !gedcom.IsNil(parents.Left) && !gedcom.IsNil(parents.Right):
-			row = newDiffRow(name, &gedcom.NodeDiff{
+			row = NewDiffRow(name, &gedcom.NodeDiff{
 				Left:  parents.Left.Name(),
 				Right: parents.Right.Name(),
 			}, c.filterFlags.HideEqual)
 
 		case !gedcom.IsNil(parents.Left):
-			row = newDiffRow(name, &gedcom.NodeDiff{
+			row = NewDiffRow(name, &gedcom.NodeDiff{
 				Left: parents.Left.Name(),
 			}, c.filterFlags.HideEqual)
 
 		case !gedcom.IsNil(parents.Right):
-			row = newDiffRow(name, &gedcom.NodeDiff{
+			row = NewDiffRow(name, &gedcom.NodeDiff{
 				Right: parents.Right.Name(),
 			}, c.filterFlags.HideEqual)
 		}
@@ -123,13 +122,13 @@ func (c *individualCompare) String() string {
 				nodeDiff.Right = spouse.Right.Name()
 			}
 
-			row := newDiffRow("Spouse", nodeDiff, c.filterFlags.HideEqual)
+			row := NewDiffRow("Spouse", nodeDiff, c.filterFlags.HideEqual)
 			tableRows = append(tableRows, row)
 		}
 
 	case !gedcom.IsNil(left):
 		for _, spouse := range left.Spouses() {
-			row := newDiffRow("Spouse", &gedcom.NodeDiff{
+			row := NewDiffRow("Spouse", &gedcom.NodeDiff{
 				Left: spouse.Name(),
 			}, c.filterFlags.HideEqual)
 			tableRows = append(tableRows, row)
@@ -137,7 +136,7 @@ func (c *individualCompare) String() string {
 
 	case !gedcom.IsNil(right):
 		for _, spouse := range right.Spouses() {
-			row := newDiffRow("Spouse", &gedcom.NodeDiff{
+			row := NewDiffRow("Spouse", &gedcom.NodeDiff{
 				Right: spouse.Name(),
 			}, c.filterFlags.HideEqual)
 			tableRows = append(tableRows, row)
@@ -155,11 +154,11 @@ func (c *individualCompare) String() string {
 		rightAnchor = c.comparison.Right.Pointer()
 	}
 
-	return html.NewComponents(
-		html.NewAnchor(leftAnchor),
-		html.NewAnchor(rightAnchor),
-		html.NewBigTitle(1, name),
-		html.NewSpace(),
-		html.NewTable("", tableRows...),
+	return NewComponents(
+		NewAnchor(leftAnchor),
+		NewAnchor(rightAnchor),
+		NewBigTitle(1, name),
+		NewSpace(),
+		NewTable("", tableRows...),
 	).String()
 }
