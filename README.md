@@ -4,7 +4,7 @@ github.com/elliotchance/gedcom
 [![Build Status](https://travis-ci.org/elliotchance/gedcom.svg?branch=master)](https://travis-ci.org/elliotchance/gedcom)
 [![codecov](https://codecov.io/gh/elliotchance/gedcom/branch/master/graph/badge.svg)](https://codecov.io/gh/elliotchance/gedcom)
 ![GitHub release](https://img.shields.io/github/release/elliotchance/gedcom.svg)
-[![Join the chat at https://gitter.im/gedcom-go/Lobby](https://badges.gitter.im/gedcom-go/Lobby.svg)](https://gitter.im/gedcom-go/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/gedcom-app/community](https://badges.gitter.im/gedcom-app/community.svg)](https://gitter.im/gedcom-app/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Maintainability](https://api.codeclimate.com/v1/badges/1a31841a6c25ca0e5c24/maintainability)](https://codeclimate.com/github/elliotchance/gedcom/maintainability)
 
 `github.com/elliotchance/gedcom` is an advanced Go-style library and set of
@@ -14,6 +14,9 @@ command-line tools for dealing with
 You can download the latest binaries for macOS, Windows and Linux on the
 [Releases page](https://github.com/elliotchance/gedcom/releases). This will not
 require you to install Go or any other dependencies.
+
+**Have questions? Want to get help or give feedback? Discuss new features? Join the chat: 
+[![Join the chat at https://gitter.im/gedcom-app/community](https://badges.gitter.im/gedcom-app/community.svg)](https://gitter.im/gedcom-app/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)**
 
 | Package              | Description |
 | -------------------- | ----------- |
