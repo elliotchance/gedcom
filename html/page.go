@@ -3,17 +3,17 @@
 package html
 
 import (
-	"fmt"
+	"io"
 )
 
 // Page is the entire page wrapped that provides the HTML head and body.
 type Page struct {
 	title             string
-	body              fmt.Stringer
+	body              Component
 	googleAnalyticsID string
 }
 
-func NewPage(title string, body fmt.Stringer, googleAnalyticsID string) *Page {
+func NewPage(title string, body Component, googleAnalyticsID string) *Page {
 	return &Page{
 		title:             title,
 		body:              body,
@@ -21,34 +21,24 @@ func NewPage(title string, body fmt.Stringer, googleAnalyticsID string) *Page {
 	}
 }
 
-func (c *Page) String() string {
-	googleAnalytics := newGoogleAnalytics(c.googleAnalyticsID)
+func (c *Page) WriteTo(w io.Writer) (int64, error) {
+	googleAnalytics := NewGoogleAnalytics(c.googleAnalyticsID)
 	footer := NewFooterRow()
 
-	return Sprintf(`
-    <html>
-	<head>
-		<meta charset="UTF-8">
-		%s
-		<title>%s</title>
-		<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
-	rel="stylesheet"
-	integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
-	crossorigin="anonymous">
-
-		<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/font/octicons.css"/>
+	n := appendString(w, `<html><head><meta charset="UTF-8">`)
+	n += appendComponent(w, googleAnalytics)
+	n += appendComponent(w, NewTag("title", nil, NewText(c.title)))
+	n += appendString(w, `<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/font/octicons.css"/>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
-	integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
-	crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
 	</head>
 	<body>
-		<div class="container">
-			%s
-			%s
-		</div>
-	</body>
-	</html>
-	`, googleAnalytics, c.title, c.body, footer)
+		<div class="container">`)
+
+	n += appendComponent(w, c.body)
+	n += appendComponent(w, footer)
+	n += appendString(w, `</div></body></html>`)
+
+	return n, nil
 }

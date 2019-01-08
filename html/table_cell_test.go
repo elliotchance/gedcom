@@ -1,52 +1,52 @@
-package html
+package html_test
 
 import (
-	"github.com/elliotchance/tf"
+	"github.com/elliotchance/gedcom/html"
 	"testing"
 )
 
-func TestTableCell_String(t *testing.T) {
-	String := tf.Function(t, (*TableCell).String)
+func TestTableCell_WriteTo(t *testing.T) {
+	c := testComponent(t, "TableCell")
 
-	c := NewText("foo bar")
+	text := html.NewText("foo bar")
 
-	String(NewTableCell(c)).Returns(`<td scope="col">foo bar</td>`)
+	c(html.NewTableCell(text)).Returns(`<td scope="col">foo bar</td>`)
 }
 
 func TestTableCell_Header(t *testing.T) {
-	String := tf.Function(t, (*TableCell).String)
+	c := testComponent(t, "TableCell_Header")
 
-	c := NewText("foo bar")
+	text := html.NewText("foo bar")
 
-	String(NewTableCell(c).Header()).Returns(`<th scope="col">foo bar</th>`)
-	String(NewTableCell(c).Header().Header()).Returns(`<th scope="col">foo bar</th>`)
+	c(html.NewTableCell(text).Header()).Returns(`<th scope="col">foo bar</th>`)
+	c(html.NewTableCell(text).Header().Header()).Returns(`<th scope="col">foo bar</th>`)
 }
 
 func TestTableCell_NoWrap(t *testing.T) {
-	String := tf.Function(t, (*TableCell).String)
+	c := testComponent(t, "TableCell_NoWrap")
 
-	c := NewText("foo bar")
+	text := html.NewText("foo bar")
 
-	String(NewTableCell(c).NoWrap()).Returns(`<td scope="col" nowrap="nowrap">foo bar</td>`)
-	String(NewTableCell(c).NoWrap().NoWrap()).Returns(`<td scope="col" nowrap="nowrap">foo bar</td>`)
+	c(html.NewTableCell(text).NoWrap()).Returns(`<td scope="col" nowrap="nowrap">foo bar</td>`)
+	c(html.NewTableCell(text).NoWrap().NoWrap()).Returns(`<td scope="col" nowrap="nowrap">foo bar</td>`)
 }
 
 func TestTableCell_Class(t *testing.T) {
-	String := tf.Function(t, (*TableCell).String)
+	c := testComponent(t, "TableCell_Class")
 
-	c := NewText("foo bar")
+	text := html.NewText("foo bar")
 
-	String(NewTableCell(c).Class("")).Returns(`<td scope="col">foo bar</td>`)
-	String(NewTableCell(c).Class("dot")).Returns(`<td scope="col" class="dot">foo bar</td>`)
-	String(NewTableCell(c).Class("dot").Class("line")).Returns(`<td scope="col" class="line">foo bar</td>`)
+	c(html.NewTableCell(text).Class("")).Returns(`<td scope="col">foo bar</td>`)
+	c(html.NewTableCell(text).Class("dot")).Returns(`<td scope="col" class="dot">foo bar</td>`)
+	c(html.NewTableCell(text).Class("dot").Class("line")).Returns(`<td scope="col" class="line">foo bar</td>`)
 }
 
 func TestTableCell_Style(t *testing.T) {
-	String := tf.Function(t, (*TableCell).String)
+	c := testComponent(t, "TableCell_Class")
 
-	c := NewText("foo bar")
+	text := html.NewText("foo bar")
 
-	String(NewTableCell(c).Style("")).Returns(`<td scope="col">foo bar</td>`)
-	String(NewTableCell(c).Style("dot")).Returns(`<td scope="col" style="dot">foo bar</td>`)
-	String(NewTableCell(c).Style("dot").Style("line")).Returns(`<td scope="col" style="line">foo bar</td>`)
+	c(html.NewTableCell(text).Style("")).Returns(`<td scope="col">foo bar</td>`)
+	c(html.NewTableCell(text).Style("dot")).Returns(`<td scope="col" style="dot">foo bar</td>`)
+	c(html.NewTableCell(text).Style("dot").Style("line")).Returns(`<td scope="col" style="line">foo bar</td>`)
 }

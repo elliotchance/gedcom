@@ -1,16 +1,18 @@
 package html
 
-import "fmt"
+import (
+	"io"
+)
 
 type Link struct {
-	text  string
+	body  Component
 	dest  string
 	style string
 }
 
-func NewLink(text, dest string) *Link {
+func NewLink(body Component, dest string) *Link {
 	return &Link{
-		text: text,
+		body: body,
 		dest: dest,
 	}
 }
@@ -21,11 +23,11 @@ func (c *Link) Style(style string) *Link {
 	return c
 }
 
-func (c *Link) String() string {
-	attributes := ""
-	if c.style != "" {
-		attributes += fmt.Sprintf(` style="%s"`, c.style)
+func (c *Link) WriteTo(w io.Writer) (int64, error) {
+	attributes := map[string]string{
+		"style": c.style,
+		"href":  c.dest,
 	}
 
-	return fmt.Sprintf(`<a href="%s"%s>%s</a>`, c.dest, attributes, c.text)
+	return NewTag("a", attributes, c.body).WriteTo(w)
 }

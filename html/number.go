@@ -3,20 +3,21 @@ package html
 import (
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
+	"io"
 )
 
-type number struct {
+type Number struct {
 	value int
 }
 
-func NewNumber(value int) *number {
-	return &number{
+func NewNumber(value int) *Number {
+	return &Number{
 		value: value,
 	}
 }
 
-func (c *number) String() string {
+func (c *Number) WriteTo(w io.Writer) (int64, error) {
 	p := message.NewPrinter(language.English)
 
-	return p.Sprintf("%d", c.value)
+	return writeString(w, p.Sprintf("%d", c.value))
 }

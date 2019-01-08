@@ -3,12 +3,11 @@ package html_test
 import (
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html"
-	"github.com/elliotchance/tf"
 	"testing"
 )
 
-func TestAge_String(t *testing.T) {
-	String := tf.Function(t, (*html.Age).String)
+func TestAge_WriteTo(t *testing.T) {
+	c := testComponent(t, "Age")
 
 	unknown := gedcom.NewUnknownAge()
 	age0 := gedcom.NewAgeWithYears(0, true, gedcom.AgeConstraintUnknown)
@@ -21,20 +20,20 @@ func TestAge_String(t *testing.T) {
 	age7 := gedcom.NewAgeWithYears(12.113, true, gedcom.AgeConstraintBeforeBirth)
 	age8 := gedcom.NewAgeWithYears(13.5, true, gedcom.AgeConstraintAfterDeath)
 
-	String(html.NewAge(unknown, unknown)).Returns(``)
-	String(html.NewAge(age1, unknown)).Returns(`after 43y 2m`)
-	String(html.NewAge(unknown, age7)).Returns(`until ~ 12y 1m`)
-	String(html.NewAge(age7, age3)).Returns(`from ~ 12y 1m to 45y 2m`)
-	String(html.NewAge(age2, age3)).Returns(`44y 2m`)
-	String(html.NewAge(age5, age6)).Returns(`~ 10y`)
-	String(html.NewAge(age0, age0)).Returns(`0y`)
+	c(html.NewAge(unknown, unknown)).Returns(``)
+	c(html.NewAge(age1, unknown)).Returns(`after 43y 2m`)
+	c(html.NewAge(unknown, age7)).Returns(`until ~ 12y 1m`)
+	c(html.NewAge(age7, age3)).Returns(`from ~ 12y 1m to 45y 2m`)
+	c(html.NewAge(age2, age3)).Returns(`44y 2m`)
+	c(html.NewAge(age5, age6)).Returns(`~ 10y`)
+	c(html.NewAge(age0, age0)).Returns(`0y`)
 
-	String(html.NewAge(age1, age1)).Returns(`43y 2m`)
-	String(html.NewAge(age2, age2)).Returns(`44y 2m`)
-	String(html.NewAge(age3, age3)).Returns(`45y 2m`)
-	String(html.NewAge(age4, age4)).Returns(``)
-	String(html.NewAge(age5, age5)).Returns(`~ 10y`)
-	String(html.NewAge(age6, age6)).Returns(`~ 11y`)
-	String(html.NewAge(age7, age7)).Returns(`~ 12y 1m`)
-	String(html.NewAge(age8, age8)).Returns(``)
+	c(html.NewAge(age1, age1)).Returns(`43y 2m`)
+	c(html.NewAge(age2, age2)).Returns(`44y 2m`)
+	c(html.NewAge(age3, age3)).Returns(`45y 2m`)
+	c(html.NewAge(age4, age4)).Returns(``)
+	c(html.NewAge(age5, age5)).Returns(`~ 10y`)
+	c(html.NewAge(age6, age6)).Returns(`~ 11y`)
+	c(html.NewAge(age7, age7)).Returns(`~ 12y 1m`)
+	c(html.NewAge(age8, age8)).Returns(``)
 }

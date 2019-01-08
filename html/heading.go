@@ -1,20 +1,33 @@
 package html
 
+import (
+	"fmt"
+	"io"
+)
+
 // Heading is larger text.
 type Heading struct {
-	text, class string
-	number      int
+	class  string
+	number int
+	body   Component
 }
 
-func NewHeading(number int, class, text string) *Heading {
+func NewHeading(number int, class string, body Component) *Heading {
 	return &Heading{
-		text:   text,
 		number: number,
 		class:  class,
+		body:   body,
 	}
 }
 
-func (c *Heading) String() string {
-	return Sprintf(`<h%d class="%s">%s</h%d>`,
-		c.number, c.class, c.text, c.number)
+func (c *Heading) WriteTo(w io.Writer) (int64, error) {
+	attributes := map[string]string{
+		"class": c.class,
+	}
+
+	return NewTag(
+		fmt.Sprintf(`h%d`, c.number),
+		attributes,
+		c.body,
+	).WriteTo(w)
 }

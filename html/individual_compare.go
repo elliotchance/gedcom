@@ -1,27 +1,27 @@
 package html
 
 import (
-	"fmt"
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/util"
+	"io"
 )
 
-type individualCompare struct {
+type IndividualCompare struct {
 	comparison  *gedcom.IndividualComparison
 	filterFlags *util.FilterFlags
 }
 
-func newIndividualCompare(comparison *gedcom.IndividualComparison, filterFlags *util.FilterFlags) *individualCompare {
-	return &individualCompare{
+func NewIndividualCompare(comparison *gedcom.IndividualComparison, filterFlags *util.FilterFlags) *IndividualCompare {
+	return &IndividualCompare{
 		comparison:  comparison,
 		filterFlags: filterFlags,
 	}
 }
 
-func (c *individualCompare) appendChildren(nd *gedcom.NodeDiff, prefix string) []fmt.Stringer {
+func (c *IndividualCompare) appendChildren(nd *gedcom.NodeDiff, prefix string) []Component {
 	title := prefix + nd.Tag().String()
 	row := NewDiffRow(title, nd, c.filterFlags.HideEqual)
-	tableRows := []fmt.Stringer{row}
+	tableRows := []Component{row}
 
 	for _, child := range nd.Children {
 		children := c.appendChildren(child, prefix+"&nbsp;&nbsp;&nbsp;&nbsp;")
@@ -31,16 +31,22 @@ func (c *individualCompare) appendChildren(nd *gedcom.NodeDiff, prefix string) [
 	return tableRows
 }
 
-func (c *individualCompare) String() string {
+func (c *IndividualCompare) WriteTo(w io.Writer) (int64, error) {
 	left := c.comparison.Left
 	right := c.comparison.Right
 
-	name := ""
+	var name Component = nil
+
 	if n := left; n != nil {
-		name = NewIndividualNameAndDates(n, true, "").String()
+		name = NewIndividualNameAndDates(n, true, "")
 	}
-	if n := right; name == "" && n != nil {
-		name = NewIndividualNameAndDates(n, true, "").String()
+
+	if n := right; name == nil && n != nil {
+		name = NewIndividualNameAndDates(n, true, "")
+	}
+
+	if name == nil {
+		name = NewEmpty()
 	}
 
 	if !gedcom.IsNil(left) {
@@ -160,5 +166,5 @@ func (c *individualCompare) String() string {
 		NewBigTitle(1, name),
 		NewSpace(),
 		NewTable("", tableRows...),
-	).String()
+	).WriteTo(w)
 }

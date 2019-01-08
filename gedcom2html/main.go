@@ -104,30 +104,40 @@ func main() {
 		log.Fatal(err)
 	}
 
+	options := html.PublishShowOptions{
+		ShowIndividuals: !optionNoIndividuals,
+		ShowPlaces:      !optionNoPlaces,
+		ShowFamilies:    !optionNoFamilies,
+		ShowSurnames:    !optionNoSurnames,
+		ShowSources:     !optionNoSources,
+		ShowStatistics:  !optionNoStatistics,
+		Checksum:        optionChecksum,
+	}
+
 	// Create the pages.
 	if !optionNoIndividuals {
-		for _, letter := range getIndexLetters(document) {
-			createFile(pageIndividuals(letter),
-				newIndividualListPage(document, letter, optionGoogleAnalyticsID))
+		for _, letter := range html.GetIndexLetters(document) {
+			createFile(html.PageIndividuals(letter),
+				html.NewIndividualListPage(document, letter, optionGoogleAnalyticsID, options))
 		}
 
-		for _, individual := range getIndividuals(document) {
+		for _, individual := range html.GetIndividuals(document) {
 			if individual.IsLiving() {
 				continue
 			}
 
-			page := newIndividualPage(document, individual, optionGoogleAnalyticsID)
-			createFile(pageIndividual(document, individual), page)
+			page := html.NewIndividualPage(document, individual, optionGoogleAnalyticsID, options)
+			createFile(html.PageIndividual(document, individual), page)
 		}
 	}
 
 	if !optionNoPlaces {
-		page := newPlaceListPage(document, optionGoogleAnalyticsID)
-		createFile(pagePlaces(), page)
+		page := html.NewPlaceListPage(document, optionGoogleAnalyticsID, options)
+		createFile(html.PagePlaces(), page)
 
 		// Sort the places so that the generated page names will be more
 		// deterministic.
-		places := getPlaces(document)
+		places := html.GetPlaces(document)
 		placeKeys := []string{}
 
 		for key := range places {
@@ -138,30 +148,31 @@ func main() {
 
 		for _, key := range placeKeys {
 			place := places[key]
-			page := newPlacePage(document, key, optionGoogleAnalyticsID)
-			createFile(pagePlace(document, place.prettyName), page)
+			page := html.NewPlacePage(document, key, optionGoogleAnalyticsID, options)
+			createFile(html.PagePlace(document, place.PrettyName), page)
 		}
 	}
 
 	if !optionNoFamilies {
-		createFile(pageFamilies(), newFamilyListPage(document, optionGoogleAnalyticsID))
+		createFile(html.PageFamilies(), html.NewFamilyListPage(document, optionGoogleAnalyticsID, options))
 	}
 
 	if !optionNoSurnames {
-		createFile(pageSurnames(), newSurnameListPage(document, optionGoogleAnalyticsID))
+		createFile(html.PageSurnames(), html.NewSurnameListPage(document, optionGoogleAnalyticsID, options))
 	}
 
 	if !optionNoSources {
-		createFile(pageSources(), newSourceListPage(document, optionGoogleAnalyticsID))
+		createFile(html.PageSources(), html.NewSourceListPage(document, optionGoogleAnalyticsID, options))
 
 		for _, source := range document.Sources() {
-			page := newSourcePage(document, source, optionGoogleAnalyticsID)
-			createFile(pageSource(source), page)
+			page := html.NewSourcePage(document, source, optionGoogleAnalyticsID, options)
+			createFile(html.PageSource(source), page)
 		}
 	}
 
 	if !optionNoStatistics {
-		createFile(pageStatistics(), newStatisticsPage(document, optionGoogleAnalyticsID))
+		createFile(html.PageStatistics(),
+			html.NewStatisticsPage(document, optionGoogleAnalyticsID, options))
 	}
 
 	// Calculate checksum
@@ -199,7 +210,7 @@ func fileSha1(path string) string {
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
-func createFile(name string, contents fmt.Stringer) {
+func createFile(name string, contents html.Component) {
 	path := fmt.Sprintf("%s/%s", optionOutputDir, name)
 	log.Printf("Writing %s...", path)
 
@@ -208,8 +219,7 @@ func createFile(name string, contents fmt.Stringer) {
 		log.Fatal(err)
 	}
 
-	// ghost:ignore
-	out.Write([]byte(contents.String()))
+	contents.WriteTo(out)
 
 	out.Close()
 }

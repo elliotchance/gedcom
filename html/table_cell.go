@@ -1,15 +1,17 @@
 package html
 
-import "fmt"
+import (
+	"io"
+)
 
 type TableCell struct {
-	content      fmt.Stringer
+	content      Component
 	class, style string
 	noWrap       bool
 	isHeader     bool
 }
 
-func NewTableCell(content fmt.Stringer) *TableCell {
+func NewTableCell(content Component) *TableCell {
 	return &TableCell{
 		content: content,
 	}
@@ -39,25 +41,29 @@ func (c *TableCell) Header() *TableCell {
 	return c
 }
 
-func (c *TableCell) String() string {
+func (c *TableCell) WriteTo(w io.Writer) (int64, error) {
 	htmlTag := "td"
 	if c.isHeader {
 		htmlTag = "th"
 	}
 
-	tag := fmt.Sprintf(`<%s scope="col"`, htmlTag)
+	n := appendSprintf(w, `<%s scope="col"`, htmlTag)
 
 	if c.class != "" {
-		tag += fmt.Sprintf(` class="%s"`, c.class)
+		n += appendSprintf(w, ` class="%s"`, c.class)
 	}
 
 	if c.noWrap {
-		tag += ` nowrap="nowrap"`
+		n += appendString(w, ` nowrap="nowrap"`)
 	}
 
 	if c.style != "" {
-		tag += fmt.Sprintf(` style="%s"`, c.style)
+		n += appendSprintf(w, ` style="%s"`, c.style)
 	}
 
-	return fmt.Sprintf(`%s>%s</%s>`, tag, c.content, htmlTag)
+	n += appendString(w, `>`)
+	n += appendComponent(w, c.content)
+	n += appendSprintf(w, `</%s>`, htmlTag)
+
+	return n, nil
 }

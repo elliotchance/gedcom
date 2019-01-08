@@ -2,12 +2,11 @@ package html_test
 
 import (
 	"github.com/elliotchance/gedcom/html"
-	"github.com/elliotchance/tf"
 	"testing"
 )
 
-func TestAnchor_String(t *testing.T) {
-	String := tf.Function(t, (*html.Anchor).String)
+func TestAnchor_WriteTo(t *testing.T) {
+	c := testComponent(t, "Anchor")
 
-	String(html.NewAnchor("foo")).Returns(`<a name="foo"/>`)
+	c(html.NewAnchor("foo")).Returns(`<a name="foo"/>`)
 }

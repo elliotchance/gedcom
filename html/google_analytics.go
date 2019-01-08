@@ -1,21 +1,23 @@
 package html
 
+import "io"
+
 type GoogleAnalytics struct {
 	id string
 }
 
-func newGoogleAnalytics(id string) *GoogleAnalytics {
+func NewGoogleAnalytics(id string) *GoogleAnalytics {
 	return &GoogleAnalytics{
 		id: id,
 	}
 }
 
-func (c *GoogleAnalytics) String() string {
+func (c *GoogleAnalytics) WriteTo(w io.Writer) (int64, error) {
 	if c.id == "" {
-		return ""
+		return writeNothing()
 	}
 
-	return Sprintf(`<!-- Global site tag (gtag.js) - Google Analytics -->
+	return writeSprintf(w, `<!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=%s"></script>
 <script>
 window.dataLayer = window.dataLayer || [];

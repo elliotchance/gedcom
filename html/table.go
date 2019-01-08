@@ -1,23 +1,26 @@
 package html
 
-import "fmt"
+import (
+	"io"
+)
 
 // Table is a HTML table.
 type Table struct {
-	content    []fmt.Stringer
+	content    []Component
 	tableClass string
 }
 
-func NewTable(tableClass string, content ...fmt.Stringer) *Table {
+func NewTable(tableClass string, content ...Component) *Table {
 	return &Table{
 		content:    content,
 		tableClass: tableClass,
 	}
 }
 
-func (c *Table) String() string {
-	components := NewComponents(c.content...).String()
+func (c *Table) WriteTo(w io.Writer) (int64, error) {
+	n := appendSprintf(w, `<table class="table %s">`, c.tableClass)
+	n += appendComponent(w, NewComponents(c.content...))
+	n += appendString(w, "</table>")
 
-	return Sprintf(`<table class="table %s">%s</table>`,
-		c.tableClass, components)
+	return n, nil
 }

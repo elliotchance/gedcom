@@ -2,12 +2,11 @@ package html_test
 
 import (
 	"github.com/elliotchance/gedcom/html"
-	"github.com/elliotchance/tf"
 	"testing"
 )
 
-func TestEmpty_String(t *testing.T) {
-	String := tf.Function(t, (*html.Empty).String)
+func TestEmpty_WriteTo(t *testing.T) {
+	c := testComponent(t, "Empty")
 
-	String(html.NewEmpty()).Returns(`&nbsp;`)
+	c(html.NewEmpty()).Returns(`&nbsp;`)
 }

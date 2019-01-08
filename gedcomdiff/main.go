@@ -93,8 +93,10 @@ func main() {
 
 	page := html.NewDiffPage(comparisons, filterFlags, optionGoogleAnalyticsID, optionShow, optionSort)
 
-	pageString := page.String()
-	out.Write([]byte(pageString))
+	_, err = page.WriteTo(out)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func parseCLIFlags() {
