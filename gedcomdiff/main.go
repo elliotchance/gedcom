@@ -148,18 +148,19 @@ func parseCLIFlags() {
 
 	flag.Float64Var(&optionMinimumSimilarity,
 		"minimum-similarity", gedcom.DefaultMinimumSimilarity,
-		util.CLIDescription(`The minimum similarity is the threshold for matching
-			individuals as the same person. This is used to compare only the
-			individual (not surrounding family) like spouses and children.
+		util.CLIDescription(`The minimum similarity is the threshold for
+			matching individuals as the same person. This is used to compare
+			only the individual (not surrounding family) like spouses and
+			children.
 
 			This value must be between 0 and 1 and should be set to the same
 			value as "minimum-weighted-similarity" if you are unsure.`))
 
-	flag.StringVar(&optionSort, "sort", optionSort, util.CLIDescription(`
+	flag.StringVar(&optionSort, "sort", html.DiffPageSortWrittenName,
+		util.CLIDescription(`
 			Controls how the individuals are sorted in the output:
 
-			"written-name": Default. Sort individuals by written their written
-			name.
+			"written-name": Sort individuals by written their written name.
 
 			"highest-similarity": Sort the individuals by their match
 			similarity. Highest matches will appear first.`))
