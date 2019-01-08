@@ -58,6 +58,10 @@ func main() {
 			`first of the name nodes only.`)
 	flag.Parse()
 
+	if optionGedcomFile == "" {
+		log.Fatal("-gedcom is required")
+	}
+
 	file, err := os.Open(optionGedcomFile)
 	if err != nil {
 		log.Fatal(err)

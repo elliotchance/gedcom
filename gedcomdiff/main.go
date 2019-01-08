@@ -2,7 +2,7 @@
 //
 // Usage
 //
-//   gedcomdiff -left-gedcom file1.ged -right-gedcom file2.ged
+//   gedcomdiff -left-gedcom file1.ged -right-gedcom file2.ged -output out.html
 //
 // For a complete list of options use:
 //
@@ -173,6 +173,18 @@ func parseCLIFlags() {
 }
 
 func validateOptions() {
+	if optionLeftGedcomFile == "" {
+		log.Fatalf(`-left-gedcom is required`)
+	}
+
+	if optionRightGedcomFile == "" {
+		log.Fatalf(`-right-gedcom is required`)
+	}
+
+	if optionOutputFile == "" {
+		log.Fatalf(`-output is required`)
+	}
+
 	optionShowValues := []string{
 		html.DiffPageShowAll,
 		html.DiffPageShowSubset,

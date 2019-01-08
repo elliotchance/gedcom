@@ -50,6 +50,10 @@ func main() {
 		"Do not include Death node if there are no visible details.")
 	flag.Parse()
 
+	if optionGedcomFile == "" {
+		log.Fatal("-gedcom is required")
+	}
+
 	file, err := os.Open(optionGedcomFile)
 	if err != nil {
 		log.Fatal(err)

@@ -80,9 +80,14 @@ func parseCLIFlags() {
 		Path to the GEDCOM file. You may specify more than one document by
 		providing -gedcom with an argument multiple times. You must provide at
 		least one document.`))
+
 	flag.StringVar(&optionFormat, "format", "json", util.CLIDescription(`
 		Output format, can be one of the following: "json", "pretty-json",
 		"gedcom" or "csv".`))
 
 	flag.Parse()
+
+	if optionGedcomFiles.String() == "" {
+		log.Fatal("you must specify at least one -gedcom file")
+	}
 }
