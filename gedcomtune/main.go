@@ -183,6 +183,14 @@ func parseCLIFlags() {
 		"Step size for jaro prefix size.")
 
 	flag.Parse()
+
+	if optionGedcomFile1 == "" {
+		log.Fatal("-gedcom1 is required")
+	}
+
+	if optionGedcomFile2 == "" {
+		log.Fatal("-gedcom2 is required")
+	}
 }
 
 func random(min, max float64) float64 {
