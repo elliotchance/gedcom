@@ -46,10 +46,10 @@ jobs:
   include:
     - stage: Release
       script:
-        - GOOS=linux GOARCH=amd64 make zip
-        - GOOS=darwin GOARCH=amd64 make zip
-        - GOOS=windows GOARCH=amd64 make zip
-        - GOOS=windows GOARCH=386 make zip
+        - GOOS=linux GOARCH=amd64 EXT="" make zip
+        - GOOS=darwin GOARCH=amd64 EXT="" make zip
+        - GOOS=windows GOARCH=amd64 EXT=".exe" make zip
+        - GOOS=windows GOARCH=386 EXT=".exe" make zip
 
       deploy:
         provider: releases
