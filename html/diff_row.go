@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"io"
 )
 
 type DiffRow struct {
@@ -18,14 +19,14 @@ func NewDiffRow(name string, nd *gedcom.NodeDiff, hideSame bool) *DiffRow {
 	}
 }
 
-func (c *DiffRow) String() string {
+func (c *DiffRow) WriteTo(w io.Writer) (int64, error) {
 	if c.hideSame {
 		if c.nd.IsDeepEqual() {
-			return ""
+			return writeNothing()
 		}
 
 		if c.nd.Tag().IsEvent() && len(c.nd.Children) == 0 {
-			return ""
+			return writeNothing()
 		}
 	}
 
@@ -60,5 +61,5 @@ func (c *DiffRow) String() string {
 		NewTableCell(NewText(c.name)),
 		NewTableCell(NewText(left)).Class(leftClass).Style("width: 40%"),
 		NewTableCell(NewText(right)).Class(rightClass).Style("width: 40%"),
-	).String()
+	).WriteTo(w)
 }

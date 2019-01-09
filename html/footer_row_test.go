@@ -1,13 +1,17 @@
 package html_test
 
 import (
+	"bytes"
 	"github.com/elliotchance/gedcom/html"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-func TestFooterRow_String(t *testing.T) {
-	component := html.NewFooterRow().String()
+func TestFooterRow_WriteTo(t *testing.T) {
+	buf := bytes.NewBuffer(nil)
+	html.NewFooterRow().WriteTo(buf)
+
+	component := string(buf.Bytes())
 
 	assert.Contains(t, component, "<div class=\"row\">")
 	assert.Contains(t, component,

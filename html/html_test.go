@@ -1,14 +1,14 @@
-package html
+package html_test
 
 import (
-	"github.com/elliotchance/tf"
+	"github.com/elliotchance/gedcom/html"
 	"testing"
 )
 
-func TestHTML_String(t *testing.T) {
-	String := tf.Function(t, (*HTML).String)
+func TestHTML_WriteTo(t *testing.T) {
+	c := testComponent(t, "HTML")
 
-	String(NewHTML("foo")).Returns(`foo`)
-	String(NewHTML(`"Fran & Freddie's Diner" <tasty@example.com>`)).
+	c(html.NewHTML("foo")).Returns(`foo`)
+	c(html.NewHTML(`"Fran & Freddie's Diner" <tasty@example.com>`)).
 		Returns(`"Fran & Freddie's Diner" <tasty@example.com>`)
 }

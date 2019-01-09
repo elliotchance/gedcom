@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"io"
 )
 
 type IndividualNameAndDates struct {
@@ -18,13 +19,13 @@ func NewIndividualNameAndDates(individual *gedcom.IndividualNode, showLiving boo
 	}
 }
 
-func (c *IndividualNameAndDates) String() string {
-	name := NewIndividualName(c.individual, c.showLiving, c.unknownText).String()
-	dates := NewIndividualDates(c.individual, c.showLiving).String()
+func (c *IndividualNameAndDates) WriteTo(w io.Writer) (int64, error) {
+	name := NewIndividualName(c.individual, c.showLiving, c.unknownText)
+	dates := NewIndividualDates(c.individual, c.showLiving)
 
-	if name == c.unknownText || dates == "" {
-		return name
+	if name.IsUnknown() || dates.IsBlank() {
+		return name.WriteTo(w)
 	}
 
-	return Sprintf("%s (%s)", name, dates)
+	return NewComponents(name, NewText(" ("), dates, NewText(")")).WriteTo(w)
 }

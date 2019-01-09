@@ -3,6 +3,7 @@ package html
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
+	"io"
 )
 
 type IndividualNameAndDatesLink struct {
@@ -19,13 +20,13 @@ func NewIndividualNameAndDatesLink(individual *gedcom.IndividualNode, showLiving
 	}
 }
 
-func (c *IndividualNameAndDatesLink) String() string {
+func (c *IndividualNameAndDatesLink) WriteTo(w io.Writer) (int64, error) {
 	if c.individual == nil {
-		return ""
+		return writeNothing()
 	}
 
-	text := NewIndividualNameAndDates(c.individual, c.showLiving, c.unknownText).String()
+	text := NewIndividualNameAndDates(c.individual, c.showLiving, c.unknownText)
 	link := fmt.Sprintf("#%s", c.individual.Pointer())
 
-	return NewLink(text, link).Style("color: black").String()
+	return NewLink(text, link).Style("color: black").WriteTo(w)
 }

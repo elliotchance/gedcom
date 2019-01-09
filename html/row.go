@@ -1,5 +1,7 @@
 package html
 
+import "io"
+
 const (
 	QuarterRow = 3
 	HalfRow    = 6
@@ -17,14 +19,14 @@ func NewRow(columns ...*Column) *Row {
 	}
 }
 
-func (c *Row) String() string {
-	columns := ""
+func (c *Row) WriteTo(w io.Writer) (int64, error) {
+	n := appendString(w, `<div class="row">`)
+
 	for _, column := range c.columns {
-		columns += column.String()
+		n += appendComponent(w, column)
 	}
 
-	return Sprintf(`
-		<div class="row">
-			%s
-		</div>`, columns)
+	n += appendString(w, "</div>")
+
+	return n, nil
 }

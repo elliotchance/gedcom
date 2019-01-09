@@ -1,6 +1,8 @@
 package html
 
-import "fmt"
+import (
+	"io"
+)
 
 type Anchor struct {
 	name string
@@ -12,6 +14,6 @@ func NewAnchor(name string) *Anchor {
 	}
 }
 
-func (c *Anchor) String() string {
-	return fmt.Sprintf(`<a name="%s"/>`, c.name)
+func (c *Anchor) WriteTo(w io.Writer) (int64, error) {
+	return writeSprintf(w, `<a name="%s"/>`, c.name)
 }

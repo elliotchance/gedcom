@@ -1,5 +1,7 @@
 package html
 
+import "io"
+
 // EventDates contains several eventDate instances that are separated by three
 // spaces. Only the dates that are non-empty will be shown.
 type EventDates struct {
@@ -12,15 +14,15 @@ func NewEventDates(items []*EventDate) *EventDates {
 	}
 }
 
-func (c *EventDates) String() string {
-	s := ""
+func (c *EventDates) WriteTo(w io.Writer) (int64, error) {
+	n := int64(0)
 	for _, date := range c.items {
-		if s != "" && date.String() != "" {
-			s += "&nbsp;&nbsp;&nbsp;"
+		if n > 0 && !date.IsBlank() {
+			n += appendString(w, "&nbsp;&nbsp;&nbsp;")
 		}
 
-		s += date.String()
+		n += appendComponent(w, date)
 	}
 
-	return s
+	return n, nil
 }

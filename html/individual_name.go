@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"io"
 )
 
 const UnknownEmphasis = "<em>Unknown</em>"
@@ -13,31 +14,35 @@ const UnknownEmphasis = "<em>Unknown</em>"
 type IndividualName struct {
 	individual  *gedcom.IndividualNode
 	showLiving  bool
-	unknownText string
+	unknownHTML string
 }
 
-func NewIndividualName(individual *gedcom.IndividualNode, showLiving bool, unknownText string) *IndividualName {
+func NewIndividualName(individual *gedcom.IndividualNode, showLiving bool, unknownHTML string) *IndividualName {
 	return &IndividualName{
 		individual:  individual,
 		showLiving:  showLiving,
-		unknownText: unknownText,
+		unknownHTML: unknownHTML,
 	}
 }
 
-func (c *IndividualName) String() string {
+func (c *IndividualName) IsUnknown() bool {
+	return c.individual == nil || len(c.individual.Names()) == 0
+}
+
+func (c *IndividualName) WriteTo(w io.Writer) (int64, error) {
 	if c.individual == nil {
-		return c.unknownText
+		return writeString(w, c.unknownHTML)
 	}
 
 	isLiving := c.individual.IsLiving()
 	if isLiving && !c.showLiving {
-		return "<em>Hidden</em>"
+		return writeString(w, "<em>Hidden</em>")
 	}
 
 	names := c.individual.Names()
 	if len(names) == 0 {
-		return c.unknownText
+		return writeString(w, c.unknownHTML)
 	}
 
-	return names[0].String()
+	return NewText(names[0].String()).WriteTo(w)
 }

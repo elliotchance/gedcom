@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"io"
 )
 
 type IndividualDates struct {
@@ -16,7 +17,29 @@ func NewIndividualDates(individual *gedcom.IndividualNode, showLiving bool) *Ind
 	}
 }
 
-func (c *IndividualDates) String() string {
+func (c *IndividualDates) IsBlank() bool {
+	eventDates := c.EventDates()
+
+	for _, eventDate := range eventDates {
+		if !eventDate.IsBlank() {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (c *IndividualDates) WriteTo(w io.Writer) (int64, error) {
+	if c.individual != nil && c.individual.IsLiving() && !c.showLiving {
+		return NewText("living").WriteTo(w)
+	}
+
+	eventDates := c.EventDates()
+
+	return NewEventDates(eventDates).WriteTo(w)
+}
+
+func (c *IndividualDates) EventDates() []*EventDate {
 	eventDates := []*EventDate{}
 
 	// Use birth or fallback to baptism.
@@ -45,11 +68,5 @@ func (c *IndividualDates) String() string {
 		eventDates = append(eventDates, eventDate)
 	}
 
-	eventDatesString := NewEventDates(eventDates).String()
-
-	if c.individual != nil && c.individual.IsLiving() && !c.showLiving {
-		eventDatesString = "living"
-	}
-
-	return eventDatesString
+	return eventDates
 }

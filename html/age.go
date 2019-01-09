@@ -1,8 +1,8 @@
 package html
 
 import (
-	"fmt"
 	"github.com/elliotchance/gedcom"
+	"io"
 	"time"
 )
 
@@ -31,22 +31,22 @@ func (c *Age) string(age gedcom.Age) string {
 	return age.String()
 }
 
-func (c *Age) String() (s string) {
+func (c *Age) WriteTo(w io.Writer) (int64, error) {
 	start := c.string(c.start)
 	end := c.string(c.end)
 
 	switch {
 	case start == "" && end == "":
-		s = ""
+		return writeNothing()
 
 	case end == "":
-		s = fmt.Sprintf(`after %s`, start)
+		return writeSprintf(w, `after %s`, start)
 
 	case start == end:
-		s = start
+		return writeString(w, start)
 
 	case start == "":
-		s = fmt.Sprintf(`until %s`, end)
+		return writeSprintf(w, `until %s`, end)
 
 	case start != end:
 		// If there is less than a year between the two dates (which is very
@@ -60,11 +60,11 @@ func (c *Age) String() (s string) {
 		yearAndABit := float64(gedcom.Year) * 1.05
 
 		if c.end.Age-c.start.Age < time.Duration(yearAndABit) {
-			s = start
-		} else {
-			s = fmt.Sprintf(`from %s to %s`, start, end)
+			return writeString(w, start)
 		}
+
+		return writeSprintf(w, `from %s to %s`, start, end)
 	}
 
-	return
+	return writeNothing()
 }

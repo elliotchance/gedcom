@@ -1,6 +1,9 @@
 package html
 
-import "github.com/elliotchance/gedcom"
+import (
+	"github.com/elliotchance/gedcom"
+	"io"
+)
 
 // EventDate shows a date like "d. 1882" but will not show anything if the date
 // is not provided.
@@ -16,10 +19,17 @@ func NewEventDate(event string, dates []*gedcom.DateNode) *EventDate {
 	}
 }
 
-func (c *EventDate) String() string {
-	if len(c.dates) == 0 {
-		return ""
+func (c *EventDate) WriteTo(w io.Writer) (int64, error) {
+	if c.IsBlank() {
+		return writeNothing()
 	}
 
-	return Sprintf("<em>%s</em> %s", c.event, c.dates[0].String())
+	return NewComponents(
+		NewTag("em", nil, NewText(c.event)),
+		NewText(" "+c.dates[0].String()),
+	).WriteTo(w)
+}
+
+func (c *EventDate) IsBlank() bool {
+	return len(c.dates) == 0
 }

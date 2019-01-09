@@ -2,6 +2,7 @@ package html
 
 import (
 	"html"
+	"io"
 	"strings"
 )
 
@@ -16,9 +17,9 @@ func NewText(s string) *Text {
 	}
 }
 
-func (c *Text) String() string {
+func (c *Text) WriteTo(w io.Writer) (int64, error) {
 	s := strings.Replace(c.s, "&nbsp;", "~~space~~", -1)
 	s = html.EscapeString(s)
 
-	return strings.Replace(s, "~~space~~", "&nbsp;", -1)
+	return writeString(w, strings.Replace(s, "~~space~~", "&nbsp;", -1))
 }

@@ -1,23 +1,27 @@
 package html
 
-import "fmt"
+import (
+	"io"
+)
 
 type TableRow struct {
-	cells []fmt.Stringer
+	cells []Component
 }
 
-func NewTableRow(cells ...fmt.Stringer) *TableRow {
+func NewTableRow(cells ...Component) *TableRow {
 	return &TableRow{
 		cells: cells,
 	}
 }
 
-func (c *TableRow) String() string {
-	s := `<tr>`
+func (c *TableRow) WriteTo(w io.Writer) (int64, error) {
+	n := appendString(w, `<tr>`)
 
 	for _, cell := range c.cells {
-		s += cell.String()
+		n += appendComponent(w, cell)
 	}
 
-	return s + `</tr>`
+	n += appendString(w, `</tr>`)
+
+	return n, nil
 }

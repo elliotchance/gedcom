@@ -3,6 +3,7 @@ package html_test
 import (
 	"testing"
 
+	"bytes"
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html"
 	"github.com/elliotchance/gedcom/util"
@@ -49,7 +50,7 @@ func died(value string) gedcom.Node {
 	})
 }
 
-func TestDiffPage_String(t *testing.T) {
+func TestDiffPage_WriteTo(t *testing.T) {
 	doc := gedcom.NewDocument()
 	jane.SetDocument(doc)
 	elliot.SetDocument(doc)
@@ -66,13 +67,17 @@ func TestDiffPage_String(t *testing.T) {
 	component := html.NewDiffPage(comparisons, filterFlags, googleAnalyticsID,
 		html.DiffPageShowAll, html.DiffPageSortHighestSimilarity)
 
-	assert.Contains(t, component.String(), "<html>")
-	assert.Contains(t, component.String(), "<title>Comparison</title>")
-	assert.Contains(t, component.String(),
+	buf := bytes.NewBuffer(nil)
+	component.WriteTo(buf)
+	s := string(buf.Bytes())
+
+	assert.Contains(t, s, "<html>")
+	assert.Contains(t, s, "<title>Comparison</title>")
+	assert.Contains(t, s,
 		"Jane Doe (<em>b.</em> 3 Mar 1803&nbsp;&nbsp;&nbsp;<em>d.</em> 14 Jun 1877)")
-	assert.Contains(t, component.String(),
+	assert.Contains(t, s,
 		"Elliot Chance (<em>b.</em> 4 Jan 1843&nbsp;&nbsp;&nbsp;<em>d.</em> 17 Mar 1907)")
-	assert.Contains(t, component.String(),
+	assert.Contains(t, s,
 		"John Smith (<em>b.</em> 4 Jan 1803&nbsp;&nbsp;&nbsp;<em>d.</em> 17 Mar 1877)")
-	assert.Contains(t, component.String(), "</html>")
+	assert.Contains(t, s, "</html>")
 }

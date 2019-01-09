@@ -1,14 +1,16 @@
 package html
 
-import "fmt"
+import (
+	"io"
+)
 
 type StyledTableCell struct {
-	content fmt.Stringer
+	content Component
 	class   string
 	style   string
 }
 
-func NewStyledTableCell(style, class string, content fmt.Stringer) *StyledTableCell {
+func NewStyledTableCell(style, class string, content Component) *StyledTableCell {
 	return &StyledTableCell{
 		content: content,
 		style:   style,
@@ -16,7 +18,12 @@ func NewStyledTableCell(style, class string, content fmt.Stringer) *StyledTableC
 	}
 }
 
-func (c *StyledTableCell) String() string {
-	return Sprintf(`<td scope="col" class="%s" style="%s">%s</td>`,
-		c.class, c.style, c.content)
+func (c *StyledTableCell) WriteTo(w io.Writer) (int64, error) {
+	attributes := map[string]string{
+		"scope": "col",
+		"class": c.class,
+		"style": c.style,
+	}
+
+	return NewTag("td", attributes, c.content).WriteTo(w)
 }

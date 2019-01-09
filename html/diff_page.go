@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/util"
+	"io"
 	"sort"
 )
 
@@ -90,8 +91,8 @@ func (c *DiffPage) weightedSimilarity(comparison *gedcom.IndividualComparison) f
 	return 0.0
 }
 
-func (c *DiffPage) String() string {
-	rows := []fmt.Stringer{}
+func (c *DiffPage) WriteTo(w io.Writer) (int64, error) {
+	rows := []Component{}
 
 	c.sortComparisons()
 
@@ -139,8 +140,8 @@ func (c *DiffPage) String() string {
 	}
 
 	// Individual pages
-	components := []fmt.Stringer{
-		NewBigTitle(1, "Individuals"),
+	components := []Component{
+		NewBigTitle(1, NewText("Individuals")),
 		NewSpace(),
 		NewTable("", rows...),
 	}
@@ -149,7 +150,7 @@ func (c *DiffPage) String() string {
 			continue
 		}
 
-		compare := newIndividualCompare(comparison, c.filterFlags)
+		compare := NewIndividualCompare(comparison, c.filterFlags)
 		components = append(components, compare)
 	}
 
@@ -157,7 +158,7 @@ func (c *DiffPage) String() string {
 		"Comparison",
 		NewComponents(components...),
 		c.googleAnalyticsID,
-	).String()
+	).WriteTo(w)
 }
 
 func (c *DiffPage) shouldSkip(comparison *gedcom.IndividualComparison) bool {
