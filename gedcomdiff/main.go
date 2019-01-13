@@ -18,6 +18,7 @@ import (
 	"github.com/elliotchance/gedcom/util"
 	"log"
 	"os"
+	"os/signal"
 )
 
 var (
@@ -44,6 +45,35 @@ func check(err error) {
 func main() {
 	parseCLIFlags()
 
+	similarityOptions := gedcom.NewSimilarityOptions()
+	similarityOptions.MinimumWeightedSimilarity = optionMinimumWeightedSimilarity
+	similarityOptions.MinimumSimilarity = optionMinimumSimilarity
+
+	compareOptions := gedcom.NewIndividualNodesCompareOptions()
+	compareOptions.SimilarityOptions = similarityOptions
+	compareOptions.Notifier = make(chan gedcom.CompareProgress)
+	compareOptions.NotifierStep = 100
+	compareOptions.Jobs = optionJobs
+
+	// Gracefully handle a ctrl+c.
+	signaller := make(chan os.Signal, 1)
+	signal.Notify(signaller, os.Interrupt)
+	go func() {
+		<-signaller
+
+		defer func() {
+			// The panic may occur if crtl+c happens after the comparisons after
+			// the comparisons are finished but it's still rendering the output.
+			//
+			// We tried our best, exit with a failure code.
+			recover()
+			log.Fatal("aborted")
+		}()
+
+		// This is the correct way to abort the comparisons.
+		close(compareOptions.Notifier)
+	}()
+
 	leftGedcom, err := gedcom.NewDocumentFromGEDCOMFile(optionLeftGedcomFile)
 	check(err)
 
@@ -59,39 +89,27 @@ func main() {
 
 	var comparisons gedcom.IndividualComparisons
 
-	similarityOptions := gedcom.NewSimilarityOptions()
-	similarityOptions.MinimumWeightedSimilarity = optionMinimumWeightedSimilarity
-	similarityOptions.MinimumSimilarity = optionMinimumSimilarity
-
-	compareOptions := gedcom.NewIndividualNodesCompareOptions()
-	compareOptions.SimilarityOptions = similarityOptions
-	compareOptions.Notifier = make(chan gedcom.CompareProgress)
-	compareOptions.NotifierStep = 100
-	compareOptions.Jobs = optionJobs
+	go func() {
+		comparisons = leftIndividuals.Compare(rightIndividuals, compareOptions)
+	}()
 
 	if optionProgress {
-		go func() {
-			comparisons = leftIndividuals.Compare(rightIndividuals, compareOptions)
-		}()
-
 		progressBar := pb.StartNew(0)
 
-		for {
-			n, ok := <-compareOptions.Notifier
-			if !ok {
-				break
-			}
-
+		for n := range compareOptions.Notifier {
 			progressBar.SetTotal(n.Total)
 			progressBar.SetCurrent(n.Done)
 		}
 
 		progressBar.Finish()
 	} else {
-		comparisons = leftIndividuals.Compare(rightIndividuals, compareOptions)
+		// Wait for notifier channel to be closed.
+		for range compareOptions.Notifier {
+		}
 	}
 
-	page := html.NewDiffPage(comparisons, filterFlags, optionGoogleAnalyticsID, optionShow, optionSort)
+	page := html.NewDiffPage(comparisons, filterFlags, optionGoogleAnalyticsID,
+		optionShow, optionSort)
 
 	_, err = page.WriteTo(out)
 	if err != nil {
