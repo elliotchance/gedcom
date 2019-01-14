@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"sync"
 )
 
 // DefaultMinimumSimilarity is a sensible value to provide to the
@@ -262,10 +263,12 @@ type IndividualNodesCompareOptions struct {
 	// not nil. If it is nil then this feature is ignored.
 	//
 	// You can control how precise this is with NotifierStep.
+	//
+	// You may close this Notifier to abort the comparison early.
 	Notifier chan CompareProgress
 
 	// NotifierStep is the number of comparisons that must happen before the
-	// Notifier is used. The default is zero so all comparisons will cause a
+	// Notifier be notified. The default is zero so all comparisons will cause a
 	// notify. You should set this to a higher amount of reduce the frequency of
 	// chatter.
 	NotifierStep int64
@@ -289,13 +292,13 @@ func NewIndividualNodesCompareOptions() *IndividualNodesCompareOptions {
 	}
 }
 
-func (o *IndividualNodesCompareOptions) end() {
-	if o.Notifier != nil {
-		close(o.Notifier)
-	}
-}
-
 func (o *IndividualNodesCompareOptions) notify(m CompareProgress) {
+	defer func() {
+		// Catch "panic: send on closed channel". This means Notifier was closed
+		// prematurely to abort the comparisons.
+		recover()
+	}()
+
 	if o.Notifier != nil {
 		o.Notifier <- m
 	}
@@ -309,36 +312,15 @@ func (o *IndividualNodesCompareOptions) jobs() int {
 	return maxInt(o.Jobs, 1)
 }
 
-// Compare returns the matching individuals from two lists.
-//
-// The length of the result slice will be no larger than the largest slice
-// provided and no smaller than the smallest slice provided.
-//
-// Individuals can only be matched once on their respective side so you can
-// guarantee that all the Left's are unique and belong to the current nodes.
-// Likewise all Right's will be unique and only belong to the other set.
-//
-// See IndividualNodesCompareOptions for more options.
-func (nodes IndividualNodes) Compare(other IndividualNodes, options *IndividualNodesCompareOptions) IndividualComparisons {
-	// Calculate all the similarities of the matrix.
-	similarities := IndividualComparisons{}
+func createJobs(left, right IndividualNodes) chan *IndividualComparison {
+	// Because the jobs are so small I've found that using a buffered channel
+	// can make the processing up to 30% faster on my 4 cores. I'm not sure what
+	// the best number for this should be, or if it could be dynamic.
+	jobs := make(chan *IndividualComparison, 10)
 
-	// ghost:ignore
-	total := int64(len(nodes)) * int64(len(other))
-
-	jobs := make(chan *IndividualComparison, 100)
-	results := make(chan *IndividualComparison, 100)
-
-	// Start workers.
-	numberOfJobs := options.jobs()
-	for w := 1; w <= numberOfJobs; w++ {
-		go nodes.compareWorker(options.SimilarityOptions, jobs, results)
-	}
-
-	// Send jobs.
 	go func() {
-		for _, a := range nodes {
-			for _, b := range other {
+		for _, a := range left {
+			for _, b := range right {
 				jobs <- &IndividualComparison{
 					Left:  a,
 					Right: b,
@@ -349,24 +331,62 @@ func (nodes IndividualNodes) Compare(other IndividualNodes, options *IndividualN
 		close(jobs)
 	}()
 
-	// Collect results.
-	for done := int64(1); done <= total; done++ {
-		similarities = append(similarities, <-results)
+	return jobs
+}
 
-		if done%options.notifierStep() == 0 {
-			options.notify(CompareProgress{
+func (o *IndividualNodesCompareOptions) processJobs(jobs chan *IndividualComparison) chan *IndividualComparison {
+	// See description in createJobs().
+	results := make(chan *IndividualComparison, 10)
+
+	go func() {
+		wg := sync.WaitGroup{}
+
+		for i := 0; i < o.jobs(); i++ {
+			wg.Add(1)
+			go func() {
+				for j := range jobs {
+					j.Similarity = j.Left.SurroundingSimilarity(j.Right, o.SimilarityOptions)
+					results <- j
+				}
+
+				wg.Done()
+			}()
+		}
+
+		wg.Wait()
+		close(results)
+	}()
+
+	return results
+}
+
+func (o *IndividualNodesCompareOptions) collectResults(results chan *IndividualComparison, total int64) []*IndividualComparison {
+	similarities := IndividualComparisons{}
+
+	done := int64(0)
+	for next := range results {
+		similarities = append(similarities, next)
+
+		if done%o.notifierStep() == 0 {
+			o.notify(CompareProgress{
 				Done:  done,
 				Total: total,
 			})
 		}
+
+		done++
 	}
 
 	// Make sure we notify that all comparisons have completed.
-	options.notify(CompareProgress{
+	o.notify(CompareProgress{
 		Done:  total,
 		Total: total,
 	})
 
+	return similarities
+}
+
+func (o *IndividualNodesCompareOptions) calculateWinners(a, b IndividualNodes, similarities []*IndividualComparison) []*IndividualComparison {
 	// Sort by similarity.
 	sort.SliceStable(similarities, func(i, j int) bool {
 		return similarities[i].Similarity.WeightedSimilarity() >
@@ -378,7 +398,7 @@ func (nodes IndividualNodes) Compare(other IndividualNodes, options *IndividualN
 	winners := IndividualComparisons{}
 	for _, s := range similarities {
 		// Once we have gone below the acceptable similarity we can bail out.
-		minWS := options.SimilarityOptions.MinimumWeightedSimilarity
+		minWS := o.SimilarityOptions.MinimumWeightedSimilarity
 		if s.Similarity.WeightedSimilarity() < minWS {
 			break
 		}
@@ -394,7 +414,7 @@ func (nodes IndividualNodes) Compare(other IndividualNodes, options *IndividualN
 	}
 
 	// All of the remaining need to be added.
-	for _, left := range nodes {
+	for _, left := range a {
 		if !found[left] {
 			winners = append(winners, &IndividualComparison{
 				Left: left,
@@ -402,7 +422,7 @@ func (nodes IndividualNodes) Compare(other IndividualNodes, options *IndividualN
 		}
 	}
 
-	for _, right := range other {
+	for _, right := range b {
 		if !found[right] {
 			winners = append(winners, &IndividualComparison{
 				Right: right,
@@ -410,16 +430,34 @@ func (nodes IndividualNodes) Compare(other IndividualNodes, options *IndividualN
 		}
 	}
 
-	options.end()
-
 	return winners
 }
 
-func (nodes IndividualNodes) compareWorker(similarityOptions *SimilarityOptions, jobs <-chan *IndividualComparison, results chan<- *IndividualComparison) {
-	for j := range jobs {
-		j.Similarity = j.Left.SurroundingSimilarity(j.Right, similarityOptions)
-		results <- j
-	}
+// Compare returns the matching individuals from two lists.
+//
+// The length of the result slice will be no larger than the largest slice
+// provided and no smaller than the smallest slice provided.
+//
+// Individuals can only be matched once on their respective side so you can
+// guarantee that all the Left's are unique and belong to the current nodes.
+// Likewise all Right's will be unique and only belong to the other set.
+//
+// See IndividualNodesCompareOptions for more options.
+func (nodes IndividualNodes) Compare(other IndividualNodes, options *IndividualNodesCompareOptions) IndividualComparisons {
+	defer func() {
+		if options.Notifier != nil {
+			close(options.Notifier)
+		}
+	}()
+
+	total := int64(len(nodes)) * int64(len(other))
+
+	jobs := createJobs(nodes, other)
+	results := options.processJobs(jobs)
+	similarities := options.collectResults(results, total)
+	winners := options.calculateWinners(nodes, other, similarities)
+
+	return winners
 }
 
 // Merge uses the expensive but more accurate Compare algorithm to determine the
