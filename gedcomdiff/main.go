@@ -12,6 +12,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/cheggaaa/pb"
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html"
@@ -33,6 +34,7 @@ var (
 	optionMinimumSimilarity         float64
 	optionMinimumWeightedSimilarity float64
 	optionSort                      string // see optionSort constants.
+	optionPreferPointerAbove        float64
 )
 
 var filterFlags = &util.FilterFlags{}
@@ -48,6 +50,7 @@ func main() {
 
 	similarityOptions := gedcom.NewSimilarityOptions()
 	similarityOptions.MinimumWeightedSimilarity = optionMinimumWeightedSimilarity
+	similarityOptions.PreferPointerAbove = optionPreferPointerAbove
 	similarityOptions.MinimumSimilarity = optionMinimumSimilarity
 
 	compareOptions := gedcom.NewIndividualNodesCompareOptions()
@@ -95,7 +98,7 @@ func main() {
 	}()
 
 	if optionProgress {
-		progressBar := pb.StartNew(0).Prefix("Comparing")
+		progressBar := pb.StartNew(0).Prefix("Comparing Documents")
 		progressBar.SetRefreshRate(500 * time.Millisecond)
 		progressBar.ShowElapsedTime = true
 		progressBar.ShowTimeLeft = true
@@ -112,12 +115,38 @@ func main() {
 		}
 	}
 
-	page := html.NewDiffPage(comparisons, filterFlags, optionGoogleAnalyticsID,
-		optionShow, optionSort, html.LivingVisibilityShow)
+	diffProgress := make(chan gedcom.Progress)
 
-	_, err = page.WriteTo(out)
-	if err != nil {
-		log.Fatal(err)
+	page := html.NewDiffPage(comparisons, filterFlags, optionGoogleAnalyticsID,
+		optionShow, optionSort, diffProgress, compareOptions, html.LivingVisibilityShow)
+
+	go func() {
+		_, err = page.WriteTo(out)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		close(diffProgress)
+	}()
+
+	if optionProgress {
+		progressBar := pb.StartNew(0).Prefix("Comparing Individuals")
+		progressBar.SetRefreshRate(500 * time.Millisecond)
+		progressBar.ShowElapsedTime = true
+		progressBar.ShowTimeLeft = true
+
+		for p := range diffProgress {
+			if p.Total != 0 {
+				progressBar.SetTotal64(p.Total)
+			}
+
+			progressBar.Add64(p.Add)
+		}
+
+		progressBar.Finish()
+	} else {
+		for range diffProgress {
+		}
 	}
 }
 
@@ -188,6 +217,26 @@ func parseCLIFlags() {
 
 			"highest-similarity": Sort the individuals by their match
 			similarity. Highest matches will appear first.`))
+
+	flag.Float64Var(&optionPreferPointerAbove, "prefer-pointer-above",
+		gedcom.DefaultMinimumSimilarity, util.CLIDescription(fmt.Sprintf(`
+			Controls if two individuals should be considered a match by their
+			pointer value.
+
+			The default value is %f which means that the individuals will be
+			considered a match if they share the same pointer and hit the same
+			default minimum similarity.
+
+			A value of 1.0 would have to be a perfect match to be considered
+			equal on their pointer, this is the same as disabling the feature.
+
+			A value of 0.0 would mean that it always trusts the pointer match,
+			even if the individuals are nothing alike.
+
+			This option makes sense when you are comparing documents that have
+			come from the same base and retained the pointers between
+			individuals of the existing data.
+			`, gedcom.DefaultMinimumSimilarity)))
 
 	filterFlags.SetupCLI()
 

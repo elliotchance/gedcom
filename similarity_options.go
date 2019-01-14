@@ -40,6 +40,24 @@ type SimilarityOptions struct {
 	// values have been chosen with gedcomtune.
 	JaroBoostThreshold float64
 	JaroPrefixSize     int
+
+	// PreferPointerAbove controls if two individuals should be considered a
+	// match by their pointer value.
+	//
+	// The default value is DefaultMinimumSimilarity which means that the
+	// individuals will be considered a match if they share the same pointer and
+	// hit the same default minimum similarity.
+	//
+	// A value of 1.0 would have to be a perfect match to be considered equal on
+	// their pointer, this is the same as disabling the feature.
+	//
+	// A value of 0.0 would mean that it always trusts the pointer match, even
+	// if the individuals are nothing alike.
+	//
+	// PreferPointerAbove makes sense when you are comparing documents that have
+	// come from the same base and retained the pointers between individuals of
+	// the existing data.
+	PreferPointerAbove float64
 }
 
 // NewSimilarityOptions returns sensible defaults that are used around many of
@@ -59,6 +77,10 @@ func NewSimilarityOptions() SimilarityOptions {
 		NameToDateRatio:    0.5,
 		JaroBoostThreshold: DefaultJaroWinklerBoostThreshold,
 		JaroPrefixSize:     DefaultJaroWinklerPrefixSize,
+
+		// Allow individuals to me matched using their pointer if they hit the
+		// same default minimum threshold.
+		PreferPointerAbove: DefaultMinimumSimilarity,
 	}
 }
 

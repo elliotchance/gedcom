@@ -95,6 +95,6 @@ func (c *IndividualEvents) WriteTo(w io.Writer) (int64, error) {
 	s := NewTable("text-center", tableHead, components)
 
 	return NewRow(NewColumn(EntireRow,
-		NewCard("Events", len(events), s),
+		NewCard(NewText("Events"), len(events), s),
 	)).WriteTo(w)
 }

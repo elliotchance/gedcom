@@ -11,12 +11,12 @@ const (
 
 // Card is a simple box with a header and body section.
 type Card struct {
-	title string
+	title Component
 	body  Component
 	count int
 }
 
-func NewCard(title string, count int, body Component) *Card {
+func NewCard(title Component, count int, body Component) *Card {
 	return &Card{
 		title: title,
 		body:  body,
@@ -25,10 +25,10 @@ func NewCard(title string, count int, body Component) *Card {
 }
 
 func (c *Card) WriteTo(w io.Writer) (int64, error) {
-	var count Component = NewText(c.title)
+	var count = c.title
 	if c.count != noBadgeCount {
 		count = NewComponents(
-			NewText(c.title),
+			c.title,
 			NewBadgePill("secondary", "float-right",
 				NewText(strconv.Itoa(c.count))),
 		)

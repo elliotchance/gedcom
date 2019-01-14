@@ -41,5 +41,6 @@ func (c *FamilyStatistics) WriteTo(w io.Writer) (int64, error) {
 
 	s := NewComponents(totalFamiliesRow, marriageCountRow, divorceCountRow)
 
-	return NewCard("Families", noBadgeCount, NewTable("", s)).WriteTo(w)
+	return NewCard(NewText("Families"), noBadgeCount, NewTable("", s)).
+		WriteTo(w)
 }

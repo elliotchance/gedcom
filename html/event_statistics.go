@@ -49,5 +49,5 @@ func (c *EventStatistics) WriteTo(w io.Writer) (int64, error) {
 
 	table := NewTable("", NewComponents(rows...))
 
-	return NewCard("Events", noBadgeCount, table).WriteTo(w)
+	return NewCard(NewText("Events"), noBadgeCount, table).WriteTo(w)
 }

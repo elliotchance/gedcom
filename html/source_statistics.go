@@ -22,5 +22,5 @@ func (c *SourceStatistics) WriteTo(w io.Writer) (int64, error) {
 		NewKeyedTableRow("Total", total, true),
 	)
 
-	return NewCard("Sources", noBadgeCount, NewTable("", s)).WriteTo(w)
+	return NewCard(NewText("Sources"), noBadgeCount, NewTable("", s)).WriteTo(w)
 }

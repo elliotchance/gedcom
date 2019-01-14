@@ -6,6 +6,7 @@ import (
 	"github.com/elliotchance/gedcom/util"
 	"io"
 	"sort"
+	"sync"
 )
 
 // These are used for optionShow. If you update these options you will also
@@ -29,30 +30,34 @@ type DiffPage struct {
 	googleAnalyticsID string
 	sort              string
 	show              string
+	progress          chan gedcom.Progress
+	compareOptions    *gedcom.IndividualNodesCompareOptions
 	visibility        LivingVisibility
 }
 
-func NewDiffPage(comparisons gedcom.IndividualComparisons, filterFlags *util.FilterFlags, googleAnalyticsID string, show, sort string, visibility LivingVisibility) *DiffPage {
+func NewDiffPage(comparisons gedcom.IndividualComparisons, filterFlags *util.FilterFlags, googleAnalyticsID string, show, sort string, progress chan gedcom.Progress, compareOptions *gedcom.IndividualNodesCompareOptions, visibility LivingVisibility) *DiffPage {
 	return &DiffPage{
 		comparisons:       comparisons,
 		filterFlags:       filterFlags,
 		googleAnalyticsID: googleAnalyticsID,
 		show:              show,
 		sort:              sort,
+		progress:          progress,
+		compareOptions:    compareOptions,
 		visibility:        visibility,
 	}
 }
 
-func (c *DiffPage) sortByWrittenName(i, j int) bool {
-	a := c.comparisons[i].Left
-	b := c.comparisons[j].Left
+func (c *DiffPage) sortByWrittenName(comparisons []*IndividualCompare, i, j int) bool {
+	a := comparisons[i].comparison.Left
+	b := comparisons[j].comparison.Left
 
 	if a == nil {
-		a = c.comparisons[i].Right
+		a = comparisons[i].comparison.Right
 	}
 
 	if b == nil {
-		b = c.comparisons[j].Right
+		b = comparisons[j].comparison.Right
 	}
 
 	aName := a.Name().String()
@@ -61,9 +66,9 @@ func (c *DiffPage) sortByWrittenName(i, j int) bool {
 	return aName < bName
 }
 
-func (c *DiffPage) sortByHighestSimilarity(i, j int) bool {
-	a := c.weightedSimilarity(c.comparisons[i])
-	b := c.weightedSimilarity(c.comparisons[j])
+func (c *DiffPage) sortByHighestSimilarity(comparisons []*IndividualCompare, i, j int) bool {
+	a := c.weightedSimilarity(comparisons[i].comparison)
+	b := c.weightedSimilarity(comparisons[j].comparison)
 
 	if a != b {
 		// Greater than because we want the highest matches up the top.
@@ -71,18 +76,18 @@ func (c *DiffPage) sortByHighestSimilarity(i, j int) bool {
 	}
 
 	// Fallback to sorting by name for non-matches
-	return c.sortByWrittenName(i, j)
+	return c.sortByWrittenName(comparisons, i, j)
 }
 
-func (c *DiffPage) sortComparisons() {
-	sortFns := map[string]func(*DiffPage, int, int) bool{
+func (c *DiffPage) sortComparisons(comparisons []*IndividualCompare) {
+	sortFns := map[string]func(*DiffPage, []*IndividualCompare, int, int) bool{
 		DiffPageSortWrittenName:       (*DiffPage).sortByWrittenName,
 		DiffPageSortHighestSimilarity: (*DiffPage).sortByHighestSimilarity,
 	}
 
 	sortFn := sortFns[c.sort]
-	sort.SliceStable(c.comparisons, func(i, j int) bool {
-		return sortFn(c, i, j)
+	sort.SliceStable(comparisons, func(i, j int) bool {
+		return sortFn(c, comparisons, i, j)
 	})
 }
 
@@ -96,26 +101,102 @@ func (c *DiffPage) weightedSimilarity(comparison *gedcom.IndividualComparison) f
 	return 0.0
 }
 
-func (c *DiffPage) WriteTo(w io.Writer) (int64, error) {
-	rows := []Component{}
+func (c *DiffPage) createJobs() chan *IndividualCompare {
+	jobs := make(chan *IndividualCompare, 10)
 
-	c.sortComparisons()
-
-	for _, comparison := range c.comparisons {
-		if c.shouldSkip(comparison) {
-			continue
+	go func() {
+		for _, comparison := range c.comparisons {
+			jobs <- NewIndividualCompare(comparison,
+				c.filterFlags, c.progress, c.compareOptions, c.visibility)
 		}
 
-		weightedSimilarity := c.weightedSimilarity(comparison)
+		close(jobs)
+	}()
+
+	return jobs
+}
+
+func (c *DiffPage) processJobs(jobs chan *IndividualCompare) chan *IndividualCompare {
+	results := make(chan *IndividualCompare, 10)
+
+	go func() {
+		wg := sync.WaitGroup{}
+		for i := 0; i < c.compareOptions.ConcurrentJobs(); i++ {
+			wg.Add(1)
+			go func() {
+				for job := range jobs {
+					if c.shouldSkip(job) {
+						continue
+					}
+
+					results <- job
+				}
+
+				wg.Done()
+			}()
+		}
+
+		wg.Wait()
+		close(results)
+	}()
+
+	return results
+}
+
+func (c *DiffPage) sortResults(in chan *IndividualCompare) chan *IndividualCompare {
+	out := make(chan *IndividualCompare, 10)
+
+	go func() {
+		// We have to read all results before they can be sorted.
+		all := []*IndividualCompare{}
+		for comparison := range in {
+			all = append(all, comparison)
+		}
+
+		c.sortComparisons(all)
+
+		// Send all results back. We expect there is only one receiver for this
+		// to work.
+		for _, item := range all {
+			out <- item
+		}
+
+		close(out)
+	}()
+
+	return out
+}
+
+func (c *DiffPage) WriteTo(w io.Writer) (int64, error) {
+	if c.progress != nil {
+		c.progress <- gedcom.Progress{
+			Total: int64(len(c.comparisons)),
+		}
+	}
+
+	jobs := c.createJobs()
+	results := c.processJobs(jobs)
+	results = c.sortResults(results)
+
+	precalculatedComparisons := []*IndividualCompare{}
+
+	for comparison := range results {
+		precalculatedComparisons = append(precalculatedComparisons, comparison)
+	}
+
+	// The index at the top of the page.
+	rows := []Component{}
+	for _, comparison := range precalculatedComparisons {
+		weightedSimilarity := c.weightedSimilarity(comparison.comparison)
 
 		leftClass := ""
 		rightClass := ""
 
 		switch {
-		case comparison.Left != nil && comparison.Right == nil:
+		case comparison.comparison.Left != nil && comparison.comparison.Right == nil:
 			leftClass = "bg-warning"
 
-		case comparison.Left == nil && comparison.Right != nil:
+		case comparison.comparison.Left == nil && comparison.comparison.Right != nil:
 			rightClass = "bg-primary"
 
 		case weightedSimilarity < 1:
@@ -126,8 +207,8 @@ func (c *DiffPage) WriteTo(w io.Writer) (int64, error) {
 			continue
 		}
 
-		leftNameAndDates := NewIndividualNameAndDatesLink(comparison.Left, c.visibility, "")
-		rightNameAndDates := NewIndividualNameAndDatesLink(comparison.Right, c.visibility, "")
+		leftNameAndDates := NewIndividualNameAndDatesLink(comparison.comparison.Left, c.visibility, "")
+		rightNameAndDates := NewIndividualNameAndDatesLink(comparison.comparison.Right, c.visibility, "")
 
 		left := NewTableCell(leftNameAndDates).Class(leftClass)
 		right := NewTableCell(rightNameAndDates).Class(rightClass)
@@ -146,41 +227,36 @@ func (c *DiffPage) WriteTo(w io.Writer) (int64, error) {
 
 	// Individual pages
 	components := []Component{
-		NewBigTitle(1, NewText("Individuals")),
 		NewSpace(),
-		NewTable("", rows...),
+		NewCard(NewText("Individuals"), noBadgeCount, NewTable("", rows...)),
+		NewSpace(),
 	}
-	for _, comparison := range c.comparisons {
-		if c.shouldSkip(comparison) {
-			continue
-		}
-
-		compare := NewIndividualCompare(comparison, c.filterFlags, c.visibility)
-		components = append(components, compare)
+	for _, comparison := range precalculatedComparisons {
+		components = append(components, comparison, NewSpace())
 	}
 
 	return NewPage(
 		"Comparison",
-		NewComponents(components...),
+		NewRow(NewColumn(EntireRow, NewComponents(components...))),
 		c.googleAnalyticsID,
 	).WriteTo(w)
 }
 
-func (c *DiffPage) shouldSkip(comparison *gedcom.IndividualComparison) bool {
+func (c *DiffPage) shouldSkip(comparison *IndividualCompare) bool {
 	switch c.show {
 	case DiffPageShowAll:
 		// Do nothing, we want to show all.
 
 	case DiffPageShowSubset:
-		if gedcom.IsNil(comparison.Right) {
+		if gedcom.IsNil(comparison.comparison.Right) {
 			return true
 		}
 
 	case DiffPageShowOnlyMatches:
-		if gedcom.IsNil(comparison.Left) || gedcom.IsNil(comparison.Right) {
+		if gedcom.IsNil(comparison.comparison.Left) || gedcom.IsNil(comparison.comparison.Right) {
 			return true
 		}
 	}
 
-	return false
+	return comparison.isEmpty()
 }

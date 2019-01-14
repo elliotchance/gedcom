@@ -525,6 +525,7 @@ func TestMergeDocumentsAndIndividuals(t *testing.T) {
 
 			options := gedcom.NewIndividualNodesCompareOptions()
 			options.SimilarityOptions.MinimumWeightedSimilarity = test.minimumSimilarity
+			options.SimilarityOptions.PreferPointerAbove = 1.0
 
 			actual, err := gedcom.MergeDocumentsAndIndividuals(
 				test.left, test.right, test.mergeFn, options)
