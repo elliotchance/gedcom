@@ -20,8 +20,8 @@ func NewPartnersAndChildren(document *gedcom.Document, individual *gedcom.Indivi
 }
 
 func (c *PartnersAndChildren) WriteTo(w io.Writer) (int64, error) {
-	column := NewColumn(EntireRow,
-		NewHeading(2, "", NewText("Spouses & Children")))
+	heading := NewHeading(2, "", NewText("Spouses & Children"))
+	column := NewColumn(EntireRow, heading)
 
 	rows := []Component{
 		NewRow(column),

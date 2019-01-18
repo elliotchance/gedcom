@@ -26,7 +26,8 @@ func NewIndividualEvent(date, place string, description Component, individual *g
 
 func (c *IndividualEvent) WriteTo(w io.Writer) (int64, error) {
 	kind := c.event.Tag().String()
-	placeLink := NewPlaceLink(c.individual.Document(), prettyPlaceName(c.place))
+	placeName := prettyPlaceName(c.place)
+	placeLink := NewPlaceLink(c.individual.Document(), placeName)
 	age := NewAge(c.individual.AgeAt(c.event))
 
 	return NewTableRow(

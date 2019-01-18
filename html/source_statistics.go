@@ -16,7 +16,8 @@ func NewSourceStatistics(document *gedcom.Document) *SourceStatistics {
 }
 
 func (c *SourceStatistics) WriteTo(w io.Writer) (int64, error) {
-	total := NewNumber(len(c.document.Sources()))
+	sources := c.document.Sources()
+	total := NewNumber(len(sources))
 	s := NewComponents(
 		NewKeyedTableRow("Total", total, true),
 	)

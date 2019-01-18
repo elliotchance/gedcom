@@ -90,8 +90,10 @@ func (f *CSVFormatter) writeLine(fields []string) {
 
 func (f *CSVFormatter) writeValue(s string) {
 	s = strings.Replace(s, `"`, `""`, -1)
+	commaIndex := strings.Index(s, ",")
+	quoteIndex := strings.Index(s, `"`)
 
-	if strings.Index(s, ",") < 0 && strings.Index(s, `"`) < 0 {
+	if commaIndex < 0 && quoteIndex < 0 {
 		fmt.Fprintf(f.Writer, "%s", s)
 	} else {
 		fmt.Fprintf(f.Writer, `"%s"`, s)

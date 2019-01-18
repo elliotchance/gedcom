@@ -44,8 +44,8 @@ type SimilarityOptions struct {
 
 // NewSimilarityOptions returns sensible defaults that are used around many of
 // the similarity functions.
-func NewSimilarityOptions() *SimilarityOptions {
-	return &SimilarityOptions{
+func NewSimilarityOptions() SimilarityOptions {
+	return SimilarityOptions{
 		MaxYears:                  DefaultMaxYearsForSimilarity,
 		MinimumSimilarity:         DefaultMinimumSimilarity,
 		MinimumWeightedSimilarity: DefaultMinimumSimilarity,
@@ -68,4 +68,14 @@ func (options SimilarityOptions) String() string {
 	sLen := len(s)
 
 	return s[25 : sLen-1]
+}
+
+func (options SimilarityOptions) canSkipExtraProcessing(individualSimilarity float64) bool {
+	actual := individualSimilarity * options.IndividualWeight
+	threshold := options.MinimumWeightedSimilarity -
+		options.ParentsWeight -
+		options.SpousesWeight -
+		options.ChildrenWeight
+
+	return actual <= threshold
 }

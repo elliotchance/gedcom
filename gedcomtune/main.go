@@ -198,7 +198,7 @@ func random(min, max float64) float64 {
 	return min + rand.Float64()*(max-min)
 }
 
-func runMinimumSimilarity(gedcom1 *gedcom.Document, gedcom2 *gedcom.Document, idealScore int, options *gedcom.SimilarityOptions) {
+func runMinimumSimilarity(gedcom1 *gedcom.Document, gedcom2 *gedcom.Document, idealScore int, options gedcom.SimilarityOptions) {
 	for minimumSimilarity := optionSimilarityMin; minimumSimilarity <= optionSimilarityMax; minimumSimilarity += optionSimilarityStep {
 		options.MinimumWeightedSimilarity = minimumSimilarity
 		options.MinimumSimilarity = minimumSimilarity
@@ -207,7 +207,7 @@ func runMinimumSimilarity(gedcom1 *gedcom.Document, gedcom2 *gedcom.Document, id
 	}
 }
 
-func runMaxYears(gedcom1 *gedcom.Document, gedcom2 *gedcom.Document, idealScore int, options *gedcom.SimilarityOptions) {
+func runMaxYears(gedcom1 *gedcom.Document, gedcom2 *gedcom.Document, idealScore int, options gedcom.SimilarityOptions) {
 	for maxYears := optionYearsMin; maxYears <= optionYearsMax; maxYears += optionYearsStep {
 		options.MaxYears = maxYears
 
@@ -215,7 +215,7 @@ func runMaxYears(gedcom1 *gedcom.Document, gedcom2 *gedcom.Document, idealScore 
 	}
 }
 
-func runIndividualWeight(gedcom1 *gedcom.Document, gedcom2 *gedcom.Document, idealScore int, options *gedcom.SimilarityOptions) {
+func runIndividualWeight(gedcom1 *gedcom.Document, gedcom2 *gedcom.Document, idealScore int, options gedcom.SimilarityOptions) {
 	for x := optionsWeightIndividualMin; x <= optionsWeightIndividualMax; x += optionsWeightIndividualStep {
 		options.IndividualWeight = x
 		options.SpousesWeight = (1.0 - x) / 3
@@ -226,7 +226,7 @@ func runIndividualWeight(gedcom1 *gedcom.Document, gedcom2 *gedcom.Document, ide
 	}
 }
 
-func runNameToDateRatio(gedcom1 *gedcom.Document, gedcom2 *gedcom.Document, idealScore int, options *gedcom.SimilarityOptions) {
+func runNameToDateRatio(gedcom1 *gedcom.Document, gedcom2 *gedcom.Document, idealScore int, options gedcom.SimilarityOptions) {
 	for x := optionsNameToDateRatioMin; x <= optionsNameToDateRatioMax; x += optionsNameToDateRatioStep {
 		options.NameToDateRatio = x
 
@@ -234,7 +234,7 @@ func runNameToDateRatio(gedcom1 *gedcom.Document, gedcom2 *gedcom.Document, idea
 	}
 }
 
-func runJaroBoost(gedcom1 *gedcom.Document, gedcom2 *gedcom.Document, idealScore int, options *gedcom.SimilarityOptions) {
+func runJaroBoost(gedcom1 *gedcom.Document, gedcom2 *gedcom.Document, idealScore int, options gedcom.SimilarityOptions) {
 	for x := optionsJaroBoostMin; x <= optionsJaroBoostMax; x += optionsJaroBoostStep {
 		options.JaroBoostThreshold = x
 
@@ -242,7 +242,7 @@ func runJaroBoost(gedcom1 *gedcom.Document, gedcom2 *gedcom.Document, idealScore
 	}
 }
 
-func runJaroPrefixSize(gedcom1 *gedcom.Document, gedcom2 *gedcom.Document, idealScore int, options *gedcom.SimilarityOptions) {
+func runJaroPrefixSize(gedcom1 *gedcom.Document, gedcom2 *gedcom.Document, idealScore int, options gedcom.SimilarityOptions) {
 	for x := optionsJaroPrefixSizeMin; x <= optionsJaroPrefixSizeMax; x += optionsJaroPrefixSizeStep {
 		options.JaroPrefixSize = x
 
@@ -260,7 +260,7 @@ func startCPUProfiler() {
 	}
 }
 
-func run(gedcom1, gedcom2 *gedcom.Document, idealScore int, options *gedcom.SimilarityOptions) {
+func run(gedcom1, gedcom2 *gedcom.Document, idealScore int, options gedcom.SimilarityOptions) {
 	compareOptions := gedcom.NewIndividualNodesCompareOptions()
 	compareOptions.SimilarityOptions = options
 

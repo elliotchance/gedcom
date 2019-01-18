@@ -10,12 +10,14 @@ func NewFooterRow() *FooterRow {
 }
 
 func (c *FooterRow) WriteTo(w io.Writer) (int64, error) {
+	link := NewLink(
+		NewText("github.com/elliotchance/gedcom"),
+		"https://github.com/elliotchance/gedcom",
+	)
+
 	content := NewComponents(
 		NewText("Generated with "),
-		NewLink(
-			NewText("github.com/elliotchance/gedcom"),
-			"https://github.com/elliotchance/gedcom",
-		),
+		link,
 	)
 
 	return NewComponents(

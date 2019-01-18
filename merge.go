@@ -215,7 +215,9 @@ func MergeNodeSlices(left, right []Node, mergeFn MergeFunction) []Node {
 // Individuals will not be merged amongst each other, only appended to the final
 // document. To merge similar individuals see MergeDocumentsAndIndividuals.
 func MergeDocuments(left, right *Document, mergeFn MergeFunction) *Document {
-	newNodes := MergeNodeSlices(Nodes(left), Nodes(right), mergeFn)
+	leftNodes := Nodes(left)
+	rightNodes := Nodes(right)
+	newNodes := MergeNodeSlices(leftNodes, rightNodes, mergeFn)
 
 	return NewDocumentWithNodes(newNodes)
 }
@@ -257,7 +259,7 @@ func MergeDocumentsAndIndividuals(left, right *Document, mergeFn MergeFunction, 
 //
 // The minimumSimilarity should be value between 0.0 and 1.0. The options must
 // not be nil, you should use NewSimilarityOptions() for sensible defaults.
-func IndividualBySurroundingSimilarityMergeFunction(minimumSimilarity float64, options *SimilarityOptions) MergeFunction {
+func IndividualBySurroundingSimilarityMergeFunction(minimumSimilarity float64, options SimilarityOptions) MergeFunction {
 	return func(left, right Node) Node {
 		leftIndividual, leftOK := left.(*IndividualNode)
 		rightIndividual, rightOK := right.(*IndividualNode)
@@ -267,7 +269,7 @@ func IndividualBySurroundingSimilarityMergeFunction(minimumSimilarity float64, o
 			return nil
 		}
 
-		similarity := leftIndividual.SurroundingSimilarity(rightIndividual, options)
+		similarity := leftIndividual.SurroundingSimilarity(rightIndividual, options, false)
 
 		if similarity.WeightedSimilarity() > minimumSimilarity {
 			// Ignore the error here because left and right must be the same

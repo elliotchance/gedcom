@@ -8,7 +8,7 @@ import (
 )
 
 func TestSimilarityOptions_String(t *testing.T) {
-	String := tf.NamedFunction(t, "SimilarityOptions_String", (*gedcom.SimilarityOptions).String)
+	String := tf.NamedFunction(t, "SimilarityOptions_String", gedcom.SimilarityOptions.String)
 	options := gedcom.NewSimilarityOptions()
 
 	String(options).Returns("MinimumSimilarity:0.733, " +

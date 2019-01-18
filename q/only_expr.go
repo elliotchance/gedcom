@@ -21,7 +21,8 @@ func (e *OnlyExpr) Evaluate(engine *Engine, input interface{}, args []*Statement
 		return nil, nil
 	}
 
-	results := reflect.MakeSlice(reflect.SliceOf(TypeOfSliceElement(input)), 0, 0)
+	inputSliceType := TypeOfSliceElement(input)
+	results := reflect.MakeSlice(reflect.SliceOf(inputSliceType), 0, 0)
 
 	condition := args[0]
 	for i := 0; i < in.Len(); i++ {

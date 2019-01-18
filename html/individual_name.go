@@ -26,7 +26,13 @@ func NewIndividualName(individual *gedcom.IndividualNode, showLiving bool, unkno
 }
 
 func (c *IndividualName) IsUnknown() bool {
-	return c.individual == nil || len(c.individual.Names()) == 0
+	if c.individual == nil {
+		return true
+	}
+
+	names := c.individual.Names()
+
+	return len(names) == 0
 }
 
 func (c *IndividualName) WriteTo(w io.Writer) (int64, error) {

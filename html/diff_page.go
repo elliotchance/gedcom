@@ -53,7 +53,10 @@ func (c *DiffPage) sortByWrittenName(i, j int) bool {
 		b = c.comparisons[j].Right
 	}
 
-	return a.Name().String() < b.Name().String()
+	aName := a.Name().String()
+	bName := b.Name().String()
+
+	return aName < bName
 }
 
 func (c *DiffPage) sortByHighestSimilarity(i, j int) bool {

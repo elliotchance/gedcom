@@ -27,11 +27,15 @@ func (c *IndividualStatistics) WriteTo(w io.Writer) (int64, error) {
 		}
 	}
 
-	totalRow := NewKeyedTableRow("Total", NewNumber(total), true)
-	livingRow := NewKeyedTableRow("Living", NewNumber(living), true)
-	deadRow := NewKeyedTableRow("Dead", NewNumber(total-living), true)
+	totalRow := keyedNumberRow("Total", total)
+	livingRow := keyedNumberRow("Living", living)
+	deadRow := keyedNumberRow("Dead", total-living)
 
 	s := NewComponents(totalRow, livingRow, deadRow)
 
 	return NewCard("Individuals", noBadgeCount, NewTable("", s)).WriteTo(w)
+}
+
+func keyedNumberRow(title string, total int) *KeyedTableRow {
+	return NewKeyedTableRow(title, NewNumber(total), true)
 }

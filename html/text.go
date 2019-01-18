@@ -20,6 +20,7 @@ func NewText(s string) *Text {
 func (c *Text) WriteTo(w io.Writer) (int64, error) {
 	s := strings.Replace(c.s, "&nbsp;", "~~space~~", -1)
 	s = html.EscapeString(s)
+	s = strings.Replace(s, "~~space~~", "&nbsp;", -1)
 
-	return writeString(w, strings.Replace(s, "~~space~~", "&nbsp;", -1))
+	return writeString(w, s)
 }

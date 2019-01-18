@@ -38,6 +38,7 @@ func (e *Engine) Evaluate(documents []*gedcom.Document) (interface{}, error) {
 		}
 	}
 
+	// ghost:ignore
 	lastStatement := e.Statements[len(e.Statements)-1]
 
 	return lastStatement.Evaluate(e, firstDocument)

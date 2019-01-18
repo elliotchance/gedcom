@@ -66,7 +66,8 @@ func NewAge(age time.Duration, isEstimate bool, constraint AgeConstraint) Age {
 // This is not precise as a year is averaged out at 365.25 days (see Year
 // constant) but is useful when only whole years matter.
 func NewAgeWithYears(years float64, isEstimate bool, constraint AgeConstraint) Age {
-	age := time.Duration(years * float64(Year))
+	year := float64(Year)
+	age := time.Duration(years * year)
 
 	return NewAge(age, isEstimate, constraint)
 }
@@ -85,6 +86,7 @@ func (age Age) IsAfter(age2 Age) bool {
 // Years can be used when 1 month resolution is enough. However, it's not
 // recommended to use this for calculations. Instead use the Age value.
 func (age Age) Years() float64 {
+	// ghost:ignore
 	return float64(age.Age) / float64(Year)
 }
 
@@ -93,11 +95,17 @@ func constraintBetweenAges(estimatedBirthDate, estimatedDeathDate Date, age time
 		return AgeConstraintBeforeBirth
 	}
 
-	if estimatedBirthDate.IsZero() || estimatedDeathDate.IsZero() {
+	if estimatedBirthDate.IsZero() {
 		return AgeConstraintUnknown
 	}
 
-	if age > estimatedDeathDate.Time().Sub(estimatedBirthDate.Time()) {
+	if estimatedDeathDate.IsZero() {
+		return AgeConstraintUnknown
+	}
+
+	birthTime := estimatedBirthDate.Time()
+	deathTime := estimatedDeathDate.Time()
+	if age > deathTime.Sub(birthTime) {
 		return AgeConstraintAfterDeath
 	}
 
@@ -123,6 +131,8 @@ func (age Age) String() string {
 	}
 
 	years := int(age.Years())
+
+	// ghost:ignore
 	months := int((age.Years() - float64(years)) * 12)
 
 	estimateSign := ""

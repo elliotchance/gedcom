@@ -141,7 +141,7 @@ type individualSimilarity struct {
 //
 // The options.MaxYears allows the error margin on dates to be adjusted. See
 // DefaultMaxYearsForSimilarity for more information.
-func (nodes IndividualNodes) Similarity(other IndividualNodes, options *SimilarityOptions) float64 {
+func (nodes IndividualNodes) Similarity(other IndividualNodes, options SimilarityOptions) float64 {
 	nodesLen := float64(len(nodes))
 	otherLen := float64(len(other))
 
@@ -245,14 +245,14 @@ func (comparisons IndividualComparisons) String() string {
 // You should use NewIndividualNodesCompareOptions to start with sensible
 // defaults.
 type IndividualNodesCompareOptions struct {
-	// Options controls the weights of the comparisons. See SimilarityOptions
-	// for more information. Any matches below MinimumSimilarity will not be
-	// used.
+	// SimilarityOptions controls the weights of the comparisons. See
+	// SimilarityOptions for more information. Any matches below
+	// MinimumSimilarity will not be used.
 	//
 	// Since this can take a long time to run with a lot of individuals there is
 	// an optional notifier channel that can be listened to for progress
 	// updates. Or pass nil to ignore this feature.
-	SimilarityOptions *SimilarityOptions
+	SimilarityOptions SimilarityOptions
 
 	// Notifier will be sent progress updates throughout the comparison if it is
 	// not nil. If it is nil then this feature is ignored.
@@ -340,7 +340,7 @@ func (o *IndividualNodesCompareOptions) processJobs(jobs chan *IndividualCompari
 			wg.Add(1)
 			go func() {
 				for j := range jobs {
-					j.Similarity = j.Left.SurroundingSimilarity(j.Right, o.SimilarityOptions)
+					j.Similarity = j.Left.SurroundingSimilarity(j.Right, o.SimilarityOptions, false)
 					results <- j
 				}
 
@@ -445,7 +445,9 @@ func (nodes IndividualNodes) Compare(other IndividualNodes, options *IndividualN
 		}
 	}()
 
-	total := int64(len(nodes)) * int64(len(other))
+	nodesLen := len(nodes)
+	otherLen := len(other)
+	total := int64(nodesLen * otherLen)
 
 	jobs := createJobs(nodes, other)
 	results := options.processJobs(jobs)
@@ -532,10 +534,9 @@ func (c IndividualComparison) stringOrDefault(s fmt.Stringer, def string) string
 //   (none) <-> Joe Bloggs (?)
 //
 func (c IndividualComparison) String() string {
-	return fmt.Sprintf(
-		"%s <-> %s (%s)",
-		c.stringOrDefault(c.Left, "(none)"),
-		c.stringOrDefault(c.Right, "(none)"),
-		c.stringOrDefault(c.Similarity, "?"),
-	)
+	left := c.stringOrDefault(c.Left, "(none)")
+	right := c.stringOrDefault(c.Right, "(none)")
+	similarity := c.stringOrDefault(c.Similarity, "?")
+
+	return fmt.Sprintf("%s <-> %s (%s)", left, right, similarity)
 }
