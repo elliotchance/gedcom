@@ -734,25 +734,68 @@ func TestDateNode_Equals(t *testing.T) {
 	// d5 has a different Start from d3 and d4.
 	d5 := gedcom.NewDateNode(nil, "From Jun 2000 to 3 Apr 2008", "", nil)
 
+	// d6 to d8 are phrases.
+	d6 := gedcom.NewDateNode(nil, "(Foo)", "", nil)
+	d7 := gedcom.NewDateNode(nil, "(15 SEP 1985)", "", nil)
+	d8 := gedcom.NewDateNode(nil, "(Foo)", "", nil)
+
+	// d9 to d11 are invalid.
+	d9 := gedcom.NewDateNode(nil, "@#DJULIAN@ 01 JAN 1323", "", nil)
+	d10 := gedcom.NewDateNode(nil, "!! 15 SEP 1985", "", nil)
+	d11 := gedcom.NewDateNode(nil, "@#DJULIAN@ 01 JAN 1323", "", nil)
+
 	Equals := tf.Function(t, (*gedcom.DateNode).Equals)
 
 	// nil values
 	Equals((*gedcom.DateNode)(nil), d1).Returns(false)
 	Equals(d1, (*gedcom.DateNode)(nil)).Returns(false)
 	Equals((*gedcom.DateNode)(nil), (*gedcom.DateNode)(nil)).Returns(false)
+	Equals(d6, (*gedcom.DateNode)(nil)).Returns(false)
 
 	// Bad input
 	Equals(d1, gedcom.NewNameNode(nil, "15 SEP 1985", "", nil)).Returns(false)
+	Equals(d6, gedcom.NewNameNode(nil, "15 SEP 1985", "", nil)).Returns(false)
 
 	// General cases.
 	Equals(d1, d2).Returns(true)
 	Equals(d2, d1).Returns(true)
 	Equals(d3, d4).Returns(true)
 	Equals(d4, d5).Returns(false)
+	Equals(d1, d10).Returns(false)
+
+	// Nothing equals a phrase except anther phrase that is exactly the same.
+	Equals(d1, d6).Returns(false)
+	Equals(d6, d1).Returns(false)
+	Equals(d1, d7).Returns(false)
+	Equals(d7, d1).Returns(false)
+	Equals(d6, d7).Returns(false)
+	Equals(d7, d6).Returns(false)
+	Equals(d6, d8).Returns(true)
+	Equals(d8, d6).Returns(true)
+
+	// Invalid dates are only equal if they have exactly the same value.
+	Equals(d9, d10).Returns(false)
+	Equals(d10, d9).Returns(false)
+	Equals(d9, d11).Returns(true)
+	Equals(d11, d9).Returns(true)
 }
 
 func TestDateNode_DateRange(t *testing.T) {
 	DateRange := tf.Function(t, (*gedcom.DateNode).DateRange)
 
 	DateRange((*gedcom.DateNode)(nil)).Returns(gedcom.Date{}, gedcom.Date{})
+}
+
+func TestDateNode_IsPhrase(t *testing.T) {
+	IsPhrase := tf.Function(t, (*gedcom.DateNode).IsPhrase)
+
+	IsPhrase((*gedcom.DateNode)(nil)).Returns(false)
+	IsPhrase(gedcom.NewDateNode(nil, "", "", nil)).Returns(false)
+	IsPhrase(gedcom.NewDateNode(nil, "(", "", nil)).Returns(false)
+	IsPhrase(gedcom.NewDateNode(nil, ")", "", nil)).Returns(false)
+	IsPhrase(gedcom.NewDateNode(nil, "3 Mar 1981", "", nil)).Returns(false)
+
+	IsPhrase(gedcom.NewDateNode(nil, "()", "", nil)).Returns(true)
+	IsPhrase(gedcom.NewDateNode(nil, "(Foo)", "", nil)).Returns(true)
+	IsPhrase(gedcom.NewDateNode(nil, "(Foo BAR)", "", nil)).Returns(true)
 }
