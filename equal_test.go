@@ -76,3 +76,29 @@ func TestDeepEqual(t *testing.T) {
 	DeepEqual(n7, n6).Returns(true)
 	DeepEqual(n7, n8).Returns(false)
 }
+
+func TestDeepEqualNodes(t *testing.T) {
+	DeepEqualNodes := tf.Function(t, gedcom.DeepEqualNodes)
+
+	// These two are the same.
+	n1 := gedcom.NewResidenceNode(nil, "", "", []gedcom.Node{
+		gedcom.NewDateNode(nil, "3 SEP 1987", "", nil),
+	})
+	n2 := gedcom.NewResidenceNode(nil, "", "", []gedcom.Node{
+		gedcom.NewDateNode(nil, "3 SEP 1987", "", nil),
+	})
+	n3 := gedcom.NewResidenceNode(nil, "", "", []gedcom.Node{
+		gedcom.NewDateNode(nil, "5 SEP 1987", "", nil),
+	})
+
+	// There aren't too many tests here because the fiddly stuff is handled in
+	// the tests for DeepEqual.
+
+	DeepEqualNodes(nil, nil).Returns(true)
+	DeepEqualNodes([]gedcom.Node{n1}, []gedcom.Node{n1}).Returns(true)
+	DeepEqualNodes([]gedcom.Node{n1}, []gedcom.Node{n2}).Returns(true)
+	DeepEqualNodes([]gedcom.Node{n1, n2}, []gedcom.Node{n1, n2}).Returns(true)
+
+	DeepEqualNodes([]gedcom.Node{n1, n2}, []gedcom.Node{n1}).Returns(false)
+	DeepEqualNodes([]gedcom.Node{n1}, []gedcom.Node{n3}).Returns(false)
+}
