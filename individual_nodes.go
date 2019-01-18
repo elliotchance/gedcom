@@ -239,11 +239,6 @@ func (comparisons IndividualComparisons) String() string {
 	return strings.Join(lines, "\n")
 }
 
-// CompareProgress contains information about the progress of a Comparison.
-type CompareProgress struct {
-	Done, Total int64
-}
-
 // IndividualNodesCompareOptions provides more optional attributes for
 // IndividualNodes.Compare.
 //
@@ -265,7 +260,7 @@ type IndividualNodesCompareOptions struct {
 	// You can control how precise this is with NotifierStep.
 	//
 	// You may close this Notifier to abort the comparison early.
-	Notifier chan CompareProgress
+	Notifier chan Progress
 
 	// NotifierStep is the number of comparisons that must happen before the
 	// Notifier be notified. The default is zero so all comparisons will cause a
@@ -292,7 +287,7 @@ func NewIndividualNodesCompareOptions() *IndividualNodesCompareOptions {
 	}
 }
 
-func (o *IndividualNodesCompareOptions) notify(m CompareProgress) {
+func (o *IndividualNodesCompareOptions) notify(m Progress) {
 	defer func() {
 		// Catch "panic: send on closed channel". This means Notifier was closed
 		// prematurely to abort the comparisons.
@@ -368,7 +363,7 @@ func (o *IndividualNodesCompareOptions) collectResults(results chan *IndividualC
 		similarities = append(similarities, next)
 
 		if done%o.notifierStep() == 0 {
-			o.notify(CompareProgress{
+			o.notify(Progress{
 				Done:  done,
 				Total: total,
 			})
@@ -378,7 +373,7 @@ func (o *IndividualNodesCompareOptions) collectResults(results chan *IndividualC
 	}
 
 	// Make sure we notify that all comparisons have completed.
-	o.notify(CompareProgress{
+	o.notify(Progress{
 		Done:  total,
 		Total: total,
 	})

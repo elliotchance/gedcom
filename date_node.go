@@ -236,7 +236,7 @@ func parseDateParts(dateString string, isEndOfRange bool) Date {
 
 	switch {
 	case len(parts) == 0, // Could not match the regexp.
-		err != nil:       // The month is unknown.
+		err != nil: // The month is unknown.
 		return Date{
 			IsEndOfRange: isEndOfRange,
 		}

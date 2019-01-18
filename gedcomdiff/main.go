@@ -51,7 +51,7 @@ func main() {
 
 	compareOptions := gedcom.NewIndividualNodesCompareOptions()
 	compareOptions.SimilarityOptions = similarityOptions
-	compareOptions.Notifier = make(chan gedcom.CompareProgress)
+	compareOptions.Notifier = make(chan gedcom.Progress)
 	compareOptions.NotifierStep = 100
 	compareOptions.Jobs = optionJobs
 
