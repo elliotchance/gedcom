@@ -19,6 +19,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"time"
 )
 
 var (
@@ -94,11 +95,14 @@ func main() {
 	}()
 
 	if optionProgress {
-		progressBar := pb.StartNew(0)
+		progressBar := pb.StartNew(0).Prefix("Comparing")
+		progressBar.SetRefreshRate(500 * time.Millisecond)
+		progressBar.ShowElapsedTime = true
+		progressBar.ShowTimeLeft = true
 
 		for n := range compareOptions.Notifier {
-			progressBar.SetTotal(n.Total)
-			progressBar.SetCurrent(n.Done)
+			progressBar.SetTotal64(n.Total)
+			progressBar.Set64(n.Done)
 		}
 
 		progressBar.Finish()
