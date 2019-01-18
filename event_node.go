@@ -25,8 +25,12 @@ func (node *EventNode) Dates() DateNodes {
 
 // Equal tests if two events are the same.
 //
-// Two events are considered equal if they both contain the same date. If either
-// or both contain more than one date only a single date must match both sides.
+// Two events are considered equal if:
+//
+// 1. They both contain the same date. If either or both contain more than one
+// date only a single date must match both sides.
+//
+// 2. They both do not have any dates, but all other attributes are the same.
 //
 // If either node is nil (including both) or if the right side is not a
 // EventNode then false is always returned.
@@ -49,6 +53,10 @@ func (node *EventNode) Equals(node2 Node) bool {
 					return true
 				}
 			}
+		}
+
+		if len(leftDates) == 0 && len(rightDates) == 0 && node.Value() == node2.Value() {
+			return DeepEqualNodes(node.Nodes(), node2.Nodes())
 		}
 	}
 
