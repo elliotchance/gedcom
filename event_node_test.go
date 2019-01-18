@@ -46,7 +46,7 @@ func TestEventNode_Dates(t *testing.T) {
 }
 
 func TestEventNode_Equals(t *testing.T) {
-	Equals := tf.Function(t, (*gedcom.EventNode).Equals)
+	Equals := tf.NamedFunction(t, "EventNode_Equals", (*gedcom.EventNode).Equals)
 
 	n1 := gedcom.NewEventNode(nil, "foo", "", nil)
 	n2 := gedcom.NewEventNode(nil, "bar", "", nil)
@@ -56,6 +56,10 @@ func TestEventNode_Equals(t *testing.T) {
 	})
 	n4 := gedcom.NewEventNode(nil, "bar", "", []gedcom.Node{
 		gedcom.NewDateNode(nil, "Oct 1943", "", nil),
+	})
+	n5 := gedcom.NewEventNode(nil, "", "", []gedcom.Node{
+		gedcom.NewNode(nil, gedcom.TagType, "Domicilie", ""),
+		gedcom.NewPlaceNode(nil, "Washington, District of Columbia, District of Columbia, United States", "", nil),
 	})
 
 	// nils
@@ -67,10 +71,11 @@ func TestEventNode_Equals(t *testing.T) {
 	Equals(n1, gedcom.NewNameNode(nil, "foo", "", nil)).Returns(false)
 
 	// General cases.
-	Equals(n1, n1).Returns(false)
+	Equals(n1, n1).Returns(true)
 	Equals(n1, n2).Returns(false)
 	Equals(n1, n3).Returns(false)
 	Equals(n3, n4).Returns(true)
+	Equals(n5, n5).Returns(true)
 }
 
 func TestEventNode_Years(t *testing.T) {
