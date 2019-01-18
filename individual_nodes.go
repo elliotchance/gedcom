@@ -16,7 +16,7 @@ import (
 //
 // The value was chosen by running comparison experiments with gedcomtune, a
 // tool to try and find ideal values for constants like this.
-const DefaultMinimumSimilarity = 0.735
+const DefaultMinimumSimilarity = 0.733
 
 // IndividualNodes is a collection of individuals.
 type IndividualNodes []*IndividualNode
