@@ -9,6 +9,8 @@
 //
 // 3. Ranges, like "Bet. 4 Apr 1823 and 8 Apr 1823"
 //
+// 4. Phrases, like "(Foo Bar)"
+//
 // This package provides a very rich API for dealing with all kind of dates in a
 // meaningful and sensible way. Some notable features include:
 //
@@ -234,7 +236,7 @@ func parseDateParts(dateString string, isEndOfRange bool) Date {
 
 	switch {
 	case len(parts) == 0, // Could not match the regexp.
-		err != nil: // The month is unknown.
+		err != nil:       // The month is unknown.
 		return Date{
 			IsEndOfRange: isEndOfRange,
 		}
@@ -419,6 +421,18 @@ func (node *DateNode) Equals(node2 Node) bool {
 	}
 
 	if date2, ok := node2.(*DateNode); ok {
+		// Phrases can only be compared to themselves and they must be the exact
+		// same value to be considered equal.
+		if node.IsPhrase() && date2.IsPhrase() && node.value == date2.value {
+			return true
+		}
+
+		// Invalid dates follow the same rules as phrases.
+		if !node.IsValid() && !date2.IsValid() && node.value == date2.value {
+			return true
+		}
+
+		// Compare dates by value range.
 		matchStartDate := node.StartDate().Equals(date2.StartDate())
 		matchEndDate := node.EndDate().Equals(date2.EndDate())
 
@@ -454,4 +468,21 @@ func (node *DateNode) IsExact() bool {
 	start, end := node.DateRange()
 
 	return start.IsExact() && end.IsExact()
+}
+
+// IsPhrase returns true if the date value is a phrase.
+//
+// A phrase is any statement offered as a date when the year is not
+// recognizable to a date parser, but which gives information about when an
+// event occurred. The date phrase is enclosed in matching parentheses.
+//
+// IsPhrase is safe to use on a nil DateNode, and will return false.
+func (node *DateNode) IsPhrase() bool {
+	if node == nil {
+		return false
+	}
+
+	v := node.value
+
+	return len(v) > 1 && v[0] == '(' && v[len(v)-1] == ')'
 }
