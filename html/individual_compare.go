@@ -9,12 +9,14 @@ import (
 type IndividualCompare struct {
 	comparison  *gedcom.IndividualComparison
 	filterFlags *util.FilterFlags
+	visibility  LivingVisibility
 }
 
-func NewIndividualCompare(comparison *gedcom.IndividualComparison, filterFlags *util.FilterFlags) *IndividualCompare {
+func NewIndividualCompare(comparison *gedcom.IndividualComparison, filterFlags *util.FilterFlags, visibility LivingVisibility) *IndividualCompare {
 	return &IndividualCompare{
 		comparison:  comparison,
 		filterFlags: filterFlags,
+		visibility:  visibility,
 	}
 }
 
@@ -38,11 +40,11 @@ func (c *IndividualCompare) WriteTo(w io.Writer) (int64, error) {
 	var name Component = nil
 
 	if n := left; n != nil {
-		name = NewIndividualNameAndDates(n, true, "")
+		name = NewIndividualNameAndDates(n, c.visibility, "")
 	}
 
 	if n := right; name == nil && n != nil {
-		name = NewIndividualNameAndDates(n, true, "")
+		name = NewIndividualNameAndDates(n, c.visibility, "")
 	}
 
 	if name == nil {

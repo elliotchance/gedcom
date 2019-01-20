@@ -29,15 +29,17 @@ type DiffPage struct {
 	googleAnalyticsID string
 	sort              string
 	show              string
+	visibility        LivingVisibility
 }
 
-func NewDiffPage(comparisons gedcom.IndividualComparisons, filterFlags *util.FilterFlags, googleAnalyticsID string, show, sort string) *DiffPage {
+func NewDiffPage(comparisons gedcom.IndividualComparisons, filterFlags *util.FilterFlags, googleAnalyticsID string, show, sort string, visibility LivingVisibility) *DiffPage {
 	return &DiffPage{
 		comparisons:       comparisons,
 		filterFlags:       filterFlags,
 		googleAnalyticsID: googleAnalyticsID,
 		show:              show,
 		sort:              sort,
+		visibility:        visibility,
 	}
 }
 
@@ -121,8 +123,8 @@ func (c *DiffPage) WriteTo(w io.Writer) (int64, error) {
 			continue
 		}
 
-		leftNameAndDates := NewIndividualNameAndDatesLink(comparison.Left, true, "")
-		rightNameAndDates := NewIndividualNameAndDatesLink(comparison.Right, true, "")
+		leftNameAndDates := NewIndividualNameAndDatesLink(comparison.Left, c.visibility, "")
+		rightNameAndDates := NewIndividualNameAndDatesLink(comparison.Right, c.visibility, "")
 
 		left := NewTableCell(leftNameAndDates).Class(leftClass)
 		right := NewTableCell(rightNameAndDates).Class(rightClass)
@@ -150,7 +152,7 @@ func (c *DiffPage) WriteTo(w io.Writer) (int64, error) {
 			continue
 		}
 
-		compare := NewIndividualCompare(comparison, c.filterFlags)
+		compare := NewIndividualCompare(comparison, c.filterFlags, c.visibility)
 		components = append(components, compare)
 	}
 

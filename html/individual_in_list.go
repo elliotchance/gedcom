@@ -10,12 +10,14 @@ import (
 type IndividualInList struct {
 	individual *gedcom.IndividualNode
 	document   *gedcom.Document
+	visibility LivingVisibility
 }
 
-func NewIndividualInList(document *gedcom.Document, individual *gedcom.IndividualNode) *IndividualInList {
+func NewIndividualInList(document *gedcom.Document, individual *gedcom.IndividualNode, visibility LivingVisibility) *IndividualInList {
 	return &IndividualInList{
 		individual: individual,
 		document:   document,
+		visibility: visibility,
 	}
 }
 
@@ -29,7 +31,7 @@ func (c *IndividualInList) WriteTo(w io.Writer) (int64, error) {
 	birthDateText := NewText(gedcom.String(birthDate))
 	deathDateText := NewText(gedcom.String(deathDate))
 
-	link := NewIndividualLink(c.document, c.individual)
+	link := NewIndividualLink(c.document, c.individual, c.visibility)
 	birthPlaceLink := NewPlaceLink(c.document, birthPlaceName)
 	deathPlaceLink := NewPlaceLink(c.document, deathPlaceName)
 	birthLines := NewLines(birthDateText, birthPlaceLink)

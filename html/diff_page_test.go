@@ -65,7 +65,8 @@ func TestDiffPage_WriteTo(t *testing.T) {
 	googleAnalyticsID := ""
 
 	component := html.NewDiffPage(comparisons, filterFlags, googleAnalyticsID,
-		html.DiffPageShowAll, html.DiffPageSortHighestSimilarity)
+		html.DiffPageShowAll, html.DiffPageSortHighestSimilarity,
+		html.LivingVisibilityPlaceholder)
 
 	buf := bytes.NewBuffer(nil)
 	component.WriteTo(buf)

@@ -62,7 +62,17 @@ func PageIndividuals(firstLetter rune) string {
 	return fmt.Sprintf("individuals-%c.html", firstLetter)
 }
 
-func PageIndividual(document *gedcom.Document, individual *gedcom.IndividualNode) string {
+func PageIndividual(document *gedcom.Document, individual *gedcom.IndividualNode, visibility LivingVisibility) string {
+	if individual.IsLiving() {
+		switch visibility {
+		case LivingVisibilityHide, LivingVisibilityPlaceholder:
+			return "#"
+
+		case LivingVisibilityShow:
+			// Proceed.
+		}
+	}
+
 	individuals := GetIndividuals(document)
 
 	for key, value := range individuals {

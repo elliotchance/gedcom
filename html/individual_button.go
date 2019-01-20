@@ -12,30 +12,51 @@ import (
 type IndividualButton struct {
 	individual *gedcom.IndividualNode
 	document   *gedcom.Document
+	visibility LivingVisibility
 }
 
-func NewIndividualButton(document *gedcom.Document, individual *gedcom.IndividualNode) *IndividualButton {
+func NewIndividualButton(document *gedcom.Document, individual *gedcom.IndividualNode, visibility LivingVisibility) *IndividualButton {
 	return &IndividualButton{
 		individual: individual,
 		document:   document,
+		visibility: visibility,
 	}
 }
 
 func (c *IndividualButton) WriteTo(w io.Writer) (int64, error) {
-	var name Component = NewIndividualName(c.individual, false, UnknownEmphasis)
+	if c.individual.IsLiving() {
+		switch c.visibility {
+		case LivingVisibilityHide:
+			return writeNothing()
+
+		case LivingVisibilityShow, LivingVisibilityPlaceholder:
+			// Proceed.
+		}
+	}
+
+	var name Component = NewIndividualName(c.individual, c.visibility, UnknownEmphasis)
 
 	onclick := ""
 	if c.individual != nil {
 		onclick = fmt.Sprintf(`location.href='%s'`,
-			PageIndividual(c.document, c.individual))
+			PageIndividual(c.document, c.individual, c.visibility))
 	}
 
-	eventDates := NewIndividualDates(c.individual, false)
+	eventDates := NewIndividualDates(c.individual, c.visibility)
 
-	// If the individual is living we need to hide all their information.
-	if c.individual != nil && c.individual.IsLiving() {
-		name = NewHTML("<em>Hidden</em>")
-		onclick = ""
+	isLiving := c.individual != nil && c.individual.IsLiving()
+	if isLiving {
+		switch c.visibility {
+		case LivingVisibilityHide:
+			return writeNothing()
+
+		case LivingVisibilityShow:
+			// Proceed.
+
+		case LivingVisibilityPlaceholder:
+			name = NewHTML("<em>Hidden</em>")
+			onclick = ""
+		}
 	}
 
 	return NewTag("button", map[string]string{

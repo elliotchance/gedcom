@@ -10,12 +10,14 @@ import (
 type SurnameIndex struct {
 	document       *gedcom.Document
 	selectedLetter rune
+	visibility     LivingVisibility
 }
 
-func NewSurnameIndex(document *gedcom.Document, selectedLetter rune) *SurnameIndex {
+func NewSurnameIndex(document *gedcom.Document, selectedLetter rune, visibility LivingVisibility) *SurnameIndex {
 	return &SurnameIndex{
 		document:       document,
 		selectedLetter: selectedLetter,
+		visibility:     visibility,
 	}
 }
 
@@ -24,7 +26,13 @@ func (c *SurnameIndex) WriteTo(w io.Writer) (int64, error) {
 
 	for _, individual := range c.document.Individuals() {
 		if individual.IsLiving() {
-			continue
+			switch c.visibility {
+			case LivingVisibilityHide, LivingVisibilityPlaceholder:
+				continue
+
+			case LivingVisibilityShow:
+				// Proceed.
+			}
 		}
 
 		surname := individual.Name().Surname()

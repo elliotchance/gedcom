@@ -6,12 +6,14 @@ import (
 )
 
 type IndividualStatistics struct {
-	document *gedcom.Document
+	document   *gedcom.Document
+	visibility LivingVisibility
 }
 
-func NewIndividualStatistics(document *gedcom.Document) *IndividualStatistics {
+func NewIndividualStatistics(document *gedcom.Document, visibility LivingVisibility) *IndividualStatistics {
 	return &IndividualStatistics{
-		document: document,
+		document:   document,
+		visibility: visibility,
 	}
 }
 
@@ -30,6 +32,18 @@ func (c *IndividualStatistics) WriteTo(w io.Writer) (int64, error) {
 	totalRow := NewKeyedTableRow("Total", NewNumber(total), true)
 	livingRow := NewKeyedTableRow("Living", NewNumber(living), true)
 	deadRow := NewKeyedTableRow("Dead", NewNumber(total-living), true)
+
+	switch c.visibility {
+	case LivingVisibilityShow, LivingVisibilityPlaceholder:
+		// Proceed.
+
+	case LivingVisibilityHide:
+		// We need to pretend like there were never any living individuals in
+		// the document at all.
+		totalRow = NewKeyedTableRow("Total", NewNumber(total-living), true)
+		livingRow = NewKeyedTableRow("Living", NewNumber(0), true)
+		deadRow = NewKeyedTableRow("Dead", NewNumber(total-living), true)
+	}
 
 	s := NewComponents(totalRow, livingRow, deadRow)
 

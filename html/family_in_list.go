@@ -6,14 +6,16 @@ import (
 )
 
 type FamilyInList struct {
-	document *gedcom.Document
-	family   *gedcom.FamilyNode
+	document   *gedcom.Document
+	family     *gedcom.FamilyNode
+	visibility LivingVisibility
 }
 
-func NewFamilyInList(document *gedcom.Document, family *gedcom.FamilyNode) *FamilyInList {
+func NewFamilyInList(document *gedcom.Document, family *gedcom.FamilyNode, visibility LivingVisibility) *FamilyInList {
 	return &FamilyInList{
-		document: document,
-		family:   family,
+		document:   document,
+		family:     family,
+		visibility: visibility,
 	}
 }
 
@@ -24,8 +26,8 @@ func (c *FamilyInList) WriteTo(w io.Writer) (int64, error) {
 		date = n.Value()
 	}
 
-	husband := NewIndividualLink(c.document, c.family.Husband())
-	wife := NewIndividualLink(c.document, c.family.Wife())
+	husband := NewIndividualLink(c.document, c.family.Husband(), c.visibility)
+	wife := NewIndividualLink(c.document, c.family.Wife(), c.visibility)
 
 	return NewTableRow(
 		NewTableCell(husband),
