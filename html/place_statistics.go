@@ -16,7 +16,8 @@ func newPlaceStatistics(document *gedcom.Document) *PlaceStatistics {
 }
 
 func (c *PlaceStatistics) WriteTo(w io.Writer) (int64, error) {
-	total := NewNumber(len(GetPlaces(c.document)))
+	places := GetPlaces(c.document)
+	total := NewNumber(len(places))
 	s := NewComponents(
 		NewKeyedTableRow("Total", total, true),
 	)

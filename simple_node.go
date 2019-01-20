@@ -151,8 +151,9 @@ func (node *SimpleNode) ObjectMap() map[string]interface{} {
 		m["Pointer"] = node.Pointer()
 	}
 
-	if len(node.Nodes()) > 0 {
-		m["Nodes"] = node.Nodes()
+	nodes := node.Nodes()
+	if len(nodes) > 0 {
+		m["Nodes"] = nodes
 	}
 
 	return m
@@ -167,7 +168,12 @@ func (node *SimpleNode) ShallowCopy() Node {
 		return nil
 	}
 
-	return NewNode(node.Document(), node.Tag(), node.Value(), node.Pointer())
+	document := node.Document()
+	tag := node.Tag()
+	value := node.Value()
+	pointer := node.Pointer()
+
+	return NewNode(document, tag, value, pointer)
 }
 
 // GEDCOMString is the recursive version of GEDCOMLine. It will render a node

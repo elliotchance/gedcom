@@ -34,7 +34,7 @@ type SurroundingSimilarity struct {
 
 	// Options affects the weights and other aspects of the normalised
 	// similarity metrics.
-	Options *SimilarityOptions
+	Options SimilarityOptions
 }
 
 // NewSurroundingSimilarity creates a surrounding similarity using default

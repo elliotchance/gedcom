@@ -466,8 +466,10 @@ func (node *DateNode) IsValid() bool {
 // See Date.IsExact for more information.
 func (node *DateNode) IsExact() bool {
 	start, end := node.DateRange()
+	startIsExact := start.IsExact()
+	endIsExact := end.IsExact()
 
-	return start.IsExact() && end.IsExact()
+	return startIsExact && endIsExact
 }
 
 // IsPhrase returns true if the date value is a phrase.
@@ -484,5 +486,14 @@ func (node *DateNode) IsPhrase() bool {
 
 	v := node.value
 
-	return len(v) > 1 && v[0] == '(' && v[len(v)-1] == ')'
+	if len(v) == 0 {
+		return false
+	}
+
+	firstLetter := v[0]
+
+	// ghost:ignore
+	lastLetter := v[len(v)-1]
+
+	return firstLetter == '(' && lastLetter == ')'
 }

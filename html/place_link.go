@@ -22,7 +22,8 @@ func (c *PlaceLink) WriteTo(w io.Writer) (int64, error) {
 		return writeNothing()
 	}
 
-	text := NewComponents(NewOcticon("location", ""), NewText(c.place))
+	icon := NewOcticon("location", "")
+	text := NewComponents(icon, NewText(c.place))
 
 	return NewLink(text, PagePlace(c.document, c.place)).WriteTo(w)
 }

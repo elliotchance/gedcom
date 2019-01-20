@@ -485,7 +485,7 @@ func (node *IndividualNode) EstimatedDeathDate() *DateNode {
 //
 // The options.MaxYears allows the error margin on dates to be adjusted. See
 // DefaultMaxYearsForSimilarity for more information.
-func (node *IndividualNode) Similarity(other *IndividualNode, options *SimilarityOptions) float64 {
+func (node *IndividualNode) Similarity(other *IndividualNode, options SimilarityOptions) float64 {
 	if node == nil || other == nil {
 		return 0.5
 	}
@@ -563,7 +563,7 @@ func (node *IndividualNode) Similarity(other *IndividualNode, options *Similarit
 // The options.MinimumSimilarity is used when comparing slices of individuals.
 // In this case that means for the spouses and children. A higher value makes
 // the matching more strict. See DefaultMinimumSimilarity for more information.
-func (node *IndividualNode) SurroundingSimilarity(other *IndividualNode, options *SimilarityOptions) (s *SurroundingSimilarity) {
+func (node *IndividualNode) SurroundingSimilarity(other *IndividualNode, options SimilarityOptions, forceFullCalculation bool) (s *SurroundingSimilarity) {
 	// Individual, spouse and children similarity only needs to be calculated
 	// once. The parents similarity will be calculated from the matrix below.
 	individualSimilarity := node.Similarity(other, options)
@@ -604,9 +604,9 @@ func (node *IndividualNode) SurroundingSimilarity(other *IndividualNode, options
 	//
 	// A higher MinimumWeight means that less work will actually need to be done
 	// because there will be less possible candidates.
-	if (individualSimilarity * options.IndividualWeight) <=
-		options.MinimumWeightedSimilarity-options.ParentsWeight-options.SpousesWeight-options.ChildrenWeight {
-
+	//
+	// ghost:ignore
+	if !forceFullCalculation && options.canSkipExtraProcessing(individualSimilarity) {
 		return NewSurroundingSimilarity(0, 0, 0, 0)
 	}
 
@@ -765,9 +765,12 @@ func (node *IndividualNode) ageAt(start, end Date) (Age, Age) {
 		startDurationSinceBirth,
 	)
 
+	startIsNotExact := !start.IsExact()
+	estimatedBirthDateIsNotExact := !estimatedBirthDate.IsExact()
+
 	startAge := NewAge(
 		startDurationSinceBirth,
-		!start.IsExact() || !estimatedBirthDate.IsExact(),
+		startIsNotExact || estimatedBirthDateIsNotExact,
 		startConstraint,
 	)
 
@@ -777,9 +780,13 @@ func (node *IndividualNode) ageAt(start, end Date) (Age, Age) {
 		endDurationSinceBirth,
 	)
 
+	endIsNotExact := !end.IsExact()
+	estimatedBirthEndTime := estimatedBirthDate.EndDate().Time()
+	estimatedEndTime := end.Time().Sub(estimatedBirthEndTime)
+
 	endAge := NewAge(
-		end.Time().Sub(estimatedBirthDate.EndDate().Time()),
-		!end.IsExact() || !estimatedBirthDate.IsExact(),
+		estimatedEndTime,
+		endIsNotExact || estimatedBirthDateIsNotExact,
 		constraint,
 	)
 

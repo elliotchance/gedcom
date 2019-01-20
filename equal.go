@@ -66,7 +66,10 @@ func DeepEqual(left, right Node) bool {
 //
 // See DeepEqual for semantics on how nodes are compared.
 func DeepEqualNodes(left, right []Node) bool {
-	if len(left) != len(right) {
+	leftLen := len(left)
+	rightLen := len(right)
+
+	if leftLen != rightLen {
 		return false
 	}
 

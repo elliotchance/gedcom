@@ -23,7 +23,10 @@ func (c *IndividualNameAndDates) WriteTo(w io.Writer) (int64, error) {
 	name := NewIndividualName(c.individual, c.visibility, c.unknownText)
 	dates := NewIndividualDates(c.individual, c.visibility)
 
-	if name.IsUnknown() || dates.IsBlank() {
+	isUnknown := name.IsUnknown()
+	datesAreBlank := dates.IsBlank()
+
+	if isUnknown || datesAreBlank {
 		return name.WriteTo(w)
 	}
 

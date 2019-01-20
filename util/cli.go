@@ -37,7 +37,8 @@ func WrapToMargin(s string, width int) (r string) {
 		r += strings.TrimSpace(newLine) + "\n"
 	}
 
-	// Remove last new line
+	// Remove last new line.
+	// ghost:ignore
 	r = r[:len(r)-1]
 
 	return

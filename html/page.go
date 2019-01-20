@@ -24,10 +24,11 @@ func NewPage(title string, body Component, googleAnalyticsID string) *Page {
 func (c *Page) WriteTo(w io.Writer) (int64, error) {
 	googleAnalytics := NewGoogleAnalytics(c.googleAnalyticsID)
 	footer := NewFooterRow()
+	title := NewTag("title", nil, NewText(c.title))
 
 	n := appendString(w, `<html><head><meta charset="UTF-8">`)
 	n += appendComponent(w, googleAnalytics)
-	n += appendComponent(w, NewTag("title", nil, NewText(c.title)))
+	n += appendComponent(w, title)
 	n += appendString(w, `<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/font/octicons.css"/>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>

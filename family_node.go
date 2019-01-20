@@ -109,7 +109,7 @@ func (node *FamilyNode) HasChild(individual *IndividualNode) bool {
 //
 // The options.MaxYears allows the error margin on dates to be adjusted. See
 // DefaultMaxYearsForSimilarity for more information.
-func (node *FamilyNode) Similarity(other *FamilyNode, depth int, options *SimilarityOptions) float64 {
+func (node *FamilyNode) Similarity(other *FamilyNode, depth int, options SimilarityOptions) float64 {
 	if depth != 0 {
 		panic("depth can only be 0")
 	}

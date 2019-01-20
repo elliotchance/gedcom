@@ -26,13 +26,15 @@ func (c *IndividualNameAndSex) WriteTo(w io.Writer) (int64, error) {
 	surname := primaryName.Surname()
 	suffix := primaryName.Suffix()
 
-	titleRow := NewKeyedTableRow("Title", NewText(title), title != "")
-	prefixRow := NewKeyedTableRow("Prefix", NewText(prefix), prefix != "")
-	givenNameRow := NewKeyedTableRow("Given Name", NewText(name), name != "")
-	surnamePrefixRow := NewKeyedTableRow("Surname Prefix", NewText(surnamePrefix), surnamePrefix != "")
-	surnameRow := NewKeyedTableRow("Surname", NewText(surname), surname != "")
-	suffixRow := NewKeyedTableRow("Suffix", NewText(suffix), suffix != "")
-	sexRow := NewKeyedTableRow("Sex", NewSexBadge(c.individual.Sex()), true)
+	titleRow := keyedRow("Title", title)
+	prefixRow := keyedRow("Prefix", prefix)
+	givenNameRow := keyedRow("Given Name", name)
+	surnamePrefixRow := keyedRow("Surname Prefix", surnamePrefix)
+	surnameRow := keyedRow("Surname", surname)
+	suffixRow := keyedRow("Suffix", suffix)
+
+	sexBadge := NewSexBadge(c.individual.Sex())
+	sexRow := NewKeyedTableRow("Sex", sexBadge, true)
 
 	s := NewComponents(
 		titleRow,
@@ -45,4 +47,11 @@ func (c *IndividualNameAndSex) WriteTo(w io.Writer) (int64, error) {
 	)
 
 	return NewCard("Name & Sex", noBadgeCount, NewTable("", s)).WriteTo(w)
+}
+
+func keyedRow(title, value string) *KeyedTableRow {
+	text := NewText(value)
+	visible := value != ""
+
+	return NewKeyedTableRow(title, text, visible)
 }

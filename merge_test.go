@@ -490,7 +490,7 @@ func TestIndividualBySurroundingSimilarityMergeFunction(t *testing.T) {
 
 			// Only check the similarity if it makes sense.
 			if leftOK && rightOK {
-				similarity := leftIndividual.SurroundingSimilarity(rightIndividual, options)
+				similarity := leftIndividual.SurroundingSimilarity(rightIndividual, options, false)
 
 				assert.Equal(t, test.similarity, similarity.WeightedSimilarity())
 			}
