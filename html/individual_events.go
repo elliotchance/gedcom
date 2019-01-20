@@ -11,12 +11,14 @@ import (
 type IndividualEvents struct {
 	document   *gedcom.Document
 	individual *gedcom.IndividualNode
+	visibility LivingVisibility
 }
 
-func newIndividualEvents(document *gedcom.Document, individual *gedcom.IndividualNode) *IndividualEvents {
+func newIndividualEvents(document *gedcom.Document, individual *gedcom.IndividualNode, visibility LivingVisibility) *IndividualEvents {
 	return &IndividualEvents{
 		document:   document,
 		individual: individual,
+		visibility: visibility,
 	}
 }
 
@@ -52,7 +54,7 @@ func (c *IndividualEvents) WriteTo(w io.Writer) (int64, error) {
 			description = NewHTML(UnknownEmphasis)
 
 			if wife := family.Wife(); wife != nil {
-				description = NewIndividualLink(c.document, wife)
+				description = NewIndividualLink(c.document, wife, c.visibility)
 			}
 		}
 
@@ -60,7 +62,7 @@ func (c *IndividualEvents) WriteTo(w io.Writer) (int64, error) {
 			description = NewHTML(UnknownEmphasis)
 
 			if husband := family.Husband(); husband != nil {
-				description = NewIndividualLink(c.document, husband)
+				description = NewIndividualLink(c.document, husband, c.visibility)
 			}
 		}
 

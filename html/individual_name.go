@@ -13,14 +13,14 @@ const UnknownEmphasis = "<em>Unknown</em>"
 // individual.
 type IndividualName struct {
 	individual  *gedcom.IndividualNode
-	showLiving  bool
+	visibility  LivingVisibility
 	unknownHTML string
 }
 
-func NewIndividualName(individual *gedcom.IndividualNode, showLiving bool, unknownHTML string) *IndividualName {
+func NewIndividualName(individual *gedcom.IndividualNode, visibility LivingVisibility, unknownHTML string) *IndividualName {
 	return &IndividualName{
 		individual:  individual,
-		showLiving:  showLiving,
+		visibility:  visibility,
 		unknownHTML: unknownHTML,
 	}
 }
@@ -35,8 +35,17 @@ func (c *IndividualName) WriteTo(w io.Writer) (int64, error) {
 	}
 
 	isLiving := c.individual.IsLiving()
-	if isLiving && !c.showLiving {
-		return writeString(w, "<em>Hidden</em>")
+	if isLiving {
+		switch c.visibility {
+		case LivingVisibilityShow:
+			// Proceed.
+
+		case LivingVisibilityHide:
+			return writeNothing()
+
+		case LivingVisibilityPlaceholder:
+			return writeString(w, "<em>Hidden</em>")
+		}
 	}
 
 	names := c.individual.Names()

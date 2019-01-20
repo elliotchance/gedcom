@@ -7,13 +7,13 @@ import (
 
 type IndividualDates struct {
 	individual *gedcom.IndividualNode
-	showLiving bool
+	visibility LivingVisibility
 }
 
-func NewIndividualDates(individual *gedcom.IndividualNode, showLiving bool) *IndividualDates {
+func NewIndividualDates(individual *gedcom.IndividualNode, visibility LivingVisibility) *IndividualDates {
 	return &IndividualDates{
 		individual: individual,
-		showLiving: showLiving,
+		visibility: visibility,
 	}
 }
 
@@ -30,7 +30,13 @@ func (c *IndividualDates) IsBlank() bool {
 }
 
 func (c *IndividualDates) WriteTo(w io.Writer) (int64, error) {
-	if c.individual != nil && c.individual.IsLiving() && !c.showLiving {
+	isLiving := c.individual != nil && c.individual.IsLiving()
+
+	if isLiving && c.visibility == LivingVisibilityHide {
+		return writeNothing()
+	}
+
+	if isLiving && c.visibility == LivingVisibilityPlaceholder {
 		return NewText("living").WriteTo(w)
 	}
 

@@ -9,13 +9,15 @@ type FamilyListPage struct {
 	document          *gedcom.Document
 	googleAnalyticsID string
 	options           PublishShowOptions
+	visibility        LivingVisibility
 }
 
-func NewFamilyListPage(document *gedcom.Document, googleAnalyticsID string, options PublishShowOptions) *FamilyListPage {
+func NewFamilyListPage(document *gedcom.Document, googleAnalyticsID string, options PublishShowOptions, visibility LivingVisibility) *FamilyListPage {
 	return &FamilyListPage{
 		document:          document,
 		googleAnalyticsID: googleAnalyticsID,
 		options:           options,
+		visibility:        visibility,
 	}
 }
 
@@ -25,7 +27,7 @@ func (c *FamilyListPage) WriteTo(w io.Writer) (int64, error) {
 	}
 
 	for _, family := range c.document.Families() {
-		familyInList := NewFamilyInList(c.document, family)
+		familyInList := NewFamilyInList(c.document, family, c.visibility)
 		table = append(table, familyInList)
 	}
 

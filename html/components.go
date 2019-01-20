@@ -1,6 +1,7 @@
 package html
 
 import (
+	"github.com/elliotchance/gedcom"
 	"io"
 )
 
@@ -11,8 +12,16 @@ type Components struct {
 }
 
 func NewComponents(items ...Component) *Components {
+	nonNilItems := []Component{}
+
+	for _, item := range items {
+		if !gedcom.IsNil(item) {
+			nonNilItems = append(nonNilItems, item)
+		}
+	}
+
 	return &Components{
-		items: items,
+		items: nonNilItems,
 	}
 }
 

@@ -8,20 +8,22 @@ import (
 // ParentButtons show two buttons separated by a "T" to be placed above the
 // large individuals name.
 type ParentButtons struct {
-	family   *gedcom.FamilyNode
-	document *gedcom.Document
+	family     *gedcom.FamilyNode
+	document   *gedcom.Document
+	visibility LivingVisibility
 }
 
-func NewParentButtons(document *gedcom.Document, family *gedcom.FamilyNode) *ParentButtons {
+func NewParentButtons(document *gedcom.Document, family *gedcom.FamilyNode, visibility LivingVisibility) *ParentButtons {
 	return &ParentButtons{
-		family:   family,
-		document: document,
+		family:     family,
+		document:   document,
+		visibility: visibility,
 	}
 }
 
 func (c *ParentButtons) WriteTo(w io.Writer) (int64, error) {
-	husband := NewIndividualButton(c.document, c.family.Husband())
-	wife := NewIndividualButton(c.document, c.family.Wife())
+	husband := NewIndividualButton(c.document, c.family.Husband(), c.visibility)
+	wife := NewIndividualButton(c.document, c.family.Wife(), c.visibility)
 	svg := NewPlusSVG(false, true, true, true)
 	space := NewSpace()
 

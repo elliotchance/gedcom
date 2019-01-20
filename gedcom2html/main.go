@@ -44,6 +44,7 @@ import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html"
+	"github.com/elliotchance/gedcom/util"
 	"io"
 	"io/ioutil"
 	"log"
@@ -57,6 +58,7 @@ var (
 	optionOutputDir         string
 	optionGoogleAnalyticsID string
 	optionChecksum          bool
+	optionLivingVisibility  string
 
 	optionNoIndividuals bool
 	optionNoPlaces      bool
@@ -77,6 +79,16 @@ func main() {
 		"The Google Analytics ID, like 'UA-78454410-2'.")
 	flag.BoolVar(&optionChecksum, "checksum", false,
 		"Output a checksum file, helpful for syncing large trees.")
+	flag.StringVar(&optionLivingVisibility, "living",
+		html.LivingVisibilityPlaceholder, util.CLIDescription(`
+			Controls how information for living individuals are handled:
+
+			"show": Show all living individuals and their information.
+
+			"hide": Remove all living individuals as if they never existed.
+
+			"placeholder": Show a "Hidden" placeholder that only that
+			individuals are known but will not be displayed.`))
 
 	flag.BoolVar(&optionNoIndividuals, "no-individuals", false,
 		"Exclude Individuals.")
@@ -118,20 +130,29 @@ func main() {
 		Checksum:        optionChecksum,
 	}
 
+	visibility := html.NewLivingVisibility(optionLivingVisibility)
+
 	// Create the pages.
 	if !optionNoIndividuals {
 		for _, letter := range html.GetIndexLetters(document) {
 			createFile(html.PageIndividuals(letter),
-				html.NewIndividualListPage(document, letter, optionGoogleAnalyticsID, options))
+				html.NewIndividualListPage(document, letter, optionGoogleAnalyticsID, options, visibility))
 		}
 
 		for _, individual := range html.GetIndividuals(document) {
 			if individual.IsLiving() {
-				continue
+				switch visibility {
+				case html.LivingVisibilityHide,
+					html.LivingVisibilityPlaceholder:
+					continue
+
+				case html.LivingVisibilityShow:
+					// Proceed.
+				}
 			}
 
-			page := html.NewIndividualPage(document, individual, optionGoogleAnalyticsID, options)
-			createFile(html.PageIndividual(document, individual), page)
+			page := html.NewIndividualPage(document, individual, optionGoogleAnalyticsID, options, visibility)
+			createFile(html.PageIndividual(document, individual, visibility), page)
 		}
 	}
 
@@ -152,13 +173,13 @@ func main() {
 
 		for _, key := range placeKeys {
 			place := places[key]
-			page := html.NewPlacePage(document, key, optionGoogleAnalyticsID, options)
+			page := html.NewPlacePage(document, key, optionGoogleAnalyticsID, options, visibility)
 			createFile(html.PagePlace(document, place.PrettyName), page)
 		}
 	}
 
 	if !optionNoFamilies {
-		createFile(html.PageFamilies(), html.NewFamilyListPage(document, optionGoogleAnalyticsID, options))
+		createFile(html.PageFamilies(), html.NewFamilyListPage(document, optionGoogleAnalyticsID, options, visibility))
 	}
 
 	if !optionNoSurnames {
@@ -176,7 +197,7 @@ func main() {
 
 	if !optionNoStatistics {
 		createFile(html.PageStatistics(),
-			html.NewStatisticsPage(document, optionGoogleAnalyticsID, options))
+			html.NewStatisticsPage(document, optionGoogleAnalyticsID, options, visibility))
 	}
 
 	// Calculate checksum

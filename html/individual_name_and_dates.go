@@ -7,21 +7,21 @@ import (
 
 type IndividualNameAndDates struct {
 	individual  *gedcom.IndividualNode
-	showLiving  bool
+	visibility  LivingVisibility
 	unknownText string
 }
 
-func NewIndividualNameAndDates(individual *gedcom.IndividualNode, showLiving bool, unknownText string) *IndividualNameAndDates {
+func NewIndividualNameAndDates(individual *gedcom.IndividualNode, visibility LivingVisibility, unknownText string) *IndividualNameAndDates {
 	return &IndividualNameAndDates{
 		individual:  individual,
-		showLiving:  showLiving,
+		visibility:  visibility,
 		unknownText: unknownText,
 	}
 }
 
 func (c *IndividualNameAndDates) WriteTo(w io.Writer) (int64, error) {
-	name := NewIndividualName(c.individual, c.showLiving, c.unknownText)
-	dates := NewIndividualDates(c.individual, c.showLiving)
+	name := NewIndividualName(c.individual, c.visibility, c.unknownText)
+	dates := NewIndividualDates(c.individual, c.visibility)
 
 	if name.IsUnknown() || dates.IsBlank() {
 		return name.WriteTo(w)

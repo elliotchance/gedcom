@@ -12,29 +12,31 @@ type IndividualPage struct {
 	individual        *gedcom.IndividualNode
 	googleAnalyticsID string
 	options           PublishShowOptions
+	visibility        LivingVisibility
 }
 
-func NewIndividualPage(document *gedcom.Document, individual *gedcom.IndividualNode, googleAnalyticsID string, options PublishShowOptions) *IndividualPage {
+func NewIndividualPage(document *gedcom.Document, individual *gedcom.IndividualNode, googleAnalyticsID string, options PublishShowOptions, visibility LivingVisibility) *IndividualPage {
 	return &IndividualPage{
 		document:          document,
 		individual:        individual,
 		googleAnalyticsID: googleAnalyticsID,
 		options:           options,
+		visibility:        visibility,
 	}
 }
 
 func (c *IndividualPage) WriteTo(w io.Writer) (int64, error) {
 	name := c.individual.Names()[0]
 
-	individualName := NewIndividualName(c.individual, false,
+	individualName := NewIndividualName(c.individual, c.visibility,
 		UnknownEmphasis)
-	individualDates := NewIndividualDates(c.individual, false)
+	individualDates := NewIndividualDates(c.individual, c.visibility)
 
 	return NewPage(
 		name.String(),
 		NewComponents(
 			NewPublishHeader(c.document, name.String(), selectedExtraTab, c.options),
-			NewAllParentButtons(c.document, c.individual),
+			NewAllParentButtons(c.document, c.individual, c.visibility),
 			NewBigTitle(1, individualName),
 			NewBigTitle(3, individualDates),
 			NewHorizontalRuleRow(),
@@ -43,9 +45,9 @@ func (c *IndividualPage) WriteTo(w io.Writer) (int64, error) {
 				NewColumn(HalfRow, NewIndividualAdditionalNames(c.individual)),
 			),
 			NewSpace(),
-			newIndividualEvents(c.document, c.individual),
+			newIndividualEvents(c.document, c.individual, c.visibility),
 			NewSpace(),
-			NewPartnersAndChildren(c.document, c.individual),
+			NewPartnersAndChildren(c.document, c.individual, c.visibility),
 		),
 		c.googleAnalyticsID,
 	).WriteTo(w)

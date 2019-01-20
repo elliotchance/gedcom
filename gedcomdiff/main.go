@@ -113,7 +113,7 @@ func main() {
 	}
 
 	page := html.NewDiffPage(comparisons, filterFlags, optionGoogleAnalyticsID,
-		optionShow, optionSort)
+		optionShow, optionSort, html.LivingVisibilityShow)
 
 	_, err = page.WriteTo(out)
 	if err != nil {

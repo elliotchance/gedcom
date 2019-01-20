@@ -10,12 +10,14 @@ import (
 type PartnersAndChildren struct {
 	individual *gedcom.IndividualNode
 	document   *gedcom.Document
+	visibility LivingVisibility
 }
 
-func NewPartnersAndChildren(document *gedcom.Document, individual *gedcom.IndividualNode) *PartnersAndChildren {
+func NewPartnersAndChildren(document *gedcom.Document, individual *gedcom.IndividualNode, visibility LivingVisibility) *PartnersAndChildren {
 	return &PartnersAndChildren{
 		individual: individual,
 		document:   document,
+		visibility: visibility,
 	}
 }
 
@@ -31,10 +33,20 @@ func (c *PartnersAndChildren) WriteTo(w io.Writer) (int64, error) {
 	spouses := c.individual.Spouses()
 
 	for _, spouse := range spouses {
+		if spouse.IsLiving() {
+			switch c.visibility {
+			case LivingVisibilityHide:
+				continue
+
+			case LivingVisibilityShow, LivingVisibilityPlaceholder:
+				// Proceed.
+			}
+		}
+
 		rows = append(rows, NewHorizontalRuleRow())
 
 		columns := []*Column{
-			NewColumn(QuarterRow, NewIndividualButton(c.document, spouse)),
+			NewColumn(QuarterRow, NewIndividualButton(c.document, spouse, c.visibility)),
 		}
 
 		family := c.individual.FamilyWithSpouse(spouse)
@@ -59,7 +71,7 @@ func (c *PartnersAndChildren) WriteTo(w io.Writer) (int64, error) {
 		rows = append(rows, NewHorizontalRuleRow())
 
 		columns := []*Column{
-			NewColumn(QuarterRow, NewIndividualButton(c.document, nil)),
+			NewColumn(QuarterRow, NewIndividualButton(c.document, nil, c.visibility)),
 		}
 
 		columns, rows = partnerSection(family, c, columns, rows)
@@ -81,7 +93,23 @@ func (c *PartnersAndChildren) WriteTo(w io.Writer) (int64, error) {
 }
 
 func partnerSection(family *gedcom.FamilyNode, c *PartnersAndChildren, columns []*Column, rows []Component) ([]*Column, []Component) {
-	children := family.Children()
+	allChildren := family.Children()
+	children := []*gedcom.IndividualNode{}
+
+	for _, child := range allChildren {
+		if child.IsLiving() {
+			switch c.visibility {
+			case LivingVisibilityHide:
+				continue
+
+			case LivingVisibilityShow, LivingVisibilityPlaceholder:
+				// Proceed.
+			}
+		}
+
+		children = append(children, child)
+	}
+
 	numberOfChildren := len(children)
 	for i, child := range children {
 		svg := NewPlusSVG(false, true, true, true)
@@ -98,7 +126,7 @@ func partnerSection(family *gedcom.FamilyNode, c *PartnersAndChildren, columns [
 
 		button := NewComponents(
 			svg,
-			NewIndividualButton(c.document, child),
+			NewIndividualButton(c.document, child, c.visibility),
 		)
 		columns = append(columns, NewColumn(3, button))
 

@@ -11,12 +11,14 @@ import (
 type AllParentButtons struct {
 	individual *gedcom.IndividualNode
 	document   *gedcom.Document
+	visibility LivingVisibility
 }
 
-func NewAllParentButtons(document *gedcom.Document, individual *gedcom.IndividualNode) *AllParentButtons {
+func NewAllParentButtons(document *gedcom.Document, individual *gedcom.IndividualNode, visibility LivingVisibility) *AllParentButtons {
 	return &AllParentButtons{
 		individual: individual,
 		document:   document,
+		visibility: visibility,
 	}
 }
 
@@ -32,14 +34,17 @@ func (c *AllParentButtons) WriteTo(w io.Writer) (int64, error) {
 			continue
 		}
 
-		components = append(components, NewParentButtons(c.document, family))
+		components = append(components,
+			NewParentButtons(c.document, family, c.visibility))
 	}
 
 	// If there are no families we still want to show an empty family. We just
 	// create a dummy family that has no child nodes.
 	if len(components) == 0 {
 		familyNode := gedcom.NewFamilyNode(nil, "", nil)
-		components = []Component{NewParentButtons(c.document, familyNode)}
+		components = []Component{
+			NewParentButtons(c.document, familyNode, c.visibility),
+		}
 	}
 
 	return NewComponents(components...).WriteTo(w)

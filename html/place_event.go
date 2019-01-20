@@ -6,21 +6,22 @@ import (
 )
 
 type PlaceEvent struct {
-	node     gedcom.Node
-	document *gedcom.Document
+	node       gedcom.Node
+	document   *gedcom.Document
+	visibility LivingVisibility
 }
 
-func NewPlaceEvent(document *gedcom.Document, node gedcom.Node) *PlaceEvent {
+func NewPlaceEvent(document *gedcom.Document, node gedcom.Node, visibility LivingVisibility) *PlaceEvent {
 	return &PlaceEvent{
-		document: document,
-		node:     node,
+		document:   document,
+		node:       node,
+		visibility: visibility,
 	}
 }
 
 func (c *PlaceEvent) WriteTo(w io.Writer) (int64, error) {
 	date := ""
 	description := c.node.Tag().String()
-	var person Component = NewEmpty()
 
 	d := gedcom.Dates(c.node).Minimum()
 
@@ -29,8 +30,20 @@ func (c *PlaceEvent) WriteTo(w io.Writer) (int64, error) {
 	}
 
 	individual := individualForNode(c.node)
-	if individual != nil && !individual.IsLiving() {
-		person = NewIndividualLink(c.document, individual)
+	var person Component = NewIndividualLink(c.document, individual, c.visibility)
+	isLiving := individual != nil && individual.IsLiving()
+
+	if isLiving {
+		switch c.visibility {
+		case LivingVisibilityHide:
+			return writeNothing()
+
+		case LivingVisibilityShow:
+			// Proceed.
+
+		case LivingVisibilityPlaceholder:
+			person = NewEmpty()
+		}
 	}
 
 	return NewTableRow(

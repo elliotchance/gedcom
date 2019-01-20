@@ -9,13 +9,15 @@ type StatisticsPage struct {
 	document          *gedcom.Document
 	googleAnalyticsID string
 	options           PublishShowOptions
+	visibility        LivingVisibility
 }
 
-func NewStatisticsPage(document *gedcom.Document, googleAnalyticsID string, options PublishShowOptions) *StatisticsPage {
+func NewStatisticsPage(document *gedcom.Document, googleAnalyticsID string, options PublishShowOptions, visibility LivingVisibility) *StatisticsPage {
 	return &StatisticsPage{
 		document:          document,
 		googleAnalyticsID: googleAnalyticsID,
 		options:           options,
+		visibility:        visibility,
 	}
 }
 
@@ -28,7 +30,7 @@ func (c *StatisticsPage) WriteTo(w io.Writer) (int64, error) {
 			NewSpace(),
 			NewRow(
 				NewColumn(HalfRow, NewComponents(
-					NewIndividualStatistics(c.document),
+					NewIndividualStatistics(c.document, c.visibility),
 					NewSpace(),
 					NewFamilyStatistics(c.document),
 					NewSpace(),

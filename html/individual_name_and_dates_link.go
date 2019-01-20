@@ -8,14 +8,14 @@ import (
 
 type IndividualNameAndDatesLink struct {
 	individual  *gedcom.IndividualNode
-	showLiving  bool
+	visibility  LivingVisibility
 	unknownText string
 }
 
-func NewIndividualNameAndDatesLink(individual *gedcom.IndividualNode, showLiving bool, unknownText string) *IndividualNameAndDatesLink {
+func NewIndividualNameAndDatesLink(individual *gedcom.IndividualNode, visibility LivingVisibility, unknownText string) *IndividualNameAndDatesLink {
 	return &IndividualNameAndDatesLink{
 		individual:  individual,
-		showLiving:  showLiving,
+		visibility:  visibility,
 		unknownText: unknownText,
 	}
 }
@@ -25,7 +25,7 @@ func (c *IndividualNameAndDatesLink) WriteTo(w io.Writer) (int64, error) {
 		return writeNothing()
 	}
 
-	text := NewIndividualNameAndDates(c.individual, c.showLiving, c.unknownText)
+	text := NewIndividualNameAndDates(c.individual, c.visibility, c.unknownText)
 	link := fmt.Sprintf("#%s", c.individual.Pointer())
 
 	return NewLink(text, link).Style("color: black").WriteTo(w)
