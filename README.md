@@ -7,6 +7,16 @@ github.com/elliotchance/gedcom
 [![Join the chat at https://gitter.im/gedcom-app/community](https://badges.gitter.im/gedcom-app/community.svg)](https://gitter.im/gedcom-app/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Maintainability](https://api.codeclimate.com/v1/badges/1a31841a6c25ca0e5c24/maintainability)](https://codeclimate.com/github/elliotchance/gedcom/maintainability)
 
+---
+
+### You can use most of the tools right now for free at:
+### [https://gedcom.app](https://gedcom.app).
+
+**Have questions? Want to get help or give feedback? Discuss new features? Join the chat:
+[![Join the chat at https://gitter.im/gedcom-app/community](https://badges.gitter.im/gedcom-app/community.svg)](https://gitter.im/gedcom-app/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)**
+
+---
+
 `github.com/elliotchance/gedcom` is an advanced Go-style library and set of
 command-line tools for dealing with
 [GEDCOM files](https://en.wikipedia.org/wiki/GEDCOM).
@@ -15,8 +25,29 @@ You can download the latest binaries for macOS, Windows and Linux on the
 [Releases page](https://github.com/elliotchance/gedcom/releases). This will not
 require you to install Go or any other dependencies.
 
-**Have questions? Want to get help or give feedback? Discuss new features? Join the chat: 
-[![Join the chat at https://gitter.im/gedcom-app/community](https://badges.gitter.im/gedcom-app/community.svg)](https://gitter.im/gedcom-app/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)**
+What Can It Do?
+---------------
+
+* **Decode and encode** GEDCOM files.
+
+* **Traverse and manipulate** GEDCOM files with the provided API.
+
+* A powerful **query language called
+[gedcomq](https://godoc.org/github.com/elliotchance/gedcom/gedcomq)** lets you
+query GEDCOM files with a CLI tool. It can output CSV, JSON and other GEDCOM
+files.
+
+* Render GEDCOM files as **fully static HTML websites**. See an example at
+[http://dechauncy.family](http://dechauncy.family).
+
+* **Compare GEDCOM files** from the same or different providers to find
+differences using the very advanced and configurable tool:
+[gedcomdiff](https://godoc.org/github.com/elliotchance/gedcom/gedcomdiff).
+
+* **Merge GEDCOM files** using the same advanced Compare algorithm with gedcomq.
+
+Packages
+--------
 
 | Package              | Description |
 | -------------------- | ----------- |

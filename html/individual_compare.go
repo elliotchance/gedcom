@@ -1,29 +1,38 @@
 package html
 
 import (
+	"bytes"
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/util"
 	"io"
 )
 
 type IndividualCompare struct {
-	comparison  *gedcom.IndividualComparison
-	filterFlags *util.FilterFlags
-	visibility  LivingVisibility
+	comparison     *gedcom.IndividualComparison
+	filterFlags    *util.FilterFlags
+	progress       chan gedcom.Progress
+	compareOptions *gedcom.IndividualNodesCompareOptions
+	visibility     LivingVisibility
+	cache          []byte
+	cacheErr       error
 }
 
-func NewIndividualCompare(comparison *gedcom.IndividualComparison, filterFlags *util.FilterFlags, visibility LivingVisibility) *IndividualCompare {
+func NewIndividualCompare(comparison *gedcom.IndividualComparison, filterFlags *util.FilterFlags, progress chan gedcom.Progress, compareOptions *gedcom.IndividualNodesCompareOptions, visibility LivingVisibility) *IndividualCompare {
 	return &IndividualCompare{
-		comparison:  comparison,
-		filterFlags: filterFlags,
-		visibility:  visibility,
+		comparison:     comparison,
+		filterFlags:    filterFlags,
+		progress:       progress,
+		compareOptions: compareOptions,
+		visibility:     visibility,
 	}
 }
 
 func (c *IndividualCompare) appendChildren(nd *gedcom.NodeDiff, prefix string) []Component {
 	title := prefix + nd.Tag().String()
+	tableRows := []Component{}
+
 	row := NewDiffRow(title, nd, c.filterFlags.HideEqual)
-	tableRows := []Component{row}
+	tableRows = c.appendDiffRow(tableRows, row)
 
 	for _, child := range nd.Children {
 		children := c.appendChildren(child, prefix+"&nbsp;&nbsp;&nbsp;&nbsp;")
@@ -33,9 +42,51 @@ func (c *IndividualCompare) appendChildren(nd *gedcom.NodeDiff, prefix string) [
 	return tableRows
 }
 
+func (c *IndividualCompare) appendDiffRow(rows []Component, row *DiffRow) []Component {
+	if row.isEmpty() {
+		return rows
+	}
+
+	return append(rows, row)
+}
+
+func (c *IndividualCompare) isEmpty() bool {
+	// Trigger cache.
+	buf := bytes.NewBuffer(nil)
+	n, _ := c.WriteTo(buf)
+
+	return n == 0
+}
+
+func (c *IndividualCompare) addProgress() {
+	if c.progress != nil {
+		c.progress <- gedcom.Progress{
+			Add: 1,
+		}
+	}
+}
+
 func (c *IndividualCompare) WriteTo(w io.Writer) (int64, error) {
+	if c.cache == nil {
+		buf := bytes.NewBuffer(nil)
+		_, c.cacheErr = c.writeTo(buf)
+		c.cache = buf.Bytes()
+	}
+
+	if c.cacheErr != nil {
+		return 0, c.cacheErr
+	}
+
+	n, err := w.Write(c.cache)
+
+	return int64(n), err
+}
+
+func (c *IndividualCompare) writeTo(w io.Writer) (int64, error) {
 	left := c.comparison.Left
 	right := c.comparison.Right
+
+	c.addProgress()
 
 	var name Component = nil
 
@@ -90,64 +141,66 @@ func (c *IndividualCompare) WriteTo(w io.Writer) (int64, error) {
 		}
 	}
 
-	compareOptions := gedcom.NewIndividualNodesCompareOptions()
-	for _, parents := range leftParents.Compare(rightParents, compareOptions) {
+	for _, parents := range leftParents.Compare(rightParents, c.compareOptions) {
 		var row *DiffRow
 		name := "Parent"
 
 		switch {
 		case !gedcom.IsNil(parents.Left) && !gedcom.IsNil(parents.Right):
 			row = NewDiffRow(name, &gedcom.NodeDiff{
-				Left:  parents.Left.Name(),
-				Right: parents.Right.Name(),
+				Left:  parents.Left,
+				Right: parents.Right,
 			}, c.filterFlags.HideEqual)
 
 		case !gedcom.IsNil(parents.Left):
 			row = NewDiffRow(name, &gedcom.NodeDiff{
-				Left: parents.Left.Name(),
+				Left: parents.Left,
 			}, c.filterFlags.HideEqual)
 
 		case !gedcom.IsNil(parents.Right):
 			row = NewDiffRow(name, &gedcom.NodeDiff{
-				Right: parents.Right.Name(),
+				Right: parents.Right,
 			}, c.filterFlags.HideEqual)
 		}
 
-		tableRows = append(tableRows, row)
+		tableRows = c.appendDiffRow(tableRows, row)
 	}
 
 	// Spouses
 	switch {
 	case !gedcom.IsNil(left) && !gedcom.IsNil(right):
-		for _, spouse := range left.Spouses().Compare(right.Spouses(), compareOptions) {
+		for _, spouse := range left.Spouses().Compare(right.Spouses(), c.compareOptions) {
 			nodeDiff := &gedcom.NodeDiff{}
 
 			if spouse.Left != nil {
-				nodeDiff.Left = spouse.Left.Name()
+				nodeDiff.Left = spouse.Left
 			}
 
 			if spouse.Right != nil {
-				nodeDiff.Right = spouse.Right.Name()
+				nodeDiff.Right = spouse.Right
 			}
 
 			row := NewDiffRow("Spouse", nodeDiff, c.filterFlags.HideEqual)
-			tableRows = append(tableRows, row)
+
+			tableRows = c.appendDiffRow(tableRows, row)
 		}
 
 	case !gedcom.IsNil(left):
 		for _, spouse := range left.Spouses() {
 			row := NewDiffRow("Spouse", &gedcom.NodeDiff{
-				Left: spouse.Name(),
+				Left: spouse,
 			}, c.filterFlags.HideEqual)
-			tableRows = append(tableRows, row)
+
+			tableRows = c.appendDiffRow(tableRows, row)
 		}
 
 	case !gedcom.IsNil(right):
 		for _, spouse := range right.Spouses() {
 			row := NewDiffRow("Spouse", &gedcom.NodeDiff{
-				Right: spouse.Name(),
+				Right: spouse,
 			}, c.filterFlags.HideEqual)
-			tableRows = append(tableRows, row)
+
+			tableRows = c.appendDiffRow(tableRows, row)
 		}
 	}
 
@@ -162,11 +215,14 @@ func (c *IndividualCompare) WriteTo(w io.Writer) (int64, error) {
 		rightAnchor = c.comparison.Right.Pointer()
 	}
 
+	// We should not show the header if the content would be blank.
+	if len(tableRows) == 0 {
+		return writeNothing()
+	}
+
 	return NewComponents(
 		NewAnchor(leftAnchor),
 		NewAnchor(rightAnchor),
-		NewBigTitle(1, name),
-		NewSpace(),
-		NewTable("", tableRows...),
+		NewCard(name, noBadgeCount, NewTable("", tableRows...)),
 	).WriteTo(w)
 }

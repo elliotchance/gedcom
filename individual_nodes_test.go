@@ -11,83 +11,94 @@ import (
 )
 
 var (
+	// John and Jane share the same pointer on purpose. They will be used for
+	// pointer comparisons.
 	elliot = individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907")
 	john   = individual("P2", "John /Smith/", "4 Jan 1803", "17 Mar 1877")
-	jane   = individual("P3", "Jane /Doe/", "3 Mar 1803", "14 June 1877")
+	jane   = individual("P2", "Jane /Doe/", "3 Mar 1803", "14 June 1877")
 	bob    = individual("P4", "Bob /Jones/", "1749", "1810")
 )
 
 var individualNodesTests = map[string]struct {
-	doc1, doc2  *gedcom.Document
-	min         float64
-	wantCompare gedcom.IndividualComparisons
-	wantMerge   gedcom.IndividualNodes
+	Doc1, Doc2 *gedcom.Document
+
+	MinimumWeightedSimilarity float64
+	PreferPointerAbove        float64
+
+	WantCompare gedcom.IndividualComparisons
+	WantMerge   gedcom.IndividualNodes
 }{
 	"BothDocumentsEmpty": {
-		doc1:        gedcom.NewDocument(),
-		doc2:        gedcom.NewDocument(),
-		min:         0.0,
-		wantCompare: gedcom.IndividualComparisons{},
+		Doc1: gedcom.NewDocument(),
+		Doc2: gedcom.NewDocument(),
+		MinimumWeightedSimilarity: 0.0,
+		PreferPointerAbove:        1.0,
+		WantCompare:               gedcom.IndividualComparisons{},
 	},
 	"Doc2Empty": {
-		doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot}),
-		doc2: gedcom.NewDocument(),
-		min:  0.0,
-		wantCompare: gedcom.IndividualComparisons{
+		Doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot}),
+		Doc2: gedcom.NewDocument(),
+		MinimumWeightedSimilarity: 0.0,
+		PreferPointerAbove:        1.0,
+		WantCompare: gedcom.IndividualComparisons{
 			{elliot, nil, nil},
 		},
-		wantMerge: gedcom.IndividualNodes{
+		WantMerge: gedcom.IndividualNodes{
 			elliot,
 		},
 	},
 	"Doc1Empty": {
-		doc1: gedcom.NewDocument(),
-		doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot}),
-		min:  0.0,
-		wantCompare: gedcom.IndividualComparisons{
+		Doc1: gedcom.NewDocument(),
+		Doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot}),
+		MinimumWeightedSimilarity: 0.0,
+		PreferPointerAbove:        1.0,
+		WantCompare: gedcom.IndividualComparisons{
 			{nil, elliot, nil},
 		},
-		wantMerge: gedcom.IndividualNodes{
+		WantMerge: gedcom.IndividualNodes{
 			elliot,
 		},
 	},
 	"SameIndividualInBothDocuments": {
-		doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot}),
-		doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot}),
-		min:  0.0,
-		wantCompare: gedcom.IndividualComparisons{
+		Doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot}),
+		Doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot}),
+		MinimumWeightedSimilarity: 0.0,
+		PreferPointerAbove:        1.0,
+		WantCompare: gedcom.IndividualComparisons{
 			{elliot, elliot, gedcom.NewSurroundingSimilarity(0.5, 1.0, 1.0, 1.0)},
 		},
-		wantMerge: gedcom.IndividualNodes{
+		WantMerge: gedcom.IndividualNodes{
 			elliot,
 		},
 	},
 	"SameIndividualsInDifferentOrder": {
-		doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot, john, jane}),
-		doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{jane, elliot, john}),
-		min:  0.0,
-		wantCompare: gedcom.IndividualComparisons{
+		Doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot, john, jane}),
+		Doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{jane, elliot, john}),
+		MinimumWeightedSimilarity: 0.0,
+		PreferPointerAbove:        1.0,
+		WantCompare: gedcom.IndividualComparisons{
 			{elliot, elliot, gedcom.NewSurroundingSimilarity(0.5, 1.0, 1.0, 1.0)},
 			{john, john, gedcom.NewSurroundingSimilarity(0.5, 1.0, 1.0, 1.0)},
 			{jane, jane, gedcom.NewSurroundingSimilarity(0.5, 1.0, 1.0, 1.0)},
 		},
-		wantMerge: gedcom.IndividualNodes{
+		WantMerge: gedcom.IndividualNodes{
 			elliot,
 			john,
 			jane,
 		},
 	},
 	"ZeroMinimumSimilarity": {
-		doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot, jane}),
-		doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{jane, john}),
-		min:  0.0,
-		wantCompare: gedcom.IndividualComparisons{
+		Doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot, jane}),
+		Doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{jane, john}),
+		MinimumWeightedSimilarity: 0.0,
+		PreferPointerAbove:        1.0,
+		WantCompare: gedcom.IndividualComparisons{
 			// elliot and john match because the minimumSimilarity is so
 			// low.
 			{jane, jane, gedcom.NewSurroundingSimilarity(0.5, 1, 1.0, 1.0)},
 			{elliot, john, gedcom.NewSurroundingSimilarity(0.5, 0.24743589743589745, 1.0, 1.0)},
 		},
-		wantMerge: gedcom.IndividualNodes{
+		WantMerge: gedcom.IndividualNodes{
 			jane,
 			gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
 				gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
@@ -104,35 +115,66 @@ var individualNodesTests = map[string]struct {
 		},
 	},
 	"OneMatch": {
-		doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot, jane}),
-		doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{jane, john}),
-		min:  0.75,
-		wantCompare: gedcom.IndividualComparisons{
+		Doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot, jane}),
+		Doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{jane, john}),
+		MinimumWeightedSimilarity: 0.75,
+		PreferPointerAbove:        1.0,
+		WantCompare: gedcom.IndividualComparisons{
 			{jane, jane, gedcom.NewSurroundingSimilarity(0.5, 1.0, 1.0, 1.0)},
 			{elliot, nil, nil},
 			{nil, john, nil},
 		},
-		wantMerge: gedcom.IndividualNodes{
+		WantMerge: gedcom.IndividualNodes{
 			jane,
 			elliot,
 			john,
 		},
 	},
 	"NoMatches": {
-		doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot, jane}),
-		doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{bob, john}),
-		min:  0.9,
-		wantCompare: gedcom.IndividualComparisons{
+		Doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot, jane}),
+		Doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{bob, john}),
+		MinimumWeightedSimilarity: 0.9,
+		PreferPointerAbove:        1.0,
+		WantCompare: gedcom.IndividualComparisons{
 			{elliot, nil, nil},
 			{jane, nil, nil},
 			{nil, bob, nil},
 			{nil, john, nil},
 		},
-		wantMerge: gedcom.IndividualNodes{
+		WantMerge: gedcom.IndividualNodes{
 			elliot,
 			jane,
 			bob,
 			john,
+		},
+	},
+	"AlwaysUsePointer": {
+		// John and Jane are both P2. Even though they are completely different
+		// we force pointers to match with a prefer value of 0.0.
+		Doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot, jane}),
+		Doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{bob, john}),
+		MinimumWeightedSimilarity: 0.9,
+		PreferPointerAbove:        0.0,
+		WantCompare: gedcom.IndividualComparisons{
+			{jane, john, gedcom.NewSurroundingSimilarity(0.5, 0.8209932199959546, 1.0, 1.0)},
+			{elliot, nil, nil},
+			{nil, bob, nil},
+		},
+		WantMerge: gedcom.IndividualNodes{
+			gedcom.NewIndividualNode(nil, "", "P2", []gedcom.Node{
+				gedcom.NewNameNode(nil, "Jane /Doe/", "", nil),
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+					gedcom.NewDateNode(nil, "4 Jan 1803", "", nil), // john
+					gedcom.NewDateNode(nil, "3 Mar 1803", "", nil), // jane
+				}),
+				gedcom.NewDeathNode(nil, "", "", []gedcom.Node{
+					gedcom.NewDateNode(nil, "17 Mar 1877", "", nil),  // john
+					gedcom.NewDateNode(nil, "14 June 1877", "", nil), // jane
+				}),
+				gedcom.NewNameNode(nil, "John /Smith/", "", nil),
+			}),
+			elliot,
+			bob,
 		},
 	},
 }
@@ -472,35 +514,37 @@ func TestIndividualNodes_Similarity(t *testing.T) {
 func TestIndividualNodes_Compare(t *testing.T) {
 	for testName, test := range individualNodesTests {
 		t.Run(testName, func(t *testing.T) {
-			for _, n := range test.doc1.Nodes() {
-				n.SetDocument(test.doc1)
-			}
-			for _, n := range test.doc2.Nodes() {
-				n.SetDocument(test.doc2)
+			for _, n := range test.Doc1.Nodes() {
+				n.SetDocument(test.Doc1)
 			}
 
-			options := gedcom.NewSimilarityOptions()
-			options.MinimumWeightedSimilarity = test.min
+			for _, n := range test.Doc2.Nodes() {
+				n.SetDocument(test.Doc2)
+			}
+
+			similarityOptions := gedcom.NewSimilarityOptions()
+			similarityOptions.MinimumWeightedSimilarity = test.MinimumWeightedSimilarity
+			similarityOptions.PreferPointerAbove = test.PreferPointerAbove
 
 			compareOptions := gedcom.NewIndividualNodesCompareOptions()
-			compareOptions.SimilarityOptions = options
+			compareOptions.SimilarityOptions = similarityOptions
 
-			individuals1 := test.doc1.Individuals()
-			individuals2 := test.doc2.Individuals()
+			individuals1 := test.Doc1.Individuals()
+			individuals2 := test.Doc2.Individuals()
 			got := individuals1.Compare(individuals2, compareOptions)
 
 			// The comparison results (got) will include the options from above.
 			// However, the fixture for this test does not provide the
 			// compareOptions as it would make the fixture verbose and
-			// confusing. Instead we set the test.min on each of the comparison
+			// confusing. Instead we set the Options on each of the comparison
 			// results so that the deep equal passes.
-			for _, x := range test.wantCompare {
+			for _, x := range test.WantCompare {
 				if x.Similarity != nil {
-					x.Similarity.Options.MinimumWeightedSimilarity = test.min
+					x.Similarity.Options = similarityOptions
 				}
 			}
 
-			assertEqual(t, test.wantCompare, got)
+			assertEqual(t, test.WantCompare, got)
 		})
 	}
 }
@@ -534,25 +578,27 @@ func TestIndividualNodes_Nodes(t *testing.T) {
 func TestIndividualNodes_Merge(t *testing.T) {
 	for testName, test := range individualNodesTests {
 		t.Run(testName, func(t *testing.T) {
-			for _, n := range test.doc1.Nodes() {
-				n.SetDocument(test.doc1)
-			}
-			for _, n := range test.doc2.Nodes() {
-				n.SetDocument(test.doc2)
+			for _, n := range test.Doc1.Nodes() {
+				n.SetDocument(test.Doc1)
 			}
 
-			options := gedcom.NewSimilarityOptions()
-			options.MinimumWeightedSimilarity = test.min
+			for _, n := range test.Doc2.Nodes() {
+				n.SetDocument(test.Doc2)
+			}
+
+			similarityOptions := gedcom.NewSimilarityOptions()
+			similarityOptions.MinimumWeightedSimilarity = test.MinimumWeightedSimilarity
+			similarityOptions.PreferPointerAbove = test.PreferPointerAbove
 
 			compareOptions := gedcom.NewIndividualNodesCompareOptions()
-			compareOptions.SimilarityOptions = options
+			compareOptions.SimilarityOptions = similarityOptions
 
-			individuals1 := test.doc1.Individuals()
-			individuals2 := test.doc2.Individuals()
+			individuals1 := test.Doc1.Individuals()
+			individuals2 := test.Doc2.Individuals()
 			got, err := individuals1.Merge(individuals2, compareOptions)
 
 			assert.NoError(t, err)
-			assertIndividualNodes(t, test.wantMerge, got)
+			assertIndividualNodes(t, test.WantMerge, got)
 		})
 	}
 }

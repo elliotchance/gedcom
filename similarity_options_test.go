@@ -20,7 +20,8 @@ func TestSimilarityOptions_String(t *testing.T) {
 		"ChildrenWeight:0.06666666666666667, " +
 		"NameToDateRatio:0.5, " +
 		"JaroBoostThreshold:0, " +
-		"JaroPrefixSize:8")
+		"JaroPrefixSize:8, " +
+		"PreferPointerAbove:0.733")
 }
 
 func TestNewSimilarityOptions(t *testing.T) {
@@ -31,5 +32,9 @@ func TestNewSimilarityOptions(t *testing.T) {
 			options.SpousesWeight + options.ChildrenWeight
 
 		assert.Equal(t, 1.0, shouldBeOne)
+	})
+
+	t.Run("PreferPointerAbove", func(t *testing.T) {
+		assert.Equal(t, gedcom.DefaultMinimumSimilarity, options.PreferPointerAbove)
 	})
 }

@@ -46,7 +46,7 @@ func (c *IndividualNameAndSex) WriteTo(w io.Writer) (int64, error) {
 		sexRow,
 	)
 
-	return NewCard("Name & Sex", noBadgeCount, NewTable("", s)).WriteTo(w)
+	return NewCard(NewText("Name & Sex"), noBadgeCount, NewTable("", s)).WriteTo(w)
 }
 
 func keyedRow(title, value string) *KeyedTableRow {

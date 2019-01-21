@@ -42,7 +42,10 @@ func (ff *FilterFlags) SetupCLI() {
 
 	flag.BoolVar(&ff.HideEqual, "hide-equal", false, "Hide equal values.")
 
-	flag.BoolVar(&ff.SimpleNames, "simple-names", false, "Simplify names.")
+	flag.BoolVar(&ff.SimpleNames, "simple-names", false, CLIDescription(`
+		The NAME node can be represented a single string, or name parts such as
+		Given name, Surname, Title, etc. When enabled, this option flattens name
+		parts into a single string as their GEDCOM name, like "John /Smith/".`))
 }
 
 func (ff *FilterFlags) FilterFunctions() []gedcom.FilterFunction {

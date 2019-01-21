@@ -1,6 +1,7 @@
 package html
 
 import (
+	"fmt"
 	"github.com/elliotchance/gedcom"
 	"io"
 )
@@ -19,15 +20,37 @@ func NewDiffRow(name string, nd *gedcom.NodeDiff, hideSame bool) *DiffRow {
 	}
 }
 
-func (c *DiffRow) WriteTo(w io.Writer) (int64, error) {
+func (c *DiffRow) isEmpty() bool {
 	if c.hideSame {
 		if c.nd.IsDeepEqual() {
-			return writeNothing()
+			return true
 		}
 
 		if c.nd.Tag().IsEvent() && len(c.nd.Children) == 0 {
-			return writeNothing()
+			return true
 		}
+	}
+
+	return false
+}
+
+func (c *DiffRow) valueAndPointer(node gedcom.Node) string {
+	v := node.Value()
+
+	if i, ok := node.(*gedcom.IndividualNode); ok {
+		v = i.Name().String()
+	}
+
+	if node.Pointer() != "" {
+		v += fmt.Sprintf(" <%s>", node.Pointer())
+	}
+
+	return v
+}
+
+func (c *DiffRow) WriteTo(w io.Writer) (int64, error) {
+	if c.isEmpty() {
+		return writeNothing()
 	}
 
 	leftClass := ""
@@ -41,11 +64,11 @@ func (c *DiffRow) WriteTo(w io.Writer) (int64, error) {
 		// do nothing
 
 	case gedcom.IsNil(c.nd.Left):
-		right = c.nd.Right.Value()
+		right = c.valueAndPointer(c.nd.Right)
 		rightClass = "bg-primary"
 
 	case gedcom.IsNil(c.nd.Right):
-		left = c.nd.Left.Value()
+		left = c.valueAndPointer(c.nd.Left)
 		leftClass = "bg-warning"
 
 	default:
@@ -53,8 +76,8 @@ func (c *DiffRow) WriteTo(w io.Writer) (int64, error) {
 			leftClass = "bg-info"
 			rightClass = "bg-info"
 		}
-		left = c.nd.Left.Value()
-		right = c.nd.Right.Value()
+		left = c.valueAndPointer(c.nd.Left)
+		right = c.valueAndPointer(c.nd.Right)
 	}
 
 	return NewTableRow(

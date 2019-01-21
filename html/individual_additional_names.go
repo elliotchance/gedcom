@@ -29,5 +29,5 @@ func (c *IndividualAdditionalNames) WriteTo(w io.Writer) (int64, error) {
 
 	table := NewTable("", rows...)
 
-	return NewCard("Additional Names", len(names)-1, table).WriteTo(w)
+	return NewCard(NewText("Additional Names"), len(names)-1, table).WriteTo(w)
 }

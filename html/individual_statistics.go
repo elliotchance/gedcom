@@ -47,7 +47,7 @@ func (c *IndividualStatistics) WriteTo(w io.Writer) (int64, error) {
 
 	s := NewComponents(totalRow, livingRow, deadRow)
 
-	return NewCard("Individuals", noBadgeCount, NewTable("", s)).WriteTo(w)
+	return NewCard(NewText("Individuals"), noBadgeCount, NewTable("", s)).WriteTo(w)
 }
 
 func keyedNumberRow(title string, total int) *KeyedTableRow {

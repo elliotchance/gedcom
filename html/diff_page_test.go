@@ -64,9 +64,10 @@ func TestDiffPage_WriteTo(t *testing.T) {
 	filterFlags := &util.FilterFlags{}
 	googleAnalyticsID := ""
 
+	compareOptions := gedcom.NewIndividualNodesCompareOptions()
 	component := html.NewDiffPage(comparisons, filterFlags, googleAnalyticsID,
-		html.DiffPageShowAll, html.DiffPageSortHighestSimilarity,
-		html.LivingVisibilityPlaceholder)
+		html.DiffPageShowAll, html.DiffPageSortHighestSimilarity, nil,
+		compareOptions, html.LivingVisibilityPlaceholder)
 
 	buf := bytes.NewBuffer(nil)
 	component.WriteTo(buf)

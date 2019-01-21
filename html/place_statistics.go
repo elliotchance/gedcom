@@ -22,5 +22,5 @@ func (c *PlaceStatistics) WriteTo(w io.Writer) (int64, error) {
 		NewKeyedTableRow("Total", total, true),
 	)
 
-	return NewCard("Places", noBadgeCount, NewTable("", s)).WriteTo(w)
+	return NewCard(NewText("Places"), noBadgeCount, NewTable("", s)).WriteTo(w)
 }
