@@ -134,3 +134,22 @@ func SimpleNameFilter() FilterFunction {
 		return node, true
 	}
 }
+
+// OnlyVitalsTagFilter removes all tags except for vital individual information.
+//
+// The vital nodes are (or multiples in the same individual of): Name, birth,
+// baptism, death and burial. Within these only the date and place is retained.
+func OnlyVitalsTagFilter() FilterFunction {
+	return WhitelistTagFilter(
+		// Level 0: We have to allow this for the children.
+		TagIndividual,
+
+		// Level 1.
+		TagName, TagBirth, TagBaptism, TagDeath, TagBurial,
+
+		// Level 2: These should only ever appear as direct children of the tags
+		// above.
+		TagGivenName, TagSurname, TagSurnamePrefix, TagNamePrefix,
+		TagNameSuffix, TagTitle, TagDate, TagPlace,
+	)
+}
