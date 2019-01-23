@@ -1,49 +1,9 @@
-// Individual Names
-//
-// A NameNode represents all the parts that make up a single name. An individual
-// may have more than one name, each one would be represented by a NameNode.
-//
-// Apart from functions to extract name parts there is also Format which works
-// similar to `fmt.Printf` where placeholders represent different components of
-// the name:
-//
-//   %% "%"
-//   %f GivenName
-//   %l Surname
-//   %m SurnamePrefix
-//   %p Prefix
-//   %s Suffix
-//   %t Title
-//
-// Each of the letters may be in upper case to convert the name part to upper
-// case also. Whitespace before, after and between name components will be
-// removed:
-//
-//   name.Format("%l, %f")     // "Smith, Bob"
-//   name.Format("%f %L")      // "Bob SMITH"
-//   name.Format("%f %m (%l)") // "Bob (Smith)"
 package gedcom
 
 import (
 	"regexp"
 	"strings"
 	"unicode"
-)
-
-// NameFormat constants can be used with NameNode.Format.
-const (
-	// This is the written format, also used by String().
-	NameFormatWritten = "%t %p %f %m %l %s"
-
-	// This is the style used in GEDCOM NAME nodes. It is used in GedcomName().
-	//
-	// It should be noted that while the formatted name is valid GEDCOM, it
-	// cannot be reverse back into its individual name parts.
-	NameFormatGEDCOM = "%t %p %f %m /%l/ %s"
-
-	// NameFormatIndex is appropriate for showing names that are indexed by
-	// their surname, such as "Smith, Bob"
-	NameFormatIndex = "%m %l, %t %p %f %s"
 )
 
 // NameNode represents all the parts that make up a single name. An individual
@@ -204,31 +164,9 @@ func (node *NameNode) GedcomName() (name string) {
 
 // Format returns a formatted name.
 //
-// There are some common formats described with the NameFormat constants.
-//
-// Format works similar to Printf where placeholders represent different
-// components of the name:
-//
-//   %% "%"
-//   %f GivenName
-//   %l Surname
-//   %m SurnamePrefix
-//   %p Prefix
-//   %s Suffix
-//   %t Title
-//
-// Each of the letters may be in upper case to convert the name part to upper
-// case also.
-//
-// Whitespace before, after and between name components will be removed.
-//
-// Examples:
-//
-//   name.Format("%l, %f")     // Smith, Bob
-//   name.Format("%f %L")      // Bob SMITH
-//   name.Format("%f %m (%l)") // Bob (Smith)
-//
-func (node *NameNode) Format(format string) string {
+// There are some common formats described with the NameFormat constants. See
+// NameFormat for a full description.
+func (node *NameNode) Format(format NameFormat) string {
 	result := ""
 	formatLen := len(format)
 

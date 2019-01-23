@@ -245,6 +245,7 @@ func TestSimpleNameFilter(t *testing.T) {
 	// ghost:ignore
 	for _, test := range []struct {
 		root     gedcom.Node
+		format   gedcom.NameFormat
 		expected string
 	}{
 		{
@@ -254,6 +255,7 @@ func TestSimpleNameFilter(t *testing.T) {
 					gedcom.NewDateNode(nil, "6 MAY 1989", "", nil),
 				}),
 			}),
+			format: gedcom.NameFormatGEDCOM,
 			expected: `0 @P1@ INDI
 1 NAME Elliot /Chance/
 1 BIRT
@@ -269,6 +271,7 @@ func TestSimpleNameFilter(t *testing.T) {
 					gedcom.NewNodeWithChildren(nil, gedcom.TagSurname, "Smith", "", nil),
 				}),
 			}),
+			format: gedcom.NameFormatGEDCOM,
 			expected: `0 @P1@ INDI
 1 BIRT
 2 DATE 6 MAY 1989
@@ -285,15 +288,47 @@ func TestSimpleNameFilter(t *testing.T) {
 					gedcom.NewDateNode(nil, "6 MAY 1989", "", nil),
 				}),
 			}),
+			format: gedcom.NameFormatGEDCOM,
 			expected: `0 @P1@ INDI
 1 NAME Bob /Smith/
 1 BIRT
 2 DATE 6 MAY 1989
 `,
 		},
+		{
+			root: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+				gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+					gedcom.NewDateNode(nil, "6 MAY 1989", "", nil),
+				}),
+			}),
+			format: gedcom.NameFormatWritten,
+			expected: `0 @P1@ INDI
+1 NAME Elliot Chance
+1 BIRT
+2 DATE 6 MAY 1989
+`,
+		},
+		{
+			root: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+				gedcom.NewNameNode(nil, "", "", []gedcom.Node{
+					gedcom.NewNodeWithChildren(nil, gedcom.TagGivenName, "Bob", "", nil),
+					gedcom.NewNodeWithChildren(nil, gedcom.TagSurname, "Smith", "", nil),
+				}),
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+					gedcom.NewDateNode(nil, "6 MAY 1989", "", nil),
+				}),
+			}),
+			format: gedcom.NameFormatIndex,
+			expected: `0 @P1@ INDI
+1 NAME Smith, Bob
+1 BIRT
+2 DATE 6 MAY 1989
+`,
+		},
 	} {
 		t.Run("", func(t *testing.T) {
-			filter := gedcom.SimpleNameFilter()
+			filter := gedcom.SimpleNameFilter(test.format)
 			result := gedcom.GEDCOMString(gedcom.Filter(test.root, filter), 0)
 			assert.Equal(t, test.expected, result)
 		})
