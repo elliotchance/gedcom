@@ -17,6 +17,9 @@ type FilterFlags struct {
 	NoLabels     bool
 	NoCensuses   bool
 
+	// Only vitals (name, birth, baptism, death and burial).
+	OnlyVitals bool
+
 	// Only official tags.
 	OnlyOfficial bool
 
@@ -38,7 +41,13 @@ func (ff *FilterFlags) SetupCLI() {
 	flag.BoolVar(&ff.NoLabels, "no-labels", false, "Exclude labels.")
 	flag.BoolVar(&ff.NoCensuses, "no-censuses", false, "Exclude censuses.")
 
-	flag.BoolVar(&ff.OnlyOfficial, "only-official", false, "Only include official GEDCOM tags.")
+	flag.BoolVar(&ff.OnlyVitals, "only-vitals", false, CLIDescription(`
+		Remove all data except for vital information. The vital nodes are (or
+		multiples in the same individual of): Name, birth, baptism, death and
+		burial. Within these only the date and place is retained.`))
+
+	flag.BoolVar(&ff.OnlyOfficial, "only-official", false,
+		"Only include official GEDCOM tags.")
 
 	flag.BoolVar(&ff.HideEqual, "hide-equal", false, "Hide equal values.")
 
@@ -91,6 +100,10 @@ func (ff *FilterFlags) FilterFunctions() []gedcom.FilterFunction {
 	if ff.NameFormat != "unmodified" {
 		format, _ := gedcom.NewNameFormatByName(ff.NameFormat)
 		filters = append(filters, gedcom.SimpleNameFilter(format))
+	}
+
+	if ff.OnlyVitals {
+		filters = append(filters, gedcom.OnlyVitalsTagFilter())
 	}
 
 	return filters

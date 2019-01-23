@@ -334,3 +334,136 @@ func TestSimpleNameFilter(t *testing.T) {
 		})
 	}
 }
+
+func TestOnlyVitalsTagFilter(t *testing.T) {
+	// ghost:ignore
+	for testName, test := range map[string]struct {
+		root     gedcom.Node
+		expected string
+	}{
+		"SimpleNameAndBirthDate": {
+			root: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+				gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+					gedcom.NewDateNode(nil, "6 MAY 1989", "", nil),
+				}),
+			}),
+			expected: `0 @P1@ INDI
+1 NAME Elliot /Chance/
+1 BIRT
+2 DATE 6 MAY 1989
+`,
+		},
+		"ComplexName1AndDeathDate": {
+			root: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+				gedcom.NewDeathNode(nil, "", "", []gedcom.Node{
+					gedcom.NewDateNode(nil, "6 MAY 1989", "", nil),
+				}),
+				gedcom.NewNameNode(nil, "Elliot /Chance/", "", []gedcom.Node{
+					gedcom.NewNodeWithChildren(nil, gedcom.TagSurname, "Smith", "", nil),
+				}),
+			}),
+			expected: `0 @P1@ INDI
+1 DEAT
+2 DATE 6 MAY 1989
+1 NAME Elliot /Chance/
+2 SURN Smith
+`,
+		},
+		"ComplexName2AndBirthPlace": {
+			root: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+				gedcom.NewNameNode(nil, "", "", []gedcom.Node{
+					gedcom.NewNodeWithChildren(nil, gedcom.TagGivenName, "Bob", "", nil),
+					gedcom.NewNodeWithChildren(nil, gedcom.TagSurname, "Smith", "", nil),
+				}),
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+					gedcom.NewPlaceNode(nil, "Sydney, Australia", "", nil),
+				}),
+			}),
+			expected: `0 @P1@ INDI
+1 NAME
+2 GIVN Bob
+2 SURN Smith
+1 BIRT
+2 PLAC Sydney, Australia
+`,
+		},
+		"Source": {
+			root: gedcom.NewSourceNode(nil, "", "P1", []gedcom.Node{
+				gedcom.NewNameNode(nil, "", "", []gedcom.Node{
+					gedcom.NewNodeWithChildren(nil, gedcom.TagGivenName, "Bob", "", nil),
+					gedcom.NewNodeWithChildren(nil, gedcom.TagSurname, "Smith", "", nil),
+				}),
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+					gedcom.NewPlaceNode(nil, "Sydney, Australia", "", nil),
+				}),
+			}),
+			expected: ``,
+		},
+		"IndividualNote": {
+			root: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+				gedcom.NewNameNode(nil, "", "", []gedcom.Node{
+					gedcom.NewNodeWithChildren(nil, gedcom.TagGivenName, "Bob", "", nil),
+					gedcom.NewNodeWithChildren(nil, gedcom.TagSurname, "Smith", "", nil),
+				}),
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+					gedcom.NewPlaceNode(nil, "Sydney, Australia", "", nil),
+				}),
+				gedcom.NewNode(nil, gedcom.TagNote, "foo", ""),
+			}),
+			expected: `0 @P1@ INDI
+1 NAME
+2 GIVN Bob
+2 SURN Smith
+1 BIRT
+2 PLAC Sydney, Australia
+`,
+		},
+		"Burial": {
+			root: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+				gedcom.NewNameNode(nil, "", "", []gedcom.Node{
+					gedcom.NewNodeWithChildren(nil, gedcom.TagGivenName, "Bob", "", nil),
+					gedcom.NewNodeWithChildren(nil, gedcom.TagTitle, "Smith", "", nil),
+				}),
+				gedcom.NewBurialNode(nil, "", "", []gedcom.Node{
+					gedcom.NewPlaceNode(nil, "6 MAY 1989", "", nil),
+					gedcom.NewPlaceNode(nil, "Sydney, Australia", "", nil),
+				}),
+			}),
+			expected: `0 @P1@ INDI
+1 NAME
+2 GIVN Bob
+2 TITL Smith
+1 BURI
+2 PLAC 6 MAY 1989
+2 PLAC Sydney, Australia
+`,
+		},
+		"Baptism": {
+			root: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+				gedcom.NewNameNode(nil, "", "", []gedcom.Node{
+					gedcom.NewNodeWithChildren(nil, gedcom.TagNameSuffix, "Bob", "", nil),
+					gedcom.NewNodeWithChildren(nil, gedcom.TagSurnamePrefix, "Smith", "", nil),
+				}),
+				gedcom.NewBaptismNode(nil, "", "", []gedcom.Node{
+					gedcom.NewPlaceNode(nil, "6 MAY 1989", "", nil),
+					gedcom.NewPlaceNode(nil, "7 MAY 1989", "", nil),
+				}),
+			}),
+			expected: `0 @P1@ INDI
+1 NAME
+2 NSFX Bob
+2 SPFX Smith
+1 BAPM
+2 PLAC 6 MAY 1989
+2 PLAC 7 MAY 1989
+`,
+		},
+	} {
+		t.Run(testName, func(t *testing.T) {
+			filter := gedcom.OnlyVitalsTagFilter()
+			result := gedcom.GEDCOMString(gedcom.Filter(test.root, filter), 0)
+			assert.Equal(t, test.expected, result)
+		})
+	}
+}
