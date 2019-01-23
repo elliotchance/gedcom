@@ -24,7 +24,7 @@ type FilterFlags struct {
 	HideEqual bool
 
 	// Condense NAME nodes to a simple string.
-	SimpleNames bool
+	NameFormat string
 }
 
 func (ff *FilterFlags) SetupCLI() {
@@ -42,10 +42,22 @@ func (ff *FilterFlags) SetupCLI() {
 
 	flag.BoolVar(&ff.HideEqual, "hide-equal", false, "Hide equal values.")
 
-	flag.BoolVar(&ff.SimpleNames, "simple-names", false, CLIDescription(`
+	flag.StringVar(&ff.NameFormat, "name-format", "written", CLIDescription(`
 		The NAME node can be represented a single string, or name parts such as
 		Given name, Surname, Title, etc. When enabled, this option flattens name
-		parts into a single string as their GEDCOM name, like "John /Smith/".`))
+		parts into a single string with the given format:
+
+		"written": Default. Flatten names to their written names, like
+		"John Smith".
+
+		"gedcom": Flatten names to their GEDCOM name, like "John /Smith/".
+
+		"index": Flatten names to their index name, like "Smith, John".
+
+		"unmodified": Do not make any modifications to the name or name parts.
+
+		You can also provide a custom format (see NameFormat) by not using one
+		of the presets above.`))
 }
 
 func (ff *FilterFlags) FilterFunctions() []gedcom.FilterFunction {
@@ -76,8 +88,9 @@ func (ff *FilterFlags) FilterFunctions() []gedcom.FilterFunction {
 		filters = append(filters, gedcom.OfficialTagFilter())
 	}
 
-	if ff.SimpleNames {
-		filters = append(filters, gedcom.SimpleNameFilter())
+	if ff.NameFormat != "unmodified" {
+		format, _ := gedcom.NewNameFormatByName(ff.NameFormat)
+		filters = append(filters, gedcom.SimpleNameFilter(format))
 	}
 
 	return filters
