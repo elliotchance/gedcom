@@ -625,9 +625,11 @@ var (
 )
 
 var (
-	// Unofficial. The unique identifier for the person on FamilySearch.org.
-	// This has been seen exported from MacFamilyFree.
-	UnofficialTagFamilySearchID = newTag("_FID", "FamilySearch ID", tagOptionNone, tagSortIndividualUnofficial)
+	// Unofficial.
+
+	// See FamilySearchIDNode
+	UnofficialTagFamilySearchID1 = newTag("_FID", "FamilySearch ID", tagOptionNone, tagSortIndividualUnofficial)
+	UnofficialTagFamilySearchID2 = newTag("_FSFTID", "FamilySearch ID", tagOptionNone, tagSortIndividualUnofficial)
 
 	// Unofficial. Latitude degrees. This has been seen exported from
 	// MacFamilyFree.
@@ -729,7 +731,8 @@ func Tags() []Tag {
 		TagTrailer, TagType, TagVersion, TagWife, TagWWW, TagWill, TagLabel,
 
 		// Unofficial
-		UnofficialTagFamilySearchID, UnofficialTagLatitudeDegrees,
+		UnofficialTagFamilySearchID1, UnofficialTagFamilySearchID2,
+		UnofficialTagLatitudeDegrees,
 		UnofficialTagLatitudeMinutes, UnofficialTagLatitudeSeconds,
 		UnofficialTagLongitudeDegress, UnofficialTagLongitudeMinutes,
 		UnofficialTagLongitudeNorth, UnofficialTagLongitudeSeconds,

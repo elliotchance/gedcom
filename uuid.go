@@ -2,8 +2,8 @@ package gedcom
 
 import (
 	"fmt"
-	"strings"
 	"regexp"
+	"strings"
 )
 
 type UUID string
