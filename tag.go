@@ -664,6 +664,9 @@ var (
 	// Unofficial. The created date and/or time. This has been seen exported
 	// from Ancestry.com.
 	UnofficialTagCreated = newTag("_CRE", "Created", tagOptionNone, tagSortIndividualUnofficial)
+
+	// See UniqueIDNode.
+	UnofficialTagUniqueID = newTag("_UID", "Unique ID", tagOptionNone, tagSortIndividualUnofficial)
 )
 
 // TagFromString returns known tag constant like TagHeader from it's raw string
@@ -730,7 +733,7 @@ func Tags() []Tag {
 		UnofficialTagLatitudeMinutes, UnofficialTagLatitudeSeconds,
 		UnofficialTagLongitudeDegress, UnofficialTagLongitudeMinutes,
 		UnofficialTagLongitudeNorth, UnofficialTagLongitudeSeconds,
-		UnofficialTagCoordinates, UnofficialTagCreated,
+		UnofficialTagCoordinates, UnofficialTagCreated, UnofficialTagUniqueID,
 	}
 }
 

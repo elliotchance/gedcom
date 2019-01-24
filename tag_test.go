@@ -20,6 +20,9 @@ var tagTests = map[string]struct {
 	str        string
 }{
 	// Official
+	//        isKnown
+	//        |  isOfficial
+	//        |  |  isEvent
 	"ABBR":  {y, y, n, &gedcom.TagAbbreviation, "Abbreviation"},
 	"ADDR":  {y, y, n, &gedcom.TagAddress, "Address"},
 	"ADOP":  {y, y, y, &gedcom.TagAdoption, "Adoption"},
@@ -161,6 +164,9 @@ var tagTests = map[string]struct {
 	"WWW":   {y, y, n, &gedcom.TagWWW, "WWW"},
 
 	// Unofficial
+	//       isKnown
+	//       |  isOfficial
+	//       |  |  isEvent
 	"_COR": {y, n, n, &gedcom.UnofficialTagCoordinates, "Coordinates"},
 	"_CRE": {y, n, n, &gedcom.UnofficialTagCreated, "Created"},
 	"_FID": {y, n, n, &gedcom.UnofficialTagFamilySearchID, "FamilySearch ID"},
@@ -171,8 +177,12 @@ var tagTests = map[string]struct {
 	"_LOM": {y, n, n, &gedcom.UnofficialTagLongitudeMinutes, "Longitude Minutes"},
 	"_LON": {y, n, n, &gedcom.UnofficialTagLongitudeNorth, "Longitude North"},
 	"_LOS": {y, n, n, &gedcom.UnofficialTagLongitudeSeconds, "Longitude Seconds"},
+	"_UID": {y, n, n, &gedcom.UnofficialTagUniqueID, "Unique ID"},
 
 	// Unknown
+	//       isKnown
+	//       |  isOfficial
+	//       |  |  isEvent
 	"FOBR": {n, n, n, nil, "FOBR"},
 	"BRBZ": {n, n, n, nil, "BRBZ"},
 	"":     {n, n, n, nil, ""},
@@ -395,6 +405,7 @@ func TestTags(t *testing.T) {
 			gedcom.UnofficialTagLongitudeMinutes,
 			gedcom.UnofficialTagLongitudeNorth,
 			gedcom.UnofficialTagLongitudeSeconds,
+			gedcom.UnofficialTagUniqueID,
 		}, tags)
 	})
 }
