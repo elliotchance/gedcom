@@ -2,10 +2,10 @@ package q_test
 
 import (
 	"errors"
+	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/q"
 	"github.com/elliotchance/tf"
 	"testing"
-	"github.com/elliotchance/gedcom"
 )
 
 func TestMergeDocumentsAndIndividualsExpr_Evaluate(t *testing.T) {

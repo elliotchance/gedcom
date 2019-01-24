@@ -835,3 +835,29 @@ func (node *IndividualNode) String() string {
 
 	return fmt.Sprintf("%s (%s)", name, strings.Join(dateParts, ", "))
 }
+
+func (node *IndividualNode) FamilySearchIDs() (nodes []*FamilySearchIDNode) {
+	if node == nil {
+		return nil
+	}
+
+	for _, tag := range FamilySearchIDNodeTags() {
+		for _, n := range NodesWithTag(node, tag) {
+			nodes = append(nodes, n.(*FamilySearchIDNode))
+		}
+	}
+
+	return
+}
+
+func (node *IndividualNode) UniqueIDs() (nodes []*UniqueIDNode) {
+	if node == nil {
+		return nil
+	}
+
+	for _, n := range NodesWithTag(node, UnofficialTagUniqueID) {
+		nodes = append(nodes, n.(*UniqueIDNode))
+	}
+
+	return
+}

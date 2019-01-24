@@ -265,6 +265,8 @@ func TestNewNode(t *testing.T) {
 		{gedcom.TagDeath, gedcom.NewDeathNode(nil, v, p, nil)},
 		{gedcom.TagEvent, gedcom.NewEventNode(nil, v, p, nil)},
 		{gedcom.TagFamily, gedcom.NewFamilyNode(nil, p, nil)},
+		{gedcom.UnofficialTagFamilySearchID1, gedcom.NewFamilySearchIDNode(nil, gedcom.UnofficialTagFamilySearchID1, v)},
+		{gedcom.UnofficialTagFamilySearchID2, gedcom.NewFamilySearchIDNode(nil, gedcom.UnofficialTagFamilySearchID2, v)},
 		{gedcom.TagFormat, gedcom.NewFormatNode(nil, v, p, nil)},
 		{gedcom.TagIndividual, gedcom.NewIndividualNode(nil, v, p, nil)},
 		{gedcom.TagLatitude, gedcom.NewLatitudeNode(nil, v, p, nil)},
@@ -280,6 +282,7 @@ func TestNewNode(t *testing.T) {
 		{gedcom.TagSource, gedcom.NewSourceNode(nil, v, p, nil)},
 		{gedcom.TagType, gedcom.NewTypeNode(nil, v, p, nil)},
 		{gedcom.TagVersion, gedcom.NewNode(nil, gedcom.TagVersion, v, p)},
+		{gedcom.UnofficialTagUniqueID, gedcom.NewUniqueIDNode(nil, v, p, nil)},
 	} {
 		t.Run(test.tag.String(), func(t *testing.T) {
 			assert.Equal(t, test.expected, gedcom.NewNode(nil, test.tag, v, p))

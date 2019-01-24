@@ -2,8 +2,8 @@ package q
 
 import (
 	"errors"
-	"github.com/elliotchance/gedcom"
 	"fmt"
+	"github.com/elliotchance/gedcom"
 )
 
 // MergeDocumentsAndIndividualsExpr is a function. See Evaluate.

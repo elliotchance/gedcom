@@ -2,11 +2,12 @@ package gedcom_test
 
 import (
 	"fmt"
+	"strings"
+	"testing"
+
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/tf"
 	"github.com/stretchr/testify/assert"
-	"strings"
-	"testing"
 )
 
 var individualTests = []struct {
@@ -1773,4 +1774,61 @@ func TestIndividualNode_String(t *testing.T) {
 			gedcom.NewDateNode(nil, "14 Jun 2007", "", nil),
 		}),
 	})).Returns("Jane Doe (d. 7 Jun 2007)")
+}
+
+func TestIndividualNode_FamilySearchIDs(t *testing.T) {
+	FamilySearchIDs := tf.NamedFunction(t, "IndividualNode_FamilySearchIDs",
+		(*gedcom.IndividualNode).FamilySearchIDs)
+
+	FamilySearchIDs(gedcom.NewIndividualNode(nil, "", "", nil)).
+		Returns(nil)
+
+	FamilySearchIDs(gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewNameNode(nil, "", "", nil),
+	})).Returns(nil)
+
+	FamilySearchIDs(gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewNameNode(nil, "", "", nil),
+		gedcom.NewFamilySearchIDNode(nil, gedcom.UnofficialTagFamilySearchID1, "LZDP-V7V"),
+	})).Returns([]*gedcom.FamilySearchIDNode{
+		gedcom.NewFamilySearchIDNode(nil, gedcom.UnofficialTagFamilySearchID1, "LZDP-V7V"),
+	})
+
+	FamilySearchIDs(gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewFamilySearchIDNode(nil, gedcom.UnofficialTagFamilySearchID2, "AZDP-V7V"),
+		gedcom.NewFamilySearchIDNode(nil, gedcom.UnofficialTagFamilySearchID1, "BZDP-V7V"),
+		gedcom.NewFamilySearchIDNode(nil, gedcom.UnofficialTagFamilySearchID2, "CZDP-V7V"),
+	})).Returns([]*gedcom.FamilySearchIDNode{
+		gedcom.NewFamilySearchIDNode(nil, gedcom.UnofficialTagFamilySearchID1, "BZDP-V7V"),
+		gedcom.NewFamilySearchIDNode(nil, gedcom.UnofficialTagFamilySearchID2, "AZDP-V7V"),
+		gedcom.NewFamilySearchIDNode(nil, gedcom.UnofficialTagFamilySearchID2, "CZDP-V7V"),
+	})
+}
+
+func TestIndividualNode_UniqueIDs(t *testing.T) {
+	UniqueIDs := tf.NamedFunction(t, "IndividualNode_UniqueIDs",
+		(*gedcom.IndividualNode).UniqueIDs)
+
+	UniqueIDs(gedcom.NewIndividualNode(nil, "", "", nil)).
+		Returns(nil)
+
+	UniqueIDs(gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewNameNode(nil, "", "", nil),
+	})).Returns(nil)
+
+	UniqueIDs(gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewNameNode(nil, "", "", nil),
+		gedcom.NewUniqueIDNode(nil, "LZDP-V7V", "", nil),
+	})).Returns([]*gedcom.UniqueIDNode{
+		gedcom.NewUniqueIDNode(nil, "LZDP-V7V", "", nil),
+	})
+
+	UniqueIDs(gedcom.NewIndividualNode(nil, "", "", []gedcom.Node{
+		gedcom.NewUniqueIDNode(nil, "AZDP-V7V", "", nil),
+		gedcom.NewNameNode(nil, "", "", nil),
+		gedcom.NewUniqueIDNode(nil, "BZDP-V7V", "", nil),
+	})).Returns([]*gedcom.UniqueIDNode{
+		gedcom.NewUniqueIDNode(nil, "AZDP-V7V", "", nil),
+		gedcom.NewUniqueIDNode(nil, "BZDP-V7V", "", nil),
+	})
 }

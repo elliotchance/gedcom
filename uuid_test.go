@@ -1,10 +1,10 @@
 package gedcom_test
 
 import (
-	"testing"
-	"github.com/elliotchance/tf"
-	"github.com/elliotchance/gedcom"
 	"fmt"
+	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/tf"
+	"testing"
 )
 
 func TestNewUUIDFromString(t *testing.T) {

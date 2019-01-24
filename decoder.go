@@ -209,6 +209,9 @@ func NewNodeWithChildren(document *Document, tag Tag, value, pointer string, chi
 	case TagFamily:
 		return NewFamilyNode(document, pointer, children)
 
+	case UnofficialTagFamilySearchID1, UnofficialTagFamilySearchID2:
+		return NewFamilySearchIDNode(document, tag, value)
+
 	case TagFormat:
 		return NewFormatNode(document, value, pointer, nil)
 
@@ -250,6 +253,9 @@ func NewNodeWithChildren(document *Document, tag Tag, value, pointer string, chi
 
 	case TagType:
 		return NewTypeNode(document, value, pointer, nil)
+
+	case UnofficialTagUniqueID:
+		return NewUniqueIDNode(document, value, pointer, nil)
 	}
 
 	return newSimpleNode(document, tag, value, pointer, children)
