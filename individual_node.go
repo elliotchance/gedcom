@@ -12,6 +12,7 @@ type IndividualNode struct {
 	cachedFamilies, cachedSpouses bool
 	families                      []*FamilyNode
 	spouses                       []*IndividualNode
+	cachedUniqueIDs               *StringSet
 }
 
 // SpouseChildren connects a single spouse to a set of children. The children
@@ -27,7 +28,7 @@ type SpouseChildren map[*IndividualNode]IndividualNodes
 func NewIndividualNode(document *Document, value, pointer string, children []Node) *IndividualNode {
 	return &IndividualNode{
 		newSimpleNode(document, TagIndividual, value, pointer, children),
-		false, false, nil, nil,
+		false, false, nil, nil, nil,
 	}
 }
 
@@ -860,4 +861,28 @@ func (node *IndividualNode) UniqueIDs() (nodes []*UniqueIDNode) {
 	}
 
 	return
+}
+
+// UniqueIdentifiers returns any strings that can be used to uniquely this
+// individual in the document.
+//
+// Unique identifiers will always include the individual pointer, but may also
+// include extra identifiers such as a FamilySearch ID.
+func (node *IndividualNode) UniqueIdentifiers() *StringSet {
+	if node.cachedUniqueIDs == nil {
+		// There should always be a pointer for an individual.
+		node.cachedUniqueIDs = NewStringSet(node.Pointer())
+
+		for _, id := range node.UniqueIDs() {
+			if uuid, err := id.UUID(); err == nil {
+				node.cachedUniqueIDs.Add(uuid.String())
+			}
+		}
+
+		for _, id := range node.FamilySearchIDs() {
+			node.cachedUniqueIDs.Add(id.String())
+		}
+	}
+
+	return node.cachedUniqueIDs
 }

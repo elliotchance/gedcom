@@ -329,9 +329,10 @@ func createJobs(totals chan int64, left, right IndividualNodes, options *Individ
 	// this is such a fast process that I won't complicate the code with this
 	// right now.
 	go func() {
-		// Describes the pointers that we have found to match and have already
-		// been emitted so there is no need to send them again.
-		sentPointers := &sync.Map{}
+		// Describes the individuals that we have found to match and have
+		// already been emitted so there is no need to send them again.
+		sentA := &sync.Map{}
+		sentB := &sync.Map{}
 
 		// This check is important because if the right side is empty we will
 		// not be able to get the Document on the right side to to the
@@ -348,8 +349,14 @@ func createJobs(totals chan int64, left, right IndividualNodes, options *Individ
 				go func(w int) {
 					for leftI := w; leftI < len(left); leftI += ws {
 						a := left[leftI]
-						b := right.ByPointer(a.Pointer())
-						if b != nil {
+						bs := right.ByUniqueIdentifiers(a.UniqueIdentifiers())
+
+						// It's totally fine for multiple identifiers to match
+						// multiple individuals. One example of this is the
+						// files might share the same I1, I2, ... numbering
+						// scheme. We need to see if any of the matches hit the
+						// threshold.
+						for _, b := range bs {
 							ss := a.SurroundingSimilarity(b, options.SimilarityOptions, true)
 							if ss.WeightedSimilarity() >= options.SimilarityOptions.PreferPointerAbove {
 								// See getTotals(). We need to notify that there will
@@ -370,8 +377,10 @@ func createJobs(totals chan int64, left, right IndividualNodes, options *Individ
 									Similarity: ss,
 								}
 
-								// The true value here does not actually matter.
-								sentPointers.Store(a.Pointer(), nil)
+								sentA.Store(a, nil)
+								sentB.Store(b, nil)
+
+								break
 							}
 						}
 					}
@@ -387,12 +396,12 @@ func createJobs(totals chan int64, left, right IndividualNodes, options *Individ
 
 		// Send the remaining matrix of individuals to be compared.
 		for _, a := range left {
-			if _, ok := sentPointers.Load(a.Pointer()); ok {
+			if _, ok := sentA.Load(a); ok {
 				continue
 			}
 
 			for _, b := range right {
-				if _, ok := sentPointers.Load(b.Pointer()); ok {
+				if _, ok := sentB.Load(b); ok {
 					continue
 				}
 
@@ -506,7 +515,7 @@ func (o *IndividualNodesCompareOptions) calculateWinners(a, b IndividualNodes, s
 		for similarity := range similarityResults {
 			// If any of the matches were made through pointers we have to
 			// remove them from the possible winners.
-			if similarity.Left.Pointer() == similarity.Right.Pointer() &&
+			if similarity.Left.UniqueIdentifiers().Intersects(similarity.Right.UniqueIdentifiers()) &&
 				similarity.Similarity.WeightedSimilarity() >= options.PreferPointerAbove {
 				winners <- similarity
 				found[similarity.Left] = true
@@ -706,4 +715,34 @@ func (c IndividualComparison) String() string {
 	similarity := c.stringOrDefault(c.Similarity, "?")
 
 	return fmt.Sprintf("%s <-> %s (%s)", left, right, similarity)
+}
+
+// ByUniqueIdentifier returns the first individual that has a UniqueIdentifier
+// of identifier. If no individual is found the nil is returned.
+func (nodes IndividualNodes) ByUniqueIdentifier(identifier string) *IndividualNode {
+	for _, individual := range nodes {
+		identifiers := individual.UniqueIdentifiers()
+
+		if identifiers.Has(identifier) {
+			return individual
+		}
+	}
+
+	return nil
+}
+
+// ByUniqueIdentifiers returns the any individuals that have a UniqueIdentifier
+// of one of the provided identifiers.
+func (nodes IndividualNodes) ByUniqueIdentifiers(identifiers *StringSet) (all IndividualNodes) {
+	identifiers.Iterate(func(identifier string) bool {
+		individualNode := nodes.ByUniqueIdentifier(identifier)
+
+		if individualNode != nil {
+			all = append(all, individualNode)
+		}
+
+		return true
+	})
+
+	return
 }

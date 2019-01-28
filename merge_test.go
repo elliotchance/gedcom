@@ -97,6 +97,17 @@ func TestMergeNodes(t *testing.T) {
 			right:    elliot,
 			expected: elliot,
 		},
+		"EqualNodes": {
+			left: gedcom.NewBirthNode(doc1, "", "P1", []gedcom.Node{
+				gedcom.NewUniqueIDNode(doc1, "EE13561DDB204985BFFDEEBF82A5226C", "", nil),
+			}),
+			right: gedcom.NewBirthNode(doc2, "", "P2", []gedcom.Node{
+				gedcom.NewUniqueIDNode(doc2, "EE13561DDB204985BFFDEEBF82A5226C5B2E", "", nil),
+			}),
+			expected: gedcom.NewBirthNode(doc1, "", "P1", []gedcom.Node{
+				gedcom.NewUniqueIDNode(doc1, "EE13561DDB204985BFFDEEBF82A5226C", "", nil),
+			}),
+		},
 	} {
 		t.Run(testName, func(t *testing.T) {
 			actual, err := gedcom.MergeNodes(test.left, test.right)
