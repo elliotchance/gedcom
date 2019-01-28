@@ -72,3 +72,45 @@ func TestUniqueIDNode_Checksum(t *testing.T) {
 		})
 	}
 }
+
+func TestUniqueIDNode_Equals(t *testing.T) {
+	for testName, test := range map[string]struct {
+		n1, n2   *gedcom.UniqueIDNode
+		expected bool
+	}{
+		"Equal1": {
+			gedcom.NewUniqueIDNode(nil, "EE13561DDB204985BFFDEEBF82A5226C", "", nil),
+			gedcom.NewUniqueIDNode(nil, "EE13561DDB204985BFFDEEBF82A5226C", "", nil),
+			true,
+		},
+		"Equal2": {
+			gedcom.NewUniqueIDNode(nil, "EE13561DDB204985BFFDEEBF82A5226C", "", nil),
+			gedcom.NewUniqueIDNode(nil, "EE13561DDB204985BFFDEEBF82A5226C5B2E", "", nil),
+			true,
+		},
+		"Equal3": {
+			gedcom.NewUniqueIDNode(nil, "EE13561DDB204985BFFDEEBF82A5226C5B2E", "", nil),
+			gedcom.NewUniqueIDNode(nil, "EE13561DDB204985BFFDEEBF82A5226C5B2E", "", nil),
+			true,
+		},
+		"NotEqual1": {
+			gedcom.NewUniqueIDNode(nil, "AE13561DDB204985BFFDEEBF82A5226C", "", nil),
+			gedcom.NewUniqueIDNode(nil, "EE13561DDB204985BFFDEEBF82A5226C", "", nil),
+			false,
+		},
+		"NotEqual2": {
+			gedcom.NewUniqueIDNode(nil, "AE13561DDB204985BFFDEEBF82A5226C", "", nil),
+			gedcom.NewUniqueIDNode(nil, "EE13561DDB204985BFFDEEBF82A5226C5B2E", "", nil),
+			false,
+		},
+		"NotEqual3": {
+			gedcom.NewUniqueIDNode(nil, "AE13561DDB204985BFFDEEBF82A5226C5B2E", "", nil),
+			gedcom.NewUniqueIDNode(nil, "EE13561DDB204985BFFDEEBF82A5226C5B2E", "", nil),
+			false,
+		},
+	} {
+		t.Run(testName, func(t *testing.T) {
+			assert.Equal(t, test.expected, test.n1.Equals(test.n2))
+		})
+	}
+}

@@ -27,7 +27,7 @@ func TestIsNil(t *testing.T) {
 }
 
 func TestSimpleNode_Equals(t *testing.T) {
-	Equals := tf.Function(t, (*gedcom.SimpleNode).Equals)
+	Equals := tf.NamedFunction(t, "SimpleNode_Equals", (*gedcom.SimpleNode).Equals)
 
 	left := []*gedcom.SimpleNode{
 		(*gedcom.SimpleNode)(nil),
