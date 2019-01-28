@@ -7,15 +7,16 @@ import (
 
 type FilterFlags struct {
 	// Specific exclusions.
-	NoEvents     bool
-	NoResidences bool
-	NoPlaces     bool
-	NoSources    bool
-	NoMaps       bool
-	NoChanges    bool
-	NoObjects    bool
-	NoLabels     bool
-	NoCensuses   bool
+	NoEvents      bool
+	NoResidences  bool
+	NoPlaces      bool
+	NoSources     bool
+	NoMaps        bool
+	NoChanges     bool
+	NoObjects     bool
+	NoLabels      bool
+	NoCensuses    bool
+	NoEmptyDeaths bool
 
 	// Only vitals (name, birth, baptism, death and burial).
 	OnlyVitals bool
@@ -40,6 +41,11 @@ func (ff *FilterFlags) SetupCLI() {
 	flag.BoolVar(&ff.NoObjects, "no-objects", false, "Exclude objects.")
 	flag.BoolVar(&ff.NoLabels, "no-labels", false, "Exclude labels.")
 	flag.BoolVar(&ff.NoCensuses, "no-censuses", false, "Exclude censuses.")
+
+	flag.BoolVar(&ff.NoEmptyDeaths, "no-empty-deaths", false, CLIDescription(
+		`Remove death nodes (DEAT) that do not have children. This is caused by
+		applications signalling that the individual is not living but can lead
+		to unwanted discrepancies in the comparison.`))
 
 	flag.BoolVar(&ff.OnlyVitals, "only-vitals", false, CLIDescription(`
 		Remove all data except for vital information. The vital nodes are (or
@@ -104,6 +110,10 @@ func (ff *FilterFlags) FilterFunctions() []gedcom.FilterFunction {
 
 	if ff.OnlyVitals {
 		filters = append(filters, gedcom.OnlyVitalsTagFilter())
+	}
+
+	if ff.NoEmptyDeaths {
+		filters = append(filters, gedcom.RemoveEmptyDeathTagFilter())
 	}
 
 	return filters

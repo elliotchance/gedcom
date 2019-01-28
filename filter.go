@@ -156,3 +156,18 @@ func OnlyVitalsTagFilter() FilterFunction {
 		TagNameSuffix, TagTitle, TagDate, TagPlace,
 	)
 }
+
+// RemoveEmptyDeathTagFilter removes any Death (DEAT) events that do not have
+// any child nodes (which would otherwise be information like the date or place.
+//
+// This is because some applications use the death tag as a marker without any
+// further information which can cause problems when comparing individuals.
+func RemoveEmptyDeathTagFilter() FilterFunction {
+	return func(node Node) (Node, bool) {
+		if death, ok := node.(*DeathNode); ok && len(death.Nodes()) == 0 {
+			return nil, false
+		}
+
+		return node, true
+	}
+}

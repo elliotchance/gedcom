@@ -467,3 +467,63 @@ func TestOnlyVitalsTagFilter(t *testing.T) {
 		})
 	}
 }
+
+func TestRemoveEmptyDeathTagFilter(t *testing.T) {
+	// ghost:ignore
+	for testName, test := range map[string]struct {
+		root     gedcom.Node
+		expected string
+	}{
+		"WithoutDeath": {
+			root: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+				gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
+				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+					gedcom.NewDateNode(nil, "6 MAY 1989", "", nil),
+				}),
+			}),
+			expected: `0 @P1@ INDI
+1 NAME Elliot /Chance/
+1 BIRT
+2 DATE 6 MAY 1989
+`,
+		},
+		"WithDeath": {
+			root: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+				gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
+				gedcom.NewDeathNode(nil, "", "", []gedcom.Node{
+					gedcom.NewDateNode(nil, "6 MAY 1989", "", nil),
+				}),
+			}),
+			expected: `0 @P1@ INDI
+1 NAME Elliot /Chance/
+1 DEAT
+2 DATE 6 MAY 1989
+`,
+		},
+		"WithEmptyDeath1": {
+			root: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+				gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
+				gedcom.NewDeathNode(nil, "", "", nil),
+			}),
+			expected: `0 @P1@ INDI
+1 NAME Elliot /Chance/
+`,
+		},
+		"WithEmptyDeath2": {
+			root: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
+				gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
+				gedcom.NewDeathNode(nil, "Y", "", nil),
+			}),
+			expected: `0 @P1@ INDI
+1 NAME Elliot /Chance/
+`,
+		},
+	} {
+		t.Run(testName, func(t *testing.T) {
+			filter := gedcom.RemoveEmptyDeathTagFilter()
+			result := gedcom.GEDCOMString(gedcom.Filter(test.root, filter), 0)
+			assert.Equal(t, test.expected, result)
+		})
+	}
+}
+
