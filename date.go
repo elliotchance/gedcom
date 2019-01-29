@@ -14,7 +14,7 @@ import (
 const (
 	DateWordsBetween = "Bet.|bet|between|from"
 	DateWordsAnd     = "and|to|-"
-	DateWordsAbout   = "Abt.|abt|about|c.|circa"
+	DateWordsAbout   = "Abt.|abt|about|c.|ca|ca.|cca|cca.|circa"
 	DateWordsAfter   = "Aft.|aft|after"
 	DateWordsBefore  = "Bef.|bef|before"
 )
