@@ -24,7 +24,7 @@ func (c *SurnameListPage) WriteTo(w io.Writer) (int64, error) {
 		NewTableHead("Surname", "Number of Individuals"),
 	}
 
-	for _, surname := range getSurnames(c.document) {
+	for _, surname := range getSurnames(c.document).Strings() {
 		table = append(table, NewSurnameInList(c.document, surname))
 	}
 

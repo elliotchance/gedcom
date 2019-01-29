@@ -2,10 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
-	"github.com/elliotchance/gedcom/util"
 	"io"
-	"sort"
-	"strings"
 )
 
 const (
@@ -97,7 +94,7 @@ func (c *PublishHeader) WriteTo(w io.Writer) (int64, error) {
 	if c.options.ShowSurnames {
 		var badge Component = NewEmpty()
 		if !c.options.Checksum {
-			badge = NewCountBadge(len(getSurnames(c.document)))
+			badge = NewCountBadge(getSurnames(c.document).Len())
 		}
 
 		item := NewNavItem(
@@ -147,22 +144,16 @@ func (c *PublishHeader) WriteTo(w io.Writer) (int64, error) {
 	).WriteTo(w)
 }
 
-var surnames = []string{}
+var surnames = gedcom.NewStringSet()
 
-func getSurnames(document *gedcom.Document) []string {
-	if len(surnames) == 0 {
+func getSurnames(document *gedcom.Document) *gedcom.StringSet {
+	if surnames.Len() == 0 {
 		for _, individual := range document.Individuals() {
 			surname := individual.Name().Surname()
-			if surname == "" || util.StringSliceContains(surnames, surname) {
-				continue
+			if surname != "" {
+				surnames.Add(surname)
 			}
-
-			surnames = append(surnames, surname)
 		}
-
-		sort.SliceStable(surnames, func(i, j int) bool {
-			return strings.ToLower(surnames[i]) < strings.ToLower(surnames[j])
-		})
 	}
 
 	return surnames

@@ -2,9 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
-	"github.com/elliotchance/gedcom/util"
 	"io"
-	"sort"
 )
 
 type SurnameIndex struct {
@@ -22,7 +20,7 @@ func NewSurnameIndex(document *gedcom.Document, selectedLetter rune, visibility 
 }
 
 func (c *SurnameIndex) WriteTo(w io.Writer) (int64, error) {
-	surnames := []string{}
+	surnames := gedcom.NewStringSet()
 
 	for _, individual := range c.document.Individuals() {
 		if individual.IsLiving() {
@@ -36,18 +34,14 @@ func (c *SurnameIndex) WriteTo(w io.Writer) (int64, error) {
 		}
 
 		surname := individual.Name().Surname()
-		exists := util.StringSliceContains(surnames, surname)
-		if surnameStartsWith(individual, c.selectedLetter) && !exists {
-			surnames = append(surnames, surname)
+		if surnameStartsWith(individual, c.selectedLetter) {
+			surnames.Add(surname)
 		}
 	}
 
-	// Sort surnames
-	sort.Strings(surnames)
-
 	// Render
 	pills := []Component{}
-	for _, surname := range surnames {
+	for _, surname := range surnames.Strings() {
 		pills = append(pills, NewNavLink(surname, "#"+surname, false))
 	}
 

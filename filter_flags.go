@@ -1,8 +1,8 @@
-package util
+package gedcom
 
 import (
 	"flag"
-	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/util"
 )
 
 type FilterFlags struct {
@@ -42,12 +42,12 @@ func (ff *FilterFlags) SetupCLI() {
 	flag.BoolVar(&ff.NoLabels, "no-labels", false, "Exclude labels.")
 	flag.BoolVar(&ff.NoCensuses, "no-censuses", false, "Exclude censuses.")
 
-	flag.BoolVar(&ff.NoEmptyDeaths, "no-empty-deaths", false, CLIDescription(
+	flag.BoolVar(&ff.NoEmptyDeaths, "no-empty-deaths", false, util.CLIDescription(
 		`Remove death nodes (DEAT) that do not have children. This is caused by
 		applications signalling that the individual is not living but can lead
 		to unwanted discrepancies in the comparison.`))
 
-	flag.BoolVar(&ff.OnlyVitals, "only-vitals", false, CLIDescription(`
+	flag.BoolVar(&ff.OnlyVitals, "only-vitals", false, util.CLIDescription(`
 		Remove all data except for vital information. The vital nodes are (or
 		multiples in the same individual of): Name, birth, baptism, death and
 		burial. Within these only the date and place is retained.`))
@@ -57,7 +57,7 @@ func (ff *FilterFlags) SetupCLI() {
 
 	flag.BoolVar(&ff.HideEqual, "hide-equal", false, "Hide equal values.")
 
-	flag.StringVar(&ff.NameFormat, "name-format", "written", CLIDescription(`
+	flag.StringVar(&ff.NameFormat, "name-format", "written", util.CLIDescription(`
 		The NAME node can be represented a single string, or name parts such as
 		Given name, Surname, Title, etc. When enabled, this option flattens name
 		parts into a single string with the given format:
@@ -75,57 +75,57 @@ func (ff *FilterFlags) SetupCLI() {
 		of the presets above.`))
 }
 
-func (ff *FilterFlags) FilterFunctions() []gedcom.FilterFunction {
-	m := map[*bool]gedcom.Tag{
-		&ff.NoEvents:     gedcom.TagEvent,
-		&ff.NoResidences: gedcom.TagResidence,
-		&ff.NoPlaces:     gedcom.TagPlace,
-		&ff.NoSources:    gedcom.TagSource,
-		&ff.NoMaps:       gedcom.TagMap,
-		&ff.NoChanges:    gedcom.TagChange,
-		&ff.NoObjects:    gedcom.TagObject,
-		&ff.NoLabels:     gedcom.TagLabel,
-		&ff.NoCensuses:   gedcom.TagCensus,
+func (ff *FilterFlags) FilterFunctions() []FilterFunction {
+	m := map[*bool]Tag{
+		&ff.NoEvents:     TagEvent,
+		&ff.NoResidences: TagResidence,
+		&ff.NoPlaces:     TagPlace,
+		&ff.NoSources:    TagSource,
+		&ff.NoMaps:       TagMap,
+		&ff.NoChanges:    TagChange,
+		&ff.NoObjects:    TagObject,
+		&ff.NoLabels:     TagLabel,
+		&ff.NoCensuses:   TagCensus,
 	}
 
-	blacklistTags := []gedcom.Tag{gedcom.TagFamilyChild, gedcom.TagFamilySpouse}
+	blacklistTags := []Tag{TagFamilyChild, TagFamilySpouse}
 	for k, v := range m {
 		if *k {
 			blacklistTags = append(blacklistTags, v)
 		}
 	}
 
-	filters := []gedcom.FilterFunction{
-		gedcom.BlacklistTagFilter(blacklistTags...),
+	filters := []FilterFunction{
+		BlacklistTagFilter(blacklistTags...),
 	}
 
 	if ff.OnlyOfficial {
-		filters = append(filters, gedcom.OfficialTagFilter())
+		filters = append(filters, OfficialTagFilter())
 	}
 
 	if ff.NameFormat != "unmodified" {
-		format, _ := gedcom.NewNameFormatByName(ff.NameFormat)
-		filters = append(filters, gedcom.SimpleNameFilter(format))
+		format, _ := NewNameFormatByName(ff.NameFormat)
+		filters = append(filters, SimpleNameFilter(format))
 	}
 
 	if ff.OnlyVitals {
-		filters = append(filters, gedcom.OnlyVitalsTagFilter())
+		filters = append(filters, OnlyVitalsTagFilter())
 	}
 
 	if ff.NoEmptyDeaths {
-		filters = append(filters, gedcom.RemoveEmptyDeathTagFilter())
+		filters = append(filters, RemoveEmptyDeathTagFilter())
 	}
 
 	return filters
 }
 
-func (ff *FilterFlags) Filter(node gedcom.Node) gedcom.Node {
-	if gedcom.IsNil(node) {
+func (ff *FilterFlags) Filter(node Node) Node {
+	if IsNil(node) {
 		return nil
 	}
 
 	for _, filter := range ff.FilterFunctions() {
-		node = gedcom.Filter(node, filter)
+		node = Filter(node, filter)
 	}
 
 	return node

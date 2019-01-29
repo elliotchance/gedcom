@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html"
-	"github.com/elliotchance/gedcom/util"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -61,7 +60,7 @@ func TestDiffPage_WriteTo(t *testing.T) {
 		gedcom.NewIndividualComparison(elliot, nil, nil),
 		gedcom.NewIndividualComparison(nil, john, nil),
 	}
-	filterFlags := &util.FilterFlags{}
+	filterFlags := &gedcom.FilterFlags{}
 	googleAnalyticsID := ""
 
 	compareOptions := gedcom.NewIndividualNodesCompareOptions()

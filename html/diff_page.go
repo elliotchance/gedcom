@@ -6,7 +6,6 @@ import (
 	"github.com/elliotchance/gedcom/util"
 	"io"
 	"sort"
-	"sync"
 )
 
 // These are used for optionShow. If you update these options you will also
@@ -26,7 +25,7 @@ const (
 
 type DiffPage struct {
 	comparisons       gedcom.IndividualComparisons
-	filterFlags       *util.FilterFlags
+	filterFlags       *gedcom.FilterFlags
 	googleAnalyticsID string
 	sort              string
 	show              string
@@ -35,7 +34,7 @@ type DiffPage struct {
 	visibility        LivingVisibility
 }
 
-func NewDiffPage(comparisons gedcom.IndividualComparisons, filterFlags *util.FilterFlags, googleAnalyticsID string, show, sort string, progress chan gedcom.Progress, compareOptions *gedcom.IndividualNodesCompareOptions, visibility LivingVisibility) *DiffPage {
+func NewDiffPage(comparisons gedcom.IndividualComparisons, filterFlags *gedcom.FilterFlags, googleAnalyticsID string, show, sort string, progress chan gedcom.Progress, compareOptions *gedcom.IndividualNodesCompareOptions, visibility LivingVisibility) *DiffPage {
 	return &DiffPage{
 		comparisons:       comparisons,
 		filterFlags:       filterFlags,
@@ -120,23 +119,16 @@ func (c *DiffPage) processJobs(jobs chan *IndividualCompare) chan *IndividualCom
 	results := make(chan *IndividualCompare, 10)
 
 	go func() {
-		wg := sync.WaitGroup{}
-		for i := 0; i < c.compareOptions.ConcurrentJobs(); i++ {
-			wg.Add(1)
-			go func() {
-				for job := range jobs {
-					if c.shouldSkip(job) {
-						continue
-					}
-
-					results <- job
+		util.WorkerPool(c.compareOptions.ConcurrentJobs(), func(_ int) {
+			for job := range jobs {
+				if c.shouldSkip(job) {
+					continue
 				}
 
-				wg.Done()
-			}()
-		}
+				results <- job
+			}
+		})
 
-		wg.Wait()
 		close(results)
 	}()
 

@@ -37,7 +37,7 @@ var (
 	optionPreferPointerAbove        float64
 )
 
-var filterFlags = &util.FilterFlags{}
+var filterFlags = &gedcom.FilterFlags{}
 
 func check(err error) {
 	if err != nil {
@@ -258,22 +258,22 @@ func validateOptions() {
 		log.Fatalf(`-output is required`)
 	}
 
-	optionShowValues := []string{
+	optionShowValues := gedcom.NewStringSet(
 		html.DiffPageShowAll,
 		html.DiffPageShowSubset,
 		html.DiffPageShowOnlyMatches,
-	}
+	)
 
-	if !util.StringSliceContains(optionShowValues, optionShow) {
+	if !optionShowValues.Has(optionShow) {
 		log.Fatalf(`invalid "-show" value: %s`, optionShow)
 	}
 
-	optionSortValues := []string{
+	optionSortValues := gedcom.NewStringSet(
 		html.DiffPageSortWrittenName,
 		html.DiffPageSortHighestSimilarity,
-	}
+	)
 
-	if !util.StringSliceContains(optionSortValues, optionSort) {
+	if !optionSortValues.Has(optionSort) {
 		log.Fatalf(`invalid "-sort" value: %s`, optionSort)
 	}
 }

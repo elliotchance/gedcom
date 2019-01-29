@@ -2,7 +2,6 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
-	"github.com/elliotchance/gedcom/util"
 	"io"
 	"sort"
 )
@@ -28,13 +27,9 @@ func (c *PlaceListPage) WriteTo(w io.Writer) (int64, error) {
 	places := GetPlaces(c.document)
 
 	// Get all countries
-	countries := []string{}
+	countries := gedcom.NewStringSet()
 	for _, place := range places {
-		if util.StringSliceContains(countries, place.country) {
-			continue
-		}
-
-		countries = append(countries, place.country)
+		countries.Add(place.country)
 	}
 
 	sortedPlaces := []*place{}
@@ -68,12 +63,9 @@ func (c *PlaceListPage) WriteTo(w io.Writer) (int64, error) {
 		lastCountry = place.country
 	}
 
-	// Sort countries
-	sort.Strings(countries)
-
 	// Render
 	pills := []Component{}
-	for _, country := range countries {
+	for _, country := range countries.Strings() {
 		pills = append(pills, NewNavLink(country, "#"+country, false))
 	}
 
