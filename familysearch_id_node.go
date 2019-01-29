@@ -14,9 +14,9 @@ type FamilySearchIDNode struct {
 	*SimpleNode
 }
 
-func NewFamilySearchIDNode(document *Document, tag Tag, value string) *FamilySearchIDNode {
+func NewFamilySearchIDNode(tag Tag, value string, children ...Node) *FamilySearchIDNode {
 	return &FamilySearchIDNode{
-		newSimpleNode(document, tag, value, "", nil),
+		newSimpleNode(tag, value, "", children...),
 	}
 }
 

@@ -9,7 +9,7 @@ import (
 )
 
 func TestSimpleNode_ChildNodes(t *testing.T) {
-	node := gedcom.NewNodeWithChildren(nil, gedcom.TagText, "", "", nil)
+	node := gedcom.NewNode(gedcom.TagText, "", "")
 
 	assert.Len(t, node.Nodes(), 0)
 }
@@ -18,9 +18,9 @@ func TestIsNil(t *testing.T) {
 	IsNil := tf.Function(t, gedcom.IsNil)
 
 	IsNil((*gedcom.SimpleNode)(nil)).Returns(true)
-	IsNil(gedcom.NewBirthNode(nil, "", "", nil)).Returns(false)
+	IsNil(gedcom.NewBirthNode("")).Returns(false)
 	IsNil((*gedcom.NameNode)(nil)).Returns(true)
-	IsNil(gedcom.NewNameNode(nil, "", "", nil)).Returns(false)
+	IsNil(gedcom.NewNameNode("")).Returns(false)
 
 	// Untyped nil is a special case that cannot be tested above.
 	assert.True(t, gedcom.IsNil(nil))
@@ -31,19 +31,19 @@ func TestSimpleNode_Equals(t *testing.T) {
 
 	left := []*gedcom.SimpleNode{
 		(*gedcom.SimpleNode)(nil),
-		gedcom.NewNode(nil, gedcom.TagVersion, "", "").(*gedcom.SimpleNode),
-		gedcom.NewNode(nil, gedcom.TagVersion, "a", "").(*gedcom.SimpleNode),
-		gedcom.NewNode(nil, gedcom.TagVersion, "", "b").(*gedcom.SimpleNode),
-		gedcom.NewNode(nil, gedcom.TagVersion, "a", "b").(*gedcom.SimpleNode),
+		gedcom.NewNode(gedcom.TagVersion, "", "").(*gedcom.SimpleNode),
+		gedcom.NewNode(gedcom.TagVersion, "a", "").(*gedcom.SimpleNode),
+		gedcom.NewNode(gedcom.TagVersion, "", "b").(*gedcom.SimpleNode),
+		gedcom.NewNode(gedcom.TagVersion, "a", "b").(*gedcom.SimpleNode),
 	}
 
-	right := []gedcom.Node{
+	right := gedcom.Nodes{
 		(*gedcom.SimpleNode)(nil),
-		gedcom.NewNode(nil, gedcom.TagVersion, "", "").(*gedcom.SimpleNode),
-		gedcom.NewNode(nil, gedcom.TagVersion, "a", "").(*gedcom.SimpleNode),
-		gedcom.NewNode(nil, gedcom.TagVersion, "", "b").(*gedcom.SimpleNode),
-		gedcom.NewNode(nil, gedcom.TagVersion, "a", "b").(*gedcom.SimpleNode),
-		gedcom.NewNameNode(nil, "", "", nil),
+		gedcom.NewNode(gedcom.TagVersion, "", "").(*gedcom.SimpleNode),
+		gedcom.NewNode(gedcom.TagVersion, "a", "").(*gedcom.SimpleNode),
+		gedcom.NewNode(gedcom.TagVersion, "", "b").(*gedcom.SimpleNode),
+		gedcom.NewNode(gedcom.TagVersion, "a", "b").(*gedcom.SimpleNode),
+		gedcom.NewNameNode(""),
 	}
 
 	const N = false
@@ -82,20 +82,10 @@ func TestSimpleNode_Pointer(t *testing.T) {
 	Pointer((*gedcom.SimpleNode)(nil)).Returns("")
 }
 
-func TestSimpleNode_Document(t *testing.T) {
-	Document := tf.Function(t, (*gedcom.SimpleNode).Document)
-
-	Document((*gedcom.SimpleNode)(nil)).Returns((*gedcom.Document)(nil))
-}
-
-func TestSimpleNode_SetDocument(t *testing.T) {
-	(*gedcom.SimpleNode)(nil).SetDocument(nil)
-}
-
 func TestSimpleNode_Nodes(t *testing.T) {
 	Nodes := tf.Function(t, (*gedcom.SimpleNode).Nodes)
 
-	Nodes((*gedcom.SimpleNode)(nil)).Returns(([]gedcom.Node)(nil))
+	Nodes((*gedcom.SimpleNode)(nil)).Returns((gedcom.Nodes)(nil))
 }
 
 func TestSimpleNode_String(t *testing.T) {
@@ -105,12 +95,12 @@ func TestSimpleNode_String(t *testing.T) {
 }
 
 func TestSimpleNode_GEDCOMString(t *testing.T) {
-	root := gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-		gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
-		gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
-			gedcom.NewDateNode(nil, "6 MAY 1989", "", nil),
-		}),
-	})
+	root := gedcom.NewDocument().AddIndividual("P1",
+		gedcom.NewNameNode("Elliot /Chance/"),
+		gedcom.NewBirthNode("",
+			gedcom.NewDateNode("6 MAY 1989"),
+		),
+	)
 
 	assert.Equal(t, root.GEDCOMString(0), `0 @P1@ INDI
 1 NAME Elliot /Chance/
@@ -123,28 +113,27 @@ func TestSimpleNode_GEDCOMLine(t *testing.T) {
 	GEDCOMLine := tf.NamedFunction(t, "SimpleNode_GEDCOMLine",
 		(*gedcom.SimpleNode).GEDCOMLine)
 
-	GEDCOMLine(gedcom.NewBirthNode(nil, "foo", "72", nil).SimpleNode, 0).
+	GEDCOMLine(gedcom.NewNode(gedcom.TagBirth, "foo", "72").(*gedcom.BirthNode).SimpleNode, 0).
 		Returns("0 @72@ BIRT foo")
 
-	GEDCOMLine(gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "bar", "baz", nil).(*gedcom.DeathNode).SimpleNode, 3).Returns("3 @baz@ DEAT bar")
+	GEDCOMLine(gedcom.NewNode(gedcom.TagDeath, "bar", "baz").(*gedcom.DeathNode).SimpleNode, 3).Returns("3 @baz@ DEAT bar")
 
-	GEDCOMLine(gedcom.NewDateNode(nil, "3 SEP 1945", "", nil).SimpleNode, 2).
+	GEDCOMLine(gedcom.NewDateNode("3 SEP 1945").SimpleNode, 2).
 		Returns("2 DATE 3 SEP 1945")
 
-	GEDCOMLine(gedcom.NewBirthNode(nil, "foo", "72", nil).SimpleNode, -1).
+	GEDCOMLine(gedcom.NewNode(gedcom.TagBirth, "foo", "72").(*gedcom.BirthNode).SimpleNode, -1).
 		Returns("@72@ BIRT foo")
 }
 
 func TestSimpleNode_SetNodes(t *testing.T) {
-	birth := gedcom.NewBirthNode(nil, "foo", "72", nil)
+	birth := gedcom.NewBirthNode("foo")
 	assert.Nil(t, birth.Nodes())
 
-	birth.SetNodes([]gedcom.Node{
-		gedcom.NewDateNode(nil, "3 SEP 1945", "", nil),
+	birth.SetNodes(gedcom.Nodes{
+		gedcom.NewDateNode("3 SEP 1945"),
 	})
-	assert.Equal(t, []gedcom.Node{
-		gedcom.NewDateNode(nil, "3 SEP 1945", "", nil),
-	}, birth.Nodes())
+	assert.Equal(t,
+		gedcom.Nodes{gedcom.NewDateNode("3 SEP 1945")}, birth.Nodes())
 
 	birth.SetNodes(nil)
 	assert.Nil(t, birth.Nodes())

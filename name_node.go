@@ -12,9 +12,9 @@ type NameNode struct {
 	*SimpleNode
 }
 
-func NewNameNode(document *Document, value, pointer string, children []Node) *NameNode {
+func NewNameNode(value string, children ...Node) *NameNode {
 	return &NameNode{
-		newSimpleNode(document, TagName, value, pointer, children),
+		newSimpleNode(TagName, value, "", children...),
 	}
 }
 

@@ -54,30 +54,30 @@ func TestCleanSpace(t *testing.T) {
 }
 
 var firtLastTests = []struct {
-	nodes       []gedcom.Node
+	nodes       gedcom.Nodes
 	first, last gedcom.Node
 }{
-	{[]gedcom.Node{}, nil, nil},
-	{[]gedcom.Node{nil}, nil, nil},
+	{gedcom.Nodes{}, nil, nil},
+	{gedcom.Nodes{nil}, nil, nil},
 	{
-		[]gedcom.Node{gedcom.NewNameNode(nil, "a", "", nil)},
-		gedcom.NewNameNode(nil, "a", "", nil),
-		gedcom.NewNameNode(nil, "a", "", nil),
+		gedcom.Nodes{gedcom.NewNameNode("a")},
+		gedcom.NewNameNode("a"),
+		gedcom.NewNameNode("a"),
 	},
 	{
-		[]gedcom.Node{nil, gedcom.NewNameNode(nil, "a", "", nil)},
-		gedcom.NewNameNode(nil, "a", "", nil),
-		gedcom.NewNameNode(nil, "a", "", nil),
+		gedcom.Nodes{nil, gedcom.NewNameNode("a")},
+		gedcom.NewNameNode("a"),
+		gedcom.NewNameNode("a"),
 	},
 	{
-		[]gedcom.Node{
+		gedcom.Nodes{
 			nil,
-			gedcom.NewNameNode(nil, "a", "", nil),
-			gedcom.NewNameNode(nil, "b", "", nil),
+			gedcom.NewNameNode("a"),
+			gedcom.NewNameNode("b"),
 			nil,
 		},
-		gedcom.NewNameNode(nil, "a", "", nil),
-		gedcom.NewNameNode(nil, "b", "", nil),
+		gedcom.NewNameNode("a"),
+		gedcom.NewNameNode("b"),
 	},
 }
 
@@ -103,8 +103,8 @@ func TestValue(t *testing.T) {
 		want string
 	}{
 		{nil, ""},
-		{gedcom.NewNodeWithChildren(nil, gedcom.TagVersion, "foo", "", nil), "foo"},
-		{gedcom.NewNameNode(nil, "foo bar", "", nil), "foo bar"},
+		{gedcom.NewNode(gedcom.TagVersion, "foo", ""), "foo"},
+		{gedcom.NewNameNode("foo bar"), "foo bar"},
 	}
 
 	for _, test := range tests {
@@ -115,22 +115,22 @@ func TestValue(t *testing.T) {
 }
 
 func TestCompound(t *testing.T) {
-	n1 := gedcom.NewNameNode(nil, "Joe /Bloggs/", "", []gedcom.Node{})
-	n2 := gedcom.NewNameNode(nil, "Jane /Doe/", "", []gedcom.Node{})
-	n3 := gedcom.NewNameNode(nil, "John /Smith/", "", []gedcom.Node{})
+	n1 := gedcom.NewNameNode("Joe /Bloggs/")
+	n2 := gedcom.NewNameNode("Jane /Doe/")
+	n3 := gedcom.NewNameNode("John /Smith/")
 
 	tests := []struct {
 		inputs []interface{}
-		want   []gedcom.Node
+		want   gedcom.Nodes
 	}{
-		{[]interface{}{}, []gedcom.Node{}},
-		{[]interface{}{nil}, []gedcom.Node{}},
-		{[]interface{}{n1}, []gedcom.Node{n1}},
-		{[]interface{}{n1, n1}, []gedcom.Node{n1, n1}},
-		{[]interface{}{n1, nil, n2}, []gedcom.Node{n1, n2}},
-		{[]interface{}{[]gedcom.Node{n1, n2}}, []gedcom.Node{n1, n2}},
-		{[]interface{}{[]gedcom.Node{n1, n2}, n3}, []gedcom.Node{n1, n2, n3}},
-		{[]interface{}{[]gedcom.Node{nil, n2}, n3}, []gedcom.Node{n2, n3}},
+		{[]interface{}{}, gedcom.Nodes{}},
+		{[]interface{}{nil}, gedcom.Nodes{}},
+		{[]interface{}{n1}, gedcom.Nodes{n1}},
+		{[]interface{}{n1, n1}, gedcom.Nodes{n1, n1}},
+		{[]interface{}{n1, n2}, gedcom.Nodes{n1, n2}},
+		{[]interface{}{gedcom.Nodes{n1, n2}}, gedcom.Nodes{n1, n2}},
+		{[]interface{}{gedcom.Nodes{n1, n2}, n3}, gedcom.Nodes{n1, n2, n3}},
+		{[]interface{}{gedcom.Nodes{nil, n2}, n3}, gedcom.Nodes{n2, n3}},
 	}
 
 	for _, test := range tests {
@@ -143,8 +143,8 @@ func TestCompound(t *testing.T) {
 func TestNodeCondition(t *testing.T) {
 	NodeCondition := tf.Function(t, gedcom.NodeCondition)
 
-	bob := gedcom.NewNameNode(nil, "Bob", "", nil)
-	sally := gedcom.NewNameNode(nil, "Sally", "", nil)
+	bob := gedcom.NewNameNode("Bob")
+	sally := gedcom.NewNameNode("Sally")
 
 	NodeCondition(true, bob, sally).Returns(bob)
 	NodeCondition(false, bob, sally).Returns(sally)
@@ -156,8 +156,9 @@ func TestPointer(t *testing.T) {
 		want string
 	}{
 		{nil, ""},
-		{gedcom.NewNodeWithChildren(nil, gedcom.TagVersion, "foo", "a", nil), "a"},
-		{gedcom.NewNameNode(nil, "foo bar", "b", nil), "b"},
+		{gedcom.NewNode(gedcom.TagVersion, "foo", "a"), "a"},
+		{gedcom.NewDocument().AddIndividual("b"), "b"},
+		{gedcom.NewDocument().AddFamily("c"), "c"},
 	}
 
 	for _, test := range tests {
@@ -168,64 +169,64 @@ func TestPointer(t *testing.T) {
 }
 
 func TestDateAndPlace(t *testing.T) {
-	date3Sep1953 := gedcom.NewDateNode(nil, "3 Sep 1953", "", nil)
-	date1Sep1953 := gedcom.NewDateNode(nil, "1 Sep 1953", "", nil)
-	place1 := gedcom.NewPlaceNode(nil, "Australia", "", nil)
-	place2 := gedcom.NewPlaceNode(nil, "United Kingdom", "", nil)
+	date3Sep1953 := gedcom.NewDateNode("3 Sep 1953")
+	date1Sep1953 := gedcom.NewDateNode("1 Sep 1953")
+	place1 := gedcom.NewPlaceNode("Australia")
+	place2 := gedcom.NewPlaceNode("United Kingdom")
 
 	// ghost:ignore
 	for _, test := range []struct {
-		nodes []gedcom.Node
+		nodes gedcom.Nodes
 		date  *gedcom.DateNode
 		place *gedcom.PlaceNode
 	}{
 		{
-			nodes: []gedcom.Node{},
+			nodes: gedcom.Nodes{},
 			date:  nil,
 			place: nil,
 		},
 		{
-			nodes: []gedcom.Node{
-				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{date3Sep1953}),
+			nodes: gedcom.Nodes{
+				gedcom.NewBirthNode("", date3Sep1953),
 			},
 			date:  date3Sep1953,
 			place: nil,
 		},
 		{
-			nodes: []gedcom.Node{
-				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{date3Sep1953}),
-				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{date1Sep1953}),
+			nodes: gedcom.Nodes{
+				gedcom.NewBirthNode("", date3Sep1953),
+				gedcom.NewBirthNode("", date1Sep1953),
 			},
 			date:  date3Sep1953,
 			place: nil,
 		},
 		{
-			nodes: []gedcom.Node{
-				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{place1}),
+			nodes: gedcom.Nodes{
+				gedcom.NewBirthNode("", place1),
 			},
 			date:  nil,
 			place: place1,
 		},
 		{
-			nodes: []gedcom.Node{
-				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{date3Sep1953, place1}),
+			nodes: gedcom.Nodes{
+				gedcom.NewBirthNode("", date3Sep1953, place1),
 			},
 			date:  date3Sep1953,
 			place: place1,
 		},
 		{
-			nodes: []gedcom.Node{
-				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{date3Sep1953}),
-				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{place1}),
+			nodes: gedcom.Nodes{
+				gedcom.NewBirthNode("", date3Sep1953),
+				gedcom.NewBirthNode("", place1),
 			},
 			date:  date3Sep1953,
 			place: place1,
 		},
 		{
-			nodes: []gedcom.Node{
-				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{date3Sep1953}),
-				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{place1}),
-				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{place2, date1Sep1953}),
+			nodes: gedcom.Nodes{
+				gedcom.NewBirthNode("", date3Sep1953),
+				gedcom.NewBirthNode("", place1),
+				gedcom.NewBirthNode("", place2, date1Sep1953),
 			},
 			date:  date3Sep1953,
 			place: place1,

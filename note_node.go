@@ -7,8 +7,8 @@ type NoteNode struct {
 }
 
 // NewNoteNode creates a new NOTE node.
-func NewNoteNode(document *Document, value, pointer string, children []Node) *NoteNode {
+func NewNoteNode(value string, children ...Node) *NoteNode {
 	return &NoteNode{
-		newSimpleNode(document, TagNote, value, pointer, children),
+		newSimpleNode(TagNote, value, "", children...),
 	}
 }

@@ -665,7 +665,7 @@ func (nodes IndividualNodes) Merge(other IndividualNodes, options *IndividualNod
 // Nodes returns a slice containing the same individuals.
 //
 // Individuals that are manipulated will affect the original individuals.
-func (nodes IndividualNodes) Nodes() (ns []Node) {
+func (nodes IndividualNodes) Nodes() (ns Nodes) {
 	for _, individual := range nodes {
 		ns = append(ns, individual)
 	}

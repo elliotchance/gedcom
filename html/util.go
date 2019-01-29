@@ -196,8 +196,8 @@ func surnameStartsWith(individual *gedcom.IndividualNode, letter rune) bool {
 	return firstLetter == letter
 }
 
-func individualForNode(node gedcom.Node) *gedcom.IndividualNode {
-	for _, individual := range node.Document().Individuals() {
+func individualForNode(doc *gedcom.Document, node gedcom.Node) *gedcom.IndividualNode {
+	for _, individual := range doc.Individuals() {
 		if gedcom.HasNestedNode(individual, node) {
 			return individual
 		}

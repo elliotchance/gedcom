@@ -37,8 +37,8 @@ var formatterTests = []struct {
 	},
 	{
 		result: []*gedcom.NameNode{
-			gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
-			gedcom.NewNameNode(nil, "Dina /Wyche/", "", nil),
+			gedcom.NewNameNode("Elliot /Chance/"),
+			gedcom.NewNameNode("Dina /Wyche/"),
 		},
 		asJSON: []byte(`[{"Tag":"NAME","Value":"Elliot /Chance/"},{"Tag":"NAME","Value":"Dina /Wyche/"}]
 `),
@@ -62,10 +62,10 @@ NAME,Dina /Wyche/
 		asGEDCOM:  []byte("0 NAME Elliot /Chance/\n0 NAME Dina /Wyche/\n"),
 	},
 	{
-		result: gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-			gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
-			gedcom.NewNameNode(nil, "Dina /Wyche/", "", nil),
-		}),
+		result: gedcom.NewDocument().AddIndividual("P1",
+			gedcom.NewNameNode("Elliot /Chance/"),
+			gedcom.NewNameNode("Dina /Wyche/"),
+		),
 		asJSON: []byte(`{"Nodes":[{"Tag":"NAME","Value":"Elliot /Chance/"},{"Tag":"NAME","Value":"Dina /Wyche/"}],"Pointer":"P1","Tag":"INDI"}
 `),
 		asPrettyJSON: []byte(`{

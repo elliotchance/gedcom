@@ -13,39 +13,39 @@ func TestDates(t *testing.T) {
 	}{
 		{nil, nil},
 		{
-			gedcom.NewNodeWithChildren(nil, gedcom.TagVersion, "foo", "", nil),
+			gedcom.NewNode(gedcom.TagVersion, "foo", ""),
 			nil,
 		},
 		{
-			gedcom.NewNameNode(nil, "foo bar", "", []gedcom.Node{
-				gedcom.NewDateNode(nil, "2 Sep 1981", "", nil),
-			}),
+			gedcom.NewNameNode("foo bar",
+				gedcom.NewDateNode("2 Sep 1981"),
+			),
 			gedcom.DateNodes{
-				gedcom.NewDateNode(nil, "2 Sep 1981", "", nil),
+				gedcom.NewDateNode("2 Sep 1981"),
 			},
 		},
 		{
-			gedcom.NewNameNode(nil, "foo bar", "", []gedcom.Node{
-				gedcom.NewDateNode(nil, "2 Sep 1981", "", nil),
-				gedcom.NewDateNode(nil, "3 Sep 1981", "", nil),
-			}),
+			gedcom.NewNameNode("foo bar",
+				gedcom.NewDateNode("2 Sep 1981"),
+				gedcom.NewDateNode("3 Sep 1981"),
+			),
 			gedcom.DateNodes{
-				gedcom.NewDateNode(nil, "2 Sep 1981", "", nil),
-				gedcom.NewDateNode(nil, "3 Sep 1981", "", nil),
+				gedcom.NewDateNode("2 Sep 1981"),
+				gedcom.NewDateNode("3 Sep 1981"),
 			},
 		},
 		{
-			gedcom.NewNameNode(nil, "foo bar", "", nil),
+			gedcom.NewNameNode("foo bar"),
 			nil,
 		},
 		{
-			gedcom.NewNameNode(nil, "foo bar", "", []gedcom.Node{
-				gedcom.NewDateNode(nil, "bar baz", "", nil),
-				gedcom.NewDateNode(nil, "3 Sep 1981", "", nil),
-			}),
+			gedcom.NewNameNode("foo bar",
+				gedcom.NewDateNode("bar baz"),
+				gedcom.NewDateNode("3 Sep 1981"),
+			),
 			[]*gedcom.DateNode{
-				gedcom.NewDateNode(nil, "bar baz", "", nil),
-				gedcom.NewDateNode(nil, "3 Sep 1981", "", nil),
+				gedcom.NewDateNode("bar baz"),
+				gedcom.NewDateNode("3 Sep 1981"),
 			},
 		},
 	}

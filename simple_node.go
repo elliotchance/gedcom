@@ -4,25 +4,24 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"sync"
 )
 
 // SimpleNode is used as the default node type when there is no more appropriate
 // or specific type to use.
 type SimpleNode struct {
-	document *Document
 	tag      Tag
 	value    string
 	pointer  string
-	children []Node
+	children Nodes
 }
 
-// NewSimpleNode creates a non-specific node.
+// newSimpleNode creates a non-specific node.
 //
 // Unlike all of the other node types this constructor is not public because it
 // is used internally by NewNode if a specific node type can not be determined.
-func newSimpleNode(document *Document, tag Tag, value, pointer string, children []Node) *SimpleNode {
+func newSimpleNode(tag Tag, value, pointer string, children ...Node) *SimpleNode {
 	return &SimpleNode{
-		document: document,
 		tag:      tag,
 		value:    value,
 		pointer:  pointer,
@@ -57,15 +56,6 @@ func (node *SimpleNode) Pointer() string {
 	return node.pointer
 }
 
-// If the node is nil the result will also be nil.
-func (node *SimpleNode) Document() *Document {
-	if node == nil {
-		return nil
-	}
-
-	return node.document
-}
-
 // Equals compares two nodes for value equality.
 //
 // 1. If either or both nodes are nil then false is always returned.
@@ -97,21 +87,8 @@ func (node *SimpleNode) Equals(node2 Node) bool {
 	return node.pointer == node2.Pointer()
 }
 
-// If the node is nil the invocation will not have any effect.
-func (node *SimpleNode) SetDocument(document *Document) {
-	if node == nil {
-		return
-	}
-
-	node.document = document
-
-	for _, child := range node.children {
-		child.SetDocument(document)
-	}
-}
-
 // If the node is nil the result will also be nil.
-func (node *SimpleNode) Nodes() []Node {
+func (node *SimpleNode) Nodes() Nodes {
 	if node == nil {
 		return nil
 	}
@@ -121,6 +98,19 @@ func (node *SimpleNode) Nodes() []Node {
 
 func (node *SimpleNode) AddNode(n Node) {
 	node.children = append(node.children, n)
+
+	// This is pretty crude and nasty. I'm sorry if your workflow is to switch
+	// between small changes and large sweeping reads but this will do for now.
+	//
+	// We can't simply remove this node because we would have to make sure we
+	// work our way up the chain which we have no easy way of doing right now.
+	nodeCache = &sync.Map{}
+}
+
+func (node *SimpleNode) DeleteNode(n Node) (didDelete bool) {
+	node.children, didDelete = node.children.deleteNode(n)
+
+	return
 }
 
 // If the node is nil the result be an empty string.
@@ -168,12 +158,11 @@ func (node *SimpleNode) ShallowCopy() Node {
 		return nil
 	}
 
-	document := node.Document()
 	tag := node.Tag()
 	value := node.Value()
 	pointer := node.Pointer()
 
-	return NewNode(document, tag, value, pointer)
+	return NewNode(tag, value, pointer)
 }
 
 // GEDCOMString is the recursive version of GEDCOMLine. It will render a node
@@ -186,7 +175,7 @@ func (node *SimpleNode) ShallowCopy() Node {
 // GEDCOMString to compare the string values of nodes or exclude the indent you
 // should use the NoIndent constant.
 func (node *SimpleNode) GEDCOMString(indent int) string {
-	document := NewDocumentWithNodes([]Node{node})
+	document := NewDocumentWithNodes(Nodes{node})
 
 	return document.GEDCOMString(indent)
 }
@@ -227,6 +216,10 @@ func (node *SimpleNode) GEDCOMLine(indent int) string {
 // SetNodes replaces all of the child nodes.
 //
 // You can use SetNodes(nil) to remove all child nodes.
-func (node *SimpleNode) SetNodes(nodes []Node) {
+func (node *SimpleNode) SetNodes(nodes Nodes) {
 	node.children = nodes
+}
+
+func (node *SimpleNode) RawSimpleNode() *SimpleNode {
+	return node
 }

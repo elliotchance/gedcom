@@ -7,17 +7,15 @@ import (
 )
 
 func TestNewMapNode(t *testing.T) {
-	doc := gedcom.NewDocument()
-	child := gedcom.NewNameNode(doc, "", "", nil)
-	node := gedcom.NewMapNode(doc, "foo", "bar", []gedcom.Node{child})
+	child := gedcom.NewNameNode("")
+	node := gedcom.NewMapNode("foo", child)
 
 	assert.NotNil(t, node)
 	assert.IsType(t, node, (*gedcom.MapNode)(nil))
 	assert.Equal(t, gedcom.TagMap, node.Tag())
-	assert.Equal(t, []gedcom.Node{child}, node.Nodes())
-	assert.Equal(t, doc, node.Document())
+	assert.Equal(t, gedcom.Nodes{child}, node.Nodes())
 	assert.Equal(t, "foo", node.Value())
-	assert.Equal(t, "bar", node.Pointer())
+	assert.Equal(t, "", node.Pointer())
 }
 
 func TestPlaceNode_Latitude(t *testing.T) {
@@ -31,32 +29,32 @@ func TestPlaceNode_Latitude(t *testing.T) {
 			expected: nil,
 		},
 		{
-			node:     gedcom.NewMapNode(nil, "", "", nil),
+			node:     gedcom.NewMapNode(""),
 			expected: nil,
 		},
 		{
-			node:     gedcom.NewMapNode(nil, "", "", []gedcom.Node{}),
+			node:     gedcom.NewMapNode(""),
 			expected: nil,
 		},
 		{
-			node: gedcom.NewMapNode(nil, "", "", []gedcom.Node{
-				gedcom.NewLatitudeNode(nil, "", "", []gedcom.Node{}),
-			}),
-			expected: gedcom.NewLatitudeNode(nil, "", "", []gedcom.Node{}),
+			node: gedcom.NewMapNode("",
+				gedcom.NewLatitudeNode(""),
+			),
+			expected: gedcom.NewLatitudeNode(""),
 		},
 		{
-			node: gedcom.NewMapNode(nil, "", "", []gedcom.Node{
-				gedcom.NewNameNode(nil, "", "", []gedcom.Node{}),
-			}),
+			node: gedcom.NewMapNode("",
+				gedcom.NewNameNode(""),
+			),
 			expected: nil,
 		},
 		{
-			node: gedcom.NewMapNode(nil, "", "", []gedcom.Node{
-				gedcom.NewNameNode(nil, "", "", []gedcom.Node{}),
-				gedcom.NewLatitudeNode(nil, "1", "", []gedcom.Node{}),
-				gedcom.NewLatitudeNode(nil, "2", "", []gedcom.Node{}),
-			}),
-			expected: gedcom.NewLatitudeNode(nil, "1", "", []gedcom.Node{}),
+			node: gedcom.NewMapNode("",
+				gedcom.NewNameNode(""),
+				gedcom.NewLatitudeNode("1"),
+				gedcom.NewLatitudeNode("2"),
+			),
+			expected: gedcom.NewLatitudeNode("1"),
 		},
 	}
 
@@ -78,32 +76,32 @@ func TestPlaceNode_Longitude(t *testing.T) {
 			expected: nil,
 		},
 		{
-			node:     gedcom.NewMapNode(nil, "", "", nil),
+			node:     gedcom.NewMapNode(""),
 			expected: nil,
 		},
 		{
-			node:     gedcom.NewMapNode(nil, "", "", []gedcom.Node{}),
+			node:     gedcom.NewMapNode(""),
 			expected: nil,
 		},
 		{
-			node: gedcom.NewMapNode(nil, "", "", []gedcom.Node{
-				gedcom.NewLongitudeNode(nil, "", "", []gedcom.Node{}),
-			}),
-			expected: gedcom.NewLongitudeNode(nil, "", "", []gedcom.Node{}),
+			node: gedcom.NewMapNode("",
+				gedcom.NewLongitudeNode(""),
+			),
+			expected: gedcom.NewLongitudeNode(""),
 		},
 		{
-			node: gedcom.NewMapNode(nil, "", "", []gedcom.Node{
-				gedcom.NewNameNode(nil, "", "", []gedcom.Node{}),
-			}),
+			node: gedcom.NewMapNode("",
+				gedcom.NewNameNode(""),
+			),
 			expected: nil,
 		},
 		{
-			node: gedcom.NewMapNode(nil, "", "", []gedcom.Node{
-				gedcom.NewNameNode(nil, "", "", []gedcom.Node{}),
-				gedcom.NewLongitudeNode(nil, "1", "", []gedcom.Node{}),
-				gedcom.NewLongitudeNode(nil, "2", "", []gedcom.Node{}),
-			}),
-			expected: gedcom.NewLongitudeNode(nil, "1", "", []gedcom.Node{}),
+			node: gedcom.NewMapNode("",
+				gedcom.NewNameNode(""),
+				gedcom.NewLongitudeNode("1"),
+				gedcom.NewLongitudeNode("2"),
+			),
+			expected: gedcom.NewLongitudeNode("1"),
 		},
 	}
 

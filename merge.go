@@ -5,7 +5,7 @@
 // - MergeNodes(left, right Node) Node: returns a new node that merges children
 // from both nodes.
 //
-// - MergeNodeSlices(left, right []Node, mergeFn MergeFunction) []Node: merges
+// - MergeNodeSlices(left, right Nodes, mergeFn MergeFunction) Nodes: merges
 // two slices based on the mergeFn. This allows more advanced merging when
 // dealing with slices of nodes.
 //
@@ -118,13 +118,13 @@ func MergeNodes(left, right Node) (Node, error) {
 // 5. Merges can only happen between a node on the left with a node on the
 // right. Even if two nodes in the left could be merged they will not be. The
 // same goes for all of the elements in the right slice.
-func MergeNodeSlices(left, right []Node, mergeFn MergeFunction) []Node {
-	newSlice := []Node{}
+func MergeNodeSlices(left, right Nodes, mergeFn MergeFunction) Nodes {
+	newSlice := Nodes{}
 
 	// Be careful to duplicate the right slice. I'm not sure why this is
 	// necessary but the unit tests that reuse mergeDocumentsTests will fail if
 	// we do not have this.
-	newRight := make([]Node, len(right))
+	newRight := make(Nodes, len(right))
 	copy(newRight, right)
 	right = newRight
 
@@ -215,8 +215,16 @@ func MergeNodeSlices(left, right []Node, mergeFn MergeFunction) []Node {
 // Individuals will not be merged amongst each other, only appended to the final
 // document. To merge similar individuals see MergeDocumentsAndIndividuals.
 func MergeDocuments(left, right *Document, mergeFn MergeFunction) *Document {
-	leftNodes := Nodes(left)
-	rightNodes := Nodes(right)
+	var leftNodes, rightNodes Nodes
+
+	if left != nil {
+		leftNodes = left.Nodes()
+	}
+
+	if right != nil {
+		rightNodes = right.Nodes()
+	}
+
 	newNodes := MergeNodeSlices(leftNodes, rightNodes, mergeFn)
 
 	return NewDocumentWithNodes(newNodes)

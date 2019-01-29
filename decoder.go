@@ -51,7 +51,8 @@ func NewDecoder(r io.Reader) *Decoder {
 // Document will be returned with zero nodes.
 func (dec *Decoder) Decode() (*Document, error) {
 	document := NewDocument()
-	indents := []Node{}
+	indents := Nodes{}
+	var family *FamilyNode
 
 	document.HasBOM = dec.consumeOptionalBOM()
 
@@ -74,9 +75,16 @@ func (dec *Decoder) Decode() (*Document, error) {
 			continue
 		}
 
-		node, indent, err := parseLine(document, line)
+		node, indent, err := parseLine(line, document, family)
 		if err != nil {
 			return nil, fmt.Errorf("line %d: %s", lineNumber, err)
+		}
+
+		// Families cannot be nested so any children that appear after this node
+		// will be attached to the most recently seen family. We do not need to
+		// set this back to nil after we exit the family node.
+		if f, ok := node.(*FamilyNode); ok {
+			family = f
 		}
 
 		// Add a root node to the document.
@@ -85,7 +93,7 @@ func (dec *Decoder) Decode() (*Document, error) {
 
 			// There can be multiple root nodes so make sure we always reset all
 			// indent pointers.
-			indents = []Node{node}
+			indents = Nodes{node}
 
 			continue
 		}
@@ -151,7 +159,7 @@ func (dec *Decoder) readLine() (string, error) {
 
 var lineRegexp = regexp.MustCompile(`^(\d) (@[^@]+@ )?(\w+) ?(.*)?$`)
 
-func parseLine(document *Document, line string) (Node, int, error) {
+func parseLine(line string, document *Document, family *FamilyNode) (Node, int, error) {
 	parts := lineRegexp.FindStringSubmatch(line)
 
 	if len(parts) == 0 {
@@ -174,7 +182,7 @@ func parseLine(document *Document, line string) (Node, int, error) {
 	// Value (optional).
 	value := parts[4]
 
-	return NewNode(document, tag, value, pointer), indent, nil
+	return newNode(document, family, tag, value, pointer), indent, nil
 }
 
 // NewNode creates a node with no children. It is also the correct way to
@@ -182,83 +190,127 @@ func parseLine(document *Document, line string) (Node, int, error) {
 //
 // If the node tag is recognised as a more specific type, such as *DateNode then
 // that will be returned. Otherwise a *SimpleNode will be used.
-func NewNode(document *Document, tag Tag, value, pointer string) Node {
-	return NewNodeWithChildren(document, tag, value, pointer, nil)
+func NewNode(tag Tag, value, pointer string, children ...Node) Node {
+	return newNodeWithChildren(nil, nil, tag, value, pointer, children)
 }
 
-func NewNodeWithChildren(document *Document, tag Tag, value, pointer string, children []Node) Node {
+func newNode(document *Document, family *FamilyNode, tag Tag, value, pointer string) Node {
+	return newNodeWithChildren(document, family, tag, value, pointer, nil)
+}
+
+func newNodeWithChildren(document *Document, family *FamilyNode, tag Tag, value, pointer string, children Nodes) Node {
+	var node Node
+
 	switch tag {
 	case TagBaptism:
-		return NewBaptismNode(document, value, pointer, children)
+		node = NewBaptismNode(value, children...)
 
 	case TagBirth:
-		return NewBirthNode(document, value, pointer, children)
+		node = NewBirthNode(value, children...)
 
 	case TagBurial:
-		return NewBurialNode(document, value, pointer, children)
+		node = NewBurialNode(value, children...)
+
+	case TagChild:
+		needsFamily(family, tag)
+
+		node = newChildNode(family, value, children...)
 
 	case TagDate:
-		return NewDateNode(document, value, pointer, children)
+		node = NewDateNode(value, children...)
 
 	case TagDeath:
-		return NewDeathNode(document, value, pointer, children)
+		node = NewDeathNode(value, children...)
 
 	case TagEvent:
-		return NewEventNode(document, value, pointer, children)
+		node = NewEventNode(value, children...)
 
 	case TagFamily:
-		return NewFamilyNode(document, pointer, children)
+		needsDocument(document, tag)
+
+		node = newFamilyNode(document, pointer, children...)
 
 	case UnofficialTagFamilySearchID1, UnofficialTagFamilySearchID2:
-		return NewFamilySearchIDNode(document, tag, value)
+		node = NewFamilySearchIDNode(tag, value, children...)
 
 	case TagFormat:
-		return NewFormatNode(document, value, pointer, nil)
+		node = NewFormatNode(value, children...)
+
+	case TagHusband:
+		needsFamily(family, tag)
+
+		node = newHusbandNode(family, value, children...)
 
 	case TagIndividual:
-		return NewIndividualNode(document, value, pointer, children)
+		needsDocument(document, tag)
+
+		node = newIndividualNode(document, pointer, children...)
 
 	case TagLatitude:
-		return NewLatitudeNode(document, value, pointer, nil)
+		node = NewLatitudeNode(value, children...)
 
 	case TagLongitude:
-		return NewLongitudeNode(document, value, pointer, nil)
+		node = NewLongitudeNode(value, children...)
 
 	case TagMap:
-		return NewMapNode(document, value, pointer, nil)
+		node = NewMapNode(value, children...)
 
 	case TagName:
-		return NewNameNode(document, value, pointer, children)
+		node = NewNameNode(value, children...)
 
 	case TagNickname:
-		return NewNicknameNode(document, value, pointer, children)
+		node = NewNicknameNode(value, children...)
 
 	case TagNote:
-		return NewNoteNode(document, value, pointer, nil)
+		node = NewNoteNode(value, children...)
 
 	case TagPhonetic:
-		return NewPhoneticVariationNode(document, value, pointer, nil)
+		node = NewPhoneticVariationNode(value, children...)
 
 	case TagPlace:
-		return NewPlaceNode(document, value, pointer, children)
+		node = NewPlaceNode(value, children...)
 
 	case TagResidence:
-		return NewResidenceNode(document, value, pointer, children)
+		node = NewResidenceNode(value, children...)
 
 	case TagRomanized:
-		return NewRomanizedVariationNode(document, value, pointer, nil)
+		node = NewRomanizedVariationNode(value, children...)
 
 	case TagSource:
-		return NewSourceNode(document, value, pointer, children)
+		node = NewSourceNode(value, pointer, children...)
 
 	case TagType:
-		return NewTypeNode(document, value, pointer, nil)
+		node = NewTypeNode(value, children...)
 
 	case UnofficialTagUniqueID:
-		return NewUniqueIDNode(document, value, pointer, nil)
+		node = NewUniqueIDNode(value, children...)
+
+	case TagWife:
+		needsFamily(family, tag)
+
+		node = newWifeNode(family, value, children...)
 	}
 
-	return newSimpleNode(document, tag, value, pointer, children)
+	if IsNil(node) {
+		node = newSimpleNode(tag, value, pointer, children...)
+	} else {
+		simpleNode := node.RawSimpleNode()
+		simpleNode.pointer = pointer
+	}
+
+	return node
+}
+
+func needsDocument(document *Document, tag Tag) {
+	if document == nil {
+		panic(fmt.Sprintf("cannot create %s without a document", tag))
+	}
+}
+
+func needsFamily(family *FamilyNode, tag Tag) {
+	if family == nil {
+		panic(fmt.Sprintf("cannot create %s without a family", tag))
+	}
 }
 
 // consumeOptionalBOM will test and discard the Byte Order Mark at the start of

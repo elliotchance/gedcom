@@ -31,7 +31,7 @@ var nameTests = []struct {
 		gedcomName:    "",
 	},
 	{
-		node:          gedcom.NewNameNode(nil, "", "", nil),
+		node:          gedcom.NewNameNode(""),
 		title:         "",
 		prefix:        "",
 		givenName:     "",
@@ -42,7 +42,7 @@ var nameTests = []struct {
 		gedcomName:    "",
 	},
 	{
-		node:          gedcom.NewNameNode(nil, "/Double  Last/", "", nil),
+		node:          gedcom.NewNameNode("/Double  Last/"),
 		title:         "",
 		prefix:        "",
 		givenName:     "",
@@ -53,7 +53,7 @@ var nameTests = []struct {
 		gedcomName:    "/Double Last/",
 	},
 	{
-		node:          gedcom.NewNameNode(nil, "//", "", nil),
+		node:          gedcom.NewNameNode("//"),
 		title:         "",
 		prefix:        "",
 		givenName:     "",
@@ -66,7 +66,7 @@ var nameTests = []struct {
 	{
 		// This is an invalid case. I don't mind that the data returned seems
 		// garbled. It's better than nothing.
-		node:          gedcom.NewNameNode(nil, "a / b", "", nil),
+		node:          gedcom.NewNameNode("a / b"),
 		title:         "",
 		prefix:        "",
 		givenName:     "a",
@@ -77,7 +77,7 @@ var nameTests = []struct {
 		gedcomName:    "a / b",
 	},
 	{
-		node:          gedcom.NewNameNode(nil, "Double First", "", nil),
+		node:          gedcom.NewNameNode("Double First"),
 		title:         "",
 		prefix:        "",
 		givenName:     "Double First",
@@ -88,7 +88,7 @@ var nameTests = []struct {
 		gedcomName:    "Double First",
 	},
 	{
-		node:          gedcom.NewNameNode(nil, "First /Last/", "", nil),
+		node:          gedcom.NewNameNode("First /Last/"),
 		title:         "",
 		prefix:        "",
 		givenName:     "First",
@@ -99,7 +99,7 @@ var nameTests = []struct {
 		gedcomName:    "First /Last/",
 	},
 	{
-		node:          gedcom.NewNameNode(nil, "First   Middle /Last/", "", nil),
+		node:          gedcom.NewNameNode("First   Middle /Last/"),
 		title:         "",
 		prefix:        "",
 		givenName:     "First Middle",
@@ -110,7 +110,7 @@ var nameTests = []struct {
 		gedcomName:    "First Middle /Last/",
 	},
 	{
-		node:          gedcom.NewNameNode(nil, "First /Last/  Suffix ", "", nil),
+		node:          gedcom.NewNameNode("First /Last/  Suffix "),
 		title:         "",
 		prefix:        "",
 		givenName:     "First",
@@ -121,7 +121,7 @@ var nameTests = []struct {
 		gedcomName:    "First /Last/ Suffix",
 	},
 	{
-		node:          gedcom.NewNameNode(nil, "   /Last/ Suffix", "", nil),
+		node:          gedcom.NewNameNode("   /Last/ Suffix"),
 		title:         "",
 		prefix:        "",
 		givenName:     "",
@@ -134,10 +134,10 @@ var nameTests = []struct {
 	{
 		// The GivenName overrides the givenName name if provided. When multiple
 		// GivenNames are provided then it will always use the first one.
-		node: gedcom.NewNameNode(nil, "First /Last/ II", "", []gedcom.Node{
-			gedcom.NewNodeWithChildren(nil, gedcom.TagGivenName, " Other  Name ", "", nil),
-			gedcom.NewNodeWithChildren(nil, gedcom.TagGivenName, "Uh-oh", "", nil),
-		}),
+		node: gedcom.NewNameNode("First /Last/ II",
+			gedcom.NewNode(gedcom.TagGivenName, " Other  Name ", ""),
+			gedcom.NewNode(gedcom.TagGivenName, "Uh-oh", ""),
+		),
 		title:         "",
 		prefix:        "",
 		givenName:     "Other Name",
@@ -150,10 +150,10 @@ var nameTests = []struct {
 	{
 		// The Surname overrides the surname name if provided. When multiple
 		// Surnames are provided then it will always use the first one.
-		node: gedcom.NewNameNode(nil, "First /Last/ II", "", []gedcom.Node{
-			gedcom.NewNodeWithChildren(nil, gedcom.TagSurname, " Other  name ", "", nil),
-			gedcom.NewNodeWithChildren(nil, gedcom.TagSurname, "uh-oh", "", nil),
-		}),
+		node: gedcom.NewNameNode("First /Last/ II",
+			gedcom.NewNode(gedcom.TagSurname, " Other  name ", ""),
+			gedcom.NewNode(gedcom.TagSurname, "uh-oh", ""),
+		),
 		title:         "",
 		prefix:        "",
 		givenName:     "First",
@@ -164,10 +164,10 @@ var nameTests = []struct {
 		gedcomName:    "First /Other name/ II",
 	},
 	{
-		node: gedcom.NewNameNode(nil, "First /Last/ Esq.", "", []gedcom.Node{
-			gedcom.NewNodeWithChildren(nil, gedcom.TagNamePrefix, " Mr ", "", nil),
-			gedcom.NewNodeWithChildren(nil, gedcom.TagNamePrefix, "Dr", "", nil),
-		}),
+		node: gedcom.NewNameNode("First /Last/ Esq.",
+			gedcom.NewNode(gedcom.TagNamePrefix, " Mr ", ""),
+			gedcom.NewNode(gedcom.TagNamePrefix, "Dr", ""),
+		),
 		title:         "",
 		prefix:        "Mr",
 		givenName:     "First",
@@ -181,11 +181,11 @@ var nameTests = []struct {
 		// The NameSuffix overrides the suffix in the name if provided.
 		// When multiple name suffixes are provided then it will always use the
 		// first one.
-		node: gedcom.NewNameNode(nil, "First /Last/ Suffix", "", []gedcom.Node{
-			gedcom.NewNodeWithChildren(nil, gedcom.TagNameSuffix, " Esq. ", "", nil),
-			gedcom.NewNodeWithChildren(nil, gedcom.TagNameSuffix, "Dr", "", nil),
-			gedcom.NewNodeWithChildren(nil, gedcom.TagNamePrefix, "Sir", "", nil),
-		}),
+		node: gedcom.NewNameNode("First /Last/ Suffix",
+			gedcom.NewNode(gedcom.TagNameSuffix, " Esq. ", ""),
+			gedcom.NewNode(gedcom.TagNameSuffix, "Dr", ""),
+			gedcom.NewNode(gedcom.TagNamePrefix, "Sir", ""),
+		),
 		title:         "",
 		prefix:        "Sir",
 		givenName:     "First",
@@ -196,10 +196,10 @@ var nameTests = []struct {
 		gedcomName:    "Sir First /Last/ Esq.",
 	},
 	{
-		node: gedcom.NewNameNode(nil, "First /Last/ Esq.", "", []gedcom.Node{
-			gedcom.NewNodeWithChildren(nil, gedcom.TagSurnamePrefix, " Foo ", "", nil),
-			gedcom.NewNodeWithChildren(nil, gedcom.TagSurnamePrefix, "Bar", "", nil),
-		}),
+		node: gedcom.NewNameNode("First /Last/ Esq.",
+			gedcom.NewNode(gedcom.TagSurnamePrefix, " Foo ", ""),
+			gedcom.NewNode(gedcom.TagSurnamePrefix, "Bar", ""),
+		),
 		title:         "",
 		prefix:        "",
 		givenName:     "First",
@@ -210,10 +210,10 @@ var nameTests = []struct {
 		gedcomName:    "First Foo /Last/ Esq.",
 	},
 	{
-		node: gedcom.NewNameNode(nil, "First /Last/ Esq.", "", []gedcom.Node{
-			gedcom.NewNodeWithChildren(nil, gedcom.TagTitle, " Grand  Duke ", "", nil),
-			gedcom.NewNodeWithChildren(nil, gedcom.TagTitle, "Nobody", "", nil),
-		}),
+		node: gedcom.NewNameNode("First /Last/ Esq.",
+			gedcom.NewNode(gedcom.TagTitle, " Grand  Duke ", ""),
+			gedcom.NewNode(gedcom.TagTitle, "Nobody", ""),
+		),
 		title:         "Grand Duke",
 		prefix:        "",
 		givenName:     "First",
@@ -301,14 +301,14 @@ func TestNameNode_Format(t *testing.T) {
 	Format(nil, "").Returns("")
 	Format(nil, "%f %l").Returns("")
 
-	name := gedcom.NewNameNode(nil, "", "", []gedcom.Node{
-		gedcom.NewNodeWithChildren(nil, gedcom.TagGivenName, "Given", "", nil),
-		gedcom.NewNodeWithChildren(nil, gedcom.TagSurname, "Surname", "", nil),
-		gedcom.NewNodeWithChildren(nil, gedcom.TagNamePrefix, "Prefix", "", nil),
-		gedcom.NewNodeWithChildren(nil, gedcom.TagNameSuffix, "Suffix", "", nil),
-		gedcom.NewNodeWithChildren(nil, gedcom.TagSurnamePrefix, "SurnamePrefix", "", nil),
-		gedcom.NewNodeWithChildren(nil, gedcom.TagTitle, "Title", "", nil),
-	})
+	name := gedcom.NewNameNode("",
+		gedcom.NewNode(gedcom.TagGivenName, "Given", ""),
+		gedcom.NewNode(gedcom.TagSurname, "Surname", ""),
+		gedcom.NewNode(gedcom.TagNamePrefix, "Prefix", ""),
+		gedcom.NewNode(gedcom.TagNameSuffix, "Suffix", ""),
+		gedcom.NewNode(gedcom.TagSurnamePrefix, "SurnamePrefix", ""),
+		gedcom.NewNode(gedcom.TagTitle, "Title", ""),
+	)
 
 	Format(name, "").Returns("")
 	Format(name, "%").Returns("%")
@@ -338,7 +338,7 @@ func TestNameNode_Format(t *testing.T) {
 	Format(name, gedcom.NameFormatGEDCOM).Returns("Title Prefix Given SurnamePrefix /Surname/ Suffix")
 	Format(name, gedcom.NameFormatIndex).Returns("SurnamePrefix Surname, Title Prefix Given Suffix")
 
-	name = gedcom.NewNameNode(nil, "Bob /Smith/", "", nil)
+	name = gedcom.NewNameNode("Bob /Smith/")
 
 	Format(name, "%f %L").Returns("Bob SMITH")
 	Format(name, "%f%L").Returns("BobSMITH")

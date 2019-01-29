@@ -29,7 +29,7 @@ func (c *PlaceEvent) WriteTo(w io.Writer) (int64, error) {
 		date = d.Value()
 	}
 
-	individual := individualForNode(c.node)
+	individual := individualForNode(c.document, c.node)
 	var person Component = NewIndividualLink(c.document, individual, c.visibility)
 	isLiving := individual != nil && individual.IsLiving()
 

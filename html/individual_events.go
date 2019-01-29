@@ -50,19 +50,19 @@ func (c *IndividualEvents) WriteTo(w io.Writer) (int64, error) {
 		}
 
 		var description Component = NewEmpty()
-		if family.Husband().Is(c.individual) {
+		if family.Husband().IsIndividual(c.individual) {
 			description = NewHTML(UnknownEmphasis)
 
 			if wife := family.Wife(); wife != nil {
-				description = NewIndividualLink(c.document, wife, c.visibility)
+				description = NewIndividualLink(c.document, wife.Individual(), c.visibility)
 			}
 		}
 
-		if family.Wife().Is(c.individual) {
+		if family.Wife().IsIndividual(c.individual) {
 			description = NewHTML(UnknownEmphasis)
 
 			if husband := family.Husband(); husband != nil {
-				description = NewIndividualLink(c.document, husband, c.visibility)
+				description = NewIndividualLink(c.document, husband.Individual(), c.visibility)
 			}
 		}
 

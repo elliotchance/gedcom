@@ -42,17 +42,48 @@ type FilterFunction func(node Node) (newNode Node, traverseChildren bool)
 //
 // There are several other functions that can be used as filters including;
 // WhitelistTagFilter, BlacklistTagFilter and OfficialTagFilter.
+//
+// Some nodes, such as an IndividualNode or FamilyNode cannot be created without
+// being attached to a document. Filter will attach these to a new document
+// which can be accessed through their respective Document() method.
 func Filter(root Node, fn FilterFunction) Node {
+	entityMap := entityMap{}
+
+	return filter(root, fn, entityMap)
+}
+
+func filter(root Node, fn FilterFunction, entityMap entityMap) Node {
 	newRoot, keepTraversing := fn(root)
-	if newRoot == nil {
+	if IsNil(newRoot) {
 		return nil
 	}
 
-	result := shallowCopyNode(newRoot)
+	var document *Document
+	var family *FamilyNode
+
+	if documentNoder, ok := newRoot.(DocumentNoder); ok {
+		document = entityMap.GetOrAssign(documentNoder.Document(), func() interface{} {
+			return NewDocument()
+		}).(*Document)
+	}
+
+	if familyNoder, ok := newRoot.(FamilyNoder); ok {
+		fam := familyNoder.Family()
+
+		document = entityMap.GetOrAssign(fam.Document(), func() interface{} {
+			return NewDocument()
+		}).(*Document)
+
+		family = entityMap.GetOrAssign(fam, func() interface{} {
+			return document.AddFamily(fam.Pointer())
+		}).(*FamilyNode)
+	}
+
+	result := shallowCopyNode(newRoot, document, family)
 
 	if keepTraversing {
 		for _, child := range root.Nodes() {
-			newNode := Filter(child, fn)
+			newNode := filter(child, fn, entityMap)
 			if newNode != nil {
 				result.AddNode(newNode)
 			}
@@ -62,13 +93,22 @@ func Filter(root Node, fn FilterFunction) Node {
 	return result
 }
 
-func shallowCopyNode(node Node) Node {
-	document := node.Document()
+// Copy a node without children.
+//
+// Some nodes require a document (such as an IndividualNode) or family (such as
+// a ChildNode) to be created. Since we don't want to attach these to the
+// existing documents, families, etc. new entities will have to be passed in.
+//
+// One important thing to note here is that we don't want to create new
+// documents, etc for every single node we copy because that will leave the new
+// nodes totally fractured and not in a state that we would expect to traverse.
+// Be careful to reuse the document and other entities in a reasonable way.
+func shallowCopyNode(node Node, document *Document, family *FamilyNode) Node {
 	tag := node.Tag()
 	value := node.Value()
 	pointer := node.Pointer()
 
-	return NewNode(document, tag, value, pointer)
+	return newNode(document, family, tag, value, pointer)
 }
 
 // WhitelistTagFilter returns any node that is one of the provided tags.
@@ -124,11 +164,12 @@ func OfficialTagFilter() FilterFunction {
 func SimpleNameFilter(format NameFormat) FilterFunction {
 	return func(node Node) (Node, bool) {
 		if name, ok := node.(*NameNode); ok {
-			newNode := NewNameNode(
-				name.Document(),
+			newNode := newNode(
+				nil,
+				nil,
+				TagName,
 				name.Format(format),
 				name.Pointer(),
-				nil,
 			)
 
 			return newNode, false

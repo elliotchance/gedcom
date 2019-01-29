@@ -27,8 +27,8 @@ func (c *AllParentButtons) WriteTo(w io.Writer) (int64, error) {
 	components := []Component{}
 
 	for _, family := range families {
-		husbandMatches := family.Husband().Is(c.individual)
-		wifeMatches := family.Wife().Is(c.individual)
+		husbandMatches := family.Husband().IsIndividual(c.individual)
+		wifeMatches := family.Wife().IsIndividual(c.individual)
 
 		if husbandMatches || wifeMatches {
 			continue
@@ -41,7 +41,7 @@ func (c *AllParentButtons) WriteTo(w io.Writer) (int64, error) {
 	// If there are no families we still want to show an empty family. We just
 	// create a dummy family that has no child nodes.
 	if len(components) == 0 {
-		familyNode := gedcom.NewFamilyNode(nil, "", nil)
+		familyNode := gedcom.NewDocument().AddFamily("")
 		components = []Component{
 			NewParentButtons(c.document, familyNode, c.visibility),
 		}

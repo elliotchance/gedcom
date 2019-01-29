@@ -107,7 +107,7 @@ func reduceTagKeys(m interface{}, options TransformOptions) interface{} {
 	return m
 }
 
-func transformNodes(nodes []gedcom.Node, options TransformOptions) []interface{} {
+func transformNodes(nodes gedcom.Nodes, options TransformOptions) []interface{} {
 	ns := []interface{}{}
 
 	for _, n := range nodes {

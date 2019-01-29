@@ -26,8 +26,8 @@ func (c *FamilyInList) WriteTo(w io.Writer) (int64, error) {
 		date = n.Value()
 	}
 
-	husband := NewIndividualLink(c.document, c.family.Husband(), c.visibility)
-	wife := NewIndividualLink(c.document, c.family.Wife(), c.visibility)
+	husband := NewIndividualLink(c.document, c.family.Husband().Individual(), c.visibility)
+	wife := NewIndividualLink(c.document, c.family.Wife().Individual(), c.visibility)
 
 	return NewTableRow(
 		NewTableCell(husband),

@@ -6,9 +6,9 @@ type BirthNode struct {
 }
 
 // NewBirthNode creates a new BIRT node.
-func NewBirthNode(document *Document, value, pointer string, children []Node) *BirthNode {
+func NewBirthNode(value string, children ...Node) *BirthNode {
 	return &BirthNode{
-		newSimpleNode(document, TagBirth, value, pointer, children),
+		newSimpleNode(TagBirth, value, "", children...),
 	}
 }
 

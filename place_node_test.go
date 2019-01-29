@@ -23,56 +23,56 @@ var placeTests = []struct {
 		country: "",
 	},
 	{
-		node:    gedcom.NewPlaceNode(nil, "Waterloo", "", nil),
+		node:    gedcom.NewPlaceNode("Waterloo"),
 		name:    "Waterloo",
 		county:  "",
 		state:   "",
 		country: "",
 	},
 	{
-		node:    gedcom.NewPlaceNode(nil, "Waterloo, NSW", "", nil),
+		node:    gedcom.NewPlaceNode("Waterloo, NSW"),
 		name:    "Waterloo, NSW",
 		county:  "",
 		state:   "",
 		country: "",
 	},
 	{
-		node:    gedcom.NewPlaceNode(nil, "Cove,Cache,Utah,USA.", "", nil),
+		node:    gedcom.NewPlaceNode("Cove,Cache,Utah,USA."),
 		name:    "Cove",
 		county:  "Cache",
 		state:   "Utah",
 		country: "USA.",
 	},
 	{
-		node:    gedcom.NewPlaceNode(nil, "Cove, Cache, Utah, USA.", "", nil),
+		node:    gedcom.NewPlaceNode("Cove, Cache, Utah, USA."),
 		name:    "Cove",
 		county:  "Cache",
 		state:   "Utah",
 		country: "USA.",
 	},
 	{
-		node:    gedcom.NewPlaceNode(nil, "United States", "", nil),
+		node:    gedcom.NewPlaceNode("United States"),
 		name:    "United States",
 		county:  "",
 		state:   "",
 		country: "United States",
 	},
 	{
-		node:    gedcom.NewPlaceNode(nil, "Foo, australia.", "", nil),
+		node:    gedcom.NewPlaceNode("Foo, australia."),
 		name:    "Foo, australia.",
 		county:  "",
 		state:   "",
 		country: "Australia",
 	},
 	{
-		node:    gedcom.NewPlaceNode(nil, "Bar, Nashville, USA", "", nil),
+		node:    gedcom.NewPlaceNode("Bar, Nashville, USA"),
 		name:    "Bar, Nashville, USA",
 		county:  "",
 		state:   "",
 		country: "USA",
 	},
 	{
-		node:    gedcom.NewPlaceNode(nil, "Hobbitown, New zealand ", "", nil),
+		node:    gedcom.NewPlaceNode("Hobbitown, New zealand "),
 		name:    "Hobbitown, New zealand",
 		county:  "",
 		state:   "",
@@ -81,17 +81,15 @@ var placeTests = []struct {
 }
 
 func TestNewPlaceNode(t *testing.T) {
-	doc := gedcom.NewDocument()
-	child := gedcom.NewNameNode(doc, "", "", nil)
-	node := gedcom.NewPlaceNode(doc, "foo", "bar", []gedcom.Node{child})
+	child := gedcom.NewNameNode("")
+	node := gedcom.NewPlaceNode("foo", child)
 
 	assert.NotNil(t, node)
 	assert.IsType(t, node, (*gedcom.PlaceNode)(nil))
 	assert.Equal(t, gedcom.TagPlace, node.Tag())
-	assert.Equal(t, []gedcom.Node{child}, node.Nodes())
-	assert.Equal(t, doc, node.Document())
+	assert.Equal(t, gedcom.Nodes{child}, node.Nodes())
 	assert.Equal(t, "foo", node.Value())
-	assert.Equal(t, "bar", node.Pointer())
+	assert.Equal(t, "", node.Pointer())
 }
 
 func TestPlaceNode_Name(t *testing.T) {
@@ -137,32 +135,32 @@ func TestPlaceNode_Format(t *testing.T) {
 			expected: nil,
 		},
 		{
-			node:     gedcom.NewPlaceNode(nil, "", "", nil),
+			node:     gedcom.NewPlaceNode(""),
 			expected: nil,
 		},
 		{
-			node:     gedcom.NewPlaceNode(nil, "", "", []gedcom.Node{}),
+			node:     gedcom.NewPlaceNode(""),
 			expected: nil,
 		},
 		{
-			node: gedcom.NewPlaceNode(nil, "", "", []gedcom.Node{
-				gedcom.NewFormatNode(nil, "", "", []gedcom.Node{}),
-			}),
-			expected: gedcom.NewFormatNode(nil, "", "", []gedcom.Node{}),
+			node: gedcom.NewPlaceNode("",
+				gedcom.NewFormatNode(""),
+			),
+			expected: gedcom.NewFormatNode(""),
 		},
 		{
-			node: gedcom.NewPlaceNode(nil, "", "", []gedcom.Node{
-				gedcom.NewNameNode(nil, "", "", []gedcom.Node{}),
-			}),
+			node: gedcom.NewPlaceNode("",
+				gedcom.NewNameNode(""),
+			),
 			expected: nil,
 		},
 		{
-			node: gedcom.NewPlaceNode(nil, "", "", []gedcom.Node{
-				gedcom.NewNameNode(nil, "", "", []gedcom.Node{}),
-				gedcom.NewFormatNode(nil, "1", "", []gedcom.Node{}),
-				gedcom.NewFormatNode(nil, "2", "", []gedcom.Node{}),
-			}),
-			expected: gedcom.NewFormatNode(nil, "1", "", []gedcom.Node{}),
+			node: gedcom.NewPlaceNode("",
+				gedcom.NewNameNode(""),
+				gedcom.NewFormatNode("1"),
+				gedcom.NewFormatNode("2"),
+			),
+			expected: gedcom.NewFormatNode("1"),
 		},
 	}
 
@@ -184,39 +182,39 @@ func TestPlaceNode_PhoneticVariations(t *testing.T) {
 			expected: []*gedcom.PhoneticVariationNode{},
 		},
 		{
-			node:     gedcom.NewPlaceNode(nil, "", "", nil),
+			node:     gedcom.NewPlaceNode(""),
 			expected: []*gedcom.PhoneticVariationNode{},
 		},
 		{
-			node:     gedcom.NewPlaceNode(nil, "", "", []gedcom.Node{}),
+			node:     gedcom.NewPlaceNode(""),
 			expected: []*gedcom.PhoneticVariationNode{},
 		},
 		{
-			node: gedcom.NewPlaceNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewPhoneticVariationNode(nil, "", "", []gedcom.Node{}),
-			}),
+			node: gedcom.NewNode(gedcom.TagPlace, "", "P1",
+				gedcom.NewPhoneticVariationNode(""),
+			).(*gedcom.PlaceNode),
 			expected: []*gedcom.PhoneticVariationNode{
-				gedcom.NewPhoneticVariationNode(nil, "", "", []gedcom.Node{}),
+				gedcom.NewPhoneticVariationNode(""),
 			},
 		},
 		{
-			node: gedcom.NewPlaceNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewPhoneticVariationNode(nil, "", "", []gedcom.Node{}),
-				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
-			}),
+			node: gedcom.NewNode(gedcom.TagPlace, "", "P1",
+				gedcom.NewPhoneticVariationNode(""),
+				gedcom.NewNode(gedcom.TagDeath, "", ""),
+			).(*gedcom.PlaceNode),
 			expected: []*gedcom.PhoneticVariationNode{
-				gedcom.NewPhoneticVariationNode(nil, "", "", []gedcom.Node{}),
+				gedcom.NewPhoneticVariationNode(""),
 			},
 		},
 		{
-			node: gedcom.NewPlaceNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewPhoneticVariationNode(nil, "foo", "", []gedcom.Node{}),
-				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
-				gedcom.NewPhoneticVariationNode(nil, "bar", "", []gedcom.Node{}),
-			}),
+			node: gedcom.NewNode(gedcom.TagPlace, "", "P1",
+				gedcom.NewPhoneticVariationNode("foo"),
+				gedcom.NewNode(gedcom.TagDeath, "", ""),
+				gedcom.NewPhoneticVariationNode("bar"),
+			).(*gedcom.PlaceNode),
 			expected: []*gedcom.PhoneticVariationNode{
-				gedcom.NewPhoneticVariationNode(nil, "foo", "", []gedcom.Node{}),
-				gedcom.NewPhoneticVariationNode(nil, "bar", "", []gedcom.Node{}),
+				gedcom.NewPhoneticVariationNode("foo"),
+				gedcom.NewPhoneticVariationNode("bar"),
 			},
 		},
 	}
@@ -239,39 +237,39 @@ func TestPlaceNode_RomanizedVariations(t *testing.T) {
 			expected: []*gedcom.RomanizedVariationNode{},
 		},
 		{
-			node:     gedcom.NewPlaceNode(nil, "", "", nil),
+			node:     gedcom.NewPlaceNode(""),
 			expected: []*gedcom.RomanizedVariationNode{},
 		},
 		{
-			node:     gedcom.NewPlaceNode(nil, "", "", []gedcom.Node{}),
+			node:     gedcom.NewPlaceNode(""),
 			expected: []*gedcom.RomanizedVariationNode{},
 		},
 		{
-			node: gedcom.NewPlaceNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewRomanizedVariationNode(nil, "", "", []gedcom.Node{}),
-			}),
+			node: gedcom.NewNode(gedcom.TagPlace, "", "P1",
+				gedcom.NewRomanizedVariationNode(""),
+			).(*gedcom.PlaceNode),
 			expected: []*gedcom.RomanizedVariationNode{
-				gedcom.NewRomanizedVariationNode(nil, "", "", []gedcom.Node{}),
+				gedcom.NewRomanizedVariationNode(""),
 			},
 		},
 		{
-			node: gedcom.NewPlaceNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewRomanizedVariationNode(nil, "", "", []gedcom.Node{}),
-				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
-			}),
+			node: gedcom.NewNode(gedcom.TagPlace, "", "P1",
+				gedcom.NewRomanizedVariationNode(""),
+				gedcom.NewNode(gedcom.TagDeath, "", ""),
+			).(*gedcom.PlaceNode),
 			expected: []*gedcom.RomanizedVariationNode{
-				gedcom.NewRomanizedVariationNode(nil, "", "", []gedcom.Node{}),
+				gedcom.NewRomanizedVariationNode(""),
 			},
 		},
 		{
-			node: gedcom.NewPlaceNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewRomanizedVariationNode(nil, "foo", "", []gedcom.Node{}),
-				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
-				gedcom.NewRomanizedVariationNode(nil, "bar", "", []gedcom.Node{}),
-			}),
+			node: gedcom.NewNode(gedcom.TagPlace, "", "P1",
+				gedcom.NewRomanizedVariationNode("foo"),
+				gedcom.NewNode(gedcom.TagDeath, "", ""),
+				gedcom.NewRomanizedVariationNode("bar"),
+			).(*gedcom.PlaceNode),
 			expected: []*gedcom.RomanizedVariationNode{
-				gedcom.NewRomanizedVariationNode(nil, "foo", "", []gedcom.Node{}),
-				gedcom.NewRomanizedVariationNode(nil, "bar", "", []gedcom.Node{}),
+				gedcom.NewRomanizedVariationNode("foo"),
+				gedcom.NewRomanizedVariationNode("bar"),
 			},
 		},
 	}
@@ -294,32 +292,32 @@ func TestPlaceNode_Map(t *testing.T) {
 			expected: nil,
 		},
 		{
-			node:     gedcom.NewPlaceNode(nil, "", "", nil),
+			node:     gedcom.NewPlaceNode(""),
 			expected: nil,
 		},
 		{
-			node:     gedcom.NewPlaceNode(nil, "", "", []gedcom.Node{}),
+			node:     gedcom.NewPlaceNode(""),
 			expected: nil,
 		},
 		{
-			node: gedcom.NewPlaceNode(nil, "", "", []gedcom.Node{
-				gedcom.NewMapNode(nil, "", "", []gedcom.Node{}),
-			}),
-			expected: gedcom.NewMapNode(nil, "", "", []gedcom.Node{}),
+			node: gedcom.NewPlaceNode("",
+				gedcom.NewMapNode(""),
+			),
+			expected: gedcom.NewMapNode(""),
 		},
 		{
-			node: gedcom.NewPlaceNode(nil, "", "", []gedcom.Node{
-				gedcom.NewNameNode(nil, "", "", []gedcom.Node{}),
-			}),
+			node: gedcom.NewPlaceNode("",
+				gedcom.NewNameNode(""),
+			),
 			expected: nil,
 		},
 		{
-			node: gedcom.NewPlaceNode(nil, "", "", []gedcom.Node{
-				gedcom.NewNameNode(nil, "", "", []gedcom.Node{}),
-				gedcom.NewMapNode(nil, "1", "", []gedcom.Node{}),
-				gedcom.NewMapNode(nil, "2", "", []gedcom.Node{}),
-			}),
-			expected: gedcom.NewMapNode(nil, "1", "", []gedcom.Node{}),
+			node: gedcom.NewPlaceNode("",
+				gedcom.NewNameNode(""),
+				gedcom.NewMapNode("1"),
+				gedcom.NewMapNode("2"),
+			),
+			expected: gedcom.NewMapNode("1"),
 		},
 	}
 
@@ -341,39 +339,39 @@ func TestPlaceNode_Notes(t *testing.T) {
 			expected: []*gedcom.NoteNode{},
 		},
 		{
-			node:     gedcom.NewPlaceNode(nil, "", "", nil),
+			node:     gedcom.NewPlaceNode(""),
 			expected: []*gedcom.NoteNode{},
 		},
 		{
-			node:     gedcom.NewPlaceNode(nil, "", "", []gedcom.Node{}),
+			node:     gedcom.NewPlaceNode(""),
 			expected: []*gedcom.NoteNode{},
 		},
 		{
-			node: gedcom.NewPlaceNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewNoteNode(nil, "", "", []gedcom.Node{}),
-			}),
+			node: gedcom.NewNode(gedcom.TagPlace, "", "P1",
+				gedcom.NewNoteNode(""),
+			).(*gedcom.PlaceNode),
 			expected: []*gedcom.NoteNode{
-				gedcom.NewNoteNode(nil, "", "", []gedcom.Node{}),
+				gedcom.NewNoteNode(""),
 			},
 		},
 		{
-			node: gedcom.NewPlaceNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewNoteNode(nil, "", "", []gedcom.Node{}),
-				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
-			}),
+			node: gedcom.NewNode(gedcom.TagPlace, "", "P1",
+				gedcom.NewNoteNode(""),
+				gedcom.NewNode(gedcom.TagDeath, "", ""),
+			).(*gedcom.PlaceNode),
 			expected: []*gedcom.NoteNode{
-				gedcom.NewNoteNode(nil, "", "", []gedcom.Node{}),
+				gedcom.NewNoteNode(""),
 			},
 		},
 		{
-			node: gedcom.NewPlaceNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewNoteNode(nil, "foo", "", []gedcom.Node{}),
-				gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{}),
-				gedcom.NewNoteNode(nil, "bar", "", []gedcom.Node{}),
-			}),
+			node: gedcom.NewNode(gedcom.TagPlace, "", "P1",
+				gedcom.NewNoteNode("foo"),
+				gedcom.NewNode(gedcom.TagDeath, "", ""),
+				gedcom.NewNoteNode("bar"),
+			).(*gedcom.PlaceNode),
 			expected: []*gedcom.NoteNode{
-				gedcom.NewNoteNode(nil, "foo", "", []gedcom.Node{}),
-				gedcom.NewNoteNode(nil, "bar", "", []gedcom.Node{}),
+				gedcom.NewNoteNode("foo"),
+				gedcom.NewNoteNode("bar"),
 			},
 		},
 	}

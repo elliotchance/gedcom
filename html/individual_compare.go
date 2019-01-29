@@ -120,10 +120,10 @@ func (c *IndividualCompare) writeTo(w io.Writer) (int64, error) {
 	if !gedcom.IsNil(left) {
 		for _, parents := range left.Parents() {
 			if parent := parents.Husband(); parent != nil {
-				leftParents = append(leftParents, parent)
+				leftParents = append(leftParents, parent.Individual())
 			}
 			if parent := parents.Wife(); parent != nil {
-				leftParents = append(leftParents, parent)
+				leftParents = append(leftParents, parent.Individual())
 			}
 		}
 	}
@@ -132,10 +132,10 @@ func (c *IndividualCompare) writeTo(w io.Writer) (int64, error) {
 	if !gedcom.IsNil(right) {
 		for _, parents := range right.Parents() {
 			if parent := parents.Husband(); parent != nil {
-				rightParents = append(rightParents, parent)
+				rightParents = append(rightParents, parent.Individual())
 			}
 			if parent := parents.Wife(); parent != nil {
-				rightParents = append(rightParents, parent)
+				rightParents = append(rightParents, parent.Individual())
 			}
 		}
 	}

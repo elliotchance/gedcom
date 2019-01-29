@@ -22,8 +22,8 @@ func NewParentButtons(document *gedcom.Document, family *gedcom.FamilyNode, visi
 }
 
 func (c *ParentButtons) WriteTo(w io.Writer) (int64, error) {
-	husband := NewIndividualButton(c.document, c.family.Husband(), c.visibility)
-	wife := NewIndividualButton(c.document, c.family.Wife(), c.visibility)
+	husband := NewIndividualButton(c.document, c.family.Husband().Individual(), c.visibility)
+	wife := NewIndividualButton(c.document, c.family.Wife().Individual(), c.visibility)
 	svg := NewPlusSVG(false, true, true, true)
 	space := NewSpace()
 

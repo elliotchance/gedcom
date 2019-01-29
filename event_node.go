@@ -7,9 +7,9 @@ type EventNode struct {
 }
 
 // EventNode creates a new EVEN node.
-func NewEventNode(document *Document, value, pointer string, children []Node) *EventNode {
+func NewEventNode(value string, children ...Node) *EventNode {
 	return &EventNode{
-		newSimpleNode(document, TagEvent, value, pointer, children),
+		newSimpleNode(TagEvent, value, "", children...),
 	}
 }
 

@@ -1,21 +1,24 @@
 package gedcom
 
+import "fmt"
+
 // FamilyNode represents a family.
 type FamilyNode struct {
-	*SimpleNode
+	*simpleDocumentNode
 	cachedHusband, cachedWife bool
-	husband, wife             *IndividualNode
+	husband                   *HusbandNode
+	wife                      *WifeNode
 }
 
-func NewFamilyNode(document *Document, pointer string, children []Node) *FamilyNode {
+func newFamilyNode(document *Document, pointer string, children ...Node) *FamilyNode {
 	return &FamilyNode{
-		newSimpleNode(document, TagFamily, "", pointer, children),
+		newSimpleDocumentNode(document, TagFamily, "", pointer, children...),
 		false, false, nil, nil,
 	}
 }
 
 // If the node is nil the result will also be nil.
-func (node *FamilyNode) Husband() (husband *IndividualNode) {
+func (node *FamilyNode) Husband() (husband *HusbandNode) {
 	if node == nil {
 		return nil
 	}
@@ -29,11 +32,17 @@ func (node *FamilyNode) Husband() (husband *IndividualNode) {
 		node.cachedHusband = true
 	}()
 
-	return node.partner(TagHusband)
+	possibleHusband := First(NodesWithTag(node, TagHusband))
+
+	if IsNil(possibleHusband) {
+		return nil
+	}
+
+	return possibleHusband.(*HusbandNode)
 }
 
 // If the node is nil the result will also be nil.
-func (node *FamilyNode) Wife() (wife *IndividualNode) {
+func (node *FamilyNode) Wife() (wife *WifeNode) {
 	if node == nil {
 		return nil
 	}
@@ -47,38 +56,27 @@ func (node *FamilyNode) Wife() (wife *IndividualNode) {
 		node.cachedWife = true
 	}()
 
-	return node.partner(TagWife)
-}
+	possibleWife := First(NodesWithTag(node, TagWife))
 
-func (node *FamilyNode) partner(tag Tag) *IndividualNode {
-	tags := NodesWithTag(node, tag)
-	if len(tags) == 0 {
+	if IsNil(possibleWife) {
 		return nil
 	}
 
-	pointer := valueToPointer(tags[0].Value())
-	individual := node.document.NodeByPointer(pointer)
-	if individual == nil {
-		return nil
-	}
-
-	return individual.(*IndividualNode)
+	return possibleWife.(*WifeNode)
 }
 
 // TODO: Needs tests
 //
 // If the node is nil the result will also be nil.
-func (node *FamilyNode) Children() IndividualNodes {
+func (node *FamilyNode) Children() ChildNodes {
 	if node == nil {
 		return nil
 	}
 
-	children := IndividualNodes{}
+	children := ChildNodes{}
 
 	for _, n := range NodesWithTag(node, TagChild) {
-		pointer := node.document.NodeByPointer(valueToPointer(n.Value()))
-		child := pointer.(*IndividualNode)
-		children = append(children, child)
+		children = append(children, n.(*ChildNode))
 	}
 
 	return children
@@ -120,4 +118,72 @@ func (node *FamilyNode) Similarity(other *FamilyNode, depth int, options Similar
 	wife := node.Wife().Similarity(other.Wife(), options)
 
 	return (husband + wife) / 2
+}
+
+func (node *FamilyNode) addChild(value string) *ChildNode {
+	n := newChildNode(node, value)
+	node.AddNode(n)
+
+	return n
+}
+
+func (node *FamilyNode) AddChild(individual *IndividualNode) *ChildNode {
+	n := newChildNodeWithIndividual(node, individual)
+	node.AddNode(n)
+
+	return n
+}
+
+func (node *FamilyNode) SetHusband(individual *IndividualNode) *FamilyNode {
+	if individual == nil {
+		DeleteNodesWithTag(node, TagHusband)
+
+		return node
+	}
+
+	return node.SetHusbandPointer(individual.Pointer())
+}
+
+func (node *FamilyNode) SetWife(individual *IndividualNode) *FamilyNode {
+	if individual == nil {
+		DeleteNodesWithTag(node, TagWife)
+
+		return node
+	}
+
+	return node.SetWifePointer(individual.Pointer())
+}
+
+func (node *FamilyNode) SetWifePointer(pointer string) *FamilyNode {
+	wife := node.Wife()
+	value := fmt.Sprintf("@%s@", pointer)
+	if wife != nil {
+		wife.value = value
+	}
+
+	node.AddNode(newNode(nil, node, TagWife, value, ""))
+	node.cachedWife = false
+
+	return node
+}
+
+func (node *FamilyNode) SetHusbandPointer(pointer string) *FamilyNode {
+	husband := node.Husband()
+	value := fmt.Sprintf("@%s@", pointer)
+	if husband != nil {
+		husband.value = value
+	}
+
+	husbandNode := newNode(nil, node, TagHusband, value, "")
+	node.AddNode(husbandNode)
+	node.cachedHusband = false
+
+	return node
+}
+
+func (node *FamilyNode) resetCache() {
+	node.cachedHusband = false
+	node.cachedWife = false
+	node.husband = nil
+	node.wife = nil
 }

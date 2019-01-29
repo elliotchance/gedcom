@@ -8,9 +8,9 @@ import (
 
 func TestGEDCOMLine(t *testing.T) {
 	GEDCOMLine := tf.Function(t, gedcom.GEDCOMLine)
-	nameNode := gedcom.NewNameNode(nil, "Joe /Bloggs/", "", []gedcom.Node{
-		gedcom.NewDateNode(nil, "3 Sep 1943", "", nil),
-	})
+	nameNode := gedcom.NewNameNode("Joe /Bloggs/",
+		gedcom.NewDateNode("3 Sep 1943"),
+	)
 
 	GEDCOMLine(nil, 0).Returns("")
 
@@ -23,9 +23,9 @@ func TestGEDCOMLine(t *testing.T) {
 
 func TestGEDCOMString(t *testing.T) {
 	GEDCOMString := tf.Function(t, gedcom.GEDCOMString)
-	nameNode := gedcom.NewNameNode(nil, "Joe /Bloggs/", "", []gedcom.Node{
-		gedcom.NewDateNode(nil, "3 Sep 1943", "", nil),
-	})
+	nameNode := gedcom.NewNameNode("Joe /Bloggs/",
+		gedcom.NewDateNode("3 Sep 1943"),
+	)
 
 	GEDCOMString(nil, 0).Returns("")
 

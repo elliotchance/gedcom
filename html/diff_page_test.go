@@ -9,51 +9,29 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var (
-	elliot = individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907")
-	john   = individual("P2", "John /Smith/", "4 Jan 1803", "17 Mar 1877")
-	jane   = individual("P3", "Jane /Doe/", "3 Mar 1803", "14 June 1877")
-)
-
-func individual(pointer, fullName, birth, death string) *gedcom.IndividualNode {
-	nodes := []gedcom.Node{}
+func individual(doc *gedcom.Document, pointer, fullName, birth, death string) *gedcom.IndividualNode {
+	individual := doc.AddIndividual(pointer)
 
 	if fullName != "" {
-		nodes = append(nodes, name(fullName))
+		individual.AddNode(gedcom.NewNameNode(fullName))
 	}
 
 	if birth != "" {
-		nodes = append(nodes, born(birth))
+		individual.AddNode(gedcom.NewBirthNode("", gedcom.NewDateNode(birth)))
 	}
 
 	if death != "" {
-		nodes = append(nodes, died(death))
+		individual.AddNode(gedcom.NewDeathNode("", gedcom.NewDateNode(death)))
 	}
 
-	return gedcom.NewIndividualNode(nil, "", pointer, nodes)
-}
-
-func name(value string) gedcom.Node {
-	return gedcom.NewNameNode(nil, value, "", nil)
-}
-
-func born(value string) *gedcom.BirthNode {
-	return gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
-		gedcom.NewDateNode(nil, value, "", []gedcom.Node{}),
-	})
-}
-
-func died(value string) gedcom.Node {
-	return gedcom.NewNodeWithChildren(nil, gedcom.TagDeath, "", "", []gedcom.Node{
-		gedcom.NewDateNode(nil, value, "", []gedcom.Node{}),
-	})
+	return individual
 }
 
 func TestDiffPage_WriteTo(t *testing.T) {
 	doc := gedcom.NewDocument()
-	jane.SetDocument(doc)
-	elliot.SetDocument(doc)
-	john.SetDocument(doc)
+	elliot := individual(doc, "P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907")
+	john := individual(doc, "P2", "John /Smith/", "4 Jan 1803", "17 Mar 1877")
+	jane := individual(doc, "P3", "Jane /Doe/", "3 Mar 1803", "14 June 1877")
 
 	comparisons := gedcom.IndividualComparisons{
 		gedcom.NewIndividualComparison(jane, jane, gedcom.NewSurroundingSimilarity(0.5, 1.0, 1.0, 1.0)),

@@ -6,9 +6,9 @@ type ResidenceNode struct {
 }
 
 // NewResidenceNode creates a new RESI node.
-func NewResidenceNode(document *Document, value, pointer string, children []Node) *ResidenceNode {
+func NewResidenceNode(value string, children ...Node) *ResidenceNode {
 	return &ResidenceNode{
-		newSimpleNode(document, TagResidence, value, pointer, children),
+		newSimpleNode(TagResidence, value, "", children...),
 	}
 }
 

@@ -9,8 +9,8 @@ type LongitudeNode struct {
 }
 
 // NewLongitudeNode creates a new LONG node.
-func NewLongitudeNode(document *Document, value, pointer string, children []Node) *LongitudeNode {
+func NewLongitudeNode(value string, children ...Node) *LongitudeNode {
 	return &LongitudeNode{
-		newSimpleNode(document, TagLongitude, value, pointer, children),
+		newSimpleNode(TagLongitude, value, "", children...),
 	}
 }

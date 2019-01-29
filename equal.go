@@ -65,7 +65,7 @@ func DeepEqual(left, right Node) bool {
 // equal amount of duplicates.
 //
 // See DeepEqual for semantics on how nodes are compared.
-func DeepEqualNodes(left, right []Node) bool {
+func DeepEqualNodes(left, right Nodes) bool {
 	leftLen := len(left)
 	rightLen := len(right)
 
