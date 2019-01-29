@@ -3,13 +3,12 @@ package html
 import (
 	"bytes"
 	"github.com/elliotchance/gedcom"
-	"github.com/elliotchance/gedcom/util"
 	"io"
 )
 
 type IndividualCompare struct {
 	comparison     *gedcom.IndividualComparison
-	filterFlags    *util.FilterFlags
+	filterFlags    *gedcom.FilterFlags
 	progress       chan gedcom.Progress
 	compareOptions *gedcom.IndividualNodesCompareOptions
 	visibility     LivingVisibility
@@ -17,7 +16,7 @@ type IndividualCompare struct {
 	cacheErr       error
 }
 
-func NewIndividualCompare(comparison *gedcom.IndividualComparison, filterFlags *util.FilterFlags, progress chan gedcom.Progress, compareOptions *gedcom.IndividualNodesCompareOptions, visibility LivingVisibility) *IndividualCompare {
+func NewIndividualCompare(comparison *gedcom.IndividualComparison, filterFlags *gedcom.FilterFlags, progress chan gedcom.Progress, compareOptions *gedcom.IndividualNodesCompareOptions, visibility LivingVisibility) *IndividualCompare {
 	return &IndividualCompare{
 		comparison:     comparison,
 		filterFlags:    filterFlags,

@@ -2,6 +2,7 @@ package gedcom
 
 import (
 	"fmt"
+	"github.com/elliotchance/gedcom/util"
 	"sort"
 	"strings"
 	"sync"
@@ -285,7 +286,7 @@ func createPointerJobs(left, right IndividualNodes, options *IndividualNodesComp
 	m := sync.Mutex{}
 	ws := options.ConcurrentJobs()
 
-	workerPool(ws, func(w int) {
+	util.WorkerPool(ws, func(w int) {
 		for leftI := w; leftI < len(left); leftI += ws {
 			a := left[leftI]
 
@@ -332,26 +333,13 @@ func adjustTotal(m *sync.Mutex, totals chan int64, leftLen int64, rightLen int64
 	m.Unlock()
 }
 
-func workerPool(ws int, fn func(int)) {
-	wg := sync.WaitGroup{}
-	for w := 0; w < ws; w++ {
-		wg.Add(1)
-		go func(w int) {
-			fn(w)
-			wg.Done()
-		}(w)
-	}
-
-	wg.Wait()
-}
-
 func createUniqueJobs(left, right IndividualNodes, options *IndividualNodesCompareOptions, totals chan int64, jobs chan *IndividualComparison, sentA, sentB *sync.Map) {
 	leftLen := int64(len(left))
 	rightLen := int64(len(right))
 	m := sync.Mutex{}
 	ws := options.ConcurrentJobs()
 
-	workerPool(ws, func(w int) {
+	util.WorkerPool(ws, func(w int) {
 		for leftI := w; leftI < len(left); leftI += ws {
 			a := left[leftI]
 			bs := right.ByUniqueIdentifiers(a.UniqueIdentifiers())
@@ -382,7 +370,7 @@ func createJobs(totals chan int64, left, right IndividualNodes, options *Individ
 	// Because the jobs are so small I've found that using a buffered channel
 	// can make the processing up to 30% faster on my 4 cores. I'm not sure what
 	// the best number for this should be, or if it could be dynamic.
-	jobs := make(chan *IndividualComparison, 10)
+	jobs := make(chan *IndividualComparison, 1000)
 
 	// Before we send of the matrix of comparisons we should attempt to find (if
 	// any) the matching pointers.
@@ -444,30 +432,22 @@ func createJobs(totals chan int64, left, right IndividualNodes, options *Individ
 	return jobs
 }
 
-func (o *IndividualNodesCompareOptions) processJobs(jobs chan *IndividualComparison) chan *IndividualComparison {
+func (o *IndividualNodesCompareOptions) processJobs(jobs chan *IndividualComparison, options *IndividualNodesCompareOptions) chan *IndividualComparison {
 	// See description in createJobs().
-	results := make(chan *IndividualComparison, 10)
+	results := make(chan *IndividualComparison, 1000)
 
 	go func() {
-		wg := sync.WaitGroup{}
-
-		for i := 0; i < 1; i++ {
-			wg.Add(1)
-			go func() {
-				for j := range jobs {
-					// The similarity may already be calculated from when it was
-					// comparing on the pointer.
-					if j.Similarity == nil {
-						j.Similarity = j.Left.SurroundingSimilarity(j.Right, o.SimilarityOptions, false)
-					}
-					results <- j
+		util.WorkerPool(options.ConcurrentJobs(), func(i int) {
+			for j := range jobs {
+				// The similarity may already be calculated from when it was
+				// comparing on the pointer.
+				if j.Similarity == nil {
+					j.Similarity = j.Left.SurroundingSimilarity(j.Right, o.SimilarityOptions, false)
 				}
+				results <- j
+			}
+		})
 
-				wg.Done()
-			}()
-		}
-
-		wg.Wait()
 		close(results)
 	}()
 
@@ -476,7 +456,7 @@ func (o *IndividualNodesCompareOptions) processJobs(jobs chan *IndividualCompari
 
 func (o *IndividualNodesCompareOptions) collectResults(results chan *IndividualComparison, totals chan int64) chan *IndividualComparison {
 	// See description in createJobs().
-	similarities := make(chan *IndividualComparison, 10)
+	similarities := make(chan *IndividualComparison, 1000)
 
 	go func() {
 		total := int64(0)
@@ -531,7 +511,7 @@ func (o *IndividualNodesCompareOptions) collectResults(results chan *IndividualC
 
 func (o *IndividualNodesCompareOptions) calculateWinners(a, b IndividualNodes, similarityResults chan *IndividualComparison, options SimilarityOptions) chan *IndividualComparison {
 	// See description in createJobs().
-	winners := make(chan *IndividualComparison, 10)
+	winners := make(chan *IndividualComparison, 1000)
 
 	go func() {
 		similarities := IndividualComparisons{}
@@ -635,7 +615,7 @@ func (nodes IndividualNodes) Compare(other IndividualNodes, options *IndividualN
 
 	totals := options.getTotals(nodes, other)
 	jobs := createJobs(totals, nodes, other, options)
-	results := options.processJobs(jobs)
+	results := options.processJobs(jobs, options)
 	similarities := options.collectResults(results, totals)
 	winners := options.calculateWinners(nodes, other, similarities, options.SimilarityOptions)
 
