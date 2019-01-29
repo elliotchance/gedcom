@@ -378,6 +378,26 @@ var dateTests = map[string]struct {
 		gedcom.Date{8, time.March, 1505, true, gedcom.DateConstraintAbout}, parseTime("8 Mar 1505 23"),
 		"Abt. 8 Mar 1505",
 	},
+	"ca. 8 Mar 1505": {
+		gedcom.Date{8, time.March, 1505, false, gedcom.DateConstraintAbout}, parseTime("8 Mar 1505 00"),
+		gedcom.Date{8, time.March, 1505, true, gedcom.DateConstraintAbout}, parseTime("8 Mar 1505 23"),
+		"Abt. 8 Mar 1505",
+	},
+	"CA 8 Mar 1505": {
+		gedcom.Date{8, time.March, 1505, false, gedcom.DateConstraintAbout}, parseTime("8 Mar 1505 00"),
+		gedcom.Date{8, time.March, 1505, true, gedcom.DateConstraintAbout}, parseTime("8 Mar 1505 23"),
+		"Abt. 8 Mar 1505",
+	},
+	"cca. 8 Mar 1505": {
+		gedcom.Date{8, time.March, 1505, false, gedcom.DateConstraintAbout}, parseTime("8 Mar 1505 00"),
+		gedcom.Date{8, time.March, 1505, true, gedcom.DateConstraintAbout}, parseTime("8 Mar 1505 23"),
+		"Abt. 8 Mar 1505",
+	},
+	"Cca 8 Mar 1505": {
+		gedcom.Date{8, time.March, 1505, false, gedcom.DateConstraintAbout}, parseTime("8 Mar 1505 00"),
+		gedcom.Date{8, time.March, 1505, true, gedcom.DateConstraintAbout}, parseTime("8 Mar 1505 23"),
+		"Abt. 8 Mar 1505",
+	},
 	"circa 21 Dec 1884": {
 		gedcom.Date{21, time.December, 1884, false, gedcom.DateConstraintAbout}, parseTime("21 Dec 1884 00"),
 		gedcom.Date{21, time.December, 1884, true, gedcom.DateConstraintAbout}, parseTime("21 Dec 1884 23"),
