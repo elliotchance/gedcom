@@ -1,10 +1,10 @@
 package gedcom_test
 
 import (
-	"testing"
 	"github.com/elliotchance/gedcom"
 	"github.com/stretchr/testify/assert"
 	"sort"
+	"testing"
 )
 
 func TestNewStringSet(t *testing.T) {
