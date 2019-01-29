@@ -211,35 +211,6 @@ func (nodes IndividualNodes) Similarity(other IndividualNodes, options Similarit
 	return total / nodesLen
 }
 
-// IndividualComparison is the result of two compared individuals.
-type IndividualComparison struct {
-	// Left or Right may be nil, but never both.
-	Left, Right *IndividualNode
-
-	// Similarity will only contain a usable value if Left and Right are not
-	// nil. Otherwise, Similarity may contain any unexpected value.
-	Similarity *SurroundingSimilarity
-}
-
-// IndividualComparisons is a slice of IndividualComparison instances.
-type IndividualComparisons []*IndividualComparison
-
-// String returns each comparison string on its own like, like:
-//
-//   John Smith <-> John H Smith (0.833333)
-//   Jane Doe <-> (none) (?)
-//   (none) <-> Joe Bloggs (?)
-//
-func (comparisons IndividualComparisons) String() string {
-	lines := []string{}
-
-	for _, comparison := range comparisons {
-		lines = append(lines, comparison.String())
-	}
-
-	return strings.Join(lines, "\n")
-}
-
 // IndividualNodesCompareOptions provides more optional attributes for
 // IndividualNodes.Compare.
 //
@@ -308,6 +279,105 @@ func (o *IndividualNodesCompareOptions) ConcurrentJobs() int {
 	return maxInt(o.Jobs, 1)
 }
 
+func createPointerJobs(left, right IndividualNodes, options *IndividualNodesCompareOptions, totals chan int64, jobs chan *IndividualComparison, sentA, sentB *sync.Map) {
+	leftLen := int64(len(left))
+	rightLen := int64(len(right))
+	m := sync.Mutex{}
+	ws := options.ConcurrentJobs()
+
+	workerPool(ws, func(w int) {
+		for leftI := w; leftI < len(left); leftI += ws {
+			a := left[leftI]
+
+			// Don't resend individuals already sent.
+			if _, ok := sentA.Load(a.Pointer()); ok {
+				continue
+			}
+
+			b := right.ByPointer(a.Pointer())
+
+			if IsNil(b) {
+				continue
+			}
+
+			// Don't resend individuals already sent.
+			if _, ok := sentB.Load(b.Pointer()); ok {
+				continue
+			}
+
+			ss := a.SurroundingSimilarity(b, options.SimilarityOptions, true)
+			if ss.WeightedSimilarity() >= options.SimilarityOptions.PreferPointerAbove {
+				adjustTotal(&m, totals, leftLen, rightLen)
+
+				jobs <- &IndividualComparison{
+					Left:         a,
+					Right:        b,
+					Similarity:   ss,
+					certainMatch: true,
+				}
+
+				sentA.Store(a.Pointer(), nil)
+				sentB.Store(b.Pointer(), nil)
+			}
+		}
+	})
+}
+
+func adjustTotal(m *sync.Mutex, totals chan int64, leftLen int64, rightLen int64) {
+	// See getTotals(). We need to notify that there will be now less jobs.
+	m.Lock()
+	totals <- -int64(leftLen + rightLen - 2)
+	leftLen--
+	rightLen--
+	m.Unlock()
+}
+
+func workerPool(ws int, fn func(int)) {
+	wg := sync.WaitGroup{}
+	for w := 0; w < ws; w++ {
+		wg.Add(1)
+		go func(w int) {
+			fn(w)
+			wg.Done()
+		}(w)
+	}
+
+	wg.Wait()
+}
+
+func createUniqueJobs(left, right IndividualNodes, options *IndividualNodesCompareOptions, totals chan int64, jobs chan *IndividualComparison, sentA, sentB *sync.Map) {
+	leftLen := int64(len(left))
+	rightLen := int64(len(right))
+	m := sync.Mutex{}
+	ws := options.ConcurrentJobs()
+
+	workerPool(ws, func(w int) {
+		for leftI := w; leftI < len(left); leftI += ws {
+			a := left[leftI]
+			bs := right.ByUniqueIdentifiers(a.UniqueIdentifiers())
+
+			// Ideally we should not get multiple individuals returned. That
+			// would mean that multiple individuals share the same unique
+			// identifier. All we can do in this case is to pick the first
+			// one.
+			if len(bs) > 0 {
+				adjustTotal(&m, totals, leftLen, rightLen)
+				ss := a.SurroundingSimilarity(bs[0], options.SimilarityOptions, true)
+
+				jobs <- &IndividualComparison{
+					Left:         a,
+					Right:        bs[0],
+					Similarity:   ss,
+					certainMatch: true,
+				}
+
+				sentA.Store(a.Pointer(), nil)
+				sentB.Store(bs[0].Pointer(), nil)
+			}
+		}
+	})
+}
+
 func createJobs(totals chan int64, left, right IndividualNodes, options *IndividualNodesCompareOptions) chan *IndividualComparison {
 	// Because the jobs are so small I've found that using a buffered channel
 	// can make the processing up to 30% faster on my 4 cores. I'm not sure what
@@ -337,71 +407,27 @@ func createJobs(totals chan int64, left, right IndividualNodes, options *Individ
 		// This check is important because if the right side is empty we will
 		// not be able to get the Document on the right side to to the
 		// comparison.
-		leftLen := int64(len(left))
-		rightLen := int64(len(right))
 		if len(right) > 0 {
-			m := sync.Mutex{}
-			ws := options.ConcurrentJobs()
+			// Any individuals that share unique identifiers. We want to do this
+			// before the pointer jobs because this provides more absolute
+			// results that are far less likely to be false positives.
+			createUniqueJobs(left, right, options, totals, jobs, sentA, sentB)
 
-			wg := sync.WaitGroup{}
-			for w := 0; w < ws; w++ {
-				wg.Add(1)
-				go func(w int) {
-					for leftI := w; leftI < len(left); leftI += ws {
-						a := left[leftI]
-						bs := right.ByUniqueIdentifiers(a.UniqueIdentifiers())
-
-						// It's totally fine for multiple identifiers to match
-						// multiple individuals. One example of this is the
-						// files might share the same I1, I2, ... numbering
-						// scheme. We need to see if any of the matches hit the
-						// threshold.
-						for _, b := range bs {
-							ss := a.SurroundingSimilarity(b, options.SimilarityOptions, true)
-							if ss.WeightedSimilarity() >= options.SimilarityOptions.PreferPointerAbove {
-								// See getTotals(). We need to notify that there will
-								// be now less jobs.
-								//
-								// We are removing one individual from both sides, but
-								// the number of comparisons goes down by the sum of
-								// each side?
-								m.Lock()
-								totals <- -int64(leftLen + rightLen - 2)
-								leftLen--
-								rightLen--
-								m.Unlock()
-
-								jobs <- &IndividualComparison{
-									Left:       a,
-									Right:      b,
-									Similarity: ss,
-								}
-
-								sentA.Store(a, nil)
-								sentB.Store(b, nil)
-
-								break
-							}
-						}
-					}
-
-					wg.Done()
-				}(w)
-			}
-
-			wg.Wait()
+			// Any individuals that share the same pointer and are at least the
+			// prefer-pointer-above.
+			createPointerJobs(left, right, options, totals, jobs, sentA, sentB)
 		}
 
 		close(totals)
 
 		// Send the remaining matrix of individuals to be compared.
 		for _, a := range left {
-			if _, ok := sentA.Load(a); ok {
+			if _, ok := sentA.Load(a.Pointer()); ok {
 				continue
 			}
 
 			for _, b := range right {
-				if _, ok := sentB.Load(b); ok {
+				if _, ok := sentB.Load(b.Pointer()); ok {
 					continue
 				}
 
@@ -513,10 +539,8 @@ func (o *IndividualNodesCompareOptions) calculateWinners(a, b IndividualNodes, s
 
 		// We have to collect all items before they can be sorted.
 		for similarity := range similarityResults {
-			// If any of the matches were made through pointers we have to
-			// remove them from the possible winners.
-			if similarity.Left.UniqueIdentifiers().Intersects(similarity.Right.UniqueIdentifiers()) &&
-				similarity.Similarity.WeightedSimilarity() >= options.PreferPointerAbove {
+			// Remove any certain matches from the pool of possible winners.
+			if similarity.certainMatch {
 				winners <- similarity
 				found[similarity.Left] = true
 				found[similarity.Right] = true

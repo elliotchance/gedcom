@@ -526,4 +526,3 @@ func TestRemoveEmptyDeathTagFilter(t *testing.T) {
 		})
 	}
 }
-

@@ -1,10 +1,10 @@
 package gedcom
 
 import (
-	"sync"
+	"fmt"
 	"sort"
 	"strings"
-	"fmt"
+	"sync"
 )
 
 // StringSet represents a slice of strings where all elements are unique (a

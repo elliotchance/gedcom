@@ -1,9 +1,9 @@
 package html
 
 import (
+	"fmt"
 	"github.com/elliotchance/gedcom"
 	"io"
-	"fmt"
 )
 
 type DiffRow struct {

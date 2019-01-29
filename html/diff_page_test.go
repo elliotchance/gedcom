@@ -57,9 +57,9 @@ func TestDiffPage_WriteTo(t *testing.T) {
 	john.SetDocument(doc)
 
 	comparisons := gedcom.IndividualComparisons{
-		{jane, jane, gedcom.NewSurroundingSimilarity(0.5, 1.0, 1.0, 1.0)},
-		{elliot, nil, nil},
-		{nil, john, nil},
+		gedcom.NewIndividualComparison(jane, jane, gedcom.NewSurroundingSimilarity(0.5, 1.0, 1.0, 1.0)),
+		gedcom.NewIndividualComparison(elliot, nil, nil),
+		gedcom.NewIndividualComparison(nil, john, nil),
 	}
 	filterFlags := &util.FilterFlags{}
 	googleAnalyticsID := ""
