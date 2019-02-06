@@ -181,6 +181,27 @@ var tests = map[string]*gedcom.Document{
 	"0 NAME κόσμε": gedcom.NewDocumentWithNodes([]gedcom.Node{
 		gedcom.NewNameNode(nil, "κόσμε", "", nil),
 	}),
+
+	// Non alphanumeric characters are allowed.
+	"0 @R-1577718385@ FAM": gedcom.NewDocumentWithNodes([]gedcom.Node{
+		gedcom.NewFamilyNode(nil, "R-1577718385", nil),
+	}),
+
+	// Crazy long pointer values are also fine.
+	"0 @SomeReallyLongPointerThatShouldProbablyNotBeUsedByWeShouldDemonstrateThatThereIsNoLimitToTheLength@ FAM": gedcom.NewDocumentWithNodes([]gedcom.Node{
+		gedcom.NewFamilyNode(nil, "SomeReallyLongPointerThatShouldProbablyNotBeUsedByWeShouldDemonstrateThatThereIsNoLimitToTheLength", nil),
+	}),
+
+	// Any punctuation is permitted as long as it isn't an "@".
+	"0 @~!-#$%^&*()@ FAM": gedcom.NewDocumentWithNodes([]gedcom.Node{
+		gedcom.NewFamilyNode(nil, "~!-#$%^&*()", nil),
+	}),
+
+	// Make sure we are not using a greedy consume so that "@" can also be in
+	// the value.
+	"0 @uh@ NAME oh@ok": gedcom.NewDocumentWithNodes([]gedcom.Node{
+		gedcom.NewNameNode(nil, "oh@ok", "uh", nil),
+	}),
 }
 
 func TestDecoder_Decode(t *testing.T) {
