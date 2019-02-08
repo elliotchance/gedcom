@@ -109,10 +109,10 @@ func main() {
 
 			printLine("    -")
 			if father := family.Husband(); father != nil {
-				printLine(fmt.Sprintf("      Father: %s", father.Name()))
+				printLine(fmt.Sprintf("      Father: %s", father.Individual().Name()))
 			}
 			if mother := family.Wife(); mother != nil {
-				printLine(fmt.Sprintf("      Mother: %s", mother.Name()))
+				printLine(fmt.Sprintf("      Mother: %s", mother.Individual().Name()))
 			}
 		}
 
@@ -145,12 +145,13 @@ func main() {
 			// Children of the spouse.
 			children := withSpouse.Children()
 			sort.SliceStable(children, func(i, j int) bool {
-				return children[i].Names()[0].String() < children[j].Names()[0].String()
+				return children[i].Individual().Names()[0].String() <
+					children[j].Individual().Names()[0].String()
 			})
 			printLine("      Children:")
 			for _, child := range children {
 				n := "Unknown"
-				if n2 := child.Name(); n2 != nil {
+				if n2 := child.Individual().Name(); n2 != nil {
 					n = n2.String()
 				}
 				printLine(fmt.Sprintf("        - Name: %s", n))

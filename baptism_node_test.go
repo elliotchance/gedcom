@@ -9,15 +9,13 @@ import (
 )
 
 func TestNewBaptismNode(t *testing.T) {
-	doc := gedcom.NewDocument()
-	child := gedcom.NewNameNode(doc, "", "", nil)
-	node := gedcom.NewBaptismNode(doc, "foo", "bar", []gedcom.Node{child})
+	child := gedcom.NewNameNode("")
+	node := gedcom.NewBaptismNode("foo", child)
 
 	assert.Equal(t, gedcom.TagBaptism, node.Tag())
-	assert.Equal(t, []gedcom.Node{child}, node.Nodes())
-	assert.Equal(t, doc, node.Document())
+	assert.Equal(t, gedcom.Nodes{child}, node.Nodes())
 	assert.Equal(t, "foo", node.Value())
-	assert.Equal(t, "bar", node.Pointer())
+	assert.Equal(t, "", node.Pointer())
 }
 
 func TestBaptismNode_Dates(t *testing.T) {
@@ -25,31 +23,31 @@ func TestBaptismNode_Dates(t *testing.T) {
 
 	Dates((*gedcom.BaptismNode)(nil)).Returns([]*gedcom.DateNode(nil))
 
-	Dates(gedcom.NewBaptismNode(nil, "", "", nil)).Returns([]*gedcom.DateNode(nil))
+	Dates(gedcom.NewBaptismNode("")).Returns([]*gedcom.DateNode(nil))
 
-	Dates(gedcom.NewBaptismNode(nil, "", "", []gedcom.Node{})).
+	Dates(gedcom.NewBaptismNode("")).
 		Returns([]*gedcom.DateNode(nil))
 
-	Dates(gedcom.NewBaptismNode(nil, "", "", []gedcom.Node{
-		gedcom.NewDateNode(nil, "3 Sep 2001", "", nil),
-	})).Returns([]*gedcom.DateNode{
-		gedcom.NewDateNode(nil, "3 Sep 2001", "", nil),
+	Dates(gedcom.NewBaptismNode("",
+		gedcom.NewDateNode("3 Sep 2001"),
+	)).Returns([]*gedcom.DateNode{
+		gedcom.NewDateNode("3 Sep 2001"),
 	})
 
-	Dates(gedcom.NewBaptismNode(nil, "", "", []gedcom.Node{
-		gedcom.NewDateNode(nil, "7 Jan 2001", "", nil),
-		gedcom.NewDateNode(nil, "3 Sep 2001", "", nil),
-	})).Returns([]*gedcom.DateNode{
-		gedcom.NewDateNode(nil, "7 Jan 2001", "", nil),
-		gedcom.NewDateNode(nil, "3 Sep 2001", "", nil),
+	Dates(gedcom.NewBaptismNode("",
+		gedcom.NewDateNode("7 Jan 2001"),
+		gedcom.NewDateNode("3 Sep 2001"),
+	)).Returns([]*gedcom.DateNode{
+		gedcom.NewDateNode("7 Jan 2001"),
+		gedcom.NewDateNode("3 Sep 2001"),
 	})
 }
 
 func TestBaptismNode_Equals(t *testing.T) {
 	Equals := tf.Function(t, (*gedcom.BaptismNode).Equals)
 
-	n1 := gedcom.NewBaptismNode(nil, "foo", "", nil)
-	n2 := gedcom.NewBaptismNode(nil, "bar", "", nil)
+	n1 := gedcom.NewBaptismNode("foo")
+	n2 := gedcom.NewBaptismNode("bar")
 
 	// nils
 	Equals((*gedcom.BaptismNode)(nil), (*gedcom.BaptismNode)(nil)).Returns(false)
@@ -57,7 +55,7 @@ func TestBaptismNode_Equals(t *testing.T) {
 	Equals((*gedcom.BaptismNode)(nil), n1).Returns(false)
 
 	// Wrong node type.
-	Equals(n1, gedcom.NewNameNode(nil, "foo", "", nil)).Returns(false)
+	Equals(n1, gedcom.NewNameNode("foo")).Returns(false)
 
 	// All other cases are success.
 	Equals(n1, n1).Returns(true)

@@ -49,12 +49,12 @@ type Document struct {
 	MaxLivingAge float64
 
 	// nodes is private because we need to track changes.
-	nodes []Node
+	nodes Nodes
 
 	// pointerCache is setup once when the document is created.
 	pointerCache sync.Map // map[string]Node
 
-	families []*FamilyNode
+	families FamilyNodes
 }
 
 // String will render the entire GEDCOM document.
@@ -122,7 +122,7 @@ func (doc *Document) NodeByPointer(ptr string) Node {
 }
 
 // Families returns the family entities in the document.
-func (doc *Document) Families() (families []*FamilyNode) {
+func (doc *Document) Families() (families FamilyNodes) {
 	if doc.families != nil {
 		return doc.families
 	}
@@ -131,7 +131,7 @@ func (doc *Document) Families() (families []*FamilyNode) {
 		doc.families = families
 	}()
 
-	families = []*FamilyNode{}
+	families = FamilyNodes{}
 
 	for _, node := range doc.Nodes() {
 		if n, ok := node.(*FamilyNode); ok {
@@ -194,6 +194,12 @@ func (doc *Document) AddNode(node Node) {
 		if pointer != "" {
 			doc.pointerCache.Store(pointer, node)
 		}
+
+		// Clear cache.
+		switch node.Tag() {
+		case TagFamily:
+			doc.families = nil
+		}
 	}
 }
 
@@ -202,7 +208,7 @@ func (doc *Document) AddNode(node Node) {
 // It is important that the slice returned is not manually manipulated (such as
 // appending) because it may cause the internal cache to all out of sync. You
 // may manipulate the nodes themselves.
-func (doc *Document) Nodes() []Node {
+func (doc *Document) Nodes() Nodes {
 	return doc.nodes
 }
 
@@ -238,7 +244,7 @@ func NewDocument() *Document {
 }
 
 // NewDocumentWithNodes creates a new document with the provided root nodes.
-func NewDocumentWithNodes(nodes []Node) *Document {
+func NewDocumentWithNodes(nodes Nodes) *Document {
 	document := NewDocument()
 	document.nodes = nodes
 	document.buildPointerCache()
@@ -246,8 +252,8 @@ func NewDocumentWithNodes(nodes []Node) *Document {
 	return document
 }
 
-func (doc *Document) nonIndividuals() []Node {
-	nodes := []Node{}
+func (doc *Document) nonIndividuals() Nodes {
+	nodes := Nodes{}
 
 	for _, node := range doc.Nodes() {
 		if _, ok := node.(*IndividualNode); !ok {
@@ -258,7 +264,7 @@ func (doc *Document) nonIndividuals() []Node {
 	return nodes
 }
 
-func (doc *Document) SetNodes(nodes []Node) {
+func (doc *Document) SetNodes(nodes Nodes) {
 	doc.nodes = nodes
 }
 
@@ -270,10 +276,52 @@ func individuals(doc *Document) IndividualNodes {
 	return doc.Individuals()
 }
 
-func nonIndividuals(doc *Document) []Node {
+func nonIndividuals(doc *Document) Nodes {
 	if doc == nil {
 		return nil
 	}
 
 	return doc.nonIndividuals()
+}
+
+func (doc *Document) AddIndividual(pointer string, children ...Node) *IndividualNode {
+	node := newIndividualNode(doc, pointer, children...)
+	doc.AddNode(node)
+
+	// I know this is a bad option, but it's an easy option. If we add a new
+	// individual we need to reset any cache on the individuals. Rather than
+	// work out which individuals need to be reset we just do them all.
+	for _, individual := range doc.Individuals() {
+		individual.resetCache()
+	}
+
+	return node
+}
+
+func (doc *Document) AddFamily(pointer string) *FamilyNode {
+	node := newFamilyNode(doc, pointer)
+	doc.AddNode(node)
+
+	// I know this is a bad option, but it's an easy option. If we add a new
+	// individual we need to reset any cache on the individuals. Rather than
+	// work out which individuals need to be reset we just do them all.
+	for _, family := range doc.Families() {
+		family.resetCache()
+	}
+
+	return node
+}
+
+func (doc *Document) AddFamilyWithHusbandAndWife(pointer string, husband, wife *IndividualNode) *FamilyNode {
+	familyNode := doc.AddFamily(pointer)
+	familyNode.SetHusband(husband)
+	familyNode.SetWife(wife)
+
+	return familyNode
+}
+
+func (doc *Document) DeleteNode(node Node) (didDelete bool) {
+	doc.nodes, didDelete = doc.nodes.deleteNode(node)
+
+	return
 }

@@ -9,47 +9,42 @@ import (
 )
 
 func TestNewBirthNode(t *testing.T) {
-	doc := gedcom.NewDocument()
-	child := gedcom.NewNameNode(doc, "", "", nil)
-	node := gedcom.NewBirthNode(doc, "foo", "bar", []gedcom.Node{child})
+	child := gedcom.NewNameNode("")
+	node := gedcom.NewBirthNode("foo", child)
 
 	assert.Equal(t, gedcom.TagBirth, node.Tag())
-	assert.Equal(t, []gedcom.Node{child}, node.Nodes())
-	assert.Equal(t, doc, node.Document())
+	assert.Equal(t, gedcom.Nodes{child}, node.Nodes())
 	assert.Equal(t, "foo", node.Value())
-	assert.Equal(t, "bar", node.Pointer())
+	assert.Equal(t, "", node.Pointer())
 }
 
 func TestBirthNode_Dates(t *testing.T) {
-	Dates := tf.Function(t, (*gedcom.BirthNode).Dates)
+	Dates := tf.NamedFunction(t, "BirthNode_Dates", (*gedcom.BirthNode).Dates)
 
 	Dates((*gedcom.BirthNode)(nil)).Returns([]*gedcom.DateNode(nil))
 
-	Dates(gedcom.NewBirthNode(nil, "", "", nil)).Returns([]*gedcom.DateNode(nil))
+	Dates(gedcom.NewBirthNode("")).Returns([]*gedcom.DateNode(nil))
 
-	Dates(gedcom.NewBirthNode(nil, "", "", []gedcom.Node{})).
-		Returns([]*gedcom.DateNode(nil))
-
-	Dates(gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
-		gedcom.NewDateNode(nil, "3 Sep 2001", "", nil),
-	})).Returns([]*gedcom.DateNode{
-		gedcom.NewDateNode(nil, "3 Sep 2001", "", nil),
+	Dates(gedcom.NewBirthNode("",
+		gedcom.NewDateNode("3 Sep 2001"),
+	)).Returns([]*gedcom.DateNode{
+		gedcom.NewDateNode("3 Sep 2001"),
 	})
 
-	Dates(gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
-		gedcom.NewDateNode(nil, "7 Jan 2001", "", nil),
-		gedcom.NewDateNode(nil, "3 Sep 2001", "", nil),
-	})).Returns([]*gedcom.DateNode{
-		gedcom.NewDateNode(nil, "7 Jan 2001", "", nil),
-		gedcom.NewDateNode(nil, "3 Sep 2001", "", nil),
+	Dates(gedcom.NewBirthNode("",
+		gedcom.NewDateNode("7 Jan 2001"),
+		gedcom.NewDateNode("3 Sep 2001"),
+	)).Returns([]*gedcom.DateNode{
+		gedcom.NewDateNode("7 Jan 2001"),
+		gedcom.NewDateNode("3 Sep 2001"),
 	})
 }
 
 func TestBirthNode_Equals(t *testing.T) {
 	Equals := tf.Function(t, (*gedcom.BirthNode).Equals)
 
-	n1 := gedcom.NewBirthNode(nil, "foo", "", nil)
-	n2 := gedcom.NewBirthNode(nil, "bar", "", nil)
+	n1 := gedcom.NewBirthNode("foo")
+	n2 := gedcom.NewBirthNode("bar")
 
 	// nils
 	Equals((*gedcom.BirthNode)(nil), (*gedcom.BirthNode)(nil)).Returns(false)
@@ -57,7 +52,7 @@ func TestBirthNode_Equals(t *testing.T) {
 	Equals((*gedcom.BirthNode)(nil), n1).Returns(false)
 
 	// Wrong node type.
-	Equals(n1, gedcom.NewNameNode(nil, "foo", "", nil)).Returns(false)
+	Equals(n1, gedcom.NewNameNode("foo")).Returns(false)
 
 	// All other cases are success.
 	Equals(n1, n1).Returns(true)

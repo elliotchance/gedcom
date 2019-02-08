@@ -6,9 +6,9 @@ type DeathNode struct {
 }
 
 // NewDeathNode creates a new DEAT node.
-func NewDeathNode(document *Document, value, pointer string, children []Node) *DeathNode {
+func NewDeathNode(value string, children ...Node) *DeathNode {
 	return &DeathNode{
-		newSimpleNode(document, TagDeath, value, pointer, children),
+		newSimpleNode(TagDeath, value, "", children...),
 	}
 }
 

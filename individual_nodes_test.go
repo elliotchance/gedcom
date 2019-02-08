@@ -13,11 +13,11 @@ import (
 var (
 	// John and Jane share the same pointer on purpose. They will be used for
 	// pointer comparisons.
-	elliot = individual("P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907")
-	john   = individual("P2", "John /Smith/", "4 Jan 1803", "17 Mar 1877")
-	jane   = individual("P2", "Jane /Doe/", "3 Mar 1803", "14 June 1877")
-	bob    = individual("P4", "Bob /Jones/", "1749", "1810")
-	harry  = individual("P5", "Harry /Gold/", "1889", "1936")
+	elliot = individual(gedcom.NewDocument(), "P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907")
+	john   = individual(gedcom.NewDocument(), "P2", "John /Smith/", "4 Jan 1803", "17 Mar 1877")
+	jane   = individual(gedcom.NewDocument(), "P2", "Jane /Doe/", "3 Mar 1803", "14 June 1877")
+	bob    = individual(gedcom.NewDocument(), "P4", "Bob /Jones/", "1749", "1810")
+	harry  = individual(gedcom.NewDocument(), "P5", "Harry /Gold/", "1889", "1936")
 )
 
 var individualNodesTests = map[string]struct {
@@ -37,7 +37,7 @@ var individualNodesTests = map[string]struct {
 		WantCompare:               gedcom.IndividualComparisons{},
 	},
 	"Doc2Empty": {
-		Doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot}),
+		Doc1: gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot}),
 		Doc2: gedcom.NewDocument(),
 		MinimumWeightedSimilarity: 0.0,
 		PreferPointerAbove:        1.0,
@@ -50,7 +50,7 @@ var individualNodesTests = map[string]struct {
 	},
 	"Doc1Empty": {
 		Doc1: gedcom.NewDocument(),
-		Doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot}),
+		Doc2: gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot}),
 		MinimumWeightedSimilarity: 0.0,
 		PreferPointerAbove:        1.0,
 		WantCompare: gedcom.IndividualComparisons{
@@ -61,8 +61,8 @@ var individualNodesTests = map[string]struct {
 		},
 	},
 	"SameIndividualInBothDocuments": {
-		Doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot}),
-		Doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot}),
+		Doc1: gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot}),
+		Doc2: gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot}),
 		MinimumWeightedSimilarity: 0.0,
 		PreferPointerAbove:        1.0,
 		WantCompare: gedcom.IndividualComparisons{
@@ -73,8 +73,8 @@ var individualNodesTests = map[string]struct {
 		},
 	},
 	"SameIndividualsInDifferentOrder": {
-		Doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot, john, jane}),
-		Doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{jane, elliot, john}),
+		Doc1: gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot, john, jane}),
+		Doc2: gedcom.NewDocumentWithNodes(gedcom.Nodes{jane, elliot, john}),
 		MinimumWeightedSimilarity: 0.0,
 		PreferPointerAbove:        1.0,
 		WantCompare: gedcom.IndividualComparisons{
@@ -89,8 +89,8 @@ var individualNodesTests = map[string]struct {
 		},
 	},
 	"ZeroMinimumSimilarity": {
-		Doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot, jane}),
-		Doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{jane, john}),
+		Doc1: gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot, jane}),
+		Doc2: gedcom.NewDocumentWithNodes(gedcom.Nodes{jane, john}),
 		MinimumWeightedSimilarity: 0.0,
 		PreferPointerAbove:        1.0,
 		WantCompare: gedcom.IndividualComparisons{
@@ -101,23 +101,23 @@ var individualNodesTests = map[string]struct {
 		},
 		WantMerge: gedcom.IndividualNodes{
 			jane,
-			gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
-				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
-					gedcom.NewDateNode(nil, "4 Jan 1803", "", nil), // john
-					gedcom.NewDateNode(nil, "4 Jan 1843", "", nil), // elliot
-				}),
-				gedcom.NewDeathNode(nil, "", "", []gedcom.Node{
-					gedcom.NewDateNode(nil, "17 Mar 1877", "", nil), // john
-					gedcom.NewDateNode(nil, "17 Mar 1907", "", nil), // elliot
-				}),
-				gedcom.NewNameNode(nil, "John /Smith/", "", nil),
-			}),
+			gedcom.NewDocument().AddIndividual("P1",
+				gedcom.NewNameNode("Elliot /Chance/"),
+				gedcom.NewBirthNode("",
+					gedcom.NewDateNode("4 Jan 1803"), // john
+					gedcom.NewDateNode("4 Jan 1843"), // elliot
+				),
+				gedcom.NewDeathNode("",
+					gedcom.NewDateNode("17 Mar 1877"), // john
+					gedcom.NewDateNode("17 Mar 1907"), // elliot
+				),
+				gedcom.NewNameNode("John /Smith/"),
+			),
 		},
 	},
 	"OneMatch": {
-		Doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot, jane}),
-		Doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{jane, john}),
+		Doc1: gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot, jane}),
+		Doc2: gedcom.NewDocumentWithNodes(gedcom.Nodes{jane, john}),
 		MinimumWeightedSimilarity: 0.75,
 		PreferPointerAbove:        1.0,
 		WantCompare: gedcom.IndividualComparisons{
@@ -132,8 +132,8 @@ var individualNodesTests = map[string]struct {
 		},
 	},
 	"NoMatches": {
-		Doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot, jane}),
-		Doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{bob, john}),
+		Doc1: gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot, jane}),
+		Doc2: gedcom.NewDocumentWithNodes(gedcom.Nodes{bob, john}),
 		MinimumWeightedSimilarity: 0.9,
 		PreferPointerAbove:        1.0,
 		WantCompare: gedcom.IndividualComparisons{
@@ -152,8 +152,8 @@ var individualNodesTests = map[string]struct {
 	"AlwaysUsePointer": {
 		// John and Jane are both P2. Even though they are completely different
 		// we force pointers to match with a prefer value of 0.0.
-		Doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{elliot, jane}),
-		Doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{bob, john}),
+		Doc1: gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot, jane}),
+		Doc2: gedcom.NewDocumentWithNodes(gedcom.Nodes{bob, john}),
 		MinimumWeightedSimilarity: 0.9,
 		PreferPointerAbove:        0.0,
 		WantCompare: gedcom.IndividualComparisons{
@@ -162,18 +162,18 @@ var individualNodesTests = map[string]struct {
 			gedcom.NewIndividualComparison(nil, bob, nil),
 		},
 		WantMerge: gedcom.IndividualNodes{
-			gedcom.NewIndividualNode(nil, "", "P2", []gedcom.Node{
-				gedcom.NewNameNode(nil, "Jane /Doe/", "", nil),
-				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
-					gedcom.NewDateNode(nil, "4 Jan 1803", "", nil), // john
-					gedcom.NewDateNode(nil, "3 Mar 1803", "", nil), // jane
-				}),
-				gedcom.NewDeathNode(nil, "", "", []gedcom.Node{
-					gedcom.NewDateNode(nil, "17 Mar 1877", "", nil),  // john
-					gedcom.NewDateNode(nil, "14 June 1877", "", nil), // jane
-				}),
-				gedcom.NewNameNode(nil, "John /Smith/", "", nil),
-			}),
+			gedcom.NewDocument().AddIndividual("P2",
+				gedcom.NewNameNode("Jane /Doe/"),
+				gedcom.NewBirthNode("",
+					gedcom.NewDateNode("4 Jan 1803"), // john
+					gedcom.NewDateNode("3 Mar 1803"), // jane
+				),
+				gedcom.NewDeathNode("",
+					gedcom.NewDateNode("17 Mar 1877"),  // john
+					gedcom.NewDateNode("14 June 1877"), // jane
+				),
+				gedcom.NewNameNode("John /Smith/"),
+			),
 			elliot,
 			bob,
 		},
@@ -181,13 +181,13 @@ var individualNodesTests = map[string]struct {
 	"AlwaysUseUID1": {
 		// Harry and John will always match because of the shared unique
 		// identifier.
-		Doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{
+		Doc1: gedcom.NewDocumentWithNodes(gedcom.Nodes{
 			elliot,
-			setUID(individual("P5", "Harry /Gold/", "1889", "1936"), "EE13561DDB204985BFFDEEBF82A5226C"),
+			setUID(individual(gedcom.NewDocument(), "P5", "Harry /Gold/", "1889", "1936"), "EE13561DDB204985BFFDEEBF82A5226C"),
 		}),
-		Doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{
+		Doc2: gedcom.NewDocumentWithNodes(gedcom.Nodes{
 			bob,
-			setUID(individual("P2", "John /Smith/", "4 Jan 1803", "17 Mar 1877"), "EE13561DDB204985BFFDEEBF82A5226C5B2E"),
+			setUID(individual(gedcom.NewDocument(), "P2", "John /Smith/", "4 Jan 1803", "17 Mar 1877"), "EE13561DDB204985BFFDEEBF82A5226C5B2E"),
 		}),
 		MinimumWeightedSimilarity: 0.9,
 		PreferPointerAbove:        0.0,
@@ -197,19 +197,19 @@ var individualNodesTests = map[string]struct {
 			gedcom.NewIndividualComparison(nil, bob, nil),
 		},
 		WantMerge: gedcom.IndividualNodes{
-			gedcom.NewIndividualNode(nil, "", "P5", []gedcom.Node{ // P5 = harry
-				gedcom.NewNameNode(nil, "Harry /Gold/", "", nil),
-				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
-					gedcom.NewDateNode(nil, "4 Jan 1803", "", nil), // john
-					gedcom.NewDateNode(nil, "1889", "", nil),       // harry
-				}),
-				gedcom.NewDeathNode(nil, "", "", []gedcom.Node{
-					gedcom.NewDateNode(nil, "17 Mar 1877", "", nil), // john
-					gedcom.NewDateNode(nil, "1936", "", nil),        // harry
-				}),
-				gedcom.NewUniqueIDNode(nil, "EE13561DDB204985BFFDEEBF82A5226C", "", nil),
-				gedcom.NewNameNode(nil, "John /Smith/", "", nil),
-			}),
+			gedcom.NewDocument().AddIndividual("P5", // P5 = harry
+				gedcom.NewNameNode("Harry /Gold/"),
+				gedcom.NewBirthNode("",
+					gedcom.NewDateNode("4 Jan 1803"), // john
+					gedcom.NewDateNode("1889"),       // harry
+				),
+				gedcom.NewDeathNode("",
+					gedcom.NewDateNode("17 Mar 1877"), // john
+					gedcom.NewDateNode("1936"),        // harry
+				),
+				gedcom.NewUniqueIDNode("EE13561DDB204985BFFDEEBF82A5226C"),
+				gedcom.NewNameNode("John /Smith/"),
+			),
 			elliot,
 			bob,
 		},
@@ -217,13 +217,13 @@ var individualNodesTests = map[string]struct {
 	"AlwaysUseUID2": {
 		// This is the same as above, but we use the opposite PreferPointerAbove
 		// value to prove that it doesn't affect unique identifier matches.
-		Doc1: gedcom.NewDocumentWithNodes([]gedcom.Node{
+		Doc1: gedcom.NewDocumentWithNodes(gedcom.Nodes{
 			elliot,
-			setUID(individual("P5", "Harry /Gold/", "1889", "1936"), "EE13561DDB204985BFFDEEBF82A5226C"),
+			setUID(individual(gedcom.NewDocument(), "P5", "Harry /Gold/", "1889", "1936"), "EE13561DDB204985BFFDEEBF82A5226C"),
 		}),
-		Doc2: gedcom.NewDocumentWithNodes([]gedcom.Node{
+		Doc2: gedcom.NewDocumentWithNodes(gedcom.Nodes{
 			bob,
-			setUID(individual("P2", "John /Smith/", "4 Jan 1803", "17 Mar 1877"), "EE13561DDB204985BFFDEEBF82A5226C5B2E"),
+			setUID(individual(gedcom.NewDocument(), "P2", "John /Smith/", "4 Jan 1803", "17 Mar 1877"), "EE13561DDB204985BFFDEEBF82A5226C5B2E"),
 		}),
 		MinimumWeightedSimilarity: 0.9,
 		PreferPointerAbove:        1.0,
@@ -233,19 +233,19 @@ var individualNodesTests = map[string]struct {
 			gedcom.NewIndividualComparison(nil, bob, nil),
 		},
 		WantMerge: gedcom.IndividualNodes{
-			gedcom.NewIndividualNode(nil, "", "P5", []gedcom.Node{ // P5 = harry
-				gedcom.NewNameNode(nil, "Harry /Gold/", "", nil),
-				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
-					gedcom.NewDateNode(nil, "4 Jan 1803", "", nil), // john
-					gedcom.NewDateNode(nil, "1889", "", nil),       // harry
-				}),
-				gedcom.NewDeathNode(nil, "", "", []gedcom.Node{
-					gedcom.NewDateNode(nil, "17 Mar 1877", "", nil), // john
-					gedcom.NewDateNode(nil, "1936", "", nil),        // harry
-				}),
-				gedcom.NewUniqueIDNode(nil, "EE13561DDB204985BFFDEEBF82A5226C", "", nil),
-				gedcom.NewNameNode(nil, "John /Smith/", "", nil),
-			}),
+			gedcom.NewDocument().AddIndividual("P5", // P5 = harry
+				gedcom.NewNameNode("Harry /Gold/"),
+				gedcom.NewBirthNode("",
+					gedcom.NewDateNode("4 Jan 1803"), // john
+					gedcom.NewDateNode("1889"),       // harry
+				),
+				gedcom.NewDeathNode("",
+					gedcom.NewDateNode("17 Mar 1877"), // john
+					gedcom.NewDateNode("1936"),        // harry
+				),
+				gedcom.NewUniqueIDNode("EE13561DDB204985BFFDEEBF82A5226C"),
+				gedcom.NewNameNode("John /Smith/"),
+			),
 			elliot,
 			bob,
 		},
@@ -268,46 +268,46 @@ func TestIndividualNodes_Similarity(t *testing.T) {
 		},
 		{
 			a: gedcom.IndividualNodes{
-				gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-					name("John /Smith/"),
-					born("4 Jan 1843"),
-					died("17 Mar 1907"),
-				}),
+				gedcom.NewDocument().AddIndividual("P1",
+					gedcom.NewNameNode("John /Smith/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("4 Jan 1843")),
+					gedcom.NewDeathNode("", gedcom.NewDateNode("17 Mar 1907")),
+				),
 			},
 			b: gedcom.IndividualNodes{
-				gedcom.NewIndividualNode(nil, "", "P2", []gedcom.Node{
-					name("John /Smith/"),
-					born("4 Jan 1843"),
-					died("17 Mar 1907"),
-				}),
+				gedcom.NewDocument().AddIndividual("P2",
+					gedcom.NewNameNode("John /Smith/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("4 Jan 1843")),
+					gedcom.NewDeathNode("", gedcom.NewDateNode("17 Mar 1907")),
+				),
 			},
 			minSimilarity: gedcom.DefaultMinimumSimilarity,
 			expected:      1.0,
 		},
 		{
 			a: gedcom.IndividualNodes{
-				gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-					name("John /Smith/"),
-					born("4 Jan 1843"),
-					died("17 Mar 1907"),
-				}),
-				gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-					name("Jane /Doe/"),
-					born("Sep 1843"),
-					died("Apr 1907"),
-				}),
+				gedcom.NewDocument().AddIndividual("P1",
+					gedcom.NewNameNode("John /Smith/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("4 Jan 1843")),
+					gedcom.NewDeathNode("", gedcom.NewDateNode("17 Mar 1907")),
+				),
+				gedcom.NewDocument().AddIndividual("P1",
+					gedcom.NewNameNode("Jane /Doe/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("Sep 1843")),
+					gedcom.NewDeathNode("", gedcom.NewDateNode("Apr 1907")),
+				),
 			},
 			b: gedcom.IndividualNodes{
-				gedcom.NewIndividualNode(nil, "", "P2", []gedcom.Node{
-					name("John /Smith/"),
-					born("4 Jan 1843"),
-					died("17 Mar 1907"),
-				}),
-				gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-					name("Jane /DOE/"),
-					born("Sep 1843"),
-					died("Apr 1907"),
-				}),
+				gedcom.NewDocument().AddIndividual("P2",
+					gedcom.NewNameNode("John /Smith/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("4 Jan 1843")),
+					gedcom.NewDeathNode("", gedcom.NewDateNode("17 Mar 1907")),
+				),
+				gedcom.NewDocument().AddIndividual("P1",
+					gedcom.NewNameNode("Jane /DOE/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("Sep 1843")),
+					gedcom.NewDeathNode("", gedcom.NewDateNode("Apr 1907")),
+				),
 			},
 			minSimilarity: gedcom.DefaultMinimumSimilarity,
 			expected:      1.0,
@@ -318,30 +318,30 @@ func TestIndividualNodes_Similarity(t *testing.T) {
 		// similarities. See the docs for explanation.
 		{
 			a: gedcom.IndividualNodes{
-				gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-					name("John /Smith/"),
-					died("Apr 1907"),
-				}),
+				gedcom.NewDocument().AddIndividual("P1",
+					gedcom.NewNameNode("John /Smith/"),
+					gedcom.NewDeathNode("", gedcom.NewDateNode("Apr 1907")),
+				),
 			},
 			b: gedcom.IndividualNodes{
-				gedcom.NewIndividualNode(nil, "", "P2", []gedcom.Node{
-					name("John /Smith/"),
-					died("Apr 1907"),
-				}),
+				gedcom.NewDocument().AddIndividual("P2",
+					gedcom.NewNameNode("John /Smith/"),
+					gedcom.NewDeathNode("", gedcom.NewDateNode("Apr 1907")),
+				),
 			},
 			minSimilarity: gedcom.DefaultMinimumSimilarity,
 			expected:      0.875,
 		},
 		{
 			a: gedcom.IndividualNodes{
-				gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-					name("John /Smith/"),
-				}),
+				gedcom.NewDocument().AddIndividual("P1",
+					gedcom.NewNameNode("John /Smith/"),
+				),
 			},
 			b: gedcom.IndividualNodes{
-				gedcom.NewIndividualNode(nil, "", "P2", []gedcom.Node{
-					name("John /Smith/"),
-				}),
+				gedcom.NewDocument().AddIndividual("P2",
+					gedcom.NewNameNode("John /Smith/"),
+				),
 			},
 			minSimilarity: gedcom.DefaultMinimumSimilarity,
 			expected:      0.75,
@@ -350,34 +350,34 @@ func TestIndividualNodes_Similarity(t *testing.T) {
 		// Similar matches but the same sized slice on both sides.
 		{
 			a: gedcom.IndividualNodes{
-				gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-					name("John /Smith/"),
-					born("4 Jan 1843"),
-					died("17 Mar 1907"),
-				}),
-				gedcom.NewIndividualNode(nil, "", "P2", []gedcom.Node{
-					name("Jane /Doe/"),
-					born("Sep 1845"),
-				}),
-				gedcom.NewIndividualNode(nil, "", "P3", []gedcom.Node{
-					name("Bob /Jones/"),
-					buried("1927"),
-				}),
+				gedcom.NewDocument().AddIndividual("P1",
+					gedcom.NewNameNode("John /Smith/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("4 Jan 1843")),
+					gedcom.NewDeathNode("", gedcom.NewDateNode("17 Mar 1907")),
+				),
+				gedcom.NewDocument().AddIndividual("P2",
+					gedcom.NewNameNode("Jane /Doe/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("Sep 1845")),
+				),
+				gedcom.NewDocument().AddIndividual("P3",
+					gedcom.NewNameNode("Bob /Jones/"),
+					gedcom.NewBurialNode("", gedcom.NewDateNode("1927")),
+				),
 			},
 			b: gedcom.IndividualNodes{
-				gedcom.NewIndividualNode(nil, "", "P4", []gedcom.Node{
-					name("John /Smith/"),
-					born("Abt. Jan 1843"),
-					died("1907"),
-				}),
-				gedcom.NewIndividualNode(nil, "", "P5", []gedcom.Node{
-					name("Jane /Doe/"),
-					born("Bef. 1846"),
-				}),
-				gedcom.NewIndividualNode(nil, "", "P6", []gedcom.Node{
-					name("Bob Thomas /Jones/"),
-					buried("1927"),
-				}),
+				gedcom.NewDocument().AddIndividual("P4",
+					gedcom.NewNameNode("John /Smith/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("Abt. Jan 1843")),
+					gedcom.NewDeathNode("", gedcom.NewDateNode("1907")),
+				),
+				gedcom.NewDocument().AddIndividual("P5",
+					gedcom.NewNameNode("Jane /Doe/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("Bef. 1846")),
+				),
+				gedcom.NewDocument().AddIndividual("P6",
+					gedcom.NewNameNode("Bob Thomas /Jones/"),
+					gedcom.NewBurialNode("", gedcom.NewDateNode("1927")),
+				),
 			},
 			minSimilarity: gedcom.DefaultMinimumSimilarity,
 			expected:      0.872532146404072,
@@ -387,60 +387,60 @@ func TestIndividualNodes_Similarity(t *testing.T) {
 		// when different sizes slices are swapped.
 		{
 			a: gedcom.IndividualNodes{
-				gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-					name("John /Smith/"),
-					born("4 Jan 1843"),
-					died("17 Mar 1907"),
-				}),
-				gedcom.NewIndividualNode(nil, "", "P2", []gedcom.Node{
-					name("Jane /Doe/"),
-					born("Sep 1845"),
-				}),
-				gedcom.NewIndividualNode(nil, "", "P3", []gedcom.Node{
-					name("Bob /Jones/"),
-					buried("1927"),
-				}),
+				gedcom.NewDocument().AddIndividual("P1",
+					gedcom.NewNameNode("John /Smith/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("4 Jan 1843")),
+					gedcom.NewDeathNode("", gedcom.NewDateNode("17 Mar 1907")),
+				),
+				gedcom.NewDocument().AddIndividual("P2",
+					gedcom.NewNameNode("Jane /Doe/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("Sep 1845")),
+				),
+				gedcom.NewDocument().AddIndividual("P3",
+					gedcom.NewNameNode("Bob /Jones/"),
+					gedcom.NewBurialNode("", gedcom.NewDateNode("1927")),
+				),
 			},
 			b: gedcom.IndividualNodes{
-				gedcom.NewIndividualNode(nil, "", "P4", []gedcom.Node{
-					name("Jane /Doe/"),
-					born("Between 1845 and 1846"),
-				}),
-				gedcom.NewIndividualNode(nil, "", "P5", []gedcom.Node{
-					name("John /Smith/"),
-					born("Bef. 10 Jan 1843"),
-					died("Abt. 1908"),
-				}),
+				gedcom.NewDocument().AddIndividual("P4",
+					gedcom.NewNameNode("Jane /Doe/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("Between 1845 and 1846")),
+				),
+				gedcom.NewDocument().AddIndividual("P5",
+					gedcom.NewNameNode("John /Smith/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("Bef. 10 Jan 1843")),
+					gedcom.NewDeathNode("", gedcom.NewDateNode("Abt. 1908")),
+				),
 			},
 			minSimilarity: gedcom.DefaultMinimumSimilarity,
 			expected:      0.7754008744441251,
 		},
 		{
 			a: gedcom.IndividualNodes{
-				gedcom.NewIndividualNode(nil, "", "P4", []gedcom.Node{
-					name("Jane /Doe/"),
-					born("Between 1845 and 1846"),
-				}),
-				gedcom.NewIndividualNode(nil, "", "P5", []gedcom.Node{
-					name("John /Smith/"),
-					born("Bef. 10 Jan 1843"),
-					died("Abt. 1908"),
-				}),
+				gedcom.NewDocument().AddIndividual("P4",
+					gedcom.NewNameNode("Jane /Doe/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("Between 1845 and 1846")),
+				),
+				gedcom.NewDocument().AddIndividual("P5",
+					gedcom.NewNameNode("John /Smith/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("Bef. 10 Jan 1843")),
+					gedcom.NewDeathNode("", gedcom.NewDateNode("Abt. 1908")),
+				),
 			},
 			b: gedcom.IndividualNodes{
-				gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-					name("John /Smith/"),
-					born("4 Jan 1843"),
-					died("17 Mar 1907"),
-				}),
-				gedcom.NewIndividualNode(nil, "", "P2", []gedcom.Node{
-					name("Jane /Doe/"),
-					born("Sep 1845"),
-				}),
-				gedcom.NewIndividualNode(nil, "", "P3", []gedcom.Node{
-					name("Bob /Jones/"),
-					buried("1927"),
-				}),
+				gedcom.NewDocument().AddIndividual("P1",
+					gedcom.NewNameNode("John /Smith/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("4 Jan 1843")),
+					gedcom.NewDeathNode("", gedcom.NewDateNode("17 Mar 1907")),
+				),
+				gedcom.NewDocument().AddIndividual("P2",
+					gedcom.NewNameNode("Jane /Doe/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("Sep 1845")),
+				),
+				gedcom.NewDocument().AddIndividual("P3",
+					gedcom.NewNameNode("Bob /Jones/"),
+					gedcom.NewBurialNode("", gedcom.NewDateNode("1927")),
+				),
 			},
 			minSimilarity: gedcom.DefaultMinimumSimilarity,
 			expected:      0.7754008744441251,
@@ -450,38 +450,38 @@ func TestIndividualNodes_Similarity(t *testing.T) {
 		{
 			a: gedcom.IndividualNodes{},
 			b: gedcom.IndividualNodes{
-				gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-					name("John /Smith/"),
-					born("4 Jan 1843"),
-					died("17 Mar 1907"),
-				}),
-				gedcom.NewIndividualNode(nil, "", "P2", []gedcom.Node{
-					name("Jane /Doe/"),
-					born("Sep 1845"),
-				}),
-				gedcom.NewIndividualNode(nil, "", "P3", []gedcom.Node{
-					name("Bob /Jones/"),
-					buried("1927"),
-				}),
+				gedcom.NewDocument().AddIndividual("P1",
+					gedcom.NewNameNode("John /Smith/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("4 Jan 1843")),
+					gedcom.NewDeathNode("", gedcom.NewDateNode("17 Mar 1907")),
+				),
+				gedcom.NewDocument().AddIndividual("P2",
+					gedcom.NewNameNode("Jane /Doe/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("Sep 1845")),
+				),
+				gedcom.NewDocument().AddIndividual("P3",
+					gedcom.NewNameNode("Bob /Jones/"),
+					gedcom.NewBurialNode("", gedcom.NewDateNode("1927")),
+				),
 			},
 			minSimilarity: gedcom.DefaultMinimumSimilarity,
 			expected:      0.5,
 		},
 		{
 			a: gedcom.IndividualNodes{
-				gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-					name("John /Smith/"),
-					born("4 Jan 1843"),
-					died("17 Mar 1907"),
-				}),
-				gedcom.NewIndividualNode(nil, "", "P2", []gedcom.Node{
-					name("Jane /Doe/"),
-					born("Sep 1845"),
-				}),
-				gedcom.NewIndividualNode(nil, "", "P3", []gedcom.Node{
-					name("Bob /Jones/"),
-					buried("1927"),
-				}),
+				gedcom.NewDocument().AddIndividual("P1",
+					gedcom.NewNameNode("John /Smith/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("4 Jan 1843")),
+					gedcom.NewDeathNode("", gedcom.NewDateNode("17 Mar 1907")),
+				),
+				gedcom.NewDocument().AddIndividual("P2",
+					gedcom.NewNameNode("Jane /Doe/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("Sep 1845")),
+				),
+				gedcom.NewDocument().AddIndividual("P3",
+					gedcom.NewNameNode("Bob /Jones/"),
+					gedcom.NewBurialNode("", gedcom.NewDateNode("1927")),
+				),
 			},
 			b:             gedcom.IndividualNodes{},
 			minSimilarity: gedcom.DefaultMinimumSimilarity,
@@ -491,38 +491,38 @@ func TestIndividualNodes_Similarity(t *testing.T) {
 		// These ones are just way off and should not be considered matches.
 		{
 			a: gedcom.IndividualNodes{
-				gedcom.NewIndividualNode(nil, "", "P4", []gedcom.Node{
-					name("Jane /Doe/"),
-					born("Between 1845 and 1846"),
-				}),
+				gedcom.NewDocument().AddIndividual("P4",
+					gedcom.NewNameNode("Jane /Doe/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("Between 1845 and 1846")),
+				),
 			},
 			b: gedcom.IndividualNodes{
-				gedcom.NewIndividualNode(nil, "", "P5", []gedcom.Node{
-					name("John /Smith/"),
-					born("Bef. 10 Jan 1943"),
-					died("Abt. 2008"),
-				}),
+				gedcom.NewDocument().AddIndividual("P5",
+					gedcom.NewNameNode("John /Smith/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("Bef. 10 Jan 1943")),
+					gedcom.NewDeathNode("", gedcom.NewDateNode("Abt. 2008")),
+				),
 			},
 			minSimilarity: gedcom.DefaultMinimumSimilarity,
 			expected:      0.5,
 		},
 		{
 			a: gedcom.IndividualNodes{
-				gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-					name("John /Smith/"),
-					born("4 Jan 1843"),
-					died("17 Mar 1907"),
-				}),
-				gedcom.NewIndividualNode(nil, "", "P2", []gedcom.Node{
-					name("Jane /Doe/"),
-					born("Sep 1845"),
-				}),
+				gedcom.NewDocument().AddIndividual("P1",
+					gedcom.NewNameNode("John /Smith/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("4 Jan 1843")),
+					gedcom.NewDeathNode("", gedcom.NewDateNode("17 Mar 1907")),
+				),
+				gedcom.NewDocument().AddIndividual("P2",
+					gedcom.NewNameNode("Jane /Doe/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("Sep 1845")),
+				),
 			},
 			b: gedcom.IndividualNodes{
-				gedcom.NewIndividualNode(nil, "", "P3", []gedcom.Node{
-					name("Bob /Jones/"),
-					born("1627"),
-				}),
+				gedcom.NewDocument().AddIndividual("P3",
+					gedcom.NewNameNode("Bob /Jones/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("1627")),
+				),
 			},
 			minSimilarity: gedcom.DefaultMinimumSimilarity,
 			expected:      0.5,
@@ -531,42 +531,42 @@ func TestIndividualNodes_Similarity(t *testing.T) {
 		// Different values for minimumSimilarity.
 		{
 			a: gedcom.IndividualNodes{
-				gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-					name("John /Smith/"),
-					born("4 Jan 1843"),
-					died("17 Mar 1907"),
-				}),
-				gedcom.NewIndividualNode(nil, "", "P2", []gedcom.Node{
-					name("Jane /Doe/"),
-					born("Sep 1845"),
-				}),
+				gedcom.NewDocument().AddIndividual("P1",
+					gedcom.NewNameNode("John /Smith/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("4 Jan 1843")),
+					gedcom.NewDeathNode("", gedcom.NewDateNode("17 Mar 1907")),
+				),
+				gedcom.NewDocument().AddIndividual("P2",
+					gedcom.NewNameNode("Jane /Doe/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("Sep 1845")),
+				),
 			},
 			b: gedcom.IndividualNodes{
-				gedcom.NewIndividualNode(nil, "", "P3", []gedcom.Node{
-					name("Bob /Jones/"),
-					born("1627"),
-				}),
+				gedcom.NewDocument().AddIndividual("P3",
+					gedcom.NewNameNode("Bob /Jones/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("1627")),
+				),
 			},
 			minSimilarity: 0.95,
 			expected:      0.5,
 		},
 		{
 			a: gedcom.IndividualNodes{
-				gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-					name("John /Smith/"),
-					born("4 Jan 1843"),
-					died("17 Mar 1907"),
-				}),
-				gedcom.NewIndividualNode(nil, "", "P2", []gedcom.Node{
-					name("Jane /Doe/"),
-					born("Sep 1845"),
-				}),
+				gedcom.NewDocument().AddIndividual("P1",
+					gedcom.NewNameNode("John /Smith/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("4 Jan 1843")),
+					gedcom.NewDeathNode("", gedcom.NewDateNode("17 Mar 1907")),
+				),
+				gedcom.NewDocument().AddIndividual("P2",
+					gedcom.NewNameNode("Jane /Doe/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("Sep 1845")),
+				),
 			},
 			b: gedcom.IndividualNodes{
-				gedcom.NewIndividualNode(nil, "", "P3", []gedcom.Node{
-					name("Bob /Jones/"),
-					born("1627"),
-				}),
+				gedcom.NewDocument().AddIndividual("P3",
+					gedcom.NewNameNode("Bob /Jones/"),
+					gedcom.NewBirthNode("", gedcom.NewDateNode("1627")),
+				),
 			},
 			minSimilarity: 0.0,
 			expected:      0.45708333333333334,
@@ -587,14 +587,6 @@ func TestIndividualNodes_Similarity(t *testing.T) {
 func TestIndividualNodes_Compare(t *testing.T) {
 	for testName, test := range individualNodesTests {
 		t.Run(testName, func(t *testing.T) {
-			for _, n := range test.Doc1.Nodes() {
-				n.SetDocument(test.Doc1)
-			}
-
-			for _, n := range test.Doc2.Nodes() {
-				n.SetDocument(test.Doc2)
-			}
-
 			similarityOptions := gedcom.NewSimilarityOptions()
 			similarityOptions.MinimumWeightedSimilarity = test.MinimumWeightedSimilarity
 			similarityOptions.PreferPointerAbove = test.PreferPointerAbove
@@ -629,6 +621,9 @@ func assertEqual(t *testing.T, expected, actual interface{}) bool {
 		gedcom.SimpleNode{},
 		gedcom.IndividualNode{},
 		gedcom.IndividualComparison{},
+		gedcom.FamilyNode{},
+		gedcom.DateNode{},
+		gedcom.ChildNode{},
 	))
 	if diff != "" {
 		assert.Fail(t, diff)
@@ -646,25 +641,17 @@ func TestNewIndividualNodesCompareOptions(t *testing.T) {
 func TestIndividualNodes_Nodes(t *testing.T) {
 	Nodes := tf.Function(t, gedcom.IndividualNodes.Nodes)
 
-	i1 := individual("P1", "Elliot /Chance/", "", "")
-	i2 := individual("P2", "Joe /Bloggs/", "", "")
+	i1 := individual(gedcom.NewDocument(), "P1", "Elliot /Chance/", "", "")
+	i2 := individual(gedcom.NewDocument(), "P2", "Joe /Bloggs/", "", "")
 
 	Nodes(nil).Returns(nil)
 	Nodes(gedcom.IndividualNodes{}).Returns(nil)
-	Nodes(gedcom.IndividualNodes{i1, i2}).Returns([]gedcom.Node{i1, i2})
+	Nodes(gedcom.IndividualNodes{i1, i2}).Returns(gedcom.Nodes{i1, i2})
 }
 
 func TestIndividualNodes_Merge(t *testing.T) {
 	for testName, test := range individualNodesTests {
 		t.Run(testName, func(t *testing.T) {
-			for _, n := range test.Doc1.Nodes() {
-				n.SetDocument(test.Doc1)
-			}
-
-			for _, n := range test.Doc2.Nodes() {
-				n.SetDocument(test.Doc2)
-			}
-
 			similarityOptions := gedcom.NewSimilarityOptions()
 			similarityOptions.MinimumWeightedSimilarity = test.MinimumWeightedSimilarity
 			similarityOptions.PreferPointerAbove = test.PreferPointerAbove
@@ -687,7 +674,7 @@ func assertIndividualNodes(t *testing.T, expected, actual gedcom.IndividualNodes
 }
 
 func setUID(i *gedcom.IndividualNode, uid string) *gedcom.IndividualNode {
-	i.AddNode(gedcom.NewUniqueIDNode(i.Document(), uid, "", nil))
+	i.AddNode(gedcom.NewUniqueIDNode(uid))
 
 	return i
 }

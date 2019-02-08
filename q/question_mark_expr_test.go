@@ -7,7 +7,11 @@ import (
 )
 
 var documentChoices = []string{
+	".AddFamily",
+	".AddFamilyWithHusbandAndWife",
+	".AddIndividual",
 	".AddNode",
+	".DeleteNode",
 	".Families",
 	".GEDCOMString",
 	".Individuals",

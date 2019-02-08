@@ -15,14 +15,13 @@ func TestEngine_Start(t *testing.T) {
 
 	parser := q.NewParser()
 
-	document := gedcom.NewDocumentWithNodes([]gedcom.Node{
-		gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-			gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
-		}),
-		gedcom.NewIndividualNode(nil, "", "P2", []gedcom.Node{
-			gedcom.NewNameNode(nil, "Dina /Wyche/", "", nil),
-		}),
-	})
+	document := gedcom.NewDocument()
+	document.AddIndividual("P1",
+		gedcom.NewNameNode("Elliot /Chance/"),
+	)
+	document.AddIndividual("P2",
+		gedcom.NewNameNode("Dina /Wyche/"),
+	)
 
 	documents := []*gedcom.Document{document}
 
@@ -32,21 +31,14 @@ func TestEngine_Start(t *testing.T) {
 
 	engine, err = parser.ParseString(".Individuals")
 	if assert.NoError(t, err) {
-		Start(engine, documents).Returns(gedcom.IndividualNodes{
-			gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
-			}),
-			gedcom.NewIndividualNode(nil, "", "P2", []gedcom.Node{
-				gedcom.NewNameNode(nil, "Dina /Wyche/", "", nil),
-			}),
-		}, nil)
+		Start(engine, documents).Returns(document.Individuals(), nil)
 	}
 
 	engine, err = parser.ParseString(".Individuals | .Name")
 	if assert.NoError(t, err) {
 		Start(engine, documents).Returns([]*gedcom.NameNode{
-			gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
-			gedcom.NewNameNode(nil, "Dina /Wyche/", "", nil),
+			gedcom.NewNameNode("Elliot /Chance/"),
+			gedcom.NewNameNode("Dina /Wyche/"),
 		}, nil)
 	}
 
@@ -69,8 +61,8 @@ func TestEngine_Start(t *testing.T) {
 	engine, err = parser.ParseString("Names is .Individuals | .Name; Names")
 	if assert.NoError(t, err) {
 		Start(engine, documents).Returns([]*gedcom.NameNode{
-			gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
-			gedcom.NewNameNode(nil, "Dina /Wyche/", "", nil),
+			gedcom.NewNameNode("Elliot /Chance/"),
+			gedcom.NewNameNode("Dina /Wyche/"),
 		}, nil)
 	}
 
@@ -106,15 +98,15 @@ func TestEngine_Start(t *testing.T) {
 	engine, err = parser.ParseString(".Individuals | .Name | First(1)")
 	if assert.NoError(t, err) {
 		Start(engine, documents).Returns([]*gedcom.NameNode{
-			gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
+			gedcom.NewNameNode("Elliot /Chance/"),
 		}, nil)
 	}
 
 	engine, err = parser.ParseString(".Individuals | .Name | Last(23)")
 	if assert.NoError(t, err) {
 		Start(engine, documents).Returns([]*gedcom.NameNode{
-			gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
-			gedcom.NewNameNode(nil, "Dina /Wyche/", "", nil),
+			gedcom.NewNameNode("Elliot /Chance/"),
+			gedcom.NewNameNode("Dina /Wyche/"),
 		}, nil)
 	}
 
@@ -129,8 +121,8 @@ func TestEngine_Start(t *testing.T) {
 	engine, err = parser.ParseString(".Individuals | { name: .Name }")
 	if assert.NoError(t, err) {
 		Start(engine, documents).Returns([]map[string]interface{}{
-			{"name": gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil)},
-			{"name": gedcom.NewNameNode(nil, "Dina /Wyche/", "", nil)},
+			{"name": gedcom.NewNameNode("Elliot /Chance/")},
+			{"name": gedcom.NewNameNode("Dina /Wyche/")},
 		}, nil)
 	}
 
@@ -138,11 +130,11 @@ func TestEngine_Start(t *testing.T) {
 	if assert.NoError(t, err) {
 		Start(engine, documents).Returns([]map[string]interface{}{
 			{
-				"name": gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
+				"name": gedcom.NewNameNode("Elliot /Chance/"),
 				"age":  gedcom.Age{},
 			},
 			{
-				"name": gedcom.NewNameNode(nil, "Dina /Wyche/", "", nil),
+				"name": gedcom.NewNameNode("Dina /Wyche/"),
 				"age":  gedcom.Age{},
 			},
 		}, nil)

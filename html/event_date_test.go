@@ -12,11 +12,11 @@ func TestEventDate_WriteTo(t *testing.T) {
 	c(html.NewEventDate("foo", gedcom.DateNodes{})).Returns(``)
 
 	c(html.NewEventDate("foo", gedcom.DateNodes{
-		gedcom.NewDateNode(nil, "3 Sep 1945", "", nil),
+		gedcom.NewDateNode("3 Sep 1945"),
 	})).Returns(`<em>foo</em> 3 Sep 1945`)
 
 	c(html.NewEventDate("bar", gedcom.DateNodes{
-		gedcom.NewDateNode(nil, "17 Sep 1945", "", nil),
-		gedcom.NewDateNode(nil, "3 Sep 1945", "", nil),
+		gedcom.NewDateNode("17 Sep 1945"),
+		gedcom.NewDateNode("3 Sep 1945"),
 	})).Returns(`<em>bar</em> 17 Sep 1945`)
 }

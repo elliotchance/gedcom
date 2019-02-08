@@ -163,9 +163,9 @@ type DateNode struct {
 }
 
 // NewDateNode creates a new DATE node.
-func NewDateNode(document *Document, value, pointer string, children []Node) *DateNode {
+func NewDateNode(value string, children ...Node) *DateNode {
 	return &DateNode{
-		newSimpleNode(document, TagDate, value, pointer, children),
+		newSimpleNode(TagDate, value, "", children...),
 		false, Date{}, Date{},
 	}
 }

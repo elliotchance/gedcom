@@ -9,15 +9,13 @@ import (
 )
 
 func TestNewBurialNode(t *testing.T) {
-	doc := gedcom.NewDocument()
-	child := gedcom.NewNameNode(doc, "", "", nil)
-	node := gedcom.NewBurialNode(doc, "foo", "bar", []gedcom.Node{child})
+	child := gedcom.NewNameNode("")
+	node := gedcom.NewBurialNode("foo", child)
 
 	assert.Equal(t, gedcom.TagBurial, node.Tag())
-	assert.Equal(t, []gedcom.Node{child}, node.Nodes())
-	assert.Equal(t, doc, node.Document())
+	assert.Equal(t, gedcom.Nodes{child}, node.Nodes())
 	assert.Equal(t, "foo", node.Value())
-	assert.Equal(t, "bar", node.Pointer())
+	assert.Equal(t, "", node.Pointer())
 }
 
 func TestBurialNode_Dates(t *testing.T) {
@@ -25,31 +23,28 @@ func TestBurialNode_Dates(t *testing.T) {
 
 	Dates((*gedcom.BurialNode)(nil)).Returns([]*gedcom.DateNode(nil))
 
-	Dates(gedcom.NewBurialNode(nil, "", "", nil)).Returns([]*gedcom.DateNode(nil))
+	Dates(gedcom.NewBurialNode("")).Returns([]*gedcom.DateNode(nil))
 
-	Dates(gedcom.NewBurialNode(nil, "", "", []gedcom.Node{})).
-		Returns([]*gedcom.DateNode(nil))
-
-	Dates(gedcom.NewBurialNode(nil, "", "", []gedcom.Node{
-		gedcom.NewDateNode(nil, "3 Sep 2001", "", nil),
-	})).Returns([]*gedcom.DateNode{
-		gedcom.NewDateNode(nil, "3 Sep 2001", "", nil),
+	Dates(gedcom.NewBurialNode("",
+		gedcom.NewDateNode("3 Sep 2001"),
+	)).Returns([]*gedcom.DateNode{
+		gedcom.NewDateNode("3 Sep 2001"),
 	})
 
-	Dates(gedcom.NewBurialNode(nil, "", "", []gedcom.Node{
-		gedcom.NewDateNode(nil, "7 Jan 2001", "", nil),
-		gedcom.NewDateNode(nil, "3 Sep 2001", "", nil),
-	})).Returns([]*gedcom.DateNode{
-		gedcom.NewDateNode(nil, "7 Jan 2001", "", nil),
-		gedcom.NewDateNode(nil, "3 Sep 2001", "", nil),
+	Dates(gedcom.NewBurialNode("",
+		gedcom.NewDateNode("7 Jan 2001"),
+		gedcom.NewDateNode("3 Sep 2001"),
+	)).Returns([]*gedcom.DateNode{
+		gedcom.NewDateNode("7 Jan 2001"),
+		gedcom.NewDateNode("3 Sep 2001"),
 	})
 }
 
 func TestBurialNode_Equals(t *testing.T) {
 	Equals := tf.Function(t, (*gedcom.BurialNode).Equals)
 
-	n1 := gedcom.NewBurialNode(nil, "foo", "", nil)
-	n2 := gedcom.NewBurialNode(nil, "bar", "", nil)
+	n1 := gedcom.NewBurialNode("foo")
+	n2 := gedcom.NewBurialNode("bar")
 
 	// nils
 	Equals((*gedcom.BurialNode)(nil), (*gedcom.BurialNode)(nil)).Returns(false)
@@ -57,7 +52,7 @@ func TestBurialNode_Equals(t *testing.T) {
 	Equals((*gedcom.BurialNode)(nil), n1).Returns(false)
 
 	// Wrong node type.
-	Equals(n1, gedcom.NewNameNode(nil, "foo", "", nil)).Returns(false)
+	Equals(n1, gedcom.NewNameNode("foo")).Returns(false)
 
 	// All other cases are success.
 	Equals(n1, n1).Returns(true)

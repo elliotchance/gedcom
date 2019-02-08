@@ -39,9 +39,9 @@ type UniqueIDNode struct {
 	*SimpleNode
 }
 
-func NewUniqueIDNode(document *Document, value, pointer string, children []Node) *UniqueIDNode {
+func NewUniqueIDNode(value string, children ...Node) *UniqueIDNode {
 	return &UniqueIDNode{
-		newSimpleNode(document, UnofficialTagUniqueID, value, pointer, children),
+		newSimpleNode(UnofficialTagUniqueID, value, "", children...),
 	}
 }
 
@@ -56,7 +56,7 @@ func NewUniqueIDNode(document *Document, value, pointer string, children []Node)
 // GEDCOM tag to carry that identifier. The Universally Unique ID (UUID) is that
 // globally unique identifier, and _UID is the tag that carries it.
 //
-// Microsoft developers known UUID as Globally Unique IDentifier (GUID). What
+// Microsoft developers known UUID as Globally Unique Identifier (GUID). What
 // makes UUIDs so suitable is that they were developed so precisely so that
 // everyone can generate UUIDs, without coordinating with anyone else, and still
 // be practically sure that the generated identifier is unique.

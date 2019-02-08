@@ -7,9 +7,9 @@ type BurialNode struct {
 }
 
 // NewBurialNode creates a new BURI node.
-func NewBurialNode(document *Document, value, pointer string, children []Node) *BurialNode {
+func NewBurialNode(value string, children ...Node) *BurialNode {
 	return &BurialNode{
-		newSimpleNode(document, TagBurial, value, pointer, children),
+		newSimpleNode(TagBurial, value, "", children...),
 	}
 }
 

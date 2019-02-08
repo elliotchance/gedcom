@@ -16,77 +16,77 @@ func TestMergeNodes(t *testing.T) {
 		error                 string
 	}{
 		"1": {
-			left: gedcom.NewBirthNode(doc1, "", "P1", []gedcom.Node{
-				gedcom.NewDateNode(doc1, "3 Sep 1943", "", nil),
-			}),
-			right: gedcom.NewBirthNode(doc2, "", "P2", []gedcom.Node{
-				gedcom.NewDateNode(doc2, "14 Apr 1947", "", nil),
-			}),
-			expected: gedcom.NewBirthNode(doc1, "", "P1", []gedcom.Node{
-				gedcom.NewDateNode(doc1, "3 Sep 1943", "", nil),
-				gedcom.NewDateNode(doc2, "14 Apr 1947", "", nil),
-			}),
+			left: gedcom.NewNode(gedcom.TagBirth, "", "P1",
+				gedcom.NewDateNode("3 Sep 1943"),
+			),
+			right: gedcom.NewNode(gedcom.TagBirth, "", "P2",
+				gedcom.NewDateNode("14 Apr 1947"),
+			),
+			expected: gedcom.NewNode(gedcom.TagBirth, "", "P1",
+				gedcom.NewDateNode("3 Sep 1943"),
+				gedcom.NewDateNode("14 Apr 1947"),
+			),
 		},
 		"2": {
-			left: gedcom.NewBirthNode(doc1, "", "P1", []gedcom.Node{
-				gedcom.NewDateNode(doc1, "3 Sep 1943", "", nil),
-			}),
-			right: gedcom.NewBirthNode(doc1, "", "P1", []gedcom.Node{
-				gedcom.NewDateNode(doc1, "3 Sep 1943", "", nil),
-			}),
-			expected: gedcom.NewBirthNode(doc1, "", "P1", []gedcom.Node{
-				gedcom.NewDateNode(doc1, "3 Sep 1943", "", nil),
-			}),
+			left: gedcom.NewNode(gedcom.TagBirth, "", "P1",
+				gedcom.NewDateNode("3 Sep 1943"),
+			),
+			right: gedcom.NewNode(gedcom.TagBirth, "", "P1",
+				gedcom.NewDateNode("3 Sep 1943"),
+			),
+			expected: gedcom.NewNode(gedcom.TagBirth, "", "P1",
+				gedcom.NewDateNode("3 Sep 1943"),
+			),
 		},
 		"3": {
-			left: gedcom.NewBirthNode(doc1, "", "P1", []gedcom.Node{
-				gedcom.NewDateNode(doc1, "3 Sep 1943", "", nil),
-			}),
-			right: gedcom.NewDateNode(doc1, "3 Sep 1943", "", nil),
+			left: gedcom.NewNode(gedcom.TagBirth, "", "P1",
+				gedcom.NewDateNode("3 Sep 1943"),
+			),
+			right: gedcom.NewDateNode("3 Sep 1943"),
 			error: "cannot merge BIRT and DATE nodes",
 		},
 		"4": {
-			left: gedcom.NewIndividualNode(doc1, "", "P1", []gedcom.Node{
-				gedcom.NewBirthNode(doc1, "", "", []gedcom.Node{
-					gedcom.NewDateNode(doc1, "3 Sep 1943", "", nil),
-				}),
-				gedcom.NewResidenceNode(nil, "", "", []gedcom.Node{
-					gedcom.NewPlaceNode(doc1, "Sydney, Australia", "", nil),
-					gedcom.NewDateNode(doc1, "3 Sep 1943", "", nil),
-				}),
-			}),
-			right: gedcom.NewIndividualNode(doc2, "", "P2", []gedcom.Node{
-				gedcom.NewBirthNode(doc2, "", "", []gedcom.Node{
-					gedcom.NewDateNode(doc2, "14 Apr 1947", "", nil),
-				}),
-				gedcom.NewResidenceNode(nil, "", "", []gedcom.Node{
-					gedcom.NewPlaceNode(doc2, "Queensland, Australia", "", nil),
-				}),
-			}),
-			expected: gedcom.NewIndividualNode(doc1, "", "P1", []gedcom.Node{
-				gedcom.NewBirthNode(doc1, "", "", []gedcom.Node{
-					gedcom.NewDateNode(doc2, "14 Apr 1947", "", nil),
-					gedcom.NewDateNode(doc1, "3 Sep 1943", "", nil),
-				}),
-				gedcom.NewResidenceNode(nil, "", "", []gedcom.Node{
-					gedcom.NewPlaceNode(doc1, "Sydney, Australia", "", nil),
-					gedcom.NewDateNode(doc1, "3 Sep 1943", "", nil),
-				}),
-				gedcom.NewResidenceNode(nil, "", "", []gedcom.Node{
-					gedcom.NewPlaceNode(doc2, "Queensland, Australia", "", nil),
-				}),
-			}),
+			left: doc1.AddIndividual("P1",
+				gedcom.NewBirthNode("",
+					gedcom.NewDateNode("3 Sep 1943"),
+				),
+				gedcom.NewResidenceNode("",
+					gedcom.NewPlaceNode("Sydney, Australia"),
+					gedcom.NewDateNode("3 Sep 1943"),
+				),
+			),
+			right: doc2.AddIndividual("P2",
+				gedcom.NewBirthNode("",
+					gedcom.NewDateNode("14 Apr 1947"),
+				),
+				gedcom.NewResidenceNode("",
+					gedcom.NewPlaceNode("Queensland, Australia"),
+				),
+			),
+			expected: doc1.AddIndividual("P1",
+				gedcom.NewBirthNode("",
+					gedcom.NewDateNode("14 Apr 1947"),
+					gedcom.NewDateNode("3 Sep 1943"),
+				),
+				gedcom.NewResidenceNode("",
+					gedcom.NewPlaceNode("Sydney, Australia"),
+					gedcom.NewDateNode("3 Sep 1943"),
+				),
+				gedcom.NewResidenceNode("",
+					gedcom.NewPlaceNode("Queensland, Australia"),
+				),
+			),
 		},
 		"NilLeft": {
-			right: gedcom.NewBirthNode(doc2, "", "P2", []gedcom.Node{
-				gedcom.NewDateNode(doc2, "14 Apr 1947", "", nil),
-			}),
+			right: gedcom.NewNode(gedcom.TagBirth, "", "P2",
+				gedcom.NewDateNode("14 Apr 1947"),
+			),
 			error: "left is nil",
 		},
 		"NilRight": {
-			left: gedcom.NewBirthNode(doc2, "", "P2", []gedcom.Node{
-				gedcom.NewDateNode(doc2, "14 Apr 1947", "", nil),
-			}),
+			left: gedcom.NewNode(gedcom.TagBirth, "", "P2",
+				gedcom.NewDateNode("14 Apr 1947"),
+			),
 			error: "right is nil",
 		},
 		"NilBoth": {
@@ -98,15 +98,15 @@ func TestMergeNodes(t *testing.T) {
 			expected: elliot,
 		},
 		"EqualNodes": {
-			left: gedcom.NewBirthNode(doc1, "", "P1", []gedcom.Node{
-				gedcom.NewUniqueIDNode(doc1, "EE13561DDB204985BFFDEEBF82A5226C", "", nil),
-			}),
-			right: gedcom.NewBirthNode(doc2, "", "P2", []gedcom.Node{
-				gedcom.NewUniqueIDNode(doc2, "EE13561DDB204985BFFDEEBF82A5226C5B2E", "", nil),
-			}),
-			expected: gedcom.NewBirthNode(doc1, "", "P1", []gedcom.Node{
-				gedcom.NewUniqueIDNode(doc1, "EE13561DDB204985BFFDEEBF82A5226C", "", nil),
-			}),
+			left: gedcom.NewNode(gedcom.TagBirth, "", "P1",
+				gedcom.NewUniqueIDNode("EE13561DDB204985BFFDEEBF82A5226C"),
+			),
+			right: gedcom.NewNode(gedcom.TagBirth, "", "P2",
+				gedcom.NewUniqueIDNode("EE13561DDB204985BFFDEEBF82A5226C5B2E"),
+			),
+			expected: gedcom.NewNode(gedcom.TagBirth, "", "P1",
+				gedcom.NewUniqueIDNode("EE13561DDB204985BFFDEEBF82A5226C"),
+			),
 		},
 	} {
 		t.Run(testName, func(t *testing.T) {
@@ -125,63 +125,60 @@ func TestMergeNodes(t *testing.T) {
 }
 
 func TestMergeNodeSlices(t *testing.T) {
-	doc1 := gedcom.NewDocument()
-	doc2 := gedcom.NewDocument()
-
 	for testName, test := range map[string]struct {
-		left, right, expected []gedcom.Node
+		left, right, expected gedcom.Nodes
 		mergeFn               gedcom.MergeFunction
 	}{
 		"1": {
-			left:  []gedcom.Node{},
-			right: []gedcom.Node{},
+			left:  gedcom.Nodes{},
+			right: gedcom.Nodes{},
 			mergeFn: func(left, right gedcom.Node) gedcom.Node {
 				return nil
 			},
-			expected: []gedcom.Node{},
+			expected: gedcom.Nodes{},
 		},
 		"2": {
-			left: []gedcom.Node{
-				gedcom.NewDateNode(doc1, "3 Sep 1943", "", nil),
+			left: gedcom.Nodes{
+				gedcom.NewDateNode("3 Sep 1943"),
 			},
-			right: []gedcom.Node{
-				gedcom.NewDateNode(doc2, "14 Apr 1947", "", nil),
+			right: gedcom.Nodes{
+				gedcom.NewDateNode("14 Apr 1947"),
 			},
 			mergeFn: func(left, right gedcom.Node) gedcom.Node {
 				return nil
 			},
-			expected: []gedcom.Node{
-				gedcom.NewDateNode(doc1, "3 Sep 1943", "", nil),
-				gedcom.NewDateNode(doc2, "14 Apr 1947", "", nil),
+			expected: gedcom.Nodes{
+				gedcom.NewDateNode("3 Sep 1943"),
+				gedcom.NewDateNode("14 Apr 1947"),
 			},
 		},
 		"3": {
-			left: []gedcom.Node{
-				gedcom.NewDateNode(doc1, "3 Sep 1943", "", nil),
-				gedcom.NewPlaceNode(doc1, "Sydney, Australia", "", nil),
+			left: gedcom.Nodes{
+				gedcom.NewDateNode("3 Sep 1943"),
+				gedcom.NewPlaceNode("Sydney, Australia"),
 			},
-			right: []gedcom.Node{
-				gedcom.NewPlaceNode(doc1, "Queensland, Australia", "", nil),
-				gedcom.NewDateNode(doc2, "14 Apr 1947", "", nil),
+			right: gedcom.Nodes{
+				gedcom.NewPlaceNode("Queensland, Australia"),
+				gedcom.NewDateNode("14 Apr 1947"),
 			},
 			mergeFn: func(left, right gedcom.Node) gedcom.Node {
 				return nil
 			},
-			expected: []gedcom.Node{
-				gedcom.NewDateNode(doc1, "3 Sep 1943", "", nil),
-				gedcom.NewPlaceNode(doc1, "Sydney, Australia", "", nil),
-				gedcom.NewPlaceNode(doc1, "Queensland, Australia", "", nil),
-				gedcom.NewDateNode(doc2, "14 Apr 1947", "", nil),
+			expected: gedcom.Nodes{
+				gedcom.NewDateNode("3 Sep 1943"),
+				gedcom.NewPlaceNode("Sydney, Australia"),
+				gedcom.NewPlaceNode("Queensland, Australia"),
+				gedcom.NewDateNode("14 Apr 1947"),
 			},
 		},
 		"4": {
-			left: []gedcom.Node{
-				gedcom.NewDateNode(doc1, "3 Sep 1943", "", nil),
-				gedcom.NewPlaceNode(doc1, "Sydney, Australia", "", nil),
+			left: gedcom.Nodes{
+				gedcom.NewDateNode("3 Sep 1943"),
+				gedcom.NewPlaceNode("Sydney, Australia"),
 			},
-			right: []gedcom.Node{
-				gedcom.NewPlaceNode(doc1, "Queensland, Australia", "", nil),
-				gedcom.NewDateNode(doc2, "14 Apr 1947", "", nil),
+			right: gedcom.Nodes{
+				gedcom.NewPlaceNode("Queensland, Australia"),
+				gedcom.NewDateNode("14 Apr 1947"),
 			},
 			mergeFn: func(left, right gedcom.Node) gedcom.Node {
 				if left.Tag().Is(right.Tag()) {
@@ -190,63 +187,63 @@ func TestMergeNodeSlices(t *testing.T) {
 
 				return nil
 			},
-			expected: []gedcom.Node{
-				gedcom.NewDateNode(doc2, "3 Sep 1943", "", nil),
-				gedcom.NewPlaceNode(doc1, "Sydney, Australia", "", nil),
+			expected: gedcom.Nodes{
+				gedcom.NewDateNode("3 Sep 1943"),
+				gedcom.NewPlaceNode("Sydney, Australia"),
 			},
 		},
 		"5": {
 			// This test is to make sure the nodes from the right are not merged
 			// more than into either a left node or a node already placed from
 			// the right.
-			left: []gedcom.Node{
-				gedcom.NewDateNode(doc1, "3 Sep 1943", "", nil),
+			left: gedcom.Nodes{
+				gedcom.NewDateNode("3 Sep 1943"),
 			},
-			right: []gedcom.Node{
-				gedcom.NewDateNode(doc2, "14 Apr 1947", "", nil),
-				gedcom.NewDateNode(doc2, "15 Apr 1947", "", nil),
-				gedcom.NewDateNode(doc2, "16 Apr 1947", "", nil),
+			right: gedcom.Nodes{
+				gedcom.NewDateNode("14 Apr 1947"),
+				gedcom.NewDateNode("15 Apr 1947"),
+				gedcom.NewDateNode("16 Apr 1947"),
 			},
 			mergeFn: func(left, right gedcom.Node) gedcom.Node {
 				// Always consider it a merge.
 				return left.ShallowCopy()
 			},
-			expected: []gedcom.Node{
+			expected: gedcom.Nodes{
 				// 14 Apr 1947 was merged into 3 Sep 1943. The rest would be
 				// appended.
-				gedcom.NewDateNode(doc2, "3 Sep 1943", "", nil),
-				gedcom.NewDateNode(doc2, "15 Apr 1947", "", nil),
-				gedcom.NewDateNode(doc2, "16 Apr 1947", "", nil),
+				gedcom.NewDateNode("3 Sep 1943"),
+				gedcom.NewDateNode("15 Apr 1947"),
+				gedcom.NewDateNode("16 Apr 1947"),
 			},
 		},
 		"LeftNil": {
-			right: []gedcom.Node{
-				gedcom.NewDateNode(doc2, "14 Apr 1947", "", nil),
-				gedcom.NewDateNode(doc2, "15 Apr 1947", "", nil),
-				gedcom.NewDateNode(doc2, "16 Apr 1947", "", nil),
+			right: gedcom.Nodes{
+				gedcom.NewDateNode("14 Apr 1947"),
+				gedcom.NewDateNode("15 Apr 1947"),
+				gedcom.NewDateNode("16 Apr 1947"),
 			},
 			mergeFn: func(left, right gedcom.Node) gedcom.Node {
 				return nil
 			},
-			expected: []gedcom.Node{
-				gedcom.NewDateNode(doc2, "14 Apr 1947", "", nil),
-				gedcom.NewDateNode(doc2, "15 Apr 1947", "", nil),
-				gedcom.NewDateNode(doc2, "16 Apr 1947", "", nil),
+			expected: gedcom.Nodes{
+				gedcom.NewDateNode("14 Apr 1947"),
+				gedcom.NewDateNode("15 Apr 1947"),
+				gedcom.NewDateNode("16 Apr 1947"),
 			},
 		},
 		"RightNil": {
-			left: []gedcom.Node{
-				gedcom.NewDateNode(doc2, "14 Apr 1947", "", nil),
-				gedcom.NewDateNode(doc2, "15 Apr 1947", "", nil),
-				gedcom.NewDateNode(doc2, "16 Apr 1947", "", nil),
+			left: gedcom.Nodes{
+				gedcom.NewDateNode("14 Apr 1947"),
+				gedcom.NewDateNode("15 Apr 1947"),
+				gedcom.NewDateNode("16 Apr 1947"),
 			},
 			mergeFn: func(left, right gedcom.Node) gedcom.Node {
 				return nil
 			},
-			expected: []gedcom.Node{
-				gedcom.NewDateNode(doc2, "14 Apr 1947", "", nil),
-				gedcom.NewDateNode(doc2, "15 Apr 1947", "", nil),
-				gedcom.NewDateNode(doc2, "16 Apr 1947", "", nil),
+			expected: gedcom.Nodes{
+				gedcom.NewDateNode("14 Apr 1947"),
+				gedcom.NewDateNode("15 Apr 1947"),
+				gedcom.NewDateNode("16 Apr 1947"),
 			},
 		},
 		"BothNil": {
@@ -297,38 +294,38 @@ var mergeDocumentsTests = map[string]struct {
 		expectedDocAndIndividuals: gedcom.NewDocument(),
 	},
 	"Merge1": {
-		left: gedcom.NewDocumentWithNodes([]gedcom.Node{
-			gedcom.NewDateNode(nil, "3 Sep 1943", "", nil),
-			gedcom.NewPlaceNode(nil, "Sydney, Australia", "", nil),
+		left: gedcom.NewDocumentWithNodes(gedcom.Nodes{
+			gedcom.NewDateNode("3 Sep 1943"),
+			gedcom.NewPlaceNode("Sydney, Australia"),
 		}),
-		right: gedcom.NewDocumentWithNodes([]gedcom.Node{
-			gedcom.NewPlaceNode(nil, "Queensland, Australia", "", nil),
-			gedcom.NewDateNode(nil, "14 Apr 1947", "", nil),
+		right: gedcom.NewDocumentWithNodes(gedcom.Nodes{
+			gedcom.NewPlaceNode("Queensland, Australia"),
+			gedcom.NewDateNode("14 Apr 1947"),
 		}),
 		mergeFn: func(left, right gedcom.Node) gedcom.Node {
 			return nil
 		},
-		expectedDoc: gedcom.NewDocumentWithNodes([]gedcom.Node{
-			gedcom.NewDateNode(nil, "3 Sep 1943", "", nil),
-			gedcom.NewPlaceNode(nil, "Sydney, Australia", "", nil),
-			gedcom.NewPlaceNode(nil, "Queensland, Australia", "", nil),
-			gedcom.NewDateNode(nil, "14 Apr 1947", "", nil),
+		expectedDoc: gedcom.NewDocumentWithNodes(gedcom.Nodes{
+			gedcom.NewDateNode("3 Sep 1943"),
+			gedcom.NewPlaceNode("Sydney, Australia"),
+			gedcom.NewPlaceNode("Queensland, Australia"),
+			gedcom.NewDateNode("14 Apr 1947"),
 		}),
-		expectedDocAndIndividuals: gedcom.NewDocumentWithNodes([]gedcom.Node{
-			gedcom.NewDateNode(nil, "3 Sep 1943", "", nil),
-			gedcom.NewPlaceNode(nil, "Sydney, Australia", "", nil),
-			gedcom.NewPlaceNode(nil, "Queensland, Australia", "", nil),
-			gedcom.NewDateNode(nil, "14 Apr 1947", "", nil),
+		expectedDocAndIndividuals: gedcom.NewDocumentWithNodes(gedcom.Nodes{
+			gedcom.NewDateNode("3 Sep 1943"),
+			gedcom.NewPlaceNode("Sydney, Australia"),
+			gedcom.NewPlaceNode("Queensland, Australia"),
+			gedcom.NewDateNode("14 Apr 1947"),
 		}),
 	},
 	"Merge2": {
-		left: gedcom.NewDocumentWithNodes([]gedcom.Node{
-			gedcom.NewDateNode(nil, "3 Sep 1943", "", nil),
-			gedcom.NewPlaceNode(nil, "Sydney, Australia", "", nil),
+		left: gedcom.NewDocumentWithNodes(gedcom.Nodes{
+			gedcom.NewDateNode("3 Sep 1943"),
+			gedcom.NewPlaceNode("Sydney, Australia"),
 		}),
-		right: gedcom.NewDocumentWithNodes([]gedcom.Node{
-			gedcom.NewPlaceNode(nil, "Queensland, Australia", "", nil),
-			gedcom.NewDateNode(nil, "14 Apr 1947", "", nil),
+		right: gedcom.NewDocumentWithNodes(gedcom.Nodes{
+			gedcom.NewPlaceNode("Queensland, Australia"),
+			gedcom.NewDateNode("14 Apr 1947"),
 		}),
 		mergeFn: func(left, right gedcom.Node) gedcom.Node {
 			if left.Tag().Is(right.Tag()) {
@@ -337,83 +334,83 @@ var mergeDocumentsTests = map[string]struct {
 
 			return nil
 		},
-		expectedDoc: gedcom.NewDocumentWithNodes([]gedcom.Node{
-			gedcom.NewDateNode(nil, "3 Sep 1943", "", nil),
-			gedcom.NewPlaceNode(nil, "Sydney, Australia", "", nil),
+		expectedDoc: gedcom.NewDocumentWithNodes(gedcom.Nodes{
+			gedcom.NewDateNode("3 Sep 1943"),
+			gedcom.NewPlaceNode("Sydney, Australia"),
 		}),
-		expectedDocAndIndividuals: gedcom.NewDocumentWithNodes([]gedcom.Node{
-			gedcom.NewDateNode(nil, "3 Sep 1943", "", nil),
-			gedcom.NewPlaceNode(nil, "Sydney, Australia", "", nil),
+		expectedDocAndIndividuals: gedcom.NewDocumentWithNodes(gedcom.Nodes{
+			gedcom.NewDateNode("3 Sep 1943"),
+			gedcom.NewPlaceNode("Sydney, Australia"),
 		}),
 	},
 	"Merge3": {
-		left: gedcom.NewDocumentWithNodes([]gedcom.Node{
+		left: gedcom.NewDocumentWithNodes(gedcom.Nodes{
 			elliot,
-			gedcom.NewDateNode(nil, "3 Sep 1943", "", nil),
-			gedcom.NewPlaceNode(nil, "Sydney, Australia", "", nil),
+			gedcom.NewDateNode("3 Sep 1943"),
+			gedcom.NewPlaceNode("Sydney, Australia"),
 			jane,
 		}),
-		right: gedcom.NewDocumentWithNodes([]gedcom.Node{
-			gedcom.NewPlaceNode(nil, "Sydney, Australia", "", nil),
+		right: gedcom.NewDocumentWithNodes(gedcom.Nodes{
+			gedcom.NewPlaceNode("Sydney, Australia"),
 			jane,
 			john,
-			gedcom.NewDateNode(nil, "3 Sep 1943", "", nil),
+			gedcom.NewDateNode("3 Sep 1943"),
 		}),
 		mergeFn: gedcom.EqualityMergeFunction,
-		expectedDoc: gedcom.NewDocumentWithNodes([]gedcom.Node{
+		expectedDoc: gedcom.NewDocumentWithNodes(gedcom.Nodes{
 			elliot,
-			gedcom.NewDateNode(nil, "3 Sep 1943", "", nil),
+			gedcom.NewDateNode("3 Sep 1943"),
 			jane,
-			gedcom.NewPlaceNode(nil, "Sydney, Australia", "", nil),
+			gedcom.NewPlaceNode("Sydney, Australia"),
 			john,
 		}),
 		minimumSimilarity: 0.1,
-		expectedDocAndIndividuals: gedcom.NewDocumentWithNodes([]gedcom.Node{
+		expectedDocAndIndividuals: gedcom.NewDocumentWithNodes(gedcom.Nodes{
 			jane,
-			gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewNameNode(nil, "Elliot /Chance/", "", nil),
-				gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
-					gedcom.NewDateNode(nil, "4 Jan 1803", "", nil), // john
-					gedcom.NewDateNode(nil, "4 Jan 1843", "", nil), // elliot
-				}),
-				gedcom.NewDeathNode(nil, "", "", []gedcom.Node{
-					gedcom.NewDateNode(nil, "17 Mar 1877", "", nil), // john
-					gedcom.NewDateNode(nil, "17 Mar 1907", "", nil), // elliot
-				}),
-				gedcom.NewNameNode(nil, "John /Smith/", "", nil),
-			}),
-			gedcom.NewDateNode(nil, "3 Sep 1943", "", nil),
-			gedcom.NewPlaceNode(nil, "Sydney, Australia", "", nil),
+			gedcom.NewDocument().AddIndividual("P1",
+				gedcom.NewNameNode("Elliot /Chance/"),
+				gedcom.NewBirthNode("",
+					gedcom.NewDateNode("4 Jan 1803"), // john
+					gedcom.NewDateNode("4 Jan 1843"), // elliot
+				),
+				gedcom.NewDeathNode("",
+					gedcom.NewDateNode("17 Mar 1877"), // john
+					gedcom.NewDateNode("17 Mar 1907"), // elliot
+				),
+				gedcom.NewNameNode("John /Smith/"),
+			),
+			gedcom.NewDateNode("3 Sep 1943"),
+			gedcom.NewPlaceNode("Sydney, Australia"),
 		}),
 	},
 	"Merge4": {
-		left: gedcom.NewDocumentWithNodes([]gedcom.Node{
+		left: gedcom.NewDocumentWithNodes(gedcom.Nodes{
 			elliot,
-			gedcom.NewDateNode(nil, "3 Sep 1943", "", nil),
-			gedcom.NewPlaceNode(nil, "Sydney, Australia", "", nil),
+			gedcom.NewDateNode("3 Sep 1943"),
+			gedcom.NewPlaceNode("Sydney, Australia"),
 			jane,
 		}),
-		right: gedcom.NewDocumentWithNodes([]gedcom.Node{
-			gedcom.NewPlaceNode(nil, "Sydney, Australia", "", nil),
+		right: gedcom.NewDocumentWithNodes(gedcom.Nodes{
+			gedcom.NewPlaceNode("Sydney, Australia"),
 			jane,
 			john,
-			gedcom.NewDateNode(nil, "3 Sep 1943", "", nil),
+			gedcom.NewDateNode("3 Sep 1943"),
 		}),
 		mergeFn:           gedcom.EqualityMergeFunction,
 		minimumSimilarity: 0.9,
-		expectedDoc: gedcom.NewDocumentWithNodes([]gedcom.Node{
+		expectedDoc: gedcom.NewDocumentWithNodes(gedcom.Nodes{
 			elliot,
-			gedcom.NewDateNode(nil, "3 Sep 1943", "", nil),
+			gedcom.NewDateNode("3 Sep 1943"),
 			jane,
-			gedcom.NewPlaceNode(nil, "Sydney, Australia", "", nil),
+			gedcom.NewPlaceNode("Sydney, Australia"),
 			john,
 		}),
-		expectedDocAndIndividuals: gedcom.NewDocumentWithNodes([]gedcom.Node{
+		expectedDocAndIndividuals: gedcom.NewDocumentWithNodes(gedcom.Nodes{
 			jane,
 			elliot,
 			john,
-			gedcom.NewDateNode(nil, "3 Sep 1943", "", nil),
-			gedcom.NewPlaceNode(nil, "Sydney, Australia", "", nil),
+			gedcom.NewDateNode("3 Sep 1943"),
+			gedcom.NewPlaceNode("Sydney, Australia"),
 		}),
 	},
 }
@@ -447,46 +444,46 @@ func TestIndividualBySurroundingSimilarityMergeFunction(t *testing.T) {
 		similarity float64
 	}{
 		"LeftIsNotIndividual": {
-			left:  gedcom.NewPlaceNode(nil, "Queensland, Australia", "", nil),
-			right: gedcom.NewIndividualNode(nil, "", "", nil),
+			left:  gedcom.NewPlaceNode("Queensland, Australia"),
+			right: gedcom.NewDocument().AddIndividual(""),
 		},
 		"RightIsNotIndividual": {
-			left:  gedcom.NewIndividualNode(nil, "", "", nil),
-			right: gedcom.NewPlaceNode(nil, "Queensland, Australia", "", nil),
+			left:  gedcom.NewDocument().AddIndividual(""),
+			right: gedcom.NewPlaceNode("Queensland, Australia"),
 		},
 		"BothAreNotIndividuals": {
-			left:  gedcom.NewPlaceNode(nil, "Queensland, Australia", "", nil),
-			right: gedcom.NewPlaceNode(nil, "Queensland, Australia", "", nil),
+			left:  gedcom.NewPlaceNode("Queensland, Australia"),
+			right: gedcom.NewPlaceNode("Queensland, Australia"),
 		},
 		"MergeAlmostExact": {
-			left: gedcom.NewIndividualNode(doc, "", "", []gedcom.Node{
-				gedcom.NewNameNode(doc, "Elliot /Chance/", "", nil),
-				gedcom.NewBirthNode(doc, "", "", []gedcom.Node{
-					gedcom.NewDateNode(doc, "3 Sep 1943", "", nil),
-				}),
-			}),
-			right: gedcom.NewIndividualNode(doc, "", "", []gedcom.Node{
-				gedcom.NewNameNode(doc, "Elliot /Chance/", "", nil),
-				gedcom.NewBirthNode(doc, "", "", []gedcom.Node{
-					gedcom.NewDateNode(doc, "7 Sep 1943", "", nil),
-				}),
-			}),
+			left: doc.AddIndividual("",
+				gedcom.NewNameNode("Elliot /Chance/"),
+				gedcom.NewBirthNode("",
+					gedcom.NewDateNode("3 Sep 1943"),
+				),
+			),
+			right: doc.AddIndividual("",
+				gedcom.NewNameNode("Elliot /Chance/"),
+				gedcom.NewBirthNode("",
+					gedcom.NewDateNode("7 Sep 1943"),
+				),
+			),
 			similarity: 0.8666640123954465,
-			expected: gedcom.NewIndividualNode(doc, "", "", []gedcom.Node{
-				gedcom.NewNameNode(doc, "Elliot /Chance/", "", nil),
-				gedcom.NewBirthNode(doc, "", "", []gedcom.Node{
-					gedcom.NewDateNode(doc, "3 Sep 1943", "", nil),
-					gedcom.NewDateNode(doc, "7 Sep 1943", "", nil),
-				}),
-			}),
+			expected: doc.AddIndividual("",
+				gedcom.NewNameNode("Elliot /Chance/"),
+				gedcom.NewBirthNode("",
+					gedcom.NewDateNode("3 Sep 1943"),
+					gedcom.NewDateNode("7 Sep 1943"),
+				),
+			),
 		},
 		"MergeNotSimilar": {
-			left: gedcom.NewIndividualNode(doc, "", "", []gedcom.Node{
-				gedcom.NewNameNode(doc, "John /Smith/", "", nil),
-			}),
-			right: gedcom.NewIndividualNode(doc, "", "", []gedcom.Node{
-				gedcom.NewNameNode(doc, "Jane /Doe/", "", nil),
-			}),
+			left: doc.AddIndividual("",
+				gedcom.NewNameNode("John /Smith/"),
+			),
+			right: doc.AddIndividual("",
+				gedcom.NewNameNode("Jane /Doe/"),
+			),
 
 			// It would be 0.6253333333333334. However, because its below the
 			// minimum threshold it doesn't bother calculating the real value.
@@ -515,24 +512,10 @@ func TestIndividualBySurroundingSimilarityMergeFunction(t *testing.T) {
 }
 
 func TestMergeDocumentsAndIndividuals(t *testing.T) {
-	doc := gedcom.NewDocument()
-
 	for testName, test := range mergeDocumentsTests {
 		t.Run(testName, func(t *testing.T) {
 			beforeLeft := test.left.String()
 			beforeRight := test.right.String()
-
-			if test.left != nil {
-				for _, n := range test.left.Nodes() {
-					n.SetDocument(doc)
-				}
-			}
-
-			if test.right != nil {
-				for _, n := range test.right.Nodes() {
-					n.SetDocument(doc)
-				}
-			}
 
 			options := gedcom.NewIndividualNodesCompareOptions()
 			options.SimilarityOptions.MinimumWeightedSimilarity = test.minimumSimilarity

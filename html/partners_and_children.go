@@ -97,7 +97,7 @@ func partnerSection(family *gedcom.FamilyNode, c *PartnersAndChildren, columns [
 	children := []*gedcom.IndividualNode{}
 
 	for _, child := range allChildren {
-		if child.IsLiving() {
+		if child.Individual().IsLiving() {
 			switch c.visibility {
 			case LivingVisibilityHide:
 				continue
@@ -107,7 +107,7 @@ func partnerSection(family *gedcom.FamilyNode, c *PartnersAndChildren, columns [
 			}
 		}
 
-		children = append(children, child)
+		children = append(children, child.Individual())
 	}
 
 	numberOfChildren := len(children)

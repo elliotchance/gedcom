@@ -8,9 +8,9 @@ import (
 
 // IndividualNode represents a person.
 type IndividualNode struct {
-	*SimpleNode
+	*simpleDocumentNode
 	cachedFamilies, cachedSpouses bool
-	families                      []*FamilyNode
+	families                      FamilyNodes
 	spouses                       []*IndividualNode
 	cachedUniqueIDs               *StringSet
 }
@@ -23,11 +23,11 @@ type IndividualNode struct {
 // assigned children. You should not assume that you can also recover the other
 // spouse from one of the keys in this map as the map is valid to be empty or to
 // only contain a nil key.
-type SpouseChildren map[*IndividualNode]IndividualNodes
+type SpouseChildren map[*IndividualNode]ChildNodes
 
-func NewIndividualNode(document *Document, value, pointer string, children []Node) *IndividualNode {
+func newIndividualNode(document *Document, pointer string, children ...Node) *IndividualNode {
 	return &IndividualNode{
-		newSimpleNode(document, TagIndividual, value, pointer, children),
+		newSimpleDocumentNode(document, TagIndividual, "", pointer, children...),
 		false, false, nil, nil, nil,
 	}
 }
@@ -104,11 +104,11 @@ func (node *IndividualNode) Spouses() (spouses IndividualNodes) {
 		}
 
 		if husband.Pointer() == node.Pointer() {
-			spouses = append(spouses, wife)
+			spouses = append(spouses, wife.Individual())
 		}
 
 		if wife.Pointer() == node.Pointer() {
-			spouses = append(spouses, husband)
+			spouses = append(spouses, husband.Individual())
 		}
 	}
 
@@ -118,7 +118,7 @@ func (node *IndividualNode) Spouses() (spouses IndividualNodes) {
 // TODO: needs tests
 //
 // If the node is nil the result will also be nil.
-func (node *IndividualNode) Families() (families []*FamilyNode) {
+func (node *IndividualNode) Families() (families FamilyNodes) {
 	if node == nil {
 		return nil
 	}
@@ -132,10 +132,14 @@ func (node *IndividualNode) Families() (families []*FamilyNode) {
 		node.cachedFamilies = true
 	}()
 
-	families = []*FamilyNode{}
+	families = FamilyNodes{}
 
 	for _, family := range node.document.Families() {
-		if family.HasChild(node) || family.Husband().Is(node) || family.Wife().Is(node) {
+		hasChild := family.HasChild(node)
+		isHusband := family.Husband().IsIndividual(node)
+		isWife := family.Wife().IsIndividual(node)
+
+		if hasChild || isHusband || isWife {
 			families = append(families, family)
 		}
 	}
@@ -168,8 +172,8 @@ func (node *IndividualNode) FamilyWithSpouse(spouse *IndividualNode) *FamilyNode
 	}
 
 	for _, family := range node.document.Families() {
-		a := family.Husband().Is(node) && family.Wife().Is(spouse)
-		b := family.Wife().Is(node) && family.Husband().Is(spouse)
+		a := family.Husband().IsIndividual(node) && family.Wife().IsIndividual(spouse)
+		b := family.Wife().IsIndividual(node) && family.Husband().IsIndividual(spouse)
 
 		if a || b {
 			return family
@@ -188,8 +192,8 @@ func (node *IndividualNode) FamilyWithUnknownSpouse() *FamilyNode {
 	}
 
 	for _, family := range node.document.Families() {
-		a := family.Husband().Is(node) && family.Wife() == nil
-		b := family.Wife().Is(node) && family.Husband() == nil
+		a := family.Husband().IsIndividual(node) && family.Wife() == nil
+		b := family.Wife().IsIndividual(node) && family.Husband() == nil
 
 		if a || b {
 			return family
@@ -261,7 +265,7 @@ func (node *IndividualNode) Births() (nodes []*BirthNode) {
 func (node *IndividualNode) Baptisms() []*BaptismNode {
 	nodes := NodesWithTag(node, TagBaptism)
 
-	return CastNodes(nodes, (*BaptismNode)(nil)).([]*BaptismNode)
+	return nodes.CastTo((*BaptismNode)(nil)).([]*BaptismNode)
 }
 
 // Deaths returns zero or more death events for the individual. It is common for
@@ -272,7 +276,7 @@ func (node *IndividualNode) Baptisms() []*BaptismNode {
 func (node *IndividualNode) Deaths() []*DeathNode {
 	nodes := NodesWithTag(node, TagDeath)
 
-	return CastNodes(nodes, (*DeathNode)(nil)).([]*DeathNode)
+	return nodes.CastTo((*DeathNode)(nil)).([]*DeathNode)
 }
 
 // Burials returns zero or more burial events for the individual.
@@ -281,7 +285,7 @@ func (node *IndividualNode) Deaths() []*DeathNode {
 func (node *IndividualNode) Burials() []*BurialNode {
 	nodes := NodesWithTag(node, TagBurial)
 
-	return CastNodes(nodes, (*BurialNode)(nil)).([]*BurialNode)
+	return nodes.CastTo((*BurialNode)(nil)).([]*BurialNode)
 }
 
 // Parents returns the families for which this individual is a child. There may
@@ -294,12 +298,12 @@ func (node *IndividualNode) Burials() []*BurialNode {
 // GEDCOM file.
 //
 // If the node is nil the result will also be nil.
-func (node *IndividualNode) Parents() []*FamilyNode {
+func (node *IndividualNode) Parents() FamilyNodes {
 	if node == nil {
 		return nil
 	}
 
-	parents := []*FamilyNode{}
+	parents := FamilyNodes{}
 
 	for _, family := range node.Families() {
 		if family.HasChild(node) {
@@ -316,20 +320,26 @@ func (node *IndividualNode) Parents() []*FamilyNode {
 //
 // If the node is nil the result will also be nil.
 func (node *IndividualNode) SpouseChildren() SpouseChildren {
-	spouseChildren := map[*IndividualNode]IndividualNodes{}
+	spouseChildren := SpouseChildren{}
 
 	for _, family := range node.Families() {
 		if !family.HasChild(node) {
 			var spouse *IndividualNode
 
-			if family.Husband().Is(node) {
-				spouse = family.Wife()
-			} else {
-				spouse = family.Husband()
+			switch {
+			case family.Husband().IsIndividual(node):
+				if wife := family.Wife(); wife != nil {
+					spouse = family.Wife().Individual()
+				}
+
+			case family.Wife().IsIndividual(node):
+				if husband := family.Husband(); husband != nil {
+					spouse = husband.Individual()
+				}
 			}
 
 			familyWithSpouse := node.FamilyWithSpouse(spouse)
-			var children IndividualNodes
+			var children ChildNodes
 			if familyWithSpouse != nil {
 				children = familyWithSpouse.Children()
 			}
@@ -350,7 +360,7 @@ func (node *IndividualNode) SpouseChildren() SpouseChildren {
 // are not to be confused with Baptisms().
 //
 // If the node is nil the result will also be nil.
-func (node *IndividualNode) LDSBaptisms() []Node {
+func (node *IndividualNode) LDSBaptisms() Nodes {
 	return NodesWithTag(node, TagLDSBaptism)
 }
 
@@ -646,8 +656,8 @@ func (node *IndividualNode) SurroundingSimilarity(other *IndividualNode, options
 // TODO: Needs tests
 //
 // If the node is nil the result will also be nil.
-func (node *IndividualNode) Children() IndividualNodes {
-	children := IndividualNodes{}
+func (node *IndividualNode) Children() ChildNodes {
+	children := ChildNodes{}
 
 	for _, family := range node.Families() {
 		if !family.HasChild(node) {
@@ -661,7 +671,7 @@ func (node *IndividualNode) Children() IndividualNodes {
 // AllEvents returns zero or more events of any kind for the individual.
 //
 // This is not to be confused with the EventNode.
-func (node *IndividualNode) AllEvents() (nodes []Node) {
+func (node *IndividualNode) AllEvents() (nodes Nodes) {
 	for _, n := range node.Nodes() {
 		if n.Tag().IsEvent() {
 			nodes = append(nodes, n)
@@ -886,4 +896,12 @@ func (node *IndividualNode) UniqueIdentifiers() *StringSet {
 	}
 
 	return node.cachedUniqueIDs
+}
+
+func (node *IndividualNode) resetCache() {
+	node.cachedFamilies = false
+	node.cachedSpouses = false
+	node.families = nil
+	node.spouses = nil
+	node.cachedUniqueIDs = nil
 }

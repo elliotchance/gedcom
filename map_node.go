@@ -9,9 +9,9 @@ type MapNode struct {
 }
 
 // NewMapNode creates a new MAP node.
-func NewMapNode(document *Document, value, pointer string, children []Node) *MapNode {
+func NewMapNode(value string, children ...Node) *MapNode {
 	return &MapNode{
-		newSimpleNode(document, TagMap, value, pointer, children),
+		newSimpleNode(TagMap, value, "", children...),
 	}
 }
 

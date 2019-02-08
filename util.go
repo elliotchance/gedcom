@@ -105,14 +105,14 @@ func Value(node Node) string {
 //
 //   nil
 //   Node
-//   []Node
+//   Nodes
 //
 // If any of the inputs are not one of the above types then a panic is raised.
 //
-// Using nil as a Node or including nil as one of the elements for []Node will
+// Using nil as a Node or including nil as one of the elements for Nodes will
 // be ignored, so you should not receive any nil values in the output.
-func Compound(nodes ...interface{}) []Node {
-	result := []Node{}
+func Compound(nodes ...interface{}) Nodes {
+	result := Nodes{}
 
 	for _, n := range nodes {
 		v := reflect.ValueOf(n)

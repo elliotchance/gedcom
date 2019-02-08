@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func parse(s ...string) []gedcom.Node {
+func parse(s ...string) gedcom.Nodes {
 	doc, err := gedcom.NewDocumentFromString(strings.Join(s, "\n"))
 	if err != nil {
 		panic(err)
@@ -273,8 +273,8 @@ func TestCompareNodes(t *testing.T) {
 
 func TestNodeDiff_IsDeepEqual(t *testing.T) {
 	d := &gedcom.NodeDiff{
-		Left:  parse("0 INDI @P3@")[0],
-		Right: parse("0 INDI @P3@")[0],
+		Left:  parse("0 @P3@ INDI")[0],
+		Right: parse("0 @P3@ INDI")[0],
 		Children: []*gedcom.NodeDiff{
 			{
 				Left:  parse("0 NAME John /Smith/")[0],
@@ -313,7 +313,7 @@ func TestNodeDiff_IsDeepEqual(t *testing.T) {
 	}
 
 	assert.Equal(t, strings.TrimSpace(`
-LR 0 INDI @P3@
+LR 0 @P3@ INDI
 LR 1 NAME John /Smith/
 LR 1 BIRT
 L  2 DATE Abt. Oct 1943
@@ -329,7 +329,7 @@ LR 2 PLAC England
 		nd       *gedcom.NodeDiff
 		expected bool
 	}{
-		{"LR 0 INDI @P3@", d, false},
+		{"LR 0 @P3@ INDI", d, false},
 		{"LR 0 NAME John /Smith/", d.Children[0], true},
 
 		{"LR 0 BIRT", d.Children[1], false},
@@ -354,8 +354,8 @@ LR 2 PLAC England
 
 func TestNodeDiff_Sort(t *testing.T) {
 	d := &gedcom.NodeDiff{
-		Left:  parse("0 INDI @P3@")[0],
-		Right: parse("0 INDI @P3@")[0],
+		Left:  parse("0 @P3@ INDI")[0],
+		Right: parse("0 @P3@ INDI")[0],
 		Children: []*gedcom.NodeDiff{
 			{
 				Left:  parse("0 BURI")[0],
@@ -421,7 +421,7 @@ func TestNodeDiff_Sort(t *testing.T) {
 	}
 
 	assert.Equal(t, strings.TrimSpace(`
-LR 0 INDI @P3@
+LR 0 @P3@ INDI
 LR 1 BURI
 L  2 DATE Abt. 1943
 L  1 NAME John /Smith/
@@ -441,7 +441,7 @@ L  2 DATE Aft. Sep 1920`), d.String())
 	d.Sort()
 
 	assert.Equal(t, strings.TrimSpace(`
-LR 0 INDI @P3@
+LR 0 @P3@ INDI
 L  1 NAME John /Smith/
  R 1 NAME John R /Smith/
 L  1 SEX M
@@ -461,8 +461,8 @@ L  2 DATE Abt. 1943`), d.String())
 
 func TestNodeDiff_LeftNode(t *testing.T) {
 	d := &gedcom.NodeDiff{
-		Left:  parse("0 INDI @P3@")[0],
-		Right: parse("0 INDI @P4@")[0],
+		Left:  parse("0 @P3@ INDI")[0],
+		Right: parse("0 @P4@ INDI")[0],
 		Children: []*gedcom.NodeDiff{
 			{
 				Left: parse("0 BURI")[0],
@@ -479,7 +479,7 @@ func TestNodeDiff_LeftNode(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, `0 INDI @P3@
+	assert.Equal(t, `0 @P3@ INDI
 1 BURI
 2 DATE 1943
 1 NAME John /Smith/
@@ -488,8 +488,8 @@ func TestNodeDiff_LeftNode(t *testing.T) {
 
 func TestNodeDiff_RightNode(t *testing.T) {
 	d := &gedcom.NodeDiff{
-		Left:  parse("0 INDI @P3@")[0],
-		Right: parse("0 INDI @P4@")[0],
+		Left:  parse("0 @P3@ INDI")[0],
+		Right: parse("0 @P4@ INDI")[0],
 		Children: []*gedcom.NodeDiff{
 			{
 				Left: parse("0 BURI")[0],
@@ -507,7 +507,7 @@ func TestNodeDiff_RightNode(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, `0 INDI @P4@
+	assert.Equal(t, `0 @P4@ INDI
 1 BURI
 2 DATE Abt. 1943
 1 NAME John /Smith/

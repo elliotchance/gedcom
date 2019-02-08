@@ -7,17 +7,17 @@ import (
 )
 
 var transformTests = []struct {
-	doc      *gedcom.Document
+	doc      func(*gedcom.Document)
 	expected []interface{}
 }{
 	{
-		doc:      gedcom.NewDocument(),
+		doc:      func(document *gedcom.Document) {},
 		expected: []interface{}{},
 	},
 	{
-		doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
-			gedcom.NewNode(nil, gedcom.TagVersion, "5.5", ""),
-		}),
+		doc: func(document *gedcom.Document) {
+			document.AddNode(gedcom.NewNode(gedcom.TagVersion, "5.5", ""))
+		},
 		expected: []interface{}{
 			map[string]interface{}{
 				"tag": "VERS",
@@ -26,11 +26,11 @@ var transformTests = []struct {
 		},
 	},
 	{
-		doc: gedcom.NewDocumentWithNodes([]gedcom.Node{
-			gedcom.NewIndividualNode(nil, "", "P1", []gedcom.Node{
-				gedcom.NewNameNode(nil, "Joe /Bloggs/", "", []gedcom.Node{}),
-			}),
-		}),
+		doc: func(document *gedcom.Document) {
+			document.AddIndividual("P1",
+				gedcom.NewNameNode("Joe /Bloggs/"),
+			)
+		},
 		expected: []interface{}{
 			map[string]interface{}{
 				"tag": "INDI",
@@ -50,7 +50,9 @@ func TestTransform(t *testing.T) {
 	for _, test := range transformTests {
 		t.Run("", func(t *testing.T) {
 			options := TransformOptions{}
-			assert.Equal(t, Transform(test.doc, options), test.expected)
+			doc := gedcom.NewDocument()
+			test.doc(doc)
+			assert.Equal(t, Transform(doc, options), test.expected)
 		})
 	}
 }

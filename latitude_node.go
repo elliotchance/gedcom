@@ -9,8 +9,8 @@ type LatitudeNode struct {
 }
 
 // NewLatitudeNode creates a new LATI node.
-func NewLatitudeNode(document *Document, value, pointer string, children []Node) *LatitudeNode {
+func NewLatitudeNode(value string, children ...Node) *LatitudeNode {
 	return &LatitudeNode{
-		newSimpleNode(document, TagLatitude, value, pointer, children),
+		newSimpleNode(TagLatitude, value, "", children...),
 	}
 }

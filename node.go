@@ -24,13 +24,10 @@ type Node interface {
 	GEDCOMStringer
 
 	// The node itself.
+	RawSimpleNode() *SimpleNode
 	Tag() Tag
 	Value() string
 	Pointer() string
-
-	// Document.
-	Document() *Document
-	SetDocument(document *Document)
 
 	// Equals performs a shallow comparison between two nodes.
 	//

@@ -14,40 +14,38 @@ var uniqueIDNodeTests = map[string]struct {
 	checksum string
 }{
 	"Empty": {
-		node:     gedcom.NewUniqueIDNode(nil, "", "", nil),
+		node:     gedcom.NewUniqueIDNode(""),
 		uuid:     gedcom.UUID(""),
 		uuidErr:  errors.New("invalid UUID: "),
 		checksum: "",
 	},
 	"UUIDOnly": {
-		node:     gedcom.NewUniqueIDNode(nil, "EE13561DDB204985BFFDEEBF82A5226C", "", nil),
+		node:     gedcom.NewUniqueIDNode("EE13561DDB204985BFFDEEBF82A5226C"),
 		uuid:     gedcom.UUID("ee13561d-db20-4985-bffd-eebf82a5226c"),
 		checksum: "",
 	},
 	"UUIDAndChecksum": {
-		node:     gedcom.NewUniqueIDNode(nil, "EE13561DDB204985BFFDEEBF82A5226C5B2E", "", nil),
+		node:     gedcom.NewUniqueIDNode("EE13561DDB204985BFFDEEBF82A5226C5B2E"),
 		uuid:     gedcom.UUID("ee13561d-db20-4985-bffd-eebf82a5226c"),
 		checksum: "5B2E",
 	},
 	"GUIDOnly": {
-		node:     gedcom.NewUniqueIDNode(nil, "{EE13561D-DB20-4985-BFFD-EEBF82A5226C}", "", nil),
+		node:     gedcom.NewUniqueIDNode("{EE13561D-DB20-4985-BFFD-EEBF82A5226C}"),
 		uuid:     gedcom.UUID("ee13561d-db20-4985-bffd-eebf82a5226c"),
 		checksum: "",
 	},
 }
 
 func TestNewUniqueIDNode(t *testing.T) {
-	doc := gedcom.NewDocument()
-	child := gedcom.NewNameNode(doc, "", "", nil)
-	node := gedcom.NewUniqueIDNode(doc, "foo", "bar", []gedcom.Node{child})
+	child := gedcom.NewNameNode("")
+	node := gedcom.NewUniqueIDNode("foo", child)
 
 	assert.NotNil(t, node)
 	assert.IsType(t, node, (*gedcom.UniqueIDNode)(nil))
 	assert.Equal(t, gedcom.UnofficialTagUniqueID, node.Tag())
-	assert.Equal(t, []gedcom.Node{child}, node.Nodes())
-	assert.Equal(t, doc, node.Document())
+	assert.Equal(t, gedcom.Nodes{child}, node.Nodes())
 	assert.Equal(t, "foo", node.Value())
-	assert.Equal(t, "bar", node.Pointer())
+	assert.Equal(t, "", node.Pointer())
 }
 
 func TestUniqueIDNode_UUID(t *testing.T) {
@@ -79,33 +77,33 @@ func TestUniqueIDNode_Equals(t *testing.T) {
 		expected bool
 	}{
 		"Equal1": {
-			gedcom.NewUniqueIDNode(nil, "EE13561DDB204985BFFDEEBF82A5226C", "", nil),
-			gedcom.NewUniqueIDNode(nil, "EE13561DDB204985BFFDEEBF82A5226C", "", nil),
+			gedcom.NewUniqueIDNode("EE13561DDB204985BFFDEEBF82A5226C"),
+			gedcom.NewUniqueIDNode("EE13561DDB204985BFFDEEBF82A5226C"),
 			true,
 		},
 		"Equal2": {
-			gedcom.NewUniqueIDNode(nil, "EE13561DDB204985BFFDEEBF82A5226C", "", nil),
-			gedcom.NewUniqueIDNode(nil, "EE13561DDB204985BFFDEEBF82A5226C5B2E", "", nil),
+			gedcom.NewUniqueIDNode("EE13561DDB204985BFFDEEBF82A5226C"),
+			gedcom.NewUniqueIDNode("EE13561DDB204985BFFDEEBF82A5226C5B2E"),
 			true,
 		},
 		"Equal3": {
-			gedcom.NewUniqueIDNode(nil, "EE13561DDB204985BFFDEEBF82A5226C5B2E", "", nil),
-			gedcom.NewUniqueIDNode(nil, "EE13561DDB204985BFFDEEBF82A5226C5B2E", "", nil),
+			gedcom.NewUniqueIDNode("EE13561DDB204985BFFDEEBF82A5226C5B2E"),
+			gedcom.NewUniqueIDNode("EE13561DDB204985BFFDEEBF82A5226C5B2E"),
 			true,
 		},
 		"NotEqual1": {
-			gedcom.NewUniqueIDNode(nil, "AE13561DDB204985BFFDEEBF82A5226C", "", nil),
-			gedcom.NewUniqueIDNode(nil, "EE13561DDB204985BFFDEEBF82A5226C", "", nil),
+			gedcom.NewUniqueIDNode("AE13561DDB204985BFFDEEBF82A5226C"),
+			gedcom.NewUniqueIDNode("EE13561DDB204985BFFDEEBF82A5226C"),
 			false,
 		},
 		"NotEqual2": {
-			gedcom.NewUniqueIDNode(nil, "AE13561DDB204985BFFDEEBF82A5226C", "", nil),
-			gedcom.NewUniqueIDNode(nil, "EE13561DDB204985BFFDEEBF82A5226C5B2E", "", nil),
+			gedcom.NewUniqueIDNode("AE13561DDB204985BFFDEEBF82A5226C"),
+			gedcom.NewUniqueIDNode("EE13561DDB204985BFFDEEBF82A5226C5B2E"),
 			false,
 		},
 		"NotEqual3": {
-			gedcom.NewUniqueIDNode(nil, "AE13561DDB204985BFFDEEBF82A5226C5B2E", "", nil),
-			gedcom.NewUniqueIDNode(nil, "EE13561DDB204985BFFDEEBF82A5226C5B2E", "", nil),
+			gedcom.NewUniqueIDNode("AE13561DDB204985BFFDEEBF82A5226C5B2E"),
+			gedcom.NewUniqueIDNode("EE13561DDB204985BFFDEEBF82A5226C5B2E"),
 			false,
 		},
 	} {

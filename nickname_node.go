@@ -7,8 +7,8 @@ type NicknameNode struct {
 }
 
 // NewNicknameNode creates a new NICK node.
-func NewNicknameNode(document *Document, value, pointer string, children []Node) *NicknameNode {
+func NewNicknameNode(value string, children ...Node) *NicknameNode {
 	return &NicknameNode{
-		newSimpleNode(document, TagNickname, value, pointer, children),
+		newSimpleNode(TagNickname, value, "", children...),
 	}
 }

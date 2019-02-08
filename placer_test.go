@@ -9,63 +9,63 @@ import (
 func TestPlaces(t *testing.T) {
 	// ghost:ignore
 	tests := []struct {
-		nodes []gedcom.Node
+		nodes gedcom.Nodes
 		want  []*gedcom.PlaceNode
 	}{
 		{nil, nil},
 		{
-			[]gedcom.Node{
-				gedcom.NewNodeWithChildren(nil, gedcom.TagVersion, "foo", "", nil),
+			gedcom.Nodes{
+				gedcom.NewNode(gedcom.TagVersion, "foo", ""),
 			},
 			nil,
 		},
 		{
-			[]gedcom.Node{
-				gedcom.NewNameNode(nil, "foo bar", "", []gedcom.Node{
-					gedcom.NewPlaceNode(nil, "Australia", "", nil),
-				}),
+			gedcom.Nodes{
+				gedcom.NewNameNode("foo bar",
+					gedcom.NewPlaceNode("Australia"),
+				),
 			},
 			[]*gedcom.PlaceNode{
-				gedcom.NewPlaceNode(nil, "Australia", "", nil),
+				gedcom.NewPlaceNode("Australia"),
 			},
 		},
 		{
-			[]gedcom.Node{
-				gedcom.NewNameNode(nil, "foo bar", "", []gedcom.Node{
-					gedcom.NewPlaceNode(nil, "Australia", "", nil),
-					gedcom.NewPlaceNode(nil, "United States", "", nil),
-				}),
+			gedcom.Nodes{
+				gedcom.NewNameNode("foo bar",
+					gedcom.NewPlaceNode("Australia"),
+					gedcom.NewPlaceNode("United States"),
+				),
 			},
 			[]*gedcom.PlaceNode{
-				gedcom.NewPlaceNode(nil, "Australia", "", nil),
-				gedcom.NewPlaceNode(nil, "United States", "", nil),
+				gedcom.NewPlaceNode("Australia"),
+				gedcom.NewPlaceNode("United States"),
 			},
 		},
 		{
-			[]gedcom.Node{
-				gedcom.NewNameNode(nil, "foo bar", "", []gedcom.Node{
-					gedcom.NewPlaceNode(nil, "Australia", "", nil),
-					gedcom.NewPlaceNode(nil, "United States", "", nil),
-				}),
-				gedcom.NewNameNode(nil, "foo bar", "", []gedcom.Node{
-					gedcom.NewPlaceNode(nil, "England", "", nil),
-				}),
+			gedcom.Nodes{
+				gedcom.NewNameNode("foo bar",
+					gedcom.NewPlaceNode("Australia"),
+					gedcom.NewPlaceNode("United States"),
+				),
+				gedcom.NewNameNode("foo bar",
+					gedcom.NewPlaceNode("England"),
+				),
 			},
 			[]*gedcom.PlaceNode{
-				gedcom.NewPlaceNode(nil, "Australia", "", nil),
-				gedcom.NewPlaceNode(nil, "United States", "", nil),
-				gedcom.NewPlaceNode(nil, "England", "", nil),
+				gedcom.NewPlaceNode("Australia"),
+				gedcom.NewPlaceNode("United States"),
+				gedcom.NewPlaceNode("England"),
 			},
 		},
 		{
-			[]gedcom.Node{
-				gedcom.NewNameNode(nil, "foo bar", "", nil),
-				gedcom.NewNameNode(nil, "foo bar", "", []gedcom.Node{
-					gedcom.NewPlaceNode(nil, "Australia", "", nil),
-				}),
+			gedcom.Nodes{
+				gedcom.NewNameNode("foo bar"),
+				gedcom.NewNameNode("foo bar",
+					gedcom.NewPlaceNode("Australia"),
+				),
 			},
 			[]*gedcom.PlaceNode{
-				gedcom.NewPlaceNode(nil, "Australia", "", nil),
+				gedcom.NewPlaceNode("Australia"),
 			},
 		},
 	}

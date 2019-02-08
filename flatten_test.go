@@ -7,19 +7,19 @@ import (
 )
 
 func TestFlatten(t *testing.T) {
-	dateNode1 := gedcom.NewDateNode(nil, "1851", "", nil)
-	dateNode2 := gedcom.NewDateNode(nil, "1856", "", nil)
-	birthNode := gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+	dateNode1 := gedcom.NewDateNode("1851")
+	dateNode2 := gedcom.NewDateNode("1856")
+	birthNode := gedcom.NewBirthNode("",
 		dateNode1,
-	})
-	deathNode := gedcom.NewBirthNode(nil, "", "", []gedcom.Node{
+	)
+	deathNode := gedcom.NewBirthNode("",
 		dateNode1,
 		dateNode2,
-	})
-	individualNode := gedcom.NewIndividualNode(nil, "", "P221", []gedcom.Node{
+	)
+	individualNode := gedcom.NewDocument().AddIndividual("P221",
 		birthNode,
 		deathNode,
-	})
+	)
 
 	t.Run("Nil", func(t *testing.T) {
 		actual := gedcom.Flatten(nil)

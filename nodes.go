@@ -5,39 +5,22 @@ import (
 	"sync"
 )
 
-// Noder allows an instance to have child nodes.
-type Noder interface {
-	// Nodes returns any child nodes.
-	Nodes() []Node
-
-	// AddNode will add a child to this node.
-	//
-	// There is no restriction on whether a node is not allow to have children
-	// so you can expect that no error can occur.
-	//
-	// AddNode will always append the child at the end, even if there is is an
-	// exact child that already exists. However, the order of node in a GEDCOM
-	// file is almost always irrelevant.
-	AddNode(node Node)
-
-	// SetNodes replaces all of the child nodes.
-	SetNodes(nodes []Node)
-}
+type Nodes []Node
 
 // nodeCache is used by NodesWithTag. Even though the lookup of child tags are
 // fairly inexpensive it happens a lot and its common for the same paths to be
 // looked up many time. Especially when doing larger task like comparing GEDCOM
 // files.
-var nodeCache = &sync.Map{} // map[Node]map[Tag][]Node{}
+var nodeCache = &sync.Map{} // map[Node]map[Tag]Nodes{}
 
 // NodesWithTag returns the zero or more nodes that have a specific GEDCOM tag.
 // If the provided node is nil then an empty slice will always be returned.
 //
 // If the node is nil the result will also be nil.
-func NodesWithTag(node Node, tag Tag) (result []Node) {
+func NodesWithTag(node Node, tag Tag) (result Nodes) {
 	if v1, ok1 := nodeCache.Load(node); ok1 {
 		if v2, ok2 := v1.(*sync.Map).Load(tag); ok2 {
-			return v2.([]Node)
+			return v2.(Nodes)
 		}
 	}
 
@@ -54,8 +37,9 @@ func NodesWithTag(node Node, tag Tag) (result []Node) {
 		return nil
 	}
 
-	nodes := []Node{}
-	for _, node := range node.Nodes() {
+	nodes := Nodes{}
+	n := node.Nodes()
+	for _, node := range n {
 		if node.Tag().Is(tag) {
 			nodes = append(nodes, node)
 		}
@@ -71,24 +55,24 @@ func NodesWithTag(node Node, tag Tag) (result []Node) {
 //   birthPlaces := NodesWithTagPath(individual, TagBirth, TagPlace)
 //
 // If the node is nil the result will also be nil.
-func NodesWithTagPath(node Node, tagPath ...Tag) []Node {
+func NodesWithTagPath(node Node, tagPath ...Tag) Nodes {
 	if IsNil(node) {
 		return nil
 	}
 
 	if len(tagPath) == 0 {
-		return []Node{}
+		return Nodes{}
 	}
 
 	return nodesWithTagPath(node, tagPath...)
 }
 
-func nodesWithTagPath(node Node, tagPath ...Tag) []Node {
+func nodesWithTagPath(node Node, tagPath ...Tag) Nodes {
 	if len(tagPath) == 0 {
-		return []Node{node}
+		return Nodes{node}
 	}
 
-	matches := []Node{}
+	matches := Nodes{}
 
 	for _, next := range NodesWithTag(node, tagPath[0]) {
 		matches = append(matches, nodesWithTagPath(next, tagPath[1:]...)...)
@@ -117,10 +101,10 @@ func HasNestedNode(node Node, lookingFor Node) bool {
 	return false
 }
 
-// CastNodes creates a slice of a more specific node type.
+// CastTo creates a slice of a more specific node type.
 //
 // All Nodes must be the same type and the same as the provided t.
-func CastNodes(nodes []Node, t interface{}) interface{} {
+func (nodes Nodes) CastTo(t interface{}) interface{} {
 	size := len(nodes)
 	nodeType := reflect.TypeOf(t)
 	sliceType := reflect.SliceOf(nodeType)
@@ -135,16 +119,39 @@ func CastNodes(nodes []Node, t interface{}) interface{} {
 }
 
 func castNodesWithTag(node Node, tag Tag, t interface{}) interface{} {
-	return CastNodes(NodesWithTag(node, tag), t)
+	return NodesWithTag(node, tag).CastTo(t)
 }
 
-// Nodes is the safer alternative to using Nodes() directly on the instance.
+func DeleteNodesWithTag(node Node, tag Tag) {
+	for _, n := range node.Nodes() {
+		if n.Tag().Is(tag) {
+			node.DeleteNode(n)
+		}
+	}
+}
+
+// FlattenAll works as Flatten with multiple inputs that are returned as a
+// single slice.
 //
-// If n is nil then nil will also be returned.
-func Nodes(n Noder) []Node {
-	if IsNil(n) {
-		return nil
+// If any of the nodes are nil they will be ignored.
+func (nodes Nodes) FlattenAll(result Nodes) {
+	for _, node := range nodes {
+		if IsNil(node) {
+			continue
+		}
+
+		result = append(result, Flatten(node)...)
 	}
 
-	return n.Nodes()
+	return
+}
+
+func (nodes Nodes) deleteNode(n Node) (Nodes, bool) {
+	for i, node2 := range nodes {
+		if node2 == n {
+			return append(nodes[:i], nodes[i+2:]...), true
+		}
+	}
+
+	return nodes, false
 }

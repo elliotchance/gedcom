@@ -7,8 +7,8 @@ type FormatNode struct {
 }
 
 // NewFormatNode creates a new FORM node.
-func NewFormatNode(document *Document, value, pointer string, children []Node) *FormatNode {
+func NewFormatNode(value string, children ...Node) *FormatNode {
 	return &FormatNode{
-		newSimpleNode(document, TagFormat, value, pointer, children),
+		newSimpleNode(TagFormat, value, "", children...),
 	}
 }

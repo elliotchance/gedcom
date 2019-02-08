@@ -7,17 +7,15 @@ import (
 )
 
 func TestNewPhoneticVariationNode(t *testing.T) {
-	doc := gedcom.NewDocument()
-	child := gedcom.NewNameNode(doc, "", "", nil)
-	node := gedcom.NewPhoneticVariationNode(doc, "foo", "bar", []gedcom.Node{child})
+	child := gedcom.NewNameNode("")
+	node := gedcom.NewPhoneticVariationNode("foo", child)
 
 	assert.NotNil(t, node)
 	assert.IsType(t, node, (*gedcom.PhoneticVariationNode)(nil))
 	assert.Equal(t, gedcom.TagPhonetic, node.Tag())
-	assert.Equal(t, []gedcom.Node{child}, node.Nodes())
-	assert.Equal(t, doc, node.Document())
+	assert.Equal(t, gedcom.Nodes{child}, node.Nodes())
 	assert.Equal(t, "foo", node.Value())
-	assert.Equal(t, "bar", node.Pointer())
+	assert.Equal(t, "", node.Pointer())
 }
 
 func TestPhoneticVariationNode_Type(t *testing.T) {
@@ -31,32 +29,32 @@ func TestPhoneticVariationNode_Type(t *testing.T) {
 			expected: nil,
 		},
 		{
-			node:     gedcom.NewPhoneticVariationNode(nil, "", "", nil),
+			node:     gedcom.NewPhoneticVariationNode(""),
 			expected: nil,
 		},
 		{
-			node:     gedcom.NewPhoneticVariationNode(nil, "", "", []gedcom.Node{}),
+			node:     gedcom.NewPhoneticVariationNode(""),
 			expected: nil,
 		},
 		{
-			node: gedcom.NewPhoneticVariationNode(nil, "", "", []gedcom.Node{
-				gedcom.NewTypeNode(nil, "", "", []gedcom.Node{}),
-			}),
-			expected: gedcom.NewTypeNode(nil, "", "", []gedcom.Node{}),
+			node: gedcom.NewPhoneticVariationNode("",
+				gedcom.NewTypeNode(""),
+			),
+			expected: gedcom.NewTypeNode(""),
 		},
 		{
-			node: gedcom.NewPhoneticVariationNode(nil, "", "", []gedcom.Node{
-				gedcom.NewNameNode(nil, "", "", []gedcom.Node{}),
-			}),
+			node: gedcom.NewPhoneticVariationNode("",
+				gedcom.NewNameNode(""),
+			),
 			expected: nil,
 		},
 		{
-			node: gedcom.NewPhoneticVariationNode(nil, "", "", []gedcom.Node{
-				gedcom.NewNameNode(nil, "", "", []gedcom.Node{}),
-				gedcom.NewTypeNode(nil, "1", "", []gedcom.Node{}),
-				gedcom.NewTypeNode(nil, "2", "", []gedcom.Node{}),
-			}),
-			expected: gedcom.NewTypeNode(nil, "1", "", []gedcom.Node{}),
+			node: gedcom.NewPhoneticVariationNode("",
+				gedcom.NewNameNode(""),
+				gedcom.NewTypeNode("1"),
+				gedcom.NewTypeNode("2"),
+			),
+			expected: gedcom.NewTypeNode("1"),
 		},
 	}
 

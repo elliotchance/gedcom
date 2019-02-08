@@ -11,7 +11,7 @@ var placesMap map[string]*place
 type place struct {
 	PrettyName string
 	country    string
-	nodes      []gedcom.Node
+	nodes      gedcom.Nodes
 }
 
 func prettyPlaceName(s string) string {
@@ -47,7 +47,7 @@ func GetPlaces(document *gedcom.Document) map[string]*place {
 				placesMap[key] = &place{
 					PrettyName: prettyName,
 					country:    country,
-					nodes:      []gedcom.Node{},
+					nodes:      gedcom.Nodes{},
 				}
 			}
 
@@ -78,8 +78,8 @@ func GetPlaces(document *gedcom.Document) map[string]*place {
 				}
 
 				// Individual name.
-				leftIndividual := individualForNode(left)
-				rightIndividual := individualForNode(right)
+				leftIndividual := individualForNode(document, left)
+				rightIndividual := individualForNode(document, right)
 
 				if leftIndividual != nil && rightIndividual != nil {
 					leftName := gedcom.String(leftIndividual.Name())

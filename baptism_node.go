@@ -8,9 +8,9 @@ type BaptismNode struct {
 }
 
 // NewBaptismNode creates a new BAPM node.
-func NewBaptismNode(document *Document, value, pointer string, children []Node) *BaptismNode {
+func NewBaptismNode(value string, children ...Node) *BaptismNode {
 	return &BaptismNode{
-		newSimpleNode(document, TagBaptism, value, pointer, children),
+		newSimpleNode(TagBaptism, value, "", children...),
 	}
 }
 

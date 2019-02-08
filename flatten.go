@@ -17,12 +17,12 @@ package gedcom
 //
 //   Flatten(DeepCopy(node))
 //
-func Flatten(node Node) []Node {
+func Flatten(node Node) Nodes {
 	if IsNil(node) {
 		return nil
 	}
 
-	result := []Node{}
+	result := Nodes{}
 
 	Filter(node, func(node Node) (newNode Node, traverseChildren bool) {
 		result = append(result, node)
@@ -31,20 +31,4 @@ func Flatten(node Node) []Node {
 	})
 
 	return result
-}
-
-// FlattenAll works as Flatten with multiple inputs that are returned as a
-// single slice.
-//
-// If any of the nodes are nil they will be ignored.
-func FlattenAll(nodes []Node) (result []Node) {
-	for _, node := range nodes {
-		if IsNil(node) {
-			continue
-		}
-
-		result = append(result, Flatten(node)...)
-	}
-
-	return
 }
