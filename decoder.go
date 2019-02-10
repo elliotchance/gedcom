@@ -276,6 +276,9 @@ func newNodeWithChildren(document *Document, family *FamilyNode, tag Tag, value,
 	case TagRomanized:
 		node = NewRomanizedVariationNode(value, children...)
 
+	case TagSex:
+		node = NewSexNode(value)
+
 	case TagSource:
 		node = NewSourceNode(value, pointer, children...)
 

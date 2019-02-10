@@ -125,30 +125,27 @@ func colorForIndividual(individual *gedcom.IndividualNode) string {
 		return "black"
 	}
 
-	switch individual.Sex() {
-	case gedcom.SexMale:
+	sex := individual.Sex()
+	switch {
+	case sex.IsMale():
 		return IndividualMaleColor
-	case gedcom.SexFemale:
+	case sex.IsFemale():
 		return IndividualFemaleColor
 	}
 
 	return "black"
 }
 
-func colorClassForSex(sex gedcom.Sex) string {
-	switch sex {
-	case gedcom.SexMale:
+func colorClassForSex(sex *gedcom.SexNode) string {
+	switch {
+	case sex.IsMale():
 		return "primary"
 
-	case gedcom.SexFemale:
+	case sex.IsFemale():
 		return "danger"
-
-	case gedcom.SexUnknown:
-		return "info"
-
-	default:
-		return "info"
 	}
+
+	return "info"
 }
 
 func colorClassForIndividual(individual *gedcom.IndividualNode) string {
