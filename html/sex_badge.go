@@ -8,10 +8,10 @@ import (
 
 // SexBadge shows a coloured "Male", "Female" or "Unknown" badge.
 type SexBadge struct {
-	sex gedcom.Sex
+	sex *gedcom.SexNode
 }
 
-func NewSexBadge(sex gedcom.Sex) *SexBadge {
+func NewSexBadge(sex *gedcom.SexNode) *SexBadge {
 	return &SexBadge{
 		sex: sex,
 	}

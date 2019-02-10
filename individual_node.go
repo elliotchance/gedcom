@@ -65,13 +65,13 @@ func (node *IndividualNode) Names() []*NameNode {
 }
 
 // If the node is nil the result will be SexUnknown.
-func (node *IndividualNode) Sex() Sex {
-	sex := NodesWithTag(node, TagSex)
-	if len(sex) == 0 {
-		return SexUnknown
+func (node *IndividualNode) Sex() *SexNode {
+	n := First(NodesWithTag(node, TagSex))
+	if IsNil(n) {
+		return nil
 	}
 
-	return Sex(sex[0].Value())
+	return n.(*SexNode)
 }
 
 // TODO: needs tests
@@ -622,7 +622,8 @@ func (node *IndividualNode) SurroundingSimilarity(other *IndividualNode, options
 	}
 
 	spousesSimilarity := node.Spouses().Similarity(other.Spouses(), options)
-	childrenSimilarity := node.Children().Similarity(other.Children(), options)
+	childrenSimilarity := node.Children().Individuals().
+		Similarity(other.Children().Individuals(), options)
 
 	s = NewSurroundingSimilarity(
 		0.0, // Parents. Filled in later.
@@ -904,4 +905,17 @@ func (node *IndividualNode) resetCache() {
 	node.families = nil
 	node.spouses = nil
 	node.cachedUniqueIDs = nil
+}
+
+// SetSex adds or replaces tge gender of an individual. You should use one of
+// the SexMale, SexFemale or SexUnknown constants.
+func (node *IndividualNode) SetSex(sex string) *IndividualNode {
+	existingSex := First(NodesWithTag(node, TagSex))
+	if existingSex == nil {
+		node.AddNode(NewNode(TagSex, string(sex), ""))
+	} else {
+		existingSex.RawSimpleNode().value = string(sex)
+	}
+
+	return node
 }

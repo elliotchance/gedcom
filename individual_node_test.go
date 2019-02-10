@@ -13,17 +13,17 @@ import (
 var individualTests = []struct {
 	node  *gedcom.IndividualNode
 	names []*gedcom.NameNode
-	sex   gedcom.Sex
+	sex   *gedcom.SexNode
 }{
 	{
 		node:  individual(gedcom.NewDocument(), "P1", "", "", ""),
 		names: []*gedcom.NameNode{},
-		sex:   gedcom.SexUnknown,
+		sex:   nil,
 	},
 	{
 		node:  gedcom.NewDocument().AddIndividual("P1"),
 		names: []*gedcom.NameNode{},
-		sex:   gedcom.SexUnknown,
+		sex:   nil,
 	},
 	{
 		node: gedcom.NewDocument().AddIndividual("P1",
@@ -32,7 +32,7 @@ var individualTests = []struct {
 		names: []*gedcom.NameNode{
 			gedcom.NewNameNode("Joe /Bloggs/"),
 		},
-		sex: gedcom.SexUnknown,
+		sex: nil,
 	},
 	{
 		node: gedcom.NewDocument().AddIndividual("P1",
@@ -44,14 +44,14 @@ var individualTests = []struct {
 			gedcom.NewNameNode("Joe /Bloggs/"),
 			gedcom.NewNameNode("John /Doe/"),
 		},
-		sex: gedcom.SexUnknown,
+		sex: nil,
 	},
 	{
 		node: gedcom.NewDocument().AddIndividual("P1",
 			gedcom.NewNode(gedcom.TagSex, "M", ""),
 		),
 		names: []*gedcom.NameNode{},
-		sex:   gedcom.SexMale,
+		sex:   gedcom.NewSexNode(gedcom.SexMale),
 	},
 	{
 		node: gedcom.NewDocument().AddIndividual("P2",
@@ -61,7 +61,7 @@ var individualTests = []struct {
 		names: []*gedcom.NameNode{
 			gedcom.NewNameNode("Joan /Bloggs/"),
 		},
-		sex: gedcom.SexFemale,
+		sex: gedcom.NewSexNode(gedcom.SexFemale),
 	},
 }
 
@@ -86,7 +86,7 @@ func TestIndividualNode_Sex(t *testing.T) {
 
 	Sex := tf.Function(t, (*gedcom.IndividualNode).Sex)
 
-	Sex((*gedcom.IndividualNode)(nil)).Returns(gedcom.SexUnknown)
+	Sex((*gedcom.IndividualNode)(nil)).Returns(nil)
 }
 
 func TestIndividualNode_Births(t *testing.T) {
