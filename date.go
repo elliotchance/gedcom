@@ -1,10 +1,55 @@
+// Dates
+//
+// Dates in GEDCOM files can be very complex as they can cater for many
+// scenarios:
+//
+// 1. Incomplete, like "Dec 1943"
+//
+// 2. Anchored, like "Aft. 3 Sep 2003" or "Before 1923"
+//
+// 3. Ranges, like "Bet. 4 Apr 1823 and 8 Apr 1823"
+//
+// 4. Phrases, like "(Foo Bar)"
+//
+// This package provides a very rich API for dealing with all kind of dates in a
+// meaningful and sensible way. Some notable features include:
+//
+// 1. All dates, even though that specify an specific day have a minimum and
+// maximum value that are their true bounds. This is especially important for
+// larger date ranges like the whole month of "Jun 1945".
+//
+// 2. Upper and lower bounds of dates can be converted to the native Go
+// time.Time object.
+//
+// 3. There is a Years function that provides a convenient way to normalise a
+// date range into a number for easier distance and comparison measurements.
+//
+// 4. Algorithms for calculating the similarity of dates on a configurable
+// parabola.
 package gedcom
 
 import (
+	"errors"
 	"fmt"
+	"regexp"
 	"strconv"
+	"strings"
 	"time"
 )
+
+// DefaultMaxYearsForSimilarity is a sensible default for the Similarity
+// function (maxYears) when comparing dates. The importance of maxYears is
+// explained in DateNode.Similarity.
+//
+// Unless you need to ensure similarity values are retained correctly through
+// versions you should use this constant instead of specifying a raw value to
+// DateNode.Similarity. This value may change in time if a more accurate default
+// is found.
+//
+// The gedcomtune tool was used to find an ideal value for this. Generally
+// speaking 2 - 3 years yielded much the same result. Any further in either
+// direction led to a drop in accuracy for matching individuals.
+const DefaultMaxYearsForSimilarity = float64(3)
 
 // The constants are used in regular expressions and documented on DateNode.
 //
@@ -21,6 +66,109 @@ const (
 
 // Date is a single point in time.
 //
+// A date in GEDCOM always represents a range contained between the StartDate()
+// and EndDate(), even when it represents a single day, like "23 Jan 1921".
+//
+// Before diving into the full specs below you should be aware of the known
+// limitations:
+//
+// 1. Only the Gregorian calendar with the English language (for month names)
+// is currently supported.
+//
+// 2. You should only expect dates that are valid and within the range of Go's
+// supported libraries will work correctly. That is years between 0 and 9999. It
+// is possible that dates outside of this range may be interpreted correctly but
+// you should not rely on that remaining the same.
+//
+// 3. There are surly more keyword combinations used in GEDCOM files than are
+// documented below. Interpreting these dates is not necessarily guaranteed to
+// work, not work or retain the same behaviour between releases. If you believe
+// there are other known cases please open an issue or pull request.
+//
+// Now into the specification. There are two basic forms of a DATE value:
+//
+//   between date and date
+//   date
+//
+// The second case is actually equivalent to the first case the the same "date"
+// substituted twice.
+//
+// The "between" keyword can be any of (non case sensitive):
+//
+//   between
+//   bet
+//   bet.
+//   from
+//
+// The "and" keyword can be one of (non case sensitive):
+//
+//   -
+//   and
+//   to
+//
+// A "date" has three basic forms:
+//
+//   prefix? day month year
+//   prefix? month year
+//   prefix? year
+//
+// The "prefix" is optional and can be used to indicate if the date is
+// approximate or not with one of the following keywords:
+//
+//   abt
+//   abt.
+//   about
+//   c.
+//   circa
+//
+// Or, the "prefix" can be used to signify unbounded dates with one of the
+// following keywords:
+//
+//   after
+//   aft
+//   aft.
+//   before
+//   bef
+//   bef.
+//
+// The "day" must be an integer between 1 and 31 and can have a single
+// proceeding zero, like "03". The day should be valid against the month used.
+// The behavior is unexpected when using invalid dates like "31 Feb 1999", but
+// you will likely not receive a date at all if it's invalid.
+//
+// The "month" must be one of the following strings (case in-sensitive):
+//
+//   apr
+//   april
+//   aug
+//   august
+//   dec
+//   december
+//   feb
+//   february
+//   jan
+//   january
+//   jul
+//   july
+//   jun
+//   june
+//   mar
+//   march
+//   may
+//   nov
+//   november
+//   oct
+//   october
+//   sep
+//   september
+//
+// The "year" must be an integer with a value between 0 and 9999 (as to conform
+// to the restrictions of the Go time package). It may be possible to parse
+// dates outside of this range but they behaviour is not defined.
+//
+// The "year" may be 1 to 4 digits but it always treated as the absolute year.
+// The year 89 is treated as the year 89, not 1989, for example.
+//
 // Values represented by a Date instance must be compatible with Go's time
 // package. This only allows for date ranges of the year between 0 and 9999. So
 // Date would not allow for BC/BCE dates.
@@ -29,8 +177,6 @@ const (
 // variables because they may contain 0 to signify that a date component was not
 // provided. Unless you have a very special case you should use Time() to
 // convert to a usable date.
-//
-// See the full specification for dates in the documentation for DateNode.
 type Date struct {
 	// Day of the month. When the day is not provided (like "Feb 1990") this
 	// will be 0.
@@ -382,4 +528,97 @@ func (date Date) equalsD(date2 Date) bool {
 // This is to say that is points to a specific day.
 func (date Date) IsExact() bool {
 	return date.Day != 0 && date.Constraint == DateConstraintExact
+}
+
+func (date Date) IsBefore(date2 Date) bool {
+	leftYears := date.Years()
+	rightYears := date2.Years()
+
+	return leftYears < rightYears
+}
+
+func (date Date) IsAfter(date2 Date) bool {
+	leftYears := date.Years()
+	rightYears := date2.Years()
+
+	return leftYears > rightYears
+}
+
+var months = map[string]time.Month{
+	"apr":       time.April,
+	"april":     time.April,
+	"aug":       time.August,
+	"august":    time.August,
+	"dec":       time.December,
+	"december":  time.December,
+	"feb":       time.February,
+	"february":  time.February,
+	"jan":       time.January,
+	"january":   time.January,
+	"jul":       time.July,
+	"july":      time.July,
+	"jun":       time.June,
+	"june":      time.June,
+	"mar":       time.March,
+	"march":     time.March,
+	"may":       time.May,
+	"nov":       time.November,
+	"november":  time.November,
+	"oct":       time.October,
+	"october":   time.October,
+	"sep":       time.September,
+	"september": time.September,
+}
+
+func parseMonthName(parts []string, monthPos int) (string, error) {
+	if len(parts) == 0 {
+		return "", errors.New("cannot parse month")
+	}
+
+	monthName := strings.ToLower(parts[monthPos])
+
+	return CleanSpace(monthName), nil
+}
+
+var dateRegexp = regexp.MustCompile(
+	fmt.Sprintf(`(?i)^(%s|%s|%s)? ?(\d+ )?(\w+ )?(\d+)$`,
+		DateWordsAbout, DateWordsBefore, DateWordsAfter))
+
+func parseDateParts(dateString string, isEndOfRange bool) Date {
+	parts := dateRegexp.FindStringSubmatch(dateString)
+
+	// Place holders for the locations of each regexp group.
+	constraintPos, dayPos, monthPos, yearPos := 1, 2, 3, 4
+
+	monthName, err := parseMonthName(parts, monthPos)
+
+	switch {
+	case len(parts) == 0, // Could not match the regexp.
+		err != nil: // The month is unknown.
+		return Date{
+			IsEndOfRange: isEndOfRange,
+		}
+	}
+
+	day := Atoi(parts[dayPos])
+	month := time.Month(months[monthName])
+	year := Atoi(parts[yearPos])
+
+	// Check the date is valid.
+	_, err = time.Parse("_2 1 2006",
+		fmt.Sprintf("%d %d %04d", day, month, year))
+	if parts[dayPos] != "" && err != nil {
+		return Date{
+			IsEndOfRange: isEndOfRange,
+			Constraint:   DateConstraintFromString(parts[constraintPos]),
+		}
+	}
+
+	return Date{
+		Day:          day,
+		Month:        month,
+		Year:         year,
+		IsEndOfRange: isEndOfRange,
+		Constraint:   DateConstraintFromString(parts[constraintPos]),
+	}
 }
