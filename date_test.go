@@ -1,11 +1,12 @@
 package gedcom_test
 
 import (
+	"testing"
+	"time"
+
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/tf"
 	"github.com/stretchr/testify/assert"
-	"testing"
-	"time"
 )
 
 func TestDate_Time(t *testing.T) {

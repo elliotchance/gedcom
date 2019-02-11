@@ -800,10 +800,10 @@ func TestDateNode_Equals(t *testing.T) {
 	Equals(d11, d9).Returns(true)
 }
 
-func TestDateNode_DateRange(t *testing.T) {
-	DateRange := tf.Function(t, (*gedcom.DateNode).DateRange)
+func TestDateNode_StartAndEndDates(t *testing.T) {
+	StartAndEndDates := tf.Function(t, (*gedcom.DateNode).StartAndEndDates)
 
-	DateRange((*gedcom.DateNode)(nil)).Returns(gedcom.Date{}, gedcom.Date{})
+	StartAndEndDates((*gedcom.DateNode)(nil)).Returns(gedcom.Date{}, gedcom.Date{})
 }
 
 func TestDateNode_IsPhrase(t *testing.T) {
