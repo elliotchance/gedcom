@@ -1,9 +1,9 @@
 package gedcom_test
 
 import (
-	"testing"
-	"github.com/elliotchance/tf"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/tf"
+	"testing"
 	"time"
 )
 

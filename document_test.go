@@ -212,3 +212,42 @@ func TestDocument_AddNode(t *testing.T) {
 		assert.Equal(t, doc.Nodes(), gedcom.Nodes{nameNode})
 	})
 }
+
+// These are just some random examples. More extensive testing is on the
+// individual nodes.
+var documentWarningTests = map[string]struct {
+	doc      func(doc *gedcom.Document)
+	expected []string
+}{
+	"EmptyDocument": {
+		func(doc *gedcom.Document) {},
+		nil,
+	},
+	"UnparsableDate": {
+		func(doc *gedcom.Document) {
+			p1 := doc.AddIndividual("P1")
+			p1.AddNode(gedcom.NewNameNode("John /Chance/"))
+			p1.AddNode(gedcom.NewBirthNode("", gedcom.NewDateNode("foo bar")))
+
+			p2 := doc.AddIndividual("P2")
+			p2.AddNode(gedcom.NewNameNode("Elliot /Chance/"))
+			p2.AddNode(gedcom.NewBirthNode("", gedcom.NewDateNode("around world war 2")))
+			p2.AddNode(gedcom.NewSexNode(gedcom.SexMale))
+		},
+		[]string{
+			`Unparsable date "foo bar"`,
+			`Unparsable date "around world war 2"`,
+		},
+	},
+}
+
+func TestDocument_Warnings(t *testing.T) {
+	for testName, test := range documentWarningTests {
+		t.Run(testName, func(t *testing.T) {
+			doc := gedcom.NewDocument()
+			test.doc(doc)
+
+			assert.Equal(t, doc.Warnings().Strings(), test.expected)
+		})
+	}
+}
