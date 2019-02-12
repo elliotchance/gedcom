@@ -223,6 +223,23 @@ var documentWarningTests = map[string]struct {
 		func(doc *gedcom.Document) {},
 		nil,
 	},
+	"ChildBornBeforeMother": {
+		func(doc *gedcom.Document) {
+			p1 := doc.AddIndividual("P1").
+				AddName("Jenny /Chance/").
+				AddBirthDate("16 May 1989")
+
+			p2 := doc.AddIndividual("P2").
+				AddName("Elliot /Chance/").
+				AddBirthDate("3 Apr 1961")
+
+			doc.AddFamilyWithHusbandAndWife("F1", nil, p1).
+				AddChild(p2)
+		},
+		[]string{
+			"The child Elliot Chance (b. 3 Apr 1961) was born before their mother Jenny Chance (b. 16 May 1989)",
+		},
+	},
 	"UnparsableDate": {
 		func(doc *gedcom.Document) {
 			p1 := doc.AddIndividual("P1")

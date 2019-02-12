@@ -1,6 +1,8 @@
 package gedcom
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // FamilyNode represents a family.
 type FamilyNode struct {
@@ -186,4 +188,40 @@ func (node *FamilyNode) resetCache() {
 	node.cachedWife = false
 	node.husband = nil
 	node.wife = nil
+}
+
+func (node *FamilyNode) childrenBornBeforeParentsWarnings() (warnings Warnings) {
+	fatherBirth, _ := node.Husband().Individual().Birth()
+	motherBirth, _ := node.Wife().Individual().Birth()
+
+	for _, child := range node.Children() {
+		childBirth, _ := child.Individual().Birth()
+		if !childBirth.IsValid() {
+			continue
+		}
+
+		if fatherBirth.IsValid() && childBirth.IsBefore(fatherBirth) {
+			warning := NewChildBornBeforeParentWarning(
+				node.Husband().Individual(),
+				child,
+			)
+			warnings = append(warnings, warning)
+		}
+
+		if motherBirth.IsValid() && childBirth.IsBefore(motherBirth) {
+			warning := NewChildBornBeforeParentWarning(
+				node.Wife().Individual(),
+				child,
+			)
+			warnings = append(warnings, warning)
+		}
+	}
+
+	return
+}
+
+func (node *FamilyNode) Warnings() (warnings Warnings) {
+	warnings = append(warnings, node.childrenBornBeforeParentsWarnings()...)
+
+	return
 }
