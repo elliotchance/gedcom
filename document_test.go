@@ -242,14 +242,14 @@ var documentWarningTests = map[string]struct {
 	},
 	"UnparsableDate": {
 		func(doc *gedcom.Document) {
-			p1 := doc.AddIndividual("P1")
-			p1.AddNode(gedcom.NewNameNode("John /Chance/"))
-			p1.AddNode(gedcom.NewBirthNode("", gedcom.NewDateNode("foo bar")))
+			doc.AddIndividual("P1").
+				AddName("John /Chance/").
+				AddBirthDate("foo bar")
 
-			p2 := doc.AddIndividual("P2")
-			p2.AddNode(gedcom.NewNameNode("Elliot /Chance/"))
-			p2.AddNode(gedcom.NewBirthNode("", gedcom.NewDateNode("around world war 2")))
-			p2.AddNode(gedcom.NewSexNode(gedcom.SexMale))
+			doc.AddIndividual("P2").
+				AddName("Elliot /Chance/").
+				AddBirthDate("around world war 2").
+				SetSex(gedcom.SexMale)
 		},
 		[]string{
 			`Unparsable date "foo bar"`,
@@ -264,7 +264,7 @@ func TestDocument_Warnings(t *testing.T) {
 			doc := gedcom.NewDocument()
 			test.doc(doc)
 
-			assert.Equal(t, doc.Warnings().Strings(), test.expected)
+			assertEqual(t, doc.Warnings().Strings(), test.expected)
 		})
 	}
 }

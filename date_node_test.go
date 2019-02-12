@@ -820,3 +820,37 @@ func TestDateNode_IsPhrase(t *testing.T) {
 	IsPhrase(gedcom.NewDateNode("(Foo)")).Returns(true)
 	IsPhrase(gedcom.NewDateNode("(Foo BAR)")).Returns(true)
 }
+
+var dateWarningTests = map[string]struct {
+	date     *gedcom.DateNode
+	expected []string
+}{
+	"Valid1": {
+		gedcom.NewDateNode("3 Sep 1943"),
+		nil,
+	},
+	"Valid2": {
+		gedcom.NewDateNode("  3 Sep 1943 "),
+		nil,
+	},
+	"Unparsable1": {
+		gedcom.NewDateNode("foo bar"),
+		[]string{
+			`Unparsable date "foo bar"`,
+		},
+	},
+	"Unparsable2": {
+		gedcom.NewDateNode("abt. world war 2"),
+		[]string{
+			`Unparsable date "abt. world war 2"`,
+		},
+	},
+}
+
+func TestDateNode_Warnings(t *testing.T) {
+	for testName, test := range dateWarningTests {
+		t.Run(testName, func(t *testing.T) {
+			assertEqual(t, test.date.Warnings().Strings(), test.expected)
+		})
+	}
+}
