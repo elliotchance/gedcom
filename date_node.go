@@ -176,3 +176,19 @@ func (node *DateNode) Warnings() Warnings {
 
 	return nil
 }
+
+func (node *DateNode) IsBefore(node2 *DateNode) bool {
+	if node == nil {
+		return false
+	}
+
+	return node.DateRange().IsBefore(node2.DateRange())
+}
+
+func (node *DateNode) IsAfter(node2 *DateNode) bool {
+	if node == nil {
+		return false
+	}
+
+	return node.DateRange().IsAfter(node2.DateRange())
+}

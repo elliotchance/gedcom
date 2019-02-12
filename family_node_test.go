@@ -222,3 +222,101 @@ func TestFamilyNode_HasChild(t *testing.T) {
 
 	HasChild((*gedcom.FamilyNode)(nil), (*gedcom.IndividualNode)(nil)).Returns(false)
 }
+
+var familyWarningTests = map[string]struct {
+	doc      func(doc *gedcom.Document)
+	expected []string
+}{
+	"ChildBornAfterParent": {
+		func(doc *gedcom.Document) {
+			nick := individual(doc, "P1", "John /Chance/", "3 Apr 1961", "")
+			elliot := individual(doc, "P2", "Elliot /Chance/", "16 May 1989", "")
+
+			family := doc.AddFamilyWithHusbandAndWife("F1", nick, nil)
+			family.AddChild(elliot)
+		},
+		nil,
+	},
+	"ChildBornBeforeFather": {
+		func(doc *gedcom.Document) {
+			p1 := doc.AddIndividual("P1").
+				AddName("John /Chance/").
+				AddBirthDate("16 May 1989")
+
+			p2 := doc.AddIndividual("P2").
+				AddName("Elliot /Chance/").
+				AddBirthDate("3 Apr 1961")
+
+			doc.AddFamilyWithHusbandAndWife("F1", p1, nil).
+				AddChild(p2)
+		},
+		[]string{
+			"The child Elliot Chance (b. 3 Apr 1961) was born before their father John Chance (b. 16 May 1989)",
+		},
+	},
+	"ChildBornBeforeMother": {
+		func(doc *gedcom.Document) {
+			p1 := doc.AddIndividual("P1").
+				AddName("Jenny /Chance/").
+				AddBirthDate("16 May 1989")
+
+			p2 := doc.AddIndividual("P2").
+				AddName("Elliot /Chance/").
+				AddBirthDate("3 Apr 1961")
+
+			doc.AddFamilyWithHusbandAndWife("F1", nil, p1).
+				AddChild(p2)
+		},
+		[]string{
+			"The child Elliot Chance (b. 3 Apr 1961) was born before their mother Jenny Chance (b. 16 May 1989)",
+		},
+	},
+	"MaleChildBornBeforeFather": {
+		func(doc *gedcom.Document) {
+			p1 := doc.AddIndividual("P1").
+				AddName("John /Chance/").
+				AddBirthDate("16 May 1989")
+
+			p2 := doc.AddIndividual("P2").
+				AddName("Elliot /Chance/").
+				AddBirthDate("3 Apr 1961").
+				SetSex(gedcom.SexMale)
+
+			doc.AddFamilyWithHusbandAndWife("F1", p1, nil).
+				AddChild(p2)
+		},
+		[]string{
+			"The child Elliot Chance (b. 3 Apr 1961) was born before his father John Chance (b. 16 May 1989)",
+		},
+	},
+	"FemaleChildBornBeforeFather": {
+		func(doc *gedcom.Document) {
+			p1 := doc.AddIndividual("P1").
+				AddName("John /Chance/").
+				AddBirthDate("16 May 1989")
+
+			p2 := doc.AddIndividual("P2").
+				AddName("Sarah /Chance/").
+				AddBirthDate("3 Apr 1961").
+				SetSex(gedcom.SexFemale)
+
+			doc.AddFamilyWithHusbandAndWife("F1", p1, nil).
+				AddChild(p2)
+		},
+		[]string{
+			"The child Sarah Chance (b. 3 Apr 1961) was born before her father John Chance (b. 16 May 1989)",
+		},
+	},
+}
+
+func TestFamilyNode_Warnings(t *testing.T) {
+	for testName, test := range familyWarningTests {
+		t.Run(testName, func(t *testing.T) {
+			doc := gedcom.NewDocument()
+			test.doc(doc)
+
+			f1 := doc.Families().ByPointer("F1")
+			assertEqual(t, f1.Warnings().Strings(), test.expected)
+		})
+	}
+}

@@ -919,3 +919,21 @@ func (node *IndividualNode) SetSex(sex string) *IndividualNode {
 
 	return node
 }
+
+func (node *IndividualNode) AddName(name string) *IndividualNode {
+	node.AddNode(NewNameNode(name))
+
+	return node
+}
+
+func (node *IndividualNode) AddBirthDate(birthDate string) *IndividualNode {
+	existingBirth := First(node.Births())
+	if existingBirth == nil {
+		existingBirth = NewBirthNode("")
+		node.AddNode(existingBirth)
+	}
+
+	existingBirth.AddNode(NewDateNode(birthDate))
+
+	return node
+}

@@ -31,3 +31,15 @@ func (node *ChildNode) Individual() *IndividualNode {
 	// TODO: may not exist
 	return n.(*IndividualNode)
 }
+
+func (node *ChildNode) Father() *HusbandNode {
+	return node.family.Husband()
+}
+
+func (node *ChildNode) Mother() *WifeNode {
+	return node.family.Wife()
+}
+
+func (node *ChildNode) String() string {
+	return node.Individual().String()
+}
