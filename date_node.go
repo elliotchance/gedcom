@@ -2,6 +2,7 @@ package gedcom
 
 import (
 	"fmt"
+	"math"
 )
 
 // DateNode represents a DATE node.
@@ -143,4 +144,25 @@ func (node *DateNode) IsPhrase() bool {
 	}
 
 	return node.DateRange().IsPhrase()
+}
+
+func (node *DateNode) Sub(node2 *DateNode) (min Duration, max Duration, errs error) {
+	nodeStart, nodeEnd := node.DateRange().StartAndEndDates()
+	node2Start, node2End := node2.DateRange().StartAndEndDates()
+
+	errs = NewErrors(
+		nodeStart.ParseError,
+		nodeEnd.ParseError,
+		node2Start.ParseError,
+		node2End.ParseError,
+	).Err()
+
+	min = Duration(node.StartDate().Time().Sub(node2.StartDate().Time()))
+	max = Duration(node.EndDate().Time().Sub(node2.EndDate().Time()))
+
+	// Durations must always be positive.
+	min = Duration(math.Abs(float64(min)))
+	max = Duration(math.Abs(float64(max)))
+
+	return
 }
