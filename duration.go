@@ -1,10 +1,10 @@
 package gedcom
 
 import (
-	"time"
 	"fmt"
 	"math"
 	"strings"
+	"time"
 )
 
 // A duration that only considers whole-day resolution.
@@ -44,7 +44,7 @@ func (d Duration) String() string {
 		parts = append(parts, pluralize(months, "month"))
 	}
 
-	if days := int(math.Ceil(float64(d)/float64(oneDay))); days != 0 {
+	if days := int(math.Ceil(float64(d) / float64(oneDay))); days != 0 {
 		parts = append(parts, pluralize(days, "day"))
 	}
 

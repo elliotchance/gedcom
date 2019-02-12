@@ -1,9 +1,9 @@
 package gedcom
 
 import (
+	"errors"
 	"fmt"
 	"strings"
-	"errors"
 )
 
 type Errors []error

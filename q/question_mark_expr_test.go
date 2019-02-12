@@ -21,6 +21,7 @@ var documentChoices = []string{
 	".SetNodes",
 	".Sources",
 	".String",
+	".Warnings",
 }
 
 var functionAndVariableChoices = []string{

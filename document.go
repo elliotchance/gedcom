@@ -187,19 +187,21 @@ func (doc *Document) Sources() []*SourceNode {
 func (doc *Document) AddNode(node Node) {
 	if !IsNil(node) {
 		doc.nodes = append(doc.nodes, node)
+		doc.addPointerToCache(node)
+	}
+}
 
-		// Update pointer index.
-		pointer := node.Pointer()
+func (doc *Document) addPointerToCache(node Node) {
+	pointer := node.Pointer()
 
-		if pointer != "" {
-			doc.pointerCache.Store(pointer, node)
-		}
+	if pointer != "" {
+		doc.pointerCache.Store(pointer, node)
+	}
 
-		// Clear cache.
-		switch node.Tag() {
-		case TagFamily:
-			doc.families = nil
-		}
+	// Clear cache.
+	switch node.Tag() {
+	case TagFamily:
+		doc.families = nil
 	}
 }
 
@@ -322,6 +324,20 @@ func (doc *Document) AddFamilyWithHusbandAndWife(pointer string, husband, wife *
 
 func (doc *Document) DeleteNode(node Node) (didDelete bool) {
 	doc.nodes, didDelete = doc.nodes.deleteNode(node)
+
+	return
+}
+
+func (doc *Document) Warnings() (warnings Warnings) {
+	for _, node := range doc.nodes {
+		Filter(node, func(node Node) (newNode Node, traverseChildren bool) {
+			if warner, ok := node.(Warner); ok {
+				warnings = append(warnings, warner.Warnings()...)
+			}
+
+			return node, true
+		})
+	}
 
 	return
 }

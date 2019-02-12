@@ -166,3 +166,13 @@ func (node *DateNode) Sub(node2 *DateNode) (min Duration, max Duration, errs err
 
 	return
 }
+
+func (node *DateNode) Warnings() Warnings {
+	if !node.IsValid() {
+		return Warnings{
+			NewUnparsableDateWarning(node),
+		}
+	}
+
+	return nil
+}
