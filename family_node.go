@@ -2,6 +2,7 @@ package gedcom
 
 import (
 	"fmt"
+	"time"
 )
 
 // FamilyNode represents a family.
@@ -220,8 +221,51 @@ func (node *FamilyNode) childrenBornBeforeParentsWarnings() (warnings Warnings) 
 	return
 }
 
+func (node *FamilyNode) siblingsBornTooCloseWarnings() (warnings Warnings) {
+	pairs := IndividualNodePairs{}
+
+	for _, child1 := range node.Children() {
+		child1Birth, _ := child1.Individual().Birth()
+		for _, child2 := range node.Children() {
+			// Exclude matching siblings to themselves. Technically we do not
+			// need to do this check because children born on the same day would
+			// be considered twins. However, its better to have it here for
+			// completeness.
+			if child1.Individual().Is(child2.Individual()) {
+				continue
+			}
+
+			child2Birth, _ := child2.Individual().Birth()
+			min, max, err := child1Birth.Sub(child2Birth)
+			if err != nil {
+				continue
+			}
+
+			nineMonths := Duration(274 * 24 * time.Hour)
+			if min < nineMonths || max < nineMonths {
+				pair := &IndividualNodePair{
+					Left:  child1.Individual(),
+					Right: child2.Individual(),
+				}
+				if !pairs.Has(pair) {
+					warning := NewSiblingsBornTooCloseWarning(
+						child1,
+						child2,
+					)
+					warnings = append(warnings, warning)
+
+					pairs = append(pairs, pair)
+				}
+			}
+		}
+	}
+
+	return
+}
+
 func (node *FamilyNode) Warnings() (warnings Warnings) {
 	warnings = append(warnings, node.childrenBornBeforeParentsWarnings()...)
+	warnings = append(warnings, node.siblingsBornTooCloseWarnings()...)
 
 	return
 }

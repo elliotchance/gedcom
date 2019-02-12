@@ -197,7 +197,7 @@ var (
 	// information.
 	TagCharacterSet = newTag("CHAR", "Character Set", tagOptionNone, tagSortIndividualInfo)
 
-	// The natural, adopted, or sealed (LDS) child of a father and a mother.
+	// See ChildNode.
 	TagChild = newTag("CHIL", "Child", tagOptionNone, tagSortIndividualInfo)
 
 	// The religious event (not LDS) of baptizing and/or naming a child.
@@ -353,7 +353,7 @@ var (
 	// Identifies information pertaining to an entire GEDCOM transmission.
 	TagHeader = newTag("HEAD", "Header", tagOptionNone, tagSortIndividualInfo)
 
-	// An individual in the family role of a married man or father.
+	// See HusbandNode.
 	TagHusband = newTag("HUSB", "Husband", tagOptionNone, tagSortIndividualInfo)
 
 	// A number assigned to identify a person within some significant external
@@ -543,7 +543,7 @@ var (
 	// A romanized variation of a superior text string. New in Gedcom 5.5.1.
 	TagRomanized = newTag("ROMN", "Romanized", tagOptionNone, tagSortIndividualInfo)
 
-	// Indicates the sex of an individual--male or female.
+	// See SexNode.
 	TagSex = newTag("SEX", "Sex", tagOptionNone, tagSortIndividualInfo)
 
 	// A religious event pertaining to the sealing of a child to his or her
@@ -612,7 +612,7 @@ var (
 	// or referenced.
 	TagVersion = newTag("VERS", "Version", tagOptionNone, tagSortIndividualInfo)
 
-	// An individual in the role as a mother and/or married woman.
+	// See WifeNode.
 	TagWife = newTag("WIFE", "Wife", tagOptionNone, tagSortIndividualInfo)
 
 	// World Wide Web home page. New in Gedcom 5.5.1.
