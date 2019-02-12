@@ -13,7 +13,7 @@ func TestYears(t *testing.T) {
 	}{
 		{nil, 0},
 		{gedcom.Yearer(nil), 0},
-		{gedcom.Date{1, 1, 1789, false, gedcom.DateConstraintExact}, 1789.0027322404371},
+		{gedcom.Date{1, 1, 1789, false, gedcom.DateConstraintExact, nil}, 1789.0027322404371},
 		{gedcom.NewDateNode("Foo"), 0},
 		{gedcom.NewDateNode("31 Jan 1435"), 1435.0846994535518},
 	}

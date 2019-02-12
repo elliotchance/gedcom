@@ -615,6 +615,14 @@ func TestIndividualNodes_Compare(t *testing.T) {
 }
 
 func assertEqual(t *testing.T, expected, actual interface{}) bool {
+	simplifyErrors := cmp.Transformer("Errors", func(in error) string {
+		if in == nil {
+			return ""
+		}
+
+		return in.Error()
+	})
+
 	// IgnoreUnexported tell the diff engine to ignore unexported fields for the
 	// following types.
 	diff := cmp.Diff(expected, actual, cmpopts.IgnoreUnexported(
@@ -624,7 +632,7 @@ func assertEqual(t *testing.T, expected, actual interface{}) bool {
 		gedcom.FamilyNode{},
 		gedcom.DateNode{},
 		gedcom.ChildNode{},
-	))
+	), simplifyErrors)
 	if diff != "" {
 		assert.Fail(t, diff)
 	}

@@ -34,16 +34,23 @@ func NewDateRangeWithString(s string) (dr DateRange) {
 	// Try to match a range first.
 	parts := dateRangeRegexp.FindStringSubmatch(dateString)
 	if len(parts) > 0 {
-		return NewDateRange(
-			parseDateParts(parts[2], false),
-			parseDateParts(parts[4], true),
+		datePart1 := parseDateParts(parts[2], false)
+		datePart2 := parseDateParts(parts[4], true)
+		dateRange := NewDateRange(
+			datePart1,
+			datePart2,
 		)
+
+		return dateRange
 	}
 
 	// Single date.
+	datePart1 := parseDateParts(dateString, false)
+	datePart2 := parseDateParts(dateString, true)
+
 	return NewDateRange(
-		parseDateParts(dateString, false),
-		parseDateParts(dateString, true),
+		datePart1,
+		datePart2,
 	)
 }
 
@@ -144,14 +151,14 @@ func (dr DateRange) EndDate() Date {
 // The simplest way to think treat all these situations is to only look at the
 // start date for each range. No matter when the end dates are or how much of
 // each other then end up overlapping.
-func (dr DateRange) Before(dr2 DateRange) bool {
+func (dr DateRange) IsBefore(dr2 DateRange) bool {
 	return dr.start.IsBefore(dr2.start)
 }
 
 // After returns true if the end date is after the other end date.
 //
 // See Before for a more detailed explanation.
-func (dr DateRange) After(dr2 DateRange) bool {
+func (dr DateRange) IsAfter(dr2 DateRange) bool {
 	return dr.end.IsAfter(dr2.end)
 }
 
@@ -295,4 +302,16 @@ func (dr DateRange) IsPhrase() bool {
 	lastLetter := dr.originalString[len(dr.originalString)-1]
 
 	return firstLetter == '(' && lastLetter == ')'
+}
+
+func (dr DateRange) ParseError() error {
+	if err := dr.StartDate().ParseError; err != nil {
+		return err
+	}
+
+	if err := dr.EndDate().ParseError; err != nil {
+		return err
+	}
+
+	return nil
 }
