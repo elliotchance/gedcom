@@ -255,24 +255,24 @@ func TestDateRange_Compare(t *testing.T) {
 	}
 }
 
-func TestDateRange_Before(t *testing.T) {
+func TestDateRange_IsBefore(t *testing.T) {
 	base := dateRangeCompareRange("3_20")
 
 	for testName, test := range dateRangeCompareTest {
 		t.Run(testName, func(t *testing.T) {
 			dr := dateRangeCompareRange(testName)
-			assert.Equal(t, test.before, dr.Before(base))
+			assert.Equal(t, test.before, dr.IsBefore(base))
 		})
 	}
 }
 
-func TestDateRange_After(t *testing.T) {
+func TestDateRange_IsAfter(t *testing.T) {
 	base := dateRangeCompareRange("3_20")
 
 	for testName, test := range dateRangeCompareTest {
 		t.Run(testName, func(t *testing.T) {
 			dr := dateRangeCompareRange(testName)
-			assert.Equal(t, test.after, dr.After(base))
+			assert.Equal(t, test.after, dr.IsAfter(base))
 		})
 	}
 }

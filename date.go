@@ -211,6 +211,9 @@ type Date struct {
 	// important in some cases to know the date may not be the value returned by
 	// Time().
 	Constraint DateConstraint
+
+	// If the date cannot be parsed this will contain the error.
+	ParseError error
 }
 
 // NewDateWithTime creates a new Date with the provided time.Time.
@@ -586,17 +589,21 @@ var dateRegexp = regexp.MustCompile(
 
 func parseDateParts(dateString string, isEndOfRange bool) Date {
 	parts := dateRegexp.FindStringSubmatch(dateString)
+	if len(parts) == 0 {
+		return Date{
+			IsEndOfRange: isEndOfRange,
+			ParseError:   fmt.Errorf("unable to parse date: %s", dateString),
+		}
+	}
 
 	// Place holders for the locations of each regexp group.
 	constraintPos, dayPos, monthPos, yearPos := 1, 2, 3, 4
 
 	monthName, err := parseMonthName(parts, monthPos)
-
-	switch {
-	case len(parts) == 0, // Could not match the regexp.
-		err != nil: // The month is unknown.
+	if err != nil {
 		return Date{
 			IsEndOfRange: isEndOfRange,
+			ParseError:   errors.New("the month is unknown"),
 		}
 	}
 
@@ -611,6 +618,7 @@ func parseDateParts(dateString string, isEndOfRange bool) Date {
 		return Date{
 			IsEndOfRange: isEndOfRange,
 			Constraint:   DateConstraintFromString(parts[constraintPos]),
+			ParseError:   err,
 		}
 	}
 
