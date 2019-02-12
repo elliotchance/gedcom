@@ -2,8 +2,7 @@ package gedcom
 
 import "fmt"
 
-// WifeNode is the natural, adopted, or sealed (LDS) child of a father and a
-// mother.
+// WifeNode is an individual in the role as a mother and/or married woman.
 type WifeNode struct {
 	*SimpleNode
 	family *FamilyNode

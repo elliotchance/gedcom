@@ -307,6 +307,42 @@ var familyWarningTests = map[string]struct {
 			"The child Sarah Chance (b. 3 Apr 1961) was born before her father John Chance (b. 16 May 1989)",
 		},
 	},
+	"SiblingsBornFarAwayFromEachOther": {
+		func(doc *gedcom.Document) {
+			p1 := doc.AddIndividual("P1").
+				AddName("John /Chance/").
+				AddBirthDate("16 May 1989")
+
+			p2 := doc.AddIndividual("P2").
+				AddName("Sarah /Chance/").
+				AddBirthDate("3 Apr 1991").
+				SetSex(gedcom.SexFemale)
+
+			f1 := doc.AddFamily("F1")
+			f1.AddChild(p1)
+			f1.AddChild(p2)
+		},
+		nil,
+	},
+	"SiblingsBornTooCloseToEachOther": {
+		func(doc *gedcom.Document) {
+			p1 := doc.AddIndividual("P1").
+				AddName("John /Chance/").
+				AddBirthDate("16 May 1989")
+
+			p2 := doc.AddIndividual("P2").
+				AddName("Sarah /Chance/").
+				AddBirthDate("3 Apr 1989").
+				SetSex(gedcom.SexFemale)
+
+			f1 := doc.AddFamily("F1")
+			f1.AddChild(p1)
+			f1.AddChild(p2)
+		},
+		[]string{
+			"The siblings John Chance (b. 16 May 1989) and Sarah Chance (b. 3 Apr 1989) were born within one month and 13 days of each other",
+		},
+	},
 }
 
 func TestFamilyNode_Warnings(t *testing.T) {
