@@ -1,7 +1,5 @@
 package gedcom
 
-import "fmt"
-
 // HusbandNode is an individual in the family role of a married man or father.
 type HusbandNode struct {
 	*SimpleNode
@@ -13,11 +11,6 @@ func newHusbandNode(family *FamilyNode, value string, children ...Node) *Husband
 		newSimpleNode(TagHusband, value, "", children...),
 		family,
 	}
-}
-
-func newHusbandNodeWithIndividual(family *FamilyNode, individual *IndividualNode) *HusbandNode {
-	// TODO: check individual belongs to the same document as family
-	return newHusbandNode(family, fmt.Sprintf("@%s@", individual.Pointer()))
 }
 
 func (node *HusbandNode) Family() *FamilyNode {

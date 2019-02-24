@@ -1,7 +1,5 @@
 package gedcom
 
-import "fmt"
-
 // WifeNode is an individual in the role as a mother and/or married woman.
 type WifeNode struct {
 	*SimpleNode
@@ -15,11 +13,6 @@ func newWifeNode(family *FamilyNode, value string, children ...Node) *WifeNode {
 	}
 }
 
-func newWifeNodeWithIndividual(family *FamilyNode, individual *IndividualNode) *WifeNode {
-	// TODO: check individual belongs to the same document as family
-	return newWifeNode(family, fmt.Sprintf("@%s@", individual.Pointer()))
-}
-
 func (node *WifeNode) Family() *FamilyNode {
 	return node.family
 }
@@ -31,7 +24,10 @@ func (node *WifeNode) Individual() *IndividualNode {
 
 	n := node.family.document.NodeByPointer(valueToPointer(node.value))
 
-	// TODO: may not exist
+	if IsNil(n) {
+		return nil
+	}
+
 	return n.(*IndividualNode)
 }
 
