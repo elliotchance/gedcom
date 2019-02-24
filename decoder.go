@@ -34,6 +34,18 @@ var byteOrderMark = []byte{0xef, 0xbb, 0xbf}
 // Decoder represents a GEDCOM decoder.
 type Decoder struct {
 	r *bufio.Reader
+
+	// It is not valid for GEDCOM values to contain new lines or carriage
+	// returns. However, some application dump data without correctly using the
+	// CONT tags.
+	//
+	// Strictly speaking we should bail out with an error but there are too many
+	// cases that are difficult to clean up for consumers so we offer and option
+	// to permit it.
+	//
+	// When enabled any line than cannot be parsed will be considered an
+	// extension of the previous line (including the new line character).
+	AllowMultiLine bool
 }
 
 // Create a new decoder to parse a reader that contain GEDCOM data.
@@ -58,6 +70,10 @@ func (dec *Decoder) Decode() (*Document, error) {
 
 	finished := false
 	lineNumber := 0
+
+	// Only used when AllowMultiLine is enabled.
+	var previousNode Node
+
 	for !finished {
 		lineNumber++
 
@@ -72,11 +88,20 @@ func (dec *Decoder) Decode() (*Document, error) {
 
 		// Skip blank lines.
 		if line == "" {
+			if dec.AllowMultiLine && previousNode != nil {
+				previousNode.RawSimpleNode().value += "\n"
+			}
+
 			continue
 		}
 
 		node, indent, err := parseLine(line, document, family)
 		if err != nil {
+			if dec.AllowMultiLine && previousNode != nil {
+				previousNode.RawSimpleNode().value += "\n" + line
+				continue
+			}
+
 			return nil, fmt.Errorf("line %d: %s", lineNumber, err)
 		}
 
@@ -90,6 +115,7 @@ func (dec *Decoder) Decode() (*Document, error) {
 		// Add a root node to the document.
 		if indent == 0 {
 			document.AddNode(node)
+			previousNode = node
 
 			// There can be multiple root nodes so make sure we always reset all
 			// indent pointers.
@@ -126,6 +152,8 @@ func (dec *Decoder) Decode() (*Document, error) {
 		}
 
 		i.AddNode(node)
+
+		previousNode = node
 	}
 
 	// Build the cache once.
