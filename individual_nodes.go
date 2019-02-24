@@ -5,7 +5,6 @@ import (
 	"github.com/elliotchance/gedcom/util"
 	"sort"
 	"strings"
-	"sync"
 	"time"
 )
 
@@ -212,78 +211,7 @@ func (nodes IndividualNodes) Similarity(other IndividualNodes, options Similarit
 	return total / nodesLen
 }
 
-// IndividualNodesCompareOptions provides more optional attributes for
-// IndividualNodes.Compare.
-//
-// You should use NewIndividualNodesCompareOptions to start with sensible
-// defaults.
-type IndividualNodesCompareOptions struct {
-	// SimilarityOptions controls the weights of the comparisons. See
-	// SimilarityOptions for more information. Any matches below
-	// MinimumSimilarity will not be used.
-	//
-	// Since this can take a long time to run with a lot of individuals there is
-	// an optional notifier channel that can be listened to for progress
-	// updates. Or pass nil to ignore this feature.
-	SimilarityOptions SimilarityOptions
-
-	// Notifier will be sent progress updates throughout the comparison if it is
-	// not nil. If it is nil then this feature is ignored.
-	//
-	// You can control how precise this is with NotifierStep.
-	//
-	// You may close this Notifier to abort the comparison early.
-	Notifier chan Progress
-
-	// NotifierStep is the number of comparisons that must happen before the
-	// Notifier be notified. The default is zero so all comparisons will cause a
-	// notify. You should set this to a higher amount of reduce the frequency of
-	// chatter.
-	NotifierStep int64
-
-	// Jobs controls the parallelism of the processing. The default value of 0
-	// works the same as a value of 1 (no concurrency). Any number higher than 1
-	// will create extra go routines to increase the CPU utilization of the
-	// processing.
-	//
-	// It is important to note that the parallelism is still bound by
-	// GOMAXPROCS.
-	Jobs int
-}
-
-// NewIndividualNodesCompareOptions creates sensible defaults for
-// IndividualNodesCompareOptions. In the majority of cases you will not need to
-// change any further options.
-func NewIndividualNodesCompareOptions() *IndividualNodesCompareOptions {
-	return &IndividualNodesCompareOptions{
-		SimilarityOptions: NewSimilarityOptions(),
-	}
-}
-
-func (o *IndividualNodesCompareOptions) notify(m Progress) {
-	defer func() {
-		// Catch "panic: send on closed channel". This means Notifier was closed
-		// prematurely to abort the comparisons.
-		recover()
-	}()
-
-	if o.Notifier != nil {
-		o.Notifier <- m
-	}
-}
-
-func (o *IndividualNodesCompareOptions) notifierStep() int64 {
-	return maxInt64(o.NotifierStep, 1)
-}
-
-func (o *IndividualNodesCompareOptions) ConcurrentJobs() int {
-	return maxInt(o.Jobs, 1)
-}
-
-func createPointerJobs(left, right IndividualNodes, options *IndividualNodesCompareOptions, totals chan int64, jobs chan *IndividualComparison, sentA, sentB *sync.Map) {
-	leftLen := int64(len(left))
-	rightLen := int64(len(right))
-	m := sync.Mutex{}
+func createPointerJobs(left, right IndividualNodes, options *IndividualNodesCompareOptions, totals chan int64, jobs chan *IndividualComparison) {
 	ws := options.ConcurrentJobs()
 
 	util.WorkerPool(ws, func(w int) {
@@ -291,7 +219,7 @@ func createPointerJobs(left, right IndividualNodes, options *IndividualNodesComp
 			a := left[leftI]
 
 			// Don't resend individuals already sent.
-			if _, ok := sentA.Load(a.Pointer()); ok {
+			if _, ok := options.sentA.Load(a.Pointer()); ok {
 				continue
 			}
 
@@ -302,13 +230,13 @@ func createPointerJobs(left, right IndividualNodes, options *IndividualNodesComp
 			}
 
 			// Don't resend individuals already sent.
-			if _, ok := sentB.Load(b.Pointer()); ok {
+			if _, ok := options.sentB.Load(b.Pointer()); ok {
 				continue
 			}
 
 			ss := a.SurroundingSimilarity(b, options.SimilarityOptions, true)
 			if ss.WeightedSimilarity() >= options.SimilarityOptions.PreferPointerAbove {
-				adjustTotal(&m, totals, leftLen, rightLen)
+				options.adjustTotal(totals)
 
 				jobs <- &IndividualComparison{
 					Left:         a,
@@ -317,26 +245,14 @@ func createPointerJobs(left, right IndividualNodes, options *IndividualNodesComp
 					certainMatch: true,
 				}
 
-				sentA.Store(a.Pointer(), nil)
-				sentB.Store(b.Pointer(), nil)
+				options.sentA.Store(a.Pointer(), nil)
+				options.sentB.Store(b.Pointer(), nil)
 			}
 		}
 	})
 }
 
-func adjustTotal(m *sync.Mutex, totals chan int64, leftLen int64, rightLen int64) {
-	// See getTotals(). We need to notify that there will be now less jobs.
-	m.Lock()
-	totals <- -int64(leftLen + rightLen - 2)
-	leftLen--
-	rightLen--
-	m.Unlock()
-}
-
-func createUniqueJobs(left, right IndividualNodes, options *IndividualNodesCompareOptions, totals chan int64, jobs chan *IndividualComparison, sentA, sentB *sync.Map) {
-	leftLen := int64(len(left))
-	rightLen := int64(len(right))
-	m := sync.Mutex{}
+func createUniqueJobs(left, right IndividualNodes, options *IndividualNodesCompareOptions, totals chan int64, jobs chan *IndividualComparison) {
 	ws := options.ConcurrentJobs()
 
 	util.WorkerPool(ws, func(w int) {
@@ -349,7 +265,7 @@ func createUniqueJobs(left, right IndividualNodes, options *IndividualNodesCompa
 			// identifier. All we can do in this case is to pick the first
 			// one.
 			if len(bs) > 0 {
-				adjustTotal(&m, totals, leftLen, rightLen)
+				options.adjustTotal(totals)
 				ss := a.SurroundingSimilarity(bs[0], options.SimilarityOptions, true)
 
 				jobs <- &IndividualComparison{
@@ -359,8 +275,8 @@ func createUniqueJobs(left, right IndividualNodes, options *IndividualNodesCompa
 					certainMatch: true,
 				}
 
-				sentA.Store(a.Pointer(), nil)
-				sentB.Store(bs[0].Pointer(), nil)
+				options.sentA.Store(a.Pointer(), nil)
+				options.sentB.Store(bs[0].Pointer(), nil)
 			}
 		}
 	})
@@ -389,8 +305,8 @@ func createJobs(totals chan int64, left, right IndividualNodes, options *Individ
 	go func() {
 		// Describes the individuals that we have found to match and have
 		// already been emitted so there is no need to send them again.
-		sentA := &sync.Map{}
-		sentB := &sync.Map{}
+		options.leftLen = int64(len(left))
+		options.rightLen = int64(len(right))
 
 		// This check is important because if the right side is empty we will
 		// not be able to get the Document on the right side to to the
@@ -399,23 +315,23 @@ func createJobs(totals chan int64, left, right IndividualNodes, options *Individ
 			// Any individuals that share unique identifiers. We want to do this
 			// before the pointer jobs because this provides more absolute
 			// results that are far less likely to be false positives.
-			createUniqueJobs(left, right, options, totals, jobs, sentA, sentB)
+			createUniqueJobs(left, right, options, totals, jobs)
 
 			// Any individuals that share the same pointer and are at least the
 			// prefer-pointer-above.
-			createPointerJobs(left, right, options, totals, jobs, sentA, sentB)
+			createPointerJobs(left, right, options, totals, jobs)
 		}
 
 		close(totals)
 
 		// Send the remaining matrix of individuals to be compared.
 		for _, a := range left {
-			if _, ok := sentA.Load(a.Pointer()); ok {
+			if _, ok := options.sentA.Load(a.Pointer()); ok {
 				continue
 			}
 
 			for _, b := range right {
-				if _, ok := sentB.Load(b.Pointer()); ok {
+				if _, ok := options.sentB.Load(b.Pointer()); ok {
 					continue
 				}
 
