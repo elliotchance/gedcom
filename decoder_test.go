@@ -345,6 +345,27 @@ func TestDecoder_Decode(t *testing.T) {
 
 		assertDocumentEqual(t, expected, actual, ged)
 	})
+
+	t.Run("AllowMultiLine", func(t *testing.T) {
+		// It is not valid for GEDCOM values to contain new lines or carriage
+		// returns. However, some application dump data without correctly using
+		// the CONT tags.
+		//
+		// Strictly speaking we should bail out with an error but there are too
+		// many cases that are difficult to clean up for consumers so we offer
+		// and option to permit it.
+
+		decoder := gedcom.NewDecoder(strings.NewReader("0 TEXT Karen Marie McMillan<br>Gender: Female<br>Birth: Aug 21 1957 - \n\n\t&nbsp;Texas, USA"))
+		decoder.AllowMultiLine = true
+
+		actual, err := decoder.Decode()
+		if assert.NoError(t, err) {
+			doc := gedcom.NewDocument()
+			doc.AddNode(gedcom.NewNode(gedcom.TagFromString("TEXT"), "Karen Marie McMillan<br>Gender: Female<br>Birth: Aug 21 1957 - \n\n\t&nbsp;Texas, USA", ""))
+
+			assertDocumentEqual(t, doc, actual)
+		}
+	})
 }
 
 func trimSpaces(s string) string {
