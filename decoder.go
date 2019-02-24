@@ -157,7 +157,7 @@ func (dec *Decoder) readLine() (string, error) {
 	return string(buf.Bytes()), nil
 }
 
-var lineRegexp = regexp.MustCompile(`^(\d) (@[^@]+@ )?(\w+) ?(.*)?$`)
+var lineRegexp = regexp.MustCompile(`^(\d) +(@[^@]+@ )?(\w+) ?(.*)?$`)
 
 func parseLine(line string, document *Document, family *FamilyNode) (Node, int, error) {
 	parts := lineRegexp.FindStringSubmatch(line)

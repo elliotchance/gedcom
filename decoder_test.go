@@ -314,6 +314,20 @@ func TestDecoder_Decode(t *testing.T) {
 		})
 	}
 
+	t.Run("DoubleSpace", func(t *testing.T) {
+		// Issue #243
+
+		decoder := gedcom.NewDecoder(strings.NewReader("0  _PUBLISH"))
+
+		actual, err := decoder.Decode()
+		assert.NoError(t, err)
+
+		doc := gedcom.NewDocument()
+		doc.AddNode(gedcom.NewNode(gedcom.TagFromString("_PUBLISH"), "", ""))
+
+		assertDocumentEqual(t, doc, actual)
+	})
+
 	t.Run("BOM", func(t *testing.T) {
 		ged := "\xEF\xBB\xBF0 HEAD\n1 CHAR UTF-8"
 		decoder := gedcom.NewDecoder(strings.NewReader(ged))
