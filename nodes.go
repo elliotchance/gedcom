@@ -25,12 +25,11 @@ func NodesWithTag(node Node, tag Tag) (result Nodes) {
 	}
 
 	defer func() {
-		if _, ok := nodeCache.Load(node); !ok {
+		if v1, ok := nodeCache.Load(node); ok {
+			v1.(*sync.Map).Store(tag, result)
+		} else {
 			nodeCache.Store(node, &sync.Map{})
 		}
-
-		v1, _ := nodeCache.Load(node)
-		v1.(*sync.Map).Store(tag, result)
 	}()
 
 	if IsNil(node) {
