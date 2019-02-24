@@ -35,6 +35,7 @@ var (
 	optionMinimumWeightedSimilarity float64
 	optionSort                      string // see optionSort constants.
 	optionPreferPointerAbove        float64
+	optionAllowMultiLine            bool
 )
 
 var filterFlags = &gedcom.FilterFlags{}
@@ -43,6 +44,18 @@ func check(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func newDocumentFromGEDCOMFile(path string) (*gedcom.Document, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+
+	decoder := gedcom.NewDecoder(file)
+	decoder.AllowMultiLine = optionAllowMultiLine
+
+	return decoder.Decode()
 }
 
 func main() {
@@ -78,10 +91,10 @@ func main() {
 		close(compareOptions.Notifier)
 	}()
 
-	leftGedcom, err := gedcom.NewDocumentFromGEDCOMFile(optionLeftGedcomFile)
+	leftGedcom, err := newDocumentFromGEDCOMFile(optionLeftGedcomFile)
 	check(err)
 
-	rightGedcom, err := gedcom.NewDocumentFromGEDCOMFile(optionRightGedcomFile)
+	rightGedcom, err := newDocumentFromGEDCOMFile(optionRightGedcomFile)
 	check(err)
 
 	// Run compare.
@@ -237,6 +250,20 @@ func parseCLIFlags() {
 			come from the same base and retained the pointers between
 			individuals of the existing data.
 			`, gedcom.DefaultMinimumSimilarity)))
+
+	flag.BoolVar(&optionAllowMultiLine, "allow-multi-line", false,
+		util.CLIDescription(`
+			It is not valid for GEDCOM values to contain new lines or carriage
+			returns. However, some application dump data without correctly using
+			the CONT tags.
+
+			Strictly speaking we should bail out with an error but there are too
+			many cases that are difficult to clean up for consumers so we offer
+			and option to permit it.
+
+			When enabled any line than cannot be parsed will be considered an
+			extension of the previous line (including the new line character).
+			`))
 
 	filterFlags.SetupCLI()
 
