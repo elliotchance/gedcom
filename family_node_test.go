@@ -251,7 +251,7 @@ var familyWarningTests = map[string]struct {
 				AddChild(p2)
 		},
 		[]string{
-			"The child Elliot Chance (b. 3 Apr 1961) was born before their father John Chance (b. 16 May 1989)",
+			"The child Elliot Chance (b. 3 Apr 1961) was born before their father John Chance (b. 16 May 1989).",
 		},
 	},
 	"ChildBornBeforeMother": {
@@ -268,7 +268,7 @@ var familyWarningTests = map[string]struct {
 				AddChild(p2)
 		},
 		[]string{
-			"The child Elliot Chance (b. 3 Apr 1961) was born before their mother Jenny Chance (b. 16 May 1989)",
+			"The child Elliot Chance (b. 3 Apr 1961) was born before their mother Jenny Chance (b. 16 May 1989).",
 		},
 	},
 	"MaleChildBornBeforeFather": {
@@ -286,7 +286,7 @@ var familyWarningTests = map[string]struct {
 				AddChild(p2)
 		},
 		[]string{
-			"The child Elliot Chance (b. 3 Apr 1961) was born before his father John Chance (b. 16 May 1989)",
+			"The child Elliot Chance (b. 3 Apr 1961) was born before his father John Chance (b. 16 May 1989).",
 		},
 	},
 	"FemaleChildBornBeforeFather": {
@@ -304,7 +304,7 @@ var familyWarningTests = map[string]struct {
 				AddChild(p2)
 		},
 		[]string{
-			"The child Sarah Chance (b. 3 Apr 1961) was born before her father John Chance (b. 16 May 1989)",
+			"The child Sarah Chance (b. 3 Apr 1961) was born before her father John Chance (b. 16 May 1989).",
 		},
 	},
 	"SiblingsBornFarAwayFromEachOther": {
@@ -340,7 +340,7 @@ var familyWarningTests = map[string]struct {
 			f1.AddChild(p2)
 		},
 		[]string{
-			"The siblings John Chance (b. 16 May 1989) and Sarah Chance (b. 3 Apr 1989) were born within one month and 13 days of each other",
+			"The siblings John Chance (b. 16 May 1989) and Sarah Chance (b. 3 Apr 1989) were born within one month and 13 days of each other.",
 		},
 	},
 }

@@ -3,8 +3,9 @@ package gedcom
 import "fmt"
 
 type ChildBornBeforeParentWarning struct {
-	Parent *IndividualNode
-	Child  *ChildNode
+	Parent  *IndividualNode
+	Child   *ChildNode
+	Context WarningContext
 }
 
 func NewChildBornBeforeParentWarning(parent *IndividualNode, child *ChildNode) *ChildBornBeforeParentWarning {
@@ -29,6 +30,10 @@ func (w *ChildBornBeforeParentWarning) String() string {
 		relationship = "mother"
 	}
 
-	return fmt.Sprintf("The child %s was born before %s %s %s",
+	return fmt.Sprintf("The child %s was born before %s %s %s.",
 		w.Child, w.Child.Individual().Sex().OwnershipWord(), relationship, w.Parent)
+}
+
+func (w *ChildBornBeforeParentWarning) SetContext(context WarningContext) {
+	w.Context = context
 }

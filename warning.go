@@ -1,8 +1,12 @@
 package gedcom
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Warning interface {
 	fmt.Stringer
+
 	Name() string
+	SetContext(context WarningContext)
 }
