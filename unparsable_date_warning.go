@@ -1,9 +1,12 @@
 package gedcom
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type UnparsableDateWarning struct {
-	Date *DateNode
+	Date    *DateNode
+	Context WarningContext
 }
 
 func NewUnparsableDateWarning(date *DateNode) *UnparsableDateWarning {
@@ -18,4 +21,8 @@ func (w *UnparsableDateWarning) Name() string {
 
 func (w *UnparsableDateWarning) String() string {
 	return fmt.Sprintf(`Unparsable date "%s"`, w.Date.Value())
+}
+
+func (w *UnparsableDateWarning) SetContext(context WarningContext) {
+	w.Context = context
 }

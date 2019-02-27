@@ -329,10 +329,25 @@ func (doc *Document) DeleteNode(node Node) (didDelete bool) {
 }
 
 func (doc *Document) Warnings() (warnings Warnings) {
+	context := WarningContext{}
+
 	for _, node := range doc.nodes {
+		if individual, ok := node.(*IndividualNode); ok {
+			context.Individual = individual
+			context.Family = nil
+		}
+
+		if family, ok := node.(*FamilyNode); ok {
+			context.Individual = nil
+			context.Family = family
+		}
+
 		Filter(node, func(node Node) (newNode Node, traverseChildren bool) {
 			if warner, ok := node.(Warner); ok {
-				warnings = append(warnings, warner.Warnings()...)
+				for _, warning := range warner.Warnings() {
+					warning.SetContext(context)
+					warnings = append(warnings, warning)
+				}
 			}
 
 			return node, true

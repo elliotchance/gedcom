@@ -237,7 +237,7 @@ var documentWarningTests = map[string]struct {
 				AddChild(p2)
 		},
 		[]string{
-			"The child Elliot Chance (b. 3 Apr 1961) was born before their mother Jenny Chance (b. 16 May 1989)",
+			"The child Elliot Chance (b. 3 Apr 1961) was born before their mother Jenny Chance (b. 16 May 1989).",
 		},
 	},
 	"UnparsableDate": {
