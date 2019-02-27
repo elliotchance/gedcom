@@ -26,3 +26,13 @@ func (w *UnparsableDateWarning) String() string {
 func (w *UnparsableDateWarning) SetContext(context WarningContext) {
 	w.Context = context
 }
+
+func (w *UnparsableDateWarning) MarshalQ() interface{} {
+	return map[string]interface{}{
+		"String":  w.String(),
+		"Name":    w.Name(),
+		"Context": w.Context.MarshalQ(),
+
+		"Date": w.Date.Value(),
+	}
+}

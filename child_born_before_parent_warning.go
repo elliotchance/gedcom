@@ -37,3 +37,14 @@ func (w *ChildBornBeforeParentWarning) String() string {
 func (w *ChildBornBeforeParentWarning) SetContext(context WarningContext) {
 	w.Context = context
 }
+
+func (w *ChildBornBeforeParentWarning) MarshalQ() interface{} {
+	return map[string]interface{}{
+		"String":  w.String(),
+		"Name":    w.Name(),
+		"Context": w.Context.MarshalQ(),
+
+		"Parent": w.Parent.Pointer(),
+		"Child":  w.Child.Individual().Pointer(),
+	}
+}
