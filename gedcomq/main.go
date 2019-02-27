@@ -72,7 +72,7 @@ func output(result interface{}) {
 		log.Panicf("unsupported format: %s", optionFormat)
 	}
 
-	formatter.Write(result)
+	formatter.Write(gedcom.MarshalQ(result))
 }
 
 func parseCLIFlags() {

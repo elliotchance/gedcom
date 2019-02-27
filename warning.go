@@ -6,6 +6,7 @@ import (
 
 type Warning interface {
 	fmt.Stringer
+	QMarshaller
 
 	Name() string
 	SetContext(context WarningContext)

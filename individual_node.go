@@ -937,3 +937,10 @@ func (node *IndividualNode) AddBirthDate(birthDate string) *IndividualNode {
 
 	return node
 }
+
+func (node *IndividualNode) MarshalQ() interface{} {
+	return map[string]interface{}{
+		"Nodes":  node.Nodes(),
+		"String": node.String(),
+	}
+}

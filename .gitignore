@@ -5,3 +5,4 @@
 /gh-md-toc
 /coverage.txt
 /gedcomq/gedcomq
+gedcomq/*.ged

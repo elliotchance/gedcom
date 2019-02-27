@@ -9,3 +9,12 @@ func (ws Warnings) Strings() (ss []string) {
 
 	return
 }
+
+func (ws Warnings) MarshalQ() interface{} {
+	out := []interface{}{}
+	for _, warning := range ws {
+		out = append(out, warning.MarshalQ())
+	}
+
+	return out
+}

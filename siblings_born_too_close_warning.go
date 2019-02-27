@@ -31,3 +31,13 @@ func (w *SiblingsBornTooCloseWarning) SetContext(context WarningContext) {
 	w.Context = context
 }
 
+func (w *SiblingsBornTooCloseWarning) MarshalQ() interface{} {
+	return map[string]interface{}{
+		"String":  w.String(),
+		"Context": w.Context.MarshalQ(),
+		"Name":    w.Name(),
+
+		"Sibling1": valueToPointer(w.Sibling1.Value()),
+		"Sibling2": valueToPointer(w.Sibling2.Value()),
+	}
+}
