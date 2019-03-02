@@ -256,6 +256,17 @@ var documentWarningTests = map[string]struct {
 			`Unparsable date "around world war 2"`,
 		},
 	},
+	"DeathBeforeBirth": {
+		func(doc *gedcom.Document) {
+			doc.AddIndividual("P1").
+				AddName("Jenny /Chance/").
+				AddBirthDate("16 May 1989").
+				AddDeathDate("16 May 1979")
+		},
+		[]string{
+			"The death (16 May 1979) was before the birth (16 May 1989) of Jenny Chance (b. 16 May 1989, d. 16 May 1979).",
+		},
+	},
 }
 
 func TestDocument_Warnings(t *testing.T) {

@@ -907,19 +907,6 @@ func (node *IndividualNode) resetCache() {
 	node.cachedUniqueIDs = nil
 }
 
-// SetSex adds or replaces tge gender of an individual. You should use one of
-// the SexMale, SexFemale or SexUnknown constants.
-func (node *IndividualNode) SetSex(sex string) *IndividualNode {
-	existingSex := First(NodesWithTag(node, TagSex))
-	if existingSex == nil {
-		node.AddNode(NewNode(TagSex, string(sex), ""))
-	} else {
-		existingSex.RawSimpleNode().value = string(sex)
-	}
-
-	return node
-}
-
 func (node *IndividualNode) AddName(name string) *IndividualNode {
 	node.AddNode(NewNameNode(name))
 
@@ -938,9 +925,126 @@ func (node *IndividualNode) AddBirthDate(birthDate string) *IndividualNode {
 	return node
 }
 
+// SetSex adds or replaces tge gender of an individual. You should use one of
+// the SexMale, SexFemale or SexUnknown constants.
+func (node *IndividualNode) SetSex(sex string) *IndividualNode {
+	existingSex := First(NodesWithTag(node, TagSex))
+	if existingSex == nil {
+		node.AddNode(NewNode(TagSex, string(sex), ""))
+	} else {
+		existingSex.RawSimpleNode().value = string(sex)
+	}
+
+	return node
+}
+
 func (node *IndividualNode) MarshalQ() interface{} {
 	return map[string]interface{}{
 		"Nodes":  node.Nodes(),
 		"String": node.String(),
 	}
+}
+
+func (node *IndividualNode) AddBurialDate(burialDate string) *IndividualNode {
+	existingBurial := First(node.Burials())
+	if existingBurial == nil {
+		existingBurial = NewBurialNode("")
+		node.AddNode(existingBurial)
+	}
+
+	existingBurial.AddNode(NewDateNode(burialDate))
+
+	return node
+}
+
+func (node *IndividualNode) AddBaptismDate(baptismDate string) *IndividualNode {
+	existingBaptism := First(node.Baptisms())
+	if existingBaptism == nil {
+		existingBaptism = NewBaptismNode("")
+		node.AddNode(existingBaptism)
+	}
+
+	existingBaptism.AddNode(NewDateNode(baptismDate))
+
+	return node
+}
+
+type eventAndDate struct {
+	Event Node
+	Date  *DateNode
+}
+
+func (node *IndividualNode) Warnings() (warnings Warnings) {
+	// Event order describes the boundaries of groups of events. That is to say
+	// that any baptism or LDS baptism events must be after a birth event but
+	// also much be before the any death event.
+	eventOrder := []*struct {
+		Tags   []Tag
+		Events []eventAndDate
+	}{
+		{
+			Tags: []Tag{TagBirth},
+		},
+		{
+			Tags: []Tag{TagBaptism, TagLDSBaptism},
+		},
+		{
+			Tags: []Tag{TagDeath},
+		},
+		{
+			Tags: []Tag{TagBurial},
+		},
+	}
+
+	// Collect all of the dates. This just makes it easier to compare later.
+	// Each of the dates found in events are partnered with the original event
+	// as we will need both if it turns into a warning.
+	for _, group := range eventOrder {
+		for _, tag := range group.Tags {
+			nodes := NodesWithTag(node, tag)
+			for _, node := range nodes {
+				for _, date := range NodesWithTag(node, TagDate) {
+					group.Events = append(group.Events, eventAndDate{
+						Event: node,
+						Date:  date.(*DateNode),
+					})
+				}
+			}
+		}
+	}
+
+	// Check the order. This is an iterative approach where each group is
+	// compared with all of the events that proceed it.
+	for i, group := range eventOrder {
+		for _, event := range group.Events {
+			for _, futureGroup := range eventOrder[i+1:] {
+				for _, futureEvent := range futureGroup.Events {
+					if futureEvent.Date.IsBefore(event.Date) {
+						warning := NewIncorrectEventOrderWarning(
+							futureEvent.Event, futureEvent.Date.DateRange(),
+							event.Event, event.Date.DateRange(),
+						)
+						warning.SetContext(WarningContext{
+							Individual: node,
+						})
+						warnings = append(warnings, warning)
+					}
+				}
+			}
+		}
+	}
+
+	return
+}
+
+func (node *IndividualNode) AddDeathDate(deathDate string) *IndividualNode {
+	existingDeath := First(node.Deaths())
+	if existingDeath == nil {
+		existingDeath = NewDeathNode("")
+		node.AddNode(existingDeath)
+	}
+
+	existingDeath.AddNode(NewDateNode(deathDate))
+
+	return node
 }

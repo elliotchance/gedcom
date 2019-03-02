@@ -5,8 +5,8 @@ import (
 )
 
 type UnparsableDateWarning struct {
-	Date    *DateNode
-	Context WarningContext
+	SimpleWarning
+	Date *DateNode
 }
 
 func NewUnparsableDateWarning(date *DateNode) *UnparsableDateWarning {
@@ -21,10 +21,6 @@ func (w *UnparsableDateWarning) Name() string {
 
 func (w *UnparsableDateWarning) String() string {
 	return fmt.Sprintf(`Unparsable date "%s"`, w.Date.Value())
-}
-
-func (w *UnparsableDateWarning) SetContext(context WarningContext) {
-	w.Context = context
 }
 
 func (w *UnparsableDateWarning) MarshalQ() interface{} {
