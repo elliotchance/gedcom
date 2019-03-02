@@ -686,3 +686,55 @@ func setUID(i *gedcom.IndividualNode, uid string) *gedcom.IndividualNode {
 
 	return i
 }
+
+var individualWarningTests = map[string]struct {
+	doc      func(doc *gedcom.Document)
+	expected []string
+}{
+	"None": {
+		func(doc *gedcom.Document) {
+			individual(doc, "P1", "Elliot /Chance/", "", "16 May 1989")
+		},
+		nil,
+	},
+	"DeathBeforeBurial": {
+		func(doc *gedcom.Document) {
+			elliot := individual(doc, "P1", "Elliot /Chance/", "", "1 May 1989")
+			elliot.AddBurialDate("16 May 1989")
+		},
+		nil,
+	},
+	"BurialBeforeDeath": {
+		func(doc *gedcom.Document) {
+			elliot := individual(doc, "P1", "Elliot /Chance/", "", "16 May 1989")
+			elliot.AddBurialDate("1 May 1989")
+		},
+		[]string{"The burial (1 May 1989) was before the death (16 May 1989) of Elliot Chance (d. 16 May 1989)."},
+	},
+	"BirthBeforeBaptism": {
+		func(doc *gedcom.Document) {
+			elliot := individual(doc, "P1", "Elliot /Chance/", "1 May 1989", "")
+			elliot.AddBaptismDate("16 May 1989")
+		},
+		nil,
+	},
+	"BaptismBeforeBirth": {
+		func(doc *gedcom.Document) {
+			elliot := individual(doc, "P1", "Elliot /Chance/", "16 May 1989", "")
+			elliot.AddBaptismDate("1 May 1989")
+		},
+		[]string{"The baptism (1 May 1989) was before the birth (16 May 1989) of Elliot Chance (b. 16 May 1989)."},
+	},
+}
+
+func TestIndividualNode_Warnings(t *testing.T) {
+	for testName, test := range individualWarningTests {
+		t.Run(testName, func(t *testing.T) {
+			doc := gedcom.NewDocument()
+			test.doc(doc)
+
+			p1 := doc.Individuals().ByPointer("P1")
+			assertEqual(t, p1.Warnings().Strings(), test.expected)
+		})
+	}
+}

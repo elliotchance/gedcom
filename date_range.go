@@ -315,3 +315,12 @@ func (dr DateRange) ParseError() error {
 
 	return nil
 }
+
+func (dr DateRange) String() string {
+	start, end := dr.StartAndEndDates()
+	if start.Equals(end) {
+		return start.String()
+	}
+
+	return fmt.Sprintf("Bet. %s and %s", start, end)
+}

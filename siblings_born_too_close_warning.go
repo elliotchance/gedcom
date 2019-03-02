@@ -3,8 +3,8 @@ package gedcom
 import "fmt"
 
 type SiblingsBornTooCloseWarning struct {
+	SimpleWarning
 	Sibling1, Sibling2 *ChildNode
-	Context            WarningContext
 }
 
 func NewSiblingsBornTooCloseWarning(sibling1, sibling2 *ChildNode) *SiblingsBornTooCloseWarning {
@@ -25,10 +25,6 @@ func (w *SiblingsBornTooCloseWarning) String() string {
 
 	return fmt.Sprintf("The siblings %s and %s were born within %s of each other.",
 		w.Sibling1, w.Sibling2, Duration(min).String())
-}
-
-func (w *SiblingsBornTooCloseWarning) SetContext(context WarningContext) {
-	w.Context = context
 }
 
 func (w *SiblingsBornTooCloseWarning) MarshalQ() interface{} {
