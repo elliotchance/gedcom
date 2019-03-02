@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -19,7 +20,7 @@ func NewIndividualNameAndDates(individual *gedcom.IndividualNode, visibility Liv
 	}
 }
 
-func (c *IndividualNameAndDates) WriteTo(w io.Writer) (int64, error) {
+func (c *IndividualNameAndDates) WriteHTMLTo(w io.Writer) (int64, error) {
 	name := NewIndividualName(c.individual, c.visibility, c.unknownText)
 	dates := NewIndividualDates(c.individual, c.visibility)
 
@@ -27,8 +28,9 @@ func (c *IndividualNameAndDates) WriteTo(w io.Writer) (int64, error) {
 	datesAreBlank := dates.IsBlank()
 
 	if isUnknown || datesAreBlank {
-		return name.WriteTo(w)
+		return name.WriteHTMLTo(w)
 	}
 
-	return NewComponents(name, NewText(" ("), dates, NewText(")")).WriteTo(w)
+	return core.NewComponents(name, core.NewText(" ("), dates,
+		core.NewText(")")).WriteHTMLTo(w)
 }

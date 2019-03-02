@@ -3,6 +3,7 @@ package html
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 	"strings"
 )
@@ -28,8 +29,8 @@ func appendString(w io.Writer, data string) int64 {
 	return n
 }
 
-func appendComponent(w io.Writer, component Component) int64 {
-	n, err := component.WriteTo(w)
+func appendComponent(w io.Writer, component core.Component) int64 {
+	n, err := component.WriteHTMLTo(w)
 	if err != nil {
 		panic(err)
 	}

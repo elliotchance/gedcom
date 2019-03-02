@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -25,30 +26,30 @@ func NewIndividualPage(document *gedcom.Document, individual *gedcom.IndividualN
 	}
 }
 
-func (c *IndividualPage) WriteTo(w io.Writer) (int64, error) {
+func (c *IndividualPage) WriteHTMLTo(w io.Writer) (int64, error) {
 	name := c.individual.Names()[0]
 
 	individualName := NewIndividualName(c.individual, c.visibility,
 		UnknownEmphasis)
 	individualDates := NewIndividualDates(c.individual, c.visibility)
 
-	return NewPage(
+	return core.NewPage(
 		name.String(),
-		NewComponents(
+		core.NewComponents(
 			NewPublishHeader(c.document, name.String(), selectedExtraTab, c.options),
 			NewAllParentButtons(c.document, c.individual, c.visibility),
-			NewBigTitle(1, individualName),
-			NewBigTitle(3, individualDates),
-			NewHorizontalRuleRow(),
-			NewRow(
-				NewColumn(HalfRow, NewIndividualNameAndSex(c.individual)),
-				NewColumn(HalfRow, NewIndividualAdditionalNames(c.individual)),
+			core.NewBigTitle(1, individualName),
+			core.NewBigTitle(3, individualDates),
+			core.NewHorizontalRuleRow(),
+			core.NewRow(
+				core.NewColumn(core.HalfRow, NewIndividualNameAndSex(c.individual)),
+				core.NewColumn(core.HalfRow, NewIndividualAdditionalNames(c.individual)),
 			),
-			NewSpace(),
+			core.NewSpace(),
 			newIndividualEvents(c.document, c.individual, c.visibility),
-			NewSpace(),
+			core.NewSpace(),
 			NewPartnersAndChildren(c.document, c.individual, c.visibility),
 		),
 		c.googleAnalyticsID,
-	).WriteTo(w)
+	).WriteHTMLTo(w)
 }

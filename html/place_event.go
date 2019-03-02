@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -19,7 +20,7 @@ func NewPlaceEvent(document *gedcom.Document, node gedcom.Node, visibility Livin
 	}
 }
 
-func (c *PlaceEvent) WriteTo(w io.Writer) (int64, error) {
+func (c *PlaceEvent) WriteHTMLTo(w io.Writer) (int64, error) {
 	date := ""
 	description := c.node.Tag().String()
 
@@ -30,7 +31,7 @@ func (c *PlaceEvent) WriteTo(w io.Writer) (int64, error) {
 	}
 
 	individual := individualForNode(c.document, c.node)
-	var person Component = NewIndividualLink(c.document, individual, c.visibility)
+	var person core.Component = NewIndividualLink(c.document, individual, c.visibility)
 	isLiving := individual != nil && individual.IsLiving()
 
 	if isLiving {
@@ -42,13 +43,13 @@ func (c *PlaceEvent) WriteTo(w io.Writer) (int64, error) {
 			// Proceed.
 
 		case LivingVisibilityPlaceholder:
-			person = NewEmpty()
+			person = core.NewEmpty()
 		}
 	}
 
-	return NewTableRow(
-		NewTableCell(NewText(date)).NoWrap(),
-		NewTableCell(NewText(description)).NoWrap(),
-		NewTableCell(person).NoWrap(),
-	).WriteTo(w)
+	return core.NewTableRow(
+		core.NewTableCell(core.NewText(date)).NoWrap(),
+		core.NewTableCell(core.NewText(description)).NoWrap(),
+		core.NewTableCell(person).NoWrap(),
+	).WriteHTMLTo(w)
 }

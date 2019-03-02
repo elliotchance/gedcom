@@ -31,16 +31,5 @@ func (w *IncorrectEventOrderWarning) String() string {
 	return fmt.Sprintf(`The %s (%s) was before the %s (%s) of %s.`,
 		strings.ToLower(w.FirstEvent.Tag().String()), w.FirstDateRange,
 		strings.ToLower(w.SecondEvent.Tag().String()), w.SecondDateRange,
-		w.Context.Individual)
-}
-
-func (w *IncorrectEventOrderWarning) MarshalQ() interface{} {
-	return map[string]interface{}{
-		"String":  w.String(),
-		"Name":    w.Name(),
-		"Context": w.Context.MarshalQ(),
-
-		"FirstEvent":  w.FirstEvent,
-		"SecondEvent": w.SecondEvent,
-	}
+		w.Context().Individual)
 }

@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -21,18 +22,18 @@ func NewParentButtons(document *gedcom.Document, family *gedcom.FamilyNode, visi
 	}
 }
 
-func (c *ParentButtons) WriteTo(w io.Writer) (int64, error) {
+func (c *ParentButtons) WriteHTMLTo(w io.Writer) (int64, error) {
 	husband := NewIndividualButton(c.document, c.family.Husband().Individual(), c.visibility)
 	wife := NewIndividualButton(c.document, c.family.Wife().Individual(), c.visibility)
 	svg := NewPlusSVG(false, true, true, true)
-	space := NewSpace()
+	space := core.NewSpace()
 
-	return NewComponents(
-		NewRow(
-			NewColumn(5, husband),
-			NewColumn(2, svg),
-			NewColumn(5, wife),
+	return core.NewComponents(
+		core.NewRow(
+			core.NewColumn(5, husband),
+			core.NewColumn(2, svg),
+			core.NewColumn(5, wife),
 		),
 		space,
-	).WriteTo(w)
+	).WriteHTMLTo(w)
 }

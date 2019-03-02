@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 	"sort"
 )
@@ -22,14 +23,14 @@ func newIndividualEvents(document *gedcom.Document, individual *gedcom.Individua
 	}
 }
 
-func (c *IndividualEvents) WriteTo(w io.Writer) (int64, error) {
-	events := []Component{}
+func (c *IndividualEvents) WriteHTMLTo(w io.Writer) (int64, error) {
+	events := []core.Component{}
 
 	for _, event := range c.individual.AllEvents() {
 		date := gedcom.String(gedcom.First(gedcom.Dates(event)))
 		place := gedcom.String(gedcom.First(gedcom.Places(event)))
 
-		e := NewIndividualEvent(date, place, NewEmpty(), c.individual, event)
+		e := NewIndividualEvent(date, place, core.NewEmpty(), c.individual, event)
 		events = append(events, e)
 	}
 
@@ -49,9 +50,9 @@ func (c *IndividualEvents) WriteTo(w io.Writer) (int64, error) {
 			place = p.Value()
 		}
 
-		var description Component = NewEmpty()
+		var description core.Component = core.NewEmpty()
 		if family.Husband().IsIndividual(c.individual) {
-			description = NewHTML(UnknownEmphasis)
+			description = core.NewHTML(UnknownEmphasis)
 
 			if wife := family.Wife(); wife != nil {
 				description = NewIndividualLink(c.document, wife.Individual(), c.visibility)
@@ -59,7 +60,7 @@ func (c *IndividualEvents) WriteTo(w io.Writer) (int64, error) {
 		}
 
 		if family.Wife().IsIndividual(c.individual) {
-			description = NewHTML(UnknownEmphasis)
+			description = core.NewHTML(UnknownEmphasis)
 
 			if husband := family.Husband(); husband != nil {
 				description = NewIndividualLink(c.document, husband.Individual(), c.visibility)
@@ -68,7 +69,7 @@ func (c *IndividualEvents) WriteTo(w io.Writer) (int64, error) {
 
 		// Empty description means that the individual is a child so this is not
 		// an event we want to show.
-		if _, ok := description.(*Empty); !ok {
+		if _, ok := description.(*core.Empty); !ok {
 			event := NewIndividualEvent(date.Value(), place,
 				description, c.individual, marriage)
 			events = append(events, event)
@@ -90,11 +91,11 @@ func (c *IndividualEvents) WriteTo(w io.Writer) (int64, error) {
 		return aStart.Years() < bStart.Years()
 	})
 
-	tableHead := NewTableHead("Age", "Type", "Date", "Place", "Description")
-	components := NewComponents(events...)
-	s := NewTable("text-center", tableHead, components)
+	tableHead := core.NewTableHead("Age", "Type", "Date", "Place", "Description")
+	components := core.NewComponents(events...)
+	s := core.NewTable("text-center", tableHead, components)
 
-	return NewRow(NewColumn(EntireRow,
-		NewCard(NewText("Events"), len(events), s),
-	)).WriteTo(w)
+	return core.NewRow(core.NewColumn(core.EntireRow,
+		core.NewCard(core.NewText("Events"), len(events), s),
+	)).WriteHTMLTo(w)
 }

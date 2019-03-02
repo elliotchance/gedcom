@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -21,25 +22,25 @@ func NewIndividualInList(document *gedcom.Document, individual *gedcom.Individua
 	}
 }
 
-func (c *IndividualInList) WriteTo(w io.Writer) (int64, error) {
+func (c *IndividualInList) WriteHTMLTo(w io.Writer) (int64, error) {
 	birthDate, birthPlace := c.individual.Birth()
 	deathDate, deathPlace := c.individual.Death()
 
 	birthPlaceName := prettyPlaceName(gedcom.String(birthPlace))
 	deathPlaceName := prettyPlaceName(gedcom.String(deathPlace))
 
-	birthDateText := NewText(gedcom.String(birthDate))
-	deathDateText := NewText(gedcom.String(deathDate))
+	birthDateText := core.NewText(gedcom.String(birthDate))
+	deathDateText := core.NewText(gedcom.String(deathDate))
 
 	link := NewIndividualLink(c.document, c.individual, c.visibility)
 	birthPlaceLink := NewPlaceLink(c.document, birthPlaceName)
 	deathPlaceLink := NewPlaceLink(c.document, deathPlaceName)
-	birthLines := NewLines(birthDateText, birthPlaceLink)
-	deathLines := NewLines(deathDateText, deathPlaceLink)
+	birthLines := core.NewLines(birthDateText, birthPlaceLink)
+	deathLines := core.NewLines(deathDateText, deathPlaceLink)
 
-	return NewTableRow(
-		NewTableCell(link).NoWrap(),
-		NewTableCell(birthLines),
-		NewTableCell(deathLines),
-	).WriteTo(w)
+	return core.NewTableRow(
+		core.NewTableCell(link).NoWrap(),
+		core.NewTableCell(birthLines),
+		core.NewTableCell(deathLines),
+	).WriteHTMLTo(w)
 }

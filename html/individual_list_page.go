@@ -3,6 +3,7 @@ package html
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 	"sort"
 )
@@ -26,9 +27,9 @@ func NewIndividualListPage(document *gedcom.Document, selectedLetter rune, googl
 	}
 }
 
-func (c *IndividualListPage) WriteTo(w io.Writer) (int64, error) {
-	table := []Component{
-		NewTableHead("Name", "Birth", "Death"),
+func (c *IndividualListPage) WriteHTMLTo(w io.Writer) (int64, error) {
+	table := []core.Component{
+		core.NewTableHead("Name", "Birth", "Death"),
 	}
 
 	individuals := gedcom.IndividualNodes{}
@@ -62,15 +63,15 @@ func (c *IndividualListPage) WriteTo(w io.Writer) (int64, error) {
 		}
 
 		if newSurname := i.Name().Surname(); newSurname != lastSurname {
-			heading := NewComponents(
-				NewAnchor(newSurname),
-				NewHeading(3, "", NewText(newSurname)),
+			heading := core.NewComponents(
+				core.NewAnchor(newSurname),
+				core.NewHeading(3, "", core.NewText(newSurname)),
 			)
 
-			table = append(table, NewTableRow(
-				NewTableCell(heading),
-				NewTableCell(NewText("")),
-				NewTableCell(NewText("")),
+			table = append(table, core.NewTableRow(
+				core.NewTableCell(heading),
+				core.NewTableCell(core.NewText("")),
+				core.NewTableCell(core.NewText("")),
 			))
 
 			lastSurname = newSurname
@@ -79,8 +80,8 @@ func (c *IndividualListPage) WriteTo(w io.Writer) (int64, error) {
 		table = append(table, NewIndividualInList(c.document, i, c.visibility))
 	}
 
-	livingRow := NewRow(
-		NewColumn(EntireRow, NewText(fmt.Sprintf(
+	livingRow := core.NewRow(
+		core.NewColumn(core.EntireRow, core.NewText(fmt.Sprintf(
 			"%d individuals are hidden because they are living.",
 			livingCount,
 		))),
@@ -92,16 +93,16 @@ func (c *IndividualListPage) WriteTo(w io.Writer) (int64, error) {
 		livingRow = nil
 	}
 
-	return NewPage("Individuals", NewComponents(
+	return core.NewPage("Individuals", core.NewComponents(
 		NewPublishHeader(c.document, "", selectedIndividualsTab, c.options),
 		livingRow,
-		NewSpace(),
+		core.NewSpace(),
 		NewIndividualIndexHeader(c.document, c.selectedLetter),
-		NewSpace(),
+		core.NewSpace(),
 		NewSurnameIndex(c.document, c.selectedLetter, c.visibility),
-		NewSpace(),
-		NewRow(
-			NewColumn(EntireRow, NewTable("", table...)),
+		core.NewSpace(),
+		core.NewRow(
+			core.NewColumn(core.EntireRow, core.NewTable("", table...)),
 		),
-	), c.googleAnalyticsID).WriteTo(w)
+	), c.googleAnalyticsID).WriteHTMLTo(w)
 }

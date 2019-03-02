@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestEventDate_WriteTo(t *testing.T) {
+func TestEventDate_WriteHTMLTo(t *testing.T) {
 	c := testComponent(t, "EventDate")
 
 	c(html.NewEventDate("foo", gedcom.DateNodes{})).Returns(``)

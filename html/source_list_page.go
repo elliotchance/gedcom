@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -19,19 +20,19 @@ func NewSourceListPage(document *gedcom.Document, googleAnalyticsID string, opti
 	}
 }
 
-func (c *SourceListPage) WriteTo(w io.Writer) (int64, error) {
-	table := []Component{
-		NewTableHead("Name"),
+func (c *SourceListPage) WriteHTMLTo(w io.Writer) (int64, error) {
+	table := []core.Component{
+		core.NewTableHead("Name"),
 	}
 
 	for _, source := range c.document.Sources() {
 		table = append(table, NewSourceInList(c.document, source))
 	}
 
-	return NewPage("Sources", NewComponents(
+	return core.NewPage("Sources", core.NewComponents(
 		NewPublishHeader(c.document, "", selectedSourcesTab, c.options),
-		NewRow(
-			NewColumn(EntireRow, NewTable("", table...)),
+		core.NewRow(
+			core.NewColumn(core.EntireRow, core.NewTable("", table...)),
 		),
-	), c.googleAnalyticsID).WriteTo(w)
+	), c.googleAnalyticsID).WriteHTMLTo(w)
 }

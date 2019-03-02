@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestSexBadge_WriteTo(t *testing.T) {
+func TestSexBadge_WriteHTMLTo(t *testing.T) {
 	c := testComponent(t, "SexBadge")
 
 	c(html.NewSexBadge(nil)).

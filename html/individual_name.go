@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -35,7 +36,7 @@ func (c *IndividualName) IsUnknown() bool {
 	return len(names) == 0
 }
 
-func (c *IndividualName) WriteTo(w io.Writer) (int64, error) {
+func (c *IndividualName) WriteHTMLTo(w io.Writer) (int64, error) {
 	if c.individual == nil {
 		return writeString(w, c.unknownHTML)
 	}
@@ -59,5 +60,5 @@ func (c *IndividualName) WriteTo(w io.Writer) (int64, error) {
 		return writeString(w, c.unknownHTML)
 	}
 
-	return NewText(names[0].String()).WriteTo(w)
+	return core.NewText(names[0].String()).WriteHTMLTo(w)
 }

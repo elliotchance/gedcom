@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -21,9 +22,9 @@ func NewFamilyListPage(document *gedcom.Document, googleAnalyticsID string, opti
 	}
 }
 
-func (c *FamilyListPage) WriteTo(w io.Writer) (int64, error) {
-	table := []Component{
-		NewTableHead("Husband", "Date", "Wife"),
+func (c *FamilyListPage) WriteHTMLTo(w io.Writer) (int64, error) {
+	table := []core.Component{
+		core.NewTableHead("Husband", "Date", "Wife"),
 	}
 
 	for _, family := range c.document.Families() {
@@ -31,9 +32,10 @@ func (c *FamilyListPage) WriteTo(w io.Writer) (int64, error) {
 		table = append(table, familyInList)
 	}
 
-	column := NewColumn(EntireRow, NewTable("", table...))
+	column := core.NewColumn(core.EntireRow, core.NewTable("", table...))
 	header := NewPublishHeader(c.document, "", selectedFamiliesTab, c.options)
-	components := NewComponents(header, NewRow(column))
+	components := core.NewComponents(header, core.NewRow(column))
 
-	return NewPage("Families", components, c.googleAnalyticsID).WriteTo(w)
+	return core.NewPage("Families", components, c.googleAnalyticsID).
+		WriteHTMLTo(w)
 }

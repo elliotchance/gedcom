@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -17,7 +18,7 @@ func NewIndividualStatistics(document *gedcom.Document, visibility LivingVisibil
 	}
 }
 
-func (c *IndividualStatistics) WriteTo(w io.Writer) (int64, error) {
+func (c *IndividualStatistics) WriteHTMLTo(w io.Writer) (int64, error) {
 	total := 0
 	living := 0
 
@@ -40,16 +41,17 @@ func (c *IndividualStatistics) WriteTo(w io.Writer) (int64, error) {
 	case LivingVisibilityHide:
 		// We need to pretend like there were never any living individuals in
 		// the document at all.
-		totalRow = NewKeyedTableRow("Total", NewNumber(total-living), true)
-		livingRow = NewKeyedTableRow("Living", NewNumber(0), true)
-		deadRow = NewKeyedTableRow("Dead", NewNumber(total-living), true)
+		totalRow = core.NewKeyedTableRow("Total", core.NewNumber(total-living), true)
+		livingRow = core.NewKeyedTableRow("Living", core.NewNumber(0), true)
+		deadRow = core.NewKeyedTableRow("Dead", core.NewNumber(total-living), true)
 	}
 
-	s := NewComponents(totalRow, livingRow, deadRow)
+	s := core.NewComponents(totalRow, livingRow, deadRow)
 
-	return NewCard(NewText("Individuals"), noBadgeCount, NewTable("", s)).WriteTo(w)
+	return core.NewCard(core.NewText("Individuals"), core.CardNoBadgeCount,
+		core.NewTable("", s)).WriteHTMLTo(w)
 }
 
-func keyedNumberRow(title string, total int) *KeyedTableRow {
-	return NewKeyedTableRow(title, NewNumber(total), true)
+func keyedNumberRow(title string, total int) *core.KeyedTableRow {
+	return core.NewKeyedTableRow(title, core.NewNumber(total), true)
 }

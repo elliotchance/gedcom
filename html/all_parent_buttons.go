@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -22,9 +23,9 @@ func NewAllParentButtons(document *gedcom.Document, individual *gedcom.Individua
 	}
 }
 
-func (c *AllParentButtons) WriteTo(w io.Writer) (int64, error) {
+func (c *AllParentButtons) WriteHTMLTo(w io.Writer) (int64, error) {
 	families := c.individual.Families()
-	components := []Component{}
+	components := []core.Component{}
 
 	for _, family := range families {
 		husbandMatches := family.Husband().IsIndividual(c.individual)
@@ -42,10 +43,10 @@ func (c *AllParentButtons) WriteTo(w io.Writer) (int64, error) {
 	// create a dummy family that has no child nodes.
 	if len(components) == 0 {
 		familyNode := gedcom.NewDocument().AddFamily("")
-		components = []Component{
+		components = []core.Component{
 			NewParentButtons(c.document, familyNode, c.visibility),
 		}
 	}
 
-	return NewComponents(components...).WriteTo(w)
+	return core.NewComponents(components...).WriteHTMLTo(w)
 }

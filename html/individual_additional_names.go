@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -17,17 +18,18 @@ func NewIndividualAdditionalNames(individual *gedcom.IndividualNode) *Individual
 	}
 }
 
-func (c *IndividualAdditionalNames) WriteTo(w io.Writer) (int64, error) {
-	rows := []Component{}
+func (c *IndividualAdditionalNames) WriteHTMLTo(w io.Writer) (int64, error) {
+	rows := []core.Component{}
 	names := c.individual.Names()
 
 	for _, name := range names {
-		row := NewKeyedTableRow(name.Type().String(), NewText(name.String()),
+		row := core.NewKeyedTableRow(name.Type().String(), core.NewText(name.String()),
 			name.Type() != "")
 		rows = append(rows, row)
 	}
 
-	table := NewTable("", rows...)
+	table := core.NewTable("", rows...)
 
-	return NewCard(NewText("Additional Names"), len(names)-1, table).WriteTo(w)
+	return core.NewCard(core.NewText("Additional Names"), len(names)-1, table).
+		WriteHTMLTo(w)
 }

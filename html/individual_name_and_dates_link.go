@@ -3,6 +3,7 @@ package html
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -20,7 +21,7 @@ func NewIndividualNameAndDatesLink(individual *gedcom.IndividualNode, visibility
 	}
 }
 
-func (c *IndividualNameAndDatesLink) WriteTo(w io.Writer) (int64, error) {
+func (c *IndividualNameAndDatesLink) WriteHTMLTo(w io.Writer) (int64, error) {
 	if c.individual == nil {
 		return writeNothing()
 	}
@@ -28,5 +29,5 @@ func (c *IndividualNameAndDatesLink) WriteTo(w io.Writer) (int64, error) {
 	text := NewIndividualNameAndDates(c.individual, c.visibility, c.unknownText)
 	link := fmt.Sprintf("#%s", c.individual.Pointer())
 
-	return NewLink(text, link).Style("color: black").WriteTo(w)
+	return core.NewLink(text, link).Style("color: black").WriteHTMLTo(w)
 }

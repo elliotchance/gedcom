@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 	"strings"
 )
@@ -49,15 +50,15 @@ func getIndexLetter(individual *gedcom.IndividualNode) rune {
 	return rune(name[0])
 }
 
-func (c *IndividualIndexHeader) WriteTo(w io.Writer) (int64, error) {
-	pills := []Component{}
+func (c *IndividualIndexHeader) WriteHTMLTo(w io.Writer) (int64, error) {
+	pills := []core.Component{}
 
 	for _, letter := range GetIndexLetters(c.document) {
 		pills = append(pills,
 			NewIndividualIndexLetter(letter, letter == c.selectedLetter))
 	}
 
-	return NewRow(
-		NewColumn(EntireRow, NewNavPills(pills)),
-	).WriteTo(w)
+	return core.NewRow(
+		core.NewColumn(core.EntireRow, core.NewNavPills(pills)),
+	).WriteHTMLTo(w)
 }

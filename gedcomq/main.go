@@ -53,10 +53,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	output(result)
+	err = output(result)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
-func output(result interface{}) {
+func output(result interface{}) error {
 	var formatter q.Formatter
 
 	switch optionFormat {
@@ -68,11 +71,13 @@ func output(result interface{}) {
 		formatter = &q.CSVFormatter{os.Stdout}
 	case "gedcom":
 		formatter = &q.GEDCOMFormatter{os.Stdout}
+	case "html":
+		formatter = &q.HTMLFormatter{os.Stdout}
 	default:
 		log.Panicf("unsupported format: %s", optionFormat)
 	}
 
-	formatter.Write(gedcom.MarshalQ(result))
+	return formatter.Write(result)
 }
 
 func parseCLIFlags() {

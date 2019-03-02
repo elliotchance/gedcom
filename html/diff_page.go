@@ -3,6 +3,7 @@ package html
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"github.com/elliotchance/gedcom/util"
 	"io"
 	"sort"
@@ -159,7 +160,7 @@ func (c *DiffPage) sortResults(in chan *IndividualCompare) chan *IndividualCompa
 	return out
 }
 
-func (c *DiffPage) WriteTo(w io.Writer) (int64, error) {
+func (c *DiffPage) WriteHTMLTo(w io.Writer) (int64, error) {
 	if c.progress != nil {
 		c.progress <- gedcom.Progress{
 			Total: int64(len(c.comparisons)),
@@ -177,7 +178,7 @@ func (c *DiffPage) WriteTo(w io.Writer) (int64, error) {
 	}
 
 	// The index at the top of the page.
-	rows := []Component{}
+	rows := []core.Component{}
 	for _, comparison := range precalculatedComparisons {
 		weightedSimilarity := c.weightedSimilarity(comparison.comparison)
 
@@ -202,36 +203,37 @@ func (c *DiffPage) WriteTo(w io.Writer) (int64, error) {
 		leftNameAndDates := NewIndividualNameAndDatesLink(comparison.comparison.Left, c.visibility, "")
 		rightNameAndDates := NewIndividualNameAndDatesLink(comparison.comparison.Right, c.visibility, "")
 
-		left := NewTableCell(leftNameAndDates).Class(leftClass)
-		right := NewTableCell(rightNameAndDates).Class(rightClass)
+		left := core.NewTableCell(leftNameAndDates).Class(leftClass)
+		right := core.NewTableCell(rightNameAndDates).Class(rightClass)
 
-		middle := NewTableCell(NewText(""))
+		middle := core.NewTableCell(core.NewText(""))
 		if weightedSimilarity != 0 {
 			similarityString := fmt.Sprintf("%.2f%%", weightedSimilarity*100)
-			middle = NewTableCell(NewText(similarityString)).
+			middle = core.NewTableCell(core.NewText(similarityString)).
 				Class("text-center " + leftClass)
 		}
 
-		tableRow := NewTableRow(left, middle, right)
+		tableRow := core.NewTableRow(left, middle, right)
 
 		rows = append(rows, tableRow)
 	}
 
 	// Individual pages
-	components := []Component{
-		NewSpace(),
-		NewCard(NewText("Individuals"), noBadgeCount, NewTable("", rows...)),
-		NewSpace(),
+	components := []core.Component{
+		core.NewSpace(),
+		core.NewCard(core.NewText("Individuals"), core.CardNoBadgeCount,
+			core.NewTable("", rows...)),
+		core.NewSpace(),
 	}
 	for _, comparison := range precalculatedComparisons {
-		components = append(components, comparison, NewSpace())
+		components = append(components, comparison, core.NewSpace())
 	}
 
-	return NewPage(
+	return core.NewPage(
 		"Comparison",
-		NewRow(NewColumn(EntireRow, NewComponents(components...))),
+		core.NewRow(core.NewColumn(core.EntireRow, core.NewComponents(components...))),
 		c.googleAnalyticsID,
-	).WriteTo(w)
+	).WriteHTMLTo(w)
 }
 
 func (c *DiffPage) shouldSkip(comparison *IndividualCompare) bool {

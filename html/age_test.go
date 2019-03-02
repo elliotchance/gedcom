@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestAge_WriteTo(t *testing.T) {
+func TestAge_WriteHTMLTo(t *testing.T) {
 	c := testComponent(t, "Age")
 
 	unknown := gedcom.NewUnknownAge()

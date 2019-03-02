@@ -1,6 +1,7 @@
 package html
 
 import (
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 	"unicode"
 )
@@ -17,9 +18,9 @@ func NewIndividualIndexLetter(letter rune, isSelected bool) *IndividualIndexLett
 	}
 }
 
-func (c *IndividualIndexLetter) WriteTo(w io.Writer) (int64, error) {
+func (c *IndividualIndexLetter) WriteHTMLTo(w io.Writer) (int64, error) {
 	text := string(unicode.ToUpper(c.letter))
 	link := PageIndividuals(c.letter)
 
-	return NewNavLink(text, link, c.isSelected).WriteTo(w)
+	return core.NewNavLink(text, link, c.isSelected).WriteHTMLTo(w)
 }

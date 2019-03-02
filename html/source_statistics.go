@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -15,12 +16,13 @@ func NewSourceStatistics(document *gedcom.Document) *SourceStatistics {
 	}
 }
 
-func (c *SourceStatistics) WriteTo(w io.Writer) (int64, error) {
+func (c *SourceStatistics) WriteHTMLTo(w io.Writer) (int64, error) {
 	sources := c.document.Sources()
-	total := NewNumber(len(sources))
-	s := NewComponents(
-		NewKeyedTableRow("Total", total, true),
+	total := core.NewNumber(len(sources))
+	s := core.NewComponents(
+		core.NewKeyedTableRow("Total", total, true),
 	)
 
-	return NewCard(NewText("Sources"), noBadgeCount, NewTable("", s)).WriteTo(w)
+	return core.NewCard(core.NewText("Sources"), core.CardNoBadgeCount,
+		core.NewTable("", s)).WriteHTMLTo(w)
 }

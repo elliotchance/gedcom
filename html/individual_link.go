@@ -3,6 +3,7 @@ package html
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -22,7 +23,7 @@ func NewIndividualLink(document *gedcom.Document, individual *gedcom.IndividualN
 	}
 }
 
-func (c *IndividualLink) WriteTo(w io.Writer) (int64, error) {
+func (c *IndividualLink) WriteHTMLTo(w io.Writer) (int64, error) {
 	if c.individual.IsLiving() {
 		switch c.visibility {
 		case LivingVisibilityHide:
@@ -36,12 +37,12 @@ func (c *IndividualLink) WriteTo(w io.Writer) (int64, error) {
 	dotColor := colorForIndividual(c.individual)
 	dotStyle := fmt.Sprintf("color: %s; font-size: 18px", dotColor)
 
-	dot := NewOcticon("primitive-dot", dotStyle)
+	dot := core.NewOcticon("primitive-dot", dotStyle)
 	individualName := NewIndividualName(c.individual, c.visibility,
 		UnknownEmphasis)
-	text := NewComponents(dot, individualName)
+	text := core.NewComponents(dot, individualName)
 
 	link := PageIndividual(c.document, c.individual, c.visibility)
 
-	return NewLink(text, link).WriteTo(w)
+	return core.NewLink(text, link).WriteHTMLTo(w)
 }

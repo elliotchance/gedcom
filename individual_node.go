@@ -829,15 +829,15 @@ func (node *IndividualNode) String() string {
 
 	dateParts := []string{}
 
-	if birth, _ := node.Birth(); birth != nil {
+	if birth, _ := node.Birth(); birth != nil && birth.DateRange().IsValid() {
 		dateParts = append(dateParts, fmt.Sprintf("b. %s", birth.String()))
-	} else if baptism, _ := node.Baptism(); baptism != nil {
+	} else if baptism, _ := node.Baptism(); baptism != nil && baptism.DateRange().IsValid() {
 		dateParts = append(dateParts, fmt.Sprintf("bap. %s", baptism.String()))
 	}
 
-	if death, _ := node.Death(); death != nil {
+	if death, _ := node.Death(); death != nil && death.DateRange().IsValid() {
 		dateParts = append(dateParts, fmt.Sprintf("d. %s", death.String()))
-	} else if burial, _ := node.Burial(); burial != nil {
+	} else if burial, _ := node.Burial(); burial != nil && burial.DateRange().IsValid() {
 		dateParts = append(dateParts, fmt.Sprintf("bur. %s", burial.String()))
 	}
 
@@ -938,13 +938,6 @@ func (node *IndividualNode) SetSex(sex string) *IndividualNode {
 	return node
 }
 
-func (node *IndividualNode) MarshalQ() interface{} {
-	return map[string]interface{}{
-		"Nodes":  node.Nodes(),
-		"String": node.String(),
-	}
-}
-
 func (node *IndividualNode) AddBurialDate(burialDate string) *IndividualNode {
 	existingBurial := First(node.Burials())
 	if existingBurial == nil {
@@ -1019,7 +1012,9 @@ func (node *IndividualNode) Warnings() (warnings Warnings) {
 		for _, event := range group.Events {
 			for _, futureGroup := range eventOrder[i+1:] {
 				for _, futureEvent := range futureGroup.Events {
-					if futureEvent.Date.IsBefore(event.Date) {
+					if event.Date.IsValid() &&
+						futureEvent.Date.IsValid() &&
+						futureEvent.Date.IsBefore(event.Date) {
 						warning := NewIncorrectEventOrderWarning(
 							futureEvent.Event, futureEvent.Date.DateRange(),
 							event.Event, event.Date.DateRange(),

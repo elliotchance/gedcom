@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -9,12 +10,12 @@ import (
 type IndividualEvent struct {
 	date        string
 	place       string
-	description Component
+	description core.Component
 	event       gedcom.Node
 	individual  *gedcom.IndividualNode
 }
 
-func NewIndividualEvent(date, place string, description Component, individual *gedcom.IndividualNode, event gedcom.Node) *IndividualEvent {
+func NewIndividualEvent(date, place string, description core.Component, individual *gedcom.IndividualNode, event gedcom.Node) *IndividualEvent {
 	return &IndividualEvent{
 		date:        date,
 		place:       place,
@@ -24,17 +25,17 @@ func NewIndividualEvent(date, place string, description Component, individual *g
 	}
 }
 
-func (c *IndividualEvent) WriteTo(w io.Writer) (int64, error) {
+func (c *IndividualEvent) WriteHTMLTo(w io.Writer) (int64, error) {
 	kind := c.event.Tag().String()
 	placeName := prettyPlaceName(c.place)
 	placeLink := NewPlaceLink(c.individual.Document(), placeName)
 	age := NewAge(c.individual.AgeAt(c.event))
 
-	return NewTableRow(
-		NewTableCell(age).NoWrap(),
-		NewTableCell(NewText(kind)).Header(),
-		NewTableCell(NewText(c.date)),
-		NewTableCell(placeLink),
-		NewTableCell(c.description),
-	).WriteTo(w)
+	return core.NewTableRow(
+		core.NewTableCell(age).NoWrap(),
+		core.NewTableCell(core.NewText(kind)).Header(),
+		core.NewTableCell(core.NewText(c.date)),
+		core.NewTableCell(placeLink),
+		core.NewTableCell(c.description),
+	).WriteHTMLTo(w)
 }

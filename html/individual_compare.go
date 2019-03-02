@@ -3,6 +3,7 @@ package html
 import (
 	"bytes"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -26,9 +27,9 @@ func NewIndividualCompare(comparison *gedcom.IndividualComparison, filterFlags *
 	}
 }
 
-func (c *IndividualCompare) appendChildren(nd *gedcom.NodeDiff, prefix string) []Component {
+func (c *IndividualCompare) appendChildren(nd *gedcom.NodeDiff, prefix string) []core.Component {
 	title := prefix + nd.Tag().String()
-	tableRows := []Component{}
+	tableRows := []core.Component{}
 
 	row := NewDiffRow(title, nd, c.filterFlags.HideEqual)
 	tableRows = c.appendDiffRow(tableRows, row)
@@ -41,7 +42,7 @@ func (c *IndividualCompare) appendChildren(nd *gedcom.NodeDiff, prefix string) [
 	return tableRows
 }
 
-func (c *IndividualCompare) appendDiffRow(rows []Component, row *DiffRow) []Component {
+func (c *IndividualCompare) appendDiffRow(rows []core.Component, row *DiffRow) []core.Component {
 	if row.isEmpty() {
 		return rows
 	}
@@ -52,7 +53,7 @@ func (c *IndividualCompare) appendDiffRow(rows []Component, row *DiffRow) []Comp
 func (c *IndividualCompare) isEmpty() bool {
 	// Trigger cache.
 	buf := bytes.NewBuffer(nil)
-	n, _ := c.WriteTo(buf)
+	n, _ := c.WriteHTMLTo(buf)
 
 	return n == 0
 }
@@ -65,10 +66,10 @@ func (c *IndividualCompare) addProgress() {
 	}
 }
 
-func (c *IndividualCompare) WriteTo(w io.Writer) (int64, error) {
+func (c *IndividualCompare) WriteHTMLTo(w io.Writer) (int64, error) {
 	if c.cache == nil {
 		buf := bytes.NewBuffer(nil)
-		_, c.cacheErr = c.writeTo(buf)
+		_, c.cacheErr = c.writeHTMLTo(buf)
 		c.cache = buf.Bytes()
 	}
 
@@ -81,13 +82,13 @@ func (c *IndividualCompare) WriteTo(w io.Writer) (int64, error) {
 	return int64(n), err
 }
 
-func (c *IndividualCompare) writeTo(w io.Writer) (int64, error) {
+func (c *IndividualCompare) writeHTMLTo(w io.Writer) (int64, error) {
 	left := c.comparison.Left
 	right := c.comparison.Right
 
 	c.addProgress()
 
-	var name Component = nil
+	var name core.Component = nil
 
 	if n := left; n != nil {
 		name = NewIndividualNameAndDates(n, c.visibility, "")
@@ -98,7 +99,7 @@ func (c *IndividualCompare) writeTo(w io.Writer) (int64, error) {
 	}
 
 	if name == nil {
-		name = NewEmpty()
+		name = core.NewEmpty()
 	}
 
 	if !gedcom.IsNil(left) {
@@ -219,9 +220,10 @@ func (c *IndividualCompare) writeTo(w io.Writer) (int64, error) {
 		return writeNothing()
 	}
 
-	return NewComponents(
-		NewAnchor(leftAnchor),
-		NewAnchor(rightAnchor),
-		NewCard(name, noBadgeCount, NewTable("", tableRows...)),
-	).WriteTo(w)
+	return core.NewComponents(
+		core.NewAnchor(leftAnchor),
+		core.NewAnchor(rightAnchor),
+		core.NewCard(name, core.CardNoBadgeCount,
+			core.NewTable("", tableRows...)),
+	).WriteHTMLTo(w)
 }

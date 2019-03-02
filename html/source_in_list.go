@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -17,8 +18,8 @@ func NewSourceInList(document *gedcom.Document, source *gedcom.SourceNode) *Sour
 	}
 }
 
-func (c *SourceInList) WriteTo(w io.Writer) (int64, error) {
-	return NewTableRow(
-		NewTableCell(NewSourceLink(c.source)),
-	).WriteTo(w)
+func (c *SourceInList) WriteHTMLTo(w io.Writer) (int64, error) {
+	return core.NewTableRow(
+		core.NewTableCell(NewSourceLink(c.source)),
+	).WriteHTMLTo(w)
 }
