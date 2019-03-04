@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -17,7 +18,7 @@ func NewSurnameInList(document *gedcom.Document, surname string) *SurnameInList 
 	}
 }
 
-func (c *SurnameInList) WriteTo(w io.Writer) (int64, error) {
+func (c *SurnameInList) WriteHTMLTo(w io.Writer) (int64, error) {
 	count := 0
 	for _, individual := range c.document.Individuals() {
 		if individual.Name().Surname() == c.surname {
@@ -25,8 +26,8 @@ func (c *SurnameInList) WriteTo(w io.Writer) (int64, error) {
 		}
 	}
 
-	return NewTableRow(
-		NewTableCell(NewSurnameLink(c.surname)),
-		NewTableCell(NewNumber(count)),
-	).WriteTo(w)
+	return core.NewTableRow(
+		core.NewTableCell(NewSurnameLink(c.surname)),
+		core.NewTableCell(core.NewNumber(count)),
+	).WriteHTMLTo(w)
 }

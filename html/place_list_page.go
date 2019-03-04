@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 	"sort"
 )
@@ -21,8 +22,8 @@ func NewPlaceListPage(document *gedcom.Document, googleAnalyticsID string, optio
 	}
 }
 
-func (c *PlaceListPage) WriteTo(w io.Writer) (int64, error) {
-	table := []Component{}
+func (c *PlaceListPage) WriteHTMLTo(w io.Writer) (int64, error) {
+	table := []core.Component{}
 
 	places := GetPlaces(c.document)
 
@@ -49,11 +50,11 @@ func (c *PlaceListPage) WriteTo(w io.Writer) (int64, error) {
 
 	for _, place := range sortedPlaces {
 		if lastCountry != place.country {
-			anchor := NewAnchor(place.country)
-			heading := NewHeading(2, "", NewText(place.country))
-			components := NewComponents(anchor, heading)
-			cell := NewTableCell(components)
-			countryTitle := NewTableRow(cell)
+			anchor := core.NewAnchor(place.country)
+			heading := core.NewHeading(2, "", core.NewText(place.country))
+			components := core.NewComponents(anchor, heading)
+			cell := core.NewTableCell(components)
+			countryTitle := core.NewTableRow(cell)
 			table = append(table, countryTitle)
 		}
 
@@ -64,17 +65,17 @@ func (c *PlaceListPage) WriteTo(w io.Writer) (int64, error) {
 	}
 
 	// Render
-	pills := []Component{}
+	pills := []core.Component{}
 	for _, country := range countries.Strings() {
-		pills = append(pills, NewNavLink(country, "#"+country, false))
+		pills = append(pills, core.NewNavLink(country, "#"+country, false))
 	}
 
-	return NewPage("Places", NewComponents(
+	return core.NewPage("Places", core.NewComponents(
 		NewPublishHeader(c.document, "", selectedPlacesTab, c.options),
-		NewNavPillsRow(pills),
-		NewSpace(),
-		NewRow(
-			NewColumn(EntireRow, NewTable("", table...)),
+		core.NewNavPillsRow(pills),
+		core.NewSpace(),
+		core.NewRow(
+			core.NewColumn(core.EntireRow, core.NewTable("", table...)),
 		),
-	), c.googleAnalyticsID).WriteTo(w)
+	), c.googleAnalyticsID).WriteHTMLTo(w)
 }

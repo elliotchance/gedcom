@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestIndividualButton_WriteTo(t *testing.T) {
+func TestIndividualButton_WriteHTMLTo(t *testing.T) {
 	doc := gedcom.NewDocument()
 	elliot := individual(doc, "P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907")
 

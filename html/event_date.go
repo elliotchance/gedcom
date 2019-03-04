@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -19,15 +20,15 @@ func NewEventDate(event string, dates []*gedcom.DateNode) *EventDate {
 	}
 }
 
-func (c *EventDate) WriteTo(w io.Writer) (int64, error) {
+func (c *EventDate) WriteHTMLTo(w io.Writer) (int64, error) {
 	if c.IsBlank() {
 		return writeNothing()
 	}
 
-	return NewComponents(
-		NewTag("em", nil, NewText(c.event)),
-		NewText(" "+c.dates[0].String()),
-	).WriteTo(w)
+	return core.NewComponents(
+		core.NewTag("em", nil, core.NewText(c.event)),
+		core.NewText(" "+c.dates[0].String()),
+	).WriteHTMLTo(w)
 }
 
 func (c *EventDate) IsBlank() bool {

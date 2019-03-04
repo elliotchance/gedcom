@@ -3,6 +3,7 @@ package html
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -48,7 +49,7 @@ func (c *DiffRow) valueAndPointer(node gedcom.Node) string {
 	return v
 }
 
-func (c *DiffRow) WriteTo(w io.Writer) (int64, error) {
+func (c *DiffRow) WriteHTMLTo(w io.Writer) (int64, error) {
 	if c.isEmpty() {
 		return writeNothing()
 	}
@@ -80,9 +81,9 @@ func (c *DiffRow) WriteTo(w io.Writer) (int64, error) {
 		right = c.valueAndPointer(c.nd.Right)
 	}
 
-	return NewTableRow(
-		NewTableCell(NewText(c.name)),
-		NewTableCell(NewText(left)).Class(leftClass).Style("width: 40%"),
-		NewTableCell(NewText(right)).Class(rightClass).Style("width: 40%"),
-	).WriteTo(w)
+	return core.NewTableRow(
+		core.NewTableCell(core.NewText(c.name)),
+		core.NewTableCell(core.NewText(left)).Class(leftClass).Style("width: 40%"),
+		core.NewTableCell(core.NewText(right)).Class(rightClass).Style("width: 40%"),
+	).WriteHTMLTo(w)
 }

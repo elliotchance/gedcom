@@ -269,3 +269,7 @@ func (node *FamilyNode) Warnings() (warnings Warnings) {
 
 	return
 }
+
+func (node *FamilyNode) String() string {
+	return fmt.Sprintf("%s — %s", node.Husband().String(), node.Wife().String())
+}

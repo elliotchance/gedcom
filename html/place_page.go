@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -23,11 +24,11 @@ func NewPlacePage(document *gedcom.Document, placeKey string, googleAnalyticsID 
 	}
 }
 
-func (c *PlacePage) WriteTo(w io.Writer) (int64, error) {
+func (c *PlacePage) WriteHTMLTo(w io.Writer) (int64, error) {
 	place := GetPlaces(c.document)[c.placeKey]
 
-	table := []Component{
-		NewTableHead("Date", "Event", "Individual"),
+	table := []core.Component{
+		core.NewTableHead("Date", "Event", "Individual"),
 	}
 
 	for _, node := range place.nodes {
@@ -35,16 +36,16 @@ func (c *PlacePage) WriteTo(w io.Writer) (int64, error) {
 		table = append(table, placeEvent)
 	}
 
-	return NewPage(
+	return core.NewPage(
 		place.PrettyName,
-		NewComponents(
+		core.NewComponents(
 			NewPublishHeader(c.document, place.PrettyName, selectedExtraTab, c.options),
-			NewBigTitle(1, NewText(place.PrettyName)),
-			NewSpace(),
-			NewRow(
-				NewColumn(EntireRow, NewTable("", table...)),
+			core.NewBigTitle(1, core.NewText(place.PrettyName)),
+			core.NewSpace(),
+			core.NewRow(
+				core.NewColumn(core.EntireRow, core.NewTable("", table...)),
 			),
 		),
 		c.googleAnalyticsID,
-	).WriteTo(w)
+	).WriteHTMLTo(w)
 }

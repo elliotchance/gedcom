@@ -31,7 +31,7 @@ func (c *Age) string(age gedcom.Age) string {
 	return age.String()
 }
 
-func (c *Age) WriteTo(w io.Writer) (int64, error) {
+func (c *Age) WriteHTMLTo(w io.Writer) (int64, error) {
 	start := c.string(c.start)
 	end := c.string(c.end)
 

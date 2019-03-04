@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -21,25 +22,25 @@ func NewSourcePage(document *gedcom.Document, source *gedcom.SourceNode, googleA
 	}
 }
 
-func (c *SourcePage) WriteTo(w io.Writer) (int64, error) {
-	table := []Component{
-		NewTableHead("Key", "Value"),
+func (c *SourcePage) WriteHTMLTo(w io.Writer) (int64, error) {
+	table := []core.Component{
+		core.NewTableHead("Key", "Value"),
 	}
 
 	for _, node := range c.source.Nodes() {
 		table = append(table, NewSourceProperty(c.document, node))
 	}
 
-	return NewPage(
+	return core.NewPage(
 		c.source.Title(),
-		NewComponents(
+		core.NewComponents(
 			NewPublishHeader(c.document, "Source", selectedExtraTab, c.options),
-			NewBigTitle(1, NewText(c.source.Title())),
-			NewSpace(),
-			NewRow(
-				NewColumn(EntireRow, NewTable("", table...)),
+			core.NewBigTitle(1, core.NewText(c.source.Title())),
+			core.NewSpace(),
+			core.NewRow(
+				core.NewColumn(core.EntireRow, core.NewTable("", table...)),
 			),
 		),
 		c.googleAnalyticsID,
-	).WriteTo(w)
+	).WriteHTMLTo(w)
 }

@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestIndividualDates_WriteTo(t *testing.T) {
+func TestIndividualDates_WriteHTMLTo(t *testing.T) {
 	c := testComponent(t, "IndividualDates")
 
 	doc := gedcom.NewDocument()

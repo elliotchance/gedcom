@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -21,12 +22,12 @@ func NewPartnersAndChildren(document *gedcom.Document, individual *gedcom.Indivi
 	}
 }
 
-func (c *PartnersAndChildren) WriteTo(w io.Writer) (int64, error) {
-	heading := NewHeading(2, "", NewText("Spouses & Children"))
-	column := NewColumn(EntireRow, heading)
+func (c *PartnersAndChildren) WriteHTMLTo(w io.Writer) (int64, error) {
+	heading := core.NewHeading(2, "", core.NewText("Spouses & Children"))
+	column := core.NewColumn(core.EntireRow, heading)
 
-	rows := []Component{
-		NewRow(column),
+	rows := []core.Component{
+		core.NewRow(column),
 	}
 
 	// Find children of known spouses.
@@ -43,10 +44,10 @@ func (c *PartnersAndChildren) WriteTo(w io.Writer) (int64, error) {
 			}
 		}
 
-		rows = append(rows, NewHorizontalRuleRow())
+		rows = append(rows, core.NewHorizontalRuleRow())
 
-		columns := []*Column{
-			NewColumn(QuarterRow, NewIndividualButton(c.document, spouse, c.visibility)),
+		columns := []*core.Column{
+			core.NewColumn(core.QuarterRow, NewIndividualButton(c.document, spouse, c.visibility)),
 		}
 
 		family := c.individual.FamilyWithSpouse(spouse)
@@ -55,8 +56,8 @@ func (c *PartnersAndChildren) WriteTo(w io.Writer) (int64, error) {
 		}
 
 		rows = append(rows,
-			NewRow(columns...),
-			NewRow(NewColumn(EntireRow, NewSpace())))
+			core.NewRow(columns...),
+			core.NewRow(core.NewColumn(core.EntireRow, core.NewSpace())))
 	}
 
 	// Find children belonging to families with an unknown spouse.
@@ -68,31 +69,32 @@ func (c *PartnersAndChildren) WriteTo(w io.Writer) (int64, error) {
 			continue
 		}
 
-		rows = append(rows, NewHorizontalRuleRow())
+		rows = append(rows, core.NewHorizontalRuleRow())
 
-		columns := []*Column{
-			NewColumn(QuarterRow, NewIndividualButton(c.document, nil, c.visibility)),
+		columns := []*core.Column{
+			core.NewColumn(core.QuarterRow,
+				NewIndividualButton(c.document, nil, c.visibility)),
 		}
 
 		columns, rows = partnerSection(family, c, columns, rows)
 
 		rows = append(rows,
-			NewRow(columns...),
-			NewRow(NewColumn(EntireRow, NewSpace())))
+			core.NewRow(columns...),
+			core.NewRow(core.NewColumn(core.EntireRow, core.NewSpace())))
 	}
 
 	if len(rows) == 1 {
 		rows = append(rows,
-			NewHorizontalRuleRow(),
-			NewText("There are no known spouses or children."),
-			NewRow(NewColumn(EntireRow, NewSpace())),
+			core.NewHorizontalRuleRow(),
+			core.NewText("There are no known spouses or children."),
+			core.NewRow(core.NewColumn(core.EntireRow, core.NewSpace())),
 		)
 	}
 
-	return NewComponents(rows...).WriteTo(w)
+	return core.NewComponents(rows...).WriteHTMLTo(w)
 }
 
-func partnerSection(family *gedcom.FamilyNode, c *PartnersAndChildren, columns []*Column, rows []Component) ([]*Column, []Component) {
+func partnerSection(family *gedcom.FamilyNode, c *PartnersAndChildren, columns []*core.Column, rows []core.Component) ([]*core.Column, []core.Component) {
 	allChildren := family.Children()
 	children := []*gedcom.IndividualNode{}
 
@@ -124,16 +126,16 @@ func partnerSection(family *gedcom.FamilyNode, c *PartnersAndChildren, columns [
 			svg = NewPlusSVG(false, true, false, true)
 		}
 
-		button := NewComponents(
+		button := core.NewComponents(
 			svg,
 			NewIndividualButton(c.document, child, c.visibility),
 		)
-		columns = append(columns, NewColumn(3, button))
+		columns = append(columns, core.NewColumn(3, button))
 
 		if len(columns) == 4 {
-			rows = append(rows, NewRow(columns...))
-			columns = []*Column{
-				NewColumn(QuarterRow, NewEmpty()),
+			rows = append(rows, core.NewRow(columns...))
+			columns = []*core.Column{
+				core.NewColumn(core.QuarterRow, core.NewEmpty()),
 			}
 		}
 	}

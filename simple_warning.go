@@ -1,9 +1,13 @@
 package gedcom
 
 type SimpleWarning struct {
-	Context WarningContext
+	context WarningContext
 }
 
 func (w *SimpleWarning) SetContext(context WarningContext) {
-	w.Context = context
+	w.context = context
+}
+
+func (w *SimpleWarning) Context() WarningContext {
+	return w.context
 }

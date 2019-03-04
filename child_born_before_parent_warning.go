@@ -33,14 +33,3 @@ func (w *ChildBornBeforeParentWarning) String() string {
 	return fmt.Sprintf("The child %s was born before %s %s %s.",
 		w.Child, w.Child.Individual().Sex().OwnershipWord(), relationship, w.Parent)
 }
-
-func (w *ChildBornBeforeParentWarning) MarshalQ() interface{} {
-	return map[string]interface{}{
-		"String":  w.String(),
-		"Name":    w.Name(),
-		"Context": w.Context.MarshalQ(),
-
-		"Parent": w.Parent.Pointer(),
-		"Child":  w.Child.Individual().Pointer(),
-	}
-}

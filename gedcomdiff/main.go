@@ -134,7 +134,7 @@ func main() {
 		optionShow, optionSort, diffProgress, compareOptions, html.LivingVisibilityShow)
 
 	go func() {
-		_, err = page.WriteTo(out)
+		_, err = page.WriteHTMLTo(out)
 		if err != nil {
 			log.Fatal(err)
 		}

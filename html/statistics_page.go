@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -21,26 +22,26 @@ func NewStatisticsPage(document *gedcom.Document, googleAnalyticsID string, opti
 	}
 }
 
-func (c *StatisticsPage) WriteTo(w io.Writer) (int64, error) {
-	return NewPage(
+func (c *StatisticsPage) WriteHTMLTo(w io.Writer) (int64, error) {
+	return core.NewPage(
 		"Statistics",
-		NewComponents(
+		core.NewComponents(
 			NewPublishHeader(c.document, "", selectedStatisticsTab, c.options),
-			NewBigTitle(1, NewText("Statistics")),
-			NewSpace(),
-			NewRow(
-				NewColumn(HalfRow, NewComponents(
+			core.NewBigTitle(1, core.NewText("Statistics")),
+			core.NewSpace(),
+			core.NewRow(
+				core.NewColumn(core.HalfRow, core.NewComponents(
 					NewIndividualStatistics(c.document, c.visibility),
-					NewSpace(),
+					core.NewSpace(),
 					NewFamilyStatistics(c.document),
-					NewSpace(),
+					core.NewSpace(),
 					NewSourceStatistics(c.document),
-					NewSpace(),
+					core.NewSpace(),
 					newPlaceStatistics(c.document),
 				)),
-				NewColumn(HalfRow, NewEventStatistics(c.document)),
+				core.NewColumn(core.HalfRow, NewEventStatistics(c.document)),
 			),
 		),
 		c.googleAnalyticsID,
-	).WriteTo(w)
+	).WriteHTMLTo(w)
 }

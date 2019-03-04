@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -15,12 +16,13 @@ func newPlaceStatistics(document *gedcom.Document) *PlaceStatistics {
 	}
 }
 
-func (c *PlaceStatistics) WriteTo(w io.Writer) (int64, error) {
+func (c *PlaceStatistics) WriteHTMLTo(w io.Writer) (int64, error) {
 	places := GetPlaces(c.document)
-	total := NewNumber(len(places))
-	s := NewComponents(
-		NewKeyedTableRow("Total", total, true),
+	total := core.NewNumber(len(places))
+	s := core.NewComponents(
+		core.NewKeyedTableRow("Total", total, true),
 	)
 
-	return NewCard(NewText("Places"), noBadgeCount, NewTable("", s)).WriteTo(w)
+	return core.NewCard(core.NewText("Places"), core.CardNoBadgeCount,
+		core.NewTable("", s)).WriteHTMLTo(w)
 }

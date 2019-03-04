@@ -2,6 +2,7 @@ package html
 
 import (
 	"fmt"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 	"unicode"
 )
@@ -16,10 +17,10 @@ func NewSurnameLink(surname string) *SurnameLink {
 	}
 }
 
-func (c *SurnameLink) WriteTo(w io.Writer) (int64, error) {
+func (c *SurnameLink) WriteHTMLTo(w io.Writer) (int64, error) {
 	firstLetter := rune(c.surname[0])
 	lowerFirstLetter := unicode.ToLower(firstLetter)
 	destination := fmt.Sprintf("%s#%s", PageIndividuals(lowerFirstLetter), c.surname)
 
-	return NewLink(NewText(c.surname), destination).WriteTo(w)
+	return core.NewLink(core.NewText(c.surname), destination).WriteHTMLTo(w)
 }

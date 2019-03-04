@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -17,13 +18,13 @@ func NewPlaceLink(document *gedcom.Document, place string) *PlaceLink {
 	}
 }
 
-func (c *PlaceLink) WriteTo(w io.Writer) (int64, error) {
+func (c *PlaceLink) WriteHTMLTo(w io.Writer) (int64, error) {
 	if c.place == "" {
 		return writeNothing()
 	}
 
-	icon := NewOcticon("location", "")
-	text := NewComponents(icon, NewText(c.place))
+	icon := core.NewOcticon("location", "")
+	text := core.NewComponents(icon, core.NewText(c.place))
 
-	return NewLink(text, PagePlace(c.document, c.place)).WriteTo(w)
+	return core.NewLink(text, PagePlace(c.document, c.place)).WriteHTMLTo(w)
 }

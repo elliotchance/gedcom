@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestEventDates_WriteTo(t *testing.T) {
+func TestEventDates_WriteHTMLTo(t *testing.T) {
 	c := testComponent(t, "EventDates")
 
 	c(html.NewEventDates([]*html.EventDate{})).Returns(``)

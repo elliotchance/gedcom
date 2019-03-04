@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -19,19 +20,19 @@ func NewSurnameListPage(document *gedcom.Document, googleAnalyticsID string, opt
 	}
 }
 
-func (c *SurnameListPage) WriteTo(w io.Writer) (int64, error) {
-	table := []Component{
-		NewTableHead("Surname", "Number of Individuals"),
+func (c *SurnameListPage) WriteHTMLTo(w io.Writer) (int64, error) {
+	table := []core.Component{
+		core.NewTableHead("Surname", "Number of Individuals"),
 	}
 
 	for _, surname := range getSurnames(c.document).Strings() {
 		table = append(table, NewSurnameInList(c.document, surname))
 	}
 
-	return NewPage("Surnames", NewComponents(
+	return core.NewPage("Surnames", core.NewComponents(
 		NewPublishHeader(c.document, "", selectedSurnamesTab, c.options),
-		NewRow(
-			NewColumn(EntireRow, NewTable("", table...)),
+		core.NewRow(
+			core.NewColumn(core.EntireRow, core.NewTable("", table...)),
 		),
-	), c.googleAnalyticsID).WriteTo(w)
+	), c.googleAnalyticsID).WriteHTMLTo(w)
 }

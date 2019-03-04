@@ -2,6 +2,7 @@ package html
 
 import (
 	"fmt"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -19,7 +20,7 @@ func NewPlusSVG(top, left, right, bottom bool) *PlusSVG {
 	}
 }
 
-func (c *PlusSVG) WriteTo(w io.Writer) (int64, error) {
+func (c *PlusSVG) WriteHTMLTo(w io.Writer) (int64, error) {
 	// The "+" is constructed of two lines. Each of the lines need 4 coordinates
 	// to represent the start and end points of X and Y. The values represent
 	// percentages.
@@ -48,10 +49,11 @@ func (c *PlusSVG) WriteTo(w io.Writer) (int64, error) {
 		vLineY2 = 80
 	}
 
-	return NewHTML(fmt.Sprintf(`
+	return core.NewHTML(fmt.Sprintf(`
 		<svg style="width: 100%%; height: 75px">
 			<line x1="%d%%" y1="%d%%" x2="%d%%" y2="%d%%" style="stroke:rgb(0,0,0);stroke-width:3" />
 			<line x1="%d%%" y1="%d%%" x2="%d%%" y2="%d%%" style="stroke:rgb(0,0,0);stroke-width:3" />
 		</svg>
-	`, hLineX1, hLineY1, hLineX2, hLineY2, vLineX1, vLineY1, vLineX2, vLineY2)).WriteTo(w)
+	`, hLineX1, hLineY1, hLineX2, hLineY2, vLineX1, vLineY1, vLineX2, vLineY2)).
+		WriteHTMLTo(w)
 }

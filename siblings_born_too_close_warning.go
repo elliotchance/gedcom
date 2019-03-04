@@ -26,14 +26,3 @@ func (w *SiblingsBornTooCloseWarning) String() string {
 	return fmt.Sprintf("The siblings %s and %s were born within %s of each other.",
 		w.Sibling1, w.Sibling2, Duration(min).String())
 }
-
-func (w *SiblingsBornTooCloseWarning) MarshalQ() interface{} {
-	return map[string]interface{}{
-		"String":  w.String(),
-		"Context": w.Context.MarshalQ(),
-		"Name":    w.Name(),
-
-		"Sibling1": valueToPointer(w.Sibling1.Value()),
-		"Sibling2": valueToPointer(w.Sibling2.Value()),
-	}
-}

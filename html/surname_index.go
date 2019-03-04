@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -19,7 +20,7 @@ func NewSurnameIndex(document *gedcom.Document, selectedLetter rune, visibility 
 	}
 }
 
-func (c *SurnameIndex) WriteTo(w io.Writer) (int64, error) {
+func (c *SurnameIndex) WriteHTMLTo(w io.Writer) (int64, error) {
 	surnames := gedcom.NewStringSet()
 
 	for _, individual := range c.document.Individuals() {
@@ -40,10 +41,10 @@ func (c *SurnameIndex) WriteTo(w io.Writer) (int64, error) {
 	}
 
 	// Render
-	pills := []Component{}
+	pills := []core.Component{}
 	for _, surname := range surnames.Strings() {
-		pills = append(pills, NewNavLink(surname, "#"+surname, false))
+		pills = append(pills, core.NewNavLink(surname, "#"+surname, false))
 	}
 
-	return NewNavPillsRow(pills).WriteTo(w)
+	return core.NewNavPillsRow(pills).WriteHTMLTo(w)
 }

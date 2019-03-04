@@ -3,6 +3,7 @@ package html
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -23,7 +24,7 @@ func NewIndividualButton(document *gedcom.Document, individual *gedcom.Individua
 	}
 }
 
-func (c *IndividualButton) WriteTo(w io.Writer) (int64, error) {
+func (c *IndividualButton) WriteHTMLTo(w io.Writer) (int64, error) {
 	if c.individual.IsLiving() {
 		switch c.visibility {
 		case LivingVisibilityHide:
@@ -34,7 +35,7 @@ func (c *IndividualButton) WriteTo(w io.Writer) (int64, error) {
 		}
 	}
 
-	var name Component = NewIndividualName(c.individual, c.visibility, UnknownEmphasis)
+	var name core.Component = NewIndividualName(c.individual, c.visibility, UnknownEmphasis)
 
 	onclick := ""
 	if c.individual != nil {
@@ -54,19 +55,19 @@ func (c *IndividualButton) WriteTo(w io.Writer) (int64, error) {
 			// Proceed.
 
 		case LivingVisibilityPlaceholder:
-			name = NewHTML("<em>Hidden</em>")
+			name = core.NewHTML("<em>Hidden</em>")
 			onclick = ""
 		}
 	}
 
-	return NewTag("button", map[string]string{
+	return core.NewTag("button", map[string]string{
 		"class":   fmt.Sprintf("btn btn-outline-%s btn-block", colorClassForIndividual(c.individual)),
 		"type":    "button",
 		"onclick": onclick,
-	}, NewComponents(
-		NewTag("strong", nil, name),
-		NewLineBreak(),
+	}, core.NewComponents(
+		core.NewTag("strong", nil, name),
+		core.NewLineBreak(),
 		eventDates,
-		NewEmpty(),
-	)).WriteTo(w)
+		core.NewEmpty(),
+	)).WriteHTMLTo(w)
 }

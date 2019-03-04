@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -15,9 +16,9 @@ func NewSourceLink(source *gedcom.SourceNode) *SourceLink {
 	}
 }
 
-func (c *SourceLink) WriteTo(w io.Writer) (int64, error) {
+func (c *SourceLink) WriteHTMLTo(w io.Writer) (int64, error) {
 	text := c.source.Title()
 	destination := PageSource(c.source)
 
-	return NewLink(NewText(text), destination).WriteTo(w)
+	return core.NewLink(core.NewText(text), destination).WriteHTMLTo(w)
 }

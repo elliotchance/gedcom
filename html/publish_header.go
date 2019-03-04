@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -43,19 +44,19 @@ func NewPublishHeader(document *gedcom.Document, extraTab string, selectedTab st
 	}
 }
 
-func (c *PublishHeader) WriteTo(w io.Writer) (int64, error) {
+func (c *PublishHeader) WriteHTMLTo(w io.Writer) (int64, error) {
 	letters := GetIndexLetters(c.document)
 
-	items := []*NavItem{}
+	items := []*core.NavItem{}
 
 	if c.options.ShowIndividuals {
-		var badge Component = NewEmpty()
+		var badge core.Component = core.NewEmpty()
 		if !c.options.Checksum {
-			badge = NewCountBadge(len(c.document.Individuals()))
+			badge = core.NewCountBadge(len(c.document.Individuals()))
 		}
 
-		title := NewComponents(NewText("Individuals "), badge)
-		item := NewNavItem(
+		title := core.NewComponents(core.NewText("Individuals "), badge)
+		item := core.NewNavItem(
 			title,
 			c.selectedTab == selectedIndividualsTab,
 			PageIndividuals(letters[0]),
@@ -64,13 +65,13 @@ func (c *PublishHeader) WriteTo(w io.Writer) (int64, error) {
 	}
 
 	if c.options.ShowPlaces {
-		var badge Component = NewEmpty()
+		var badge core.Component = core.NewEmpty()
 		if !c.options.Checksum {
-			badge = NewCountBadge(len(GetPlaces(c.document)))
+			badge = core.NewCountBadge(len(GetPlaces(c.document)))
 		}
 
-		item := NewNavItem(
-			NewComponents(NewText("Places "), badge),
+		item := core.NewNavItem(
+			core.NewComponents(core.NewText("Places "), badge),
 			c.selectedTab == selectedPlacesTab,
 			PagePlaces(),
 		)
@@ -78,13 +79,13 @@ func (c *PublishHeader) WriteTo(w io.Writer) (int64, error) {
 	}
 
 	if c.options.ShowFamilies {
-		var badge Component = NewEmpty()
+		var badge core.Component = core.NewEmpty()
 		if !c.options.Checksum {
-			badge = NewCountBadge(len(c.document.Families()))
+			badge = core.NewCountBadge(len(c.document.Families()))
 		}
 
-		item := NewNavItem(
-			NewComponents(NewText("Families "), badge),
+		item := core.NewNavItem(
+			core.NewComponents(core.NewText("Families "), badge),
 			c.selectedTab == selectedFamiliesTab,
 			PageFamilies(),
 		)
@@ -92,13 +93,13 @@ func (c *PublishHeader) WriteTo(w io.Writer) (int64, error) {
 	}
 
 	if c.options.ShowSurnames {
-		var badge Component = NewEmpty()
+		var badge core.Component = core.NewEmpty()
 		if !c.options.Checksum {
-			badge = NewCountBadge(getSurnames(c.document).Len())
+			badge = core.NewCountBadge(getSurnames(c.document).Len())
 		}
 
-		item := NewNavItem(
-			NewComponents(NewText("Surnames "), badge),
+		item := core.NewNavItem(
+			core.NewComponents(core.NewText("Surnames "), badge),
 			c.selectedTab == selectedSurnamesTab,
 			PageSurnames(),
 		)
@@ -106,13 +107,13 @@ func (c *PublishHeader) WriteTo(w io.Writer) (int64, error) {
 	}
 
 	if c.options.ShowSources {
-		var badge Component = NewEmpty()
+		var badge core.Component = core.NewEmpty()
 		if !c.options.Checksum {
-			badge = NewCountBadge(len(c.document.Sources()))
+			badge = core.NewCountBadge(len(c.document.Sources()))
 		}
 
-		item := NewNavItem(
-			NewComponents(NewText("Sources "), badge),
+		item := core.NewNavItem(
+			core.NewComponents(core.NewText("Sources "), badge),
 			c.selectedTab == selectedSourcesTab,
 			PageSources(),
 		)
@@ -120,8 +121,8 @@ func (c *PublishHeader) WriteTo(w io.Writer) (int64, error) {
 	}
 
 	if c.options.ShowStatistics {
-		item := NewNavItem(
-			NewText("Statistics"),
+		item := core.NewNavItem(
+			core.NewText("Statistics"),
 			c.selectedTab == selectedStatisticsTab,
 			PageStatistics(),
 		)
@@ -129,19 +130,19 @@ func (c *PublishHeader) WriteTo(w io.Writer) (int64, error) {
 	}
 
 	if c.extraTab != "" {
-		item := NewNavItem(
-			NewText(c.extraTab),
+		item := core.NewNavItem(
+			core.NewText(c.extraTab),
 			c.selectedTab == selectedExtraTab,
 			"#",
 		)
 		items = append(items, item)
 	}
 
-	return NewComponents(
-		NewSpace(),
-		NewNavTabs(items),
-		NewSpace(),
-	).WriteTo(w)
+	return core.NewComponents(
+		core.NewSpace(),
+		core.NewNavTabs(items),
+		core.NewSpace(),
+	).WriteHTMLTo(w)
 }
 
 var surnames = gedcom.NewStringSet()

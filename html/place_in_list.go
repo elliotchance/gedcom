@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -17,12 +18,12 @@ func NewPlaceInList(document *gedcom.Document, place *place) *PlaceInList {
 	}
 }
 
-func (c *PlaceInList) WriteTo(w io.Writer) (int64, error) {
+func (c *PlaceInList) WriteHTMLTo(w io.Writer) (int64, error) {
 	placeLink := NewPlaceLink(c.document, c.place.PrettyName)
-	countBadge := NewCountBadge(len(c.place.nodes))
-	content := NewComponents(placeLink, countBadge)
+	countBadge := core.NewCountBadge(len(c.place.nodes))
+	content := core.NewComponents(placeLink, countBadge)
 
-	return NewTableRow(
-		NewTableCell(content).NoWrap(),
-	).WriteTo(w)
+	return core.NewTableRow(
+		core.NewTableCell(content).NoWrap(),
+	).WriteHTMLTo(w)
 }

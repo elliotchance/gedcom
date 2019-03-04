@@ -44,6 +44,7 @@ import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html"
+	"github.com/elliotchance/gedcom/html/core"
 	"github.com/elliotchance/gedcom/util"
 	"io"
 	"io/ioutil"
@@ -216,7 +217,7 @@ func main() {
 
 		sort.Strings(lines)
 
-		createFile("checksum.csv", html.NewText(strings.Join(lines, "\n")))
+		createFile("checksum.csv", core.NewText(strings.Join(lines, "\n")))
 	}
 }
 
@@ -235,7 +236,7 @@ func fileSha1(path string) string {
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
-func createFile(name string, contents html.Component) {
+func createFile(name string, contents core.Component) {
 	path := fmt.Sprintf("%s/%s", optionOutputDir, name)
 	log.Printf("Writing %s...", path)
 
@@ -244,7 +245,7 @@ func createFile(name string, contents html.Component) {
 		log.Fatal(err)
 	}
 
-	contents.WriteTo(out)
+	contents.WriteHTMLTo(out)
 
 	out.Close()
 }

@@ -46,3 +46,11 @@ func (node *HusbandNode) IsIndividual(node2 *IndividualNode) bool {
 
 	return node.Individual().Is(node2)
 }
+
+func (node *HusbandNode) String() string {
+	if node == nil || node.Individual() == nil {
+		return "(unknown)"
+	}
+
+	return node.Individual().String()
+}

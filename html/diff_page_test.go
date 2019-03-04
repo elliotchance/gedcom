@@ -27,7 +27,7 @@ func individual(doc *gedcom.Document, pointer, fullName, birth, death string) *g
 	return individual
 }
 
-func TestDiffPage_WriteTo(t *testing.T) {
+func TestDiffPage_WriteHTMLTo(t *testing.T) {
 	doc := gedcom.NewDocument()
 	elliot := individual(doc, "P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907")
 	john := individual(doc, "P2", "John /Smith/", "4 Jan 1803", "17 Mar 1877")
@@ -47,7 +47,7 @@ func TestDiffPage_WriteTo(t *testing.T) {
 		compareOptions, html.LivingVisibilityPlaceholder)
 
 	buf := bytes.NewBuffer(nil)
-	component.WriteTo(buf)
+	component.WriteHTMLTo(buf)
 	s := string(buf.Bytes())
 
 	assert.Contains(t, s, "<html>")

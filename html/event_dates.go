@@ -14,7 +14,7 @@ func NewEventDates(items []*EventDate) *EventDates {
 	}
 }
 
-func (c *EventDates) WriteTo(w io.Writer) (int64, error) {
+func (c *EventDates) WriteHTMLTo(w io.Writer) (int64, error) {
 	n := int64(0)
 	for _, date := range c.items {
 		if n > 0 && !date.IsBlank() {

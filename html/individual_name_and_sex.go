@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -17,7 +18,7 @@ func NewIndividualNameAndSex(individual *gedcom.IndividualNode) *IndividualNameA
 	}
 }
 
-func (c *IndividualNameAndSex) WriteTo(w io.Writer) (int64, error) {
+func (c *IndividualNameAndSex) WriteHTMLTo(w io.Writer) (int64, error) {
 	primaryName := c.individual.Names()[0]
 	title := primaryName.Title()
 	prefix := primaryName.Prefix()
@@ -34,9 +35,9 @@ func (c *IndividualNameAndSex) WriteTo(w io.Writer) (int64, error) {
 	suffixRow := keyedRow("Suffix", suffix)
 
 	sexBadge := NewSexBadge(c.individual.Sex())
-	sexRow := NewKeyedTableRow("Sex", sexBadge, true)
+	sexRow := core.NewKeyedTableRow("Sex", sexBadge, true)
 
-	s := NewComponents(
+	s := core.NewComponents(
 		titleRow,
 		prefixRow,
 		givenNameRow,
@@ -46,12 +47,13 @@ func (c *IndividualNameAndSex) WriteTo(w io.Writer) (int64, error) {
 		sexRow,
 	)
 
-	return NewCard(NewText("Name & Sex"), noBadgeCount, NewTable("", s)).WriteTo(w)
+	return core.NewCard(core.NewText("Name & Sex"), core.CardNoBadgeCount,
+		core.NewTable("", s)).WriteHTMLTo(w)
 }
 
-func keyedRow(title, value string) *KeyedTableRow {
-	text := NewText(value)
+func keyedRow(title, value string) *core.KeyedTableRow {
+	text := core.NewText(value)
 	visible := value != ""
 
-	return NewKeyedTableRow(title, text, visible)
+	return core.NewKeyedTableRow(title, text, visible)
 }

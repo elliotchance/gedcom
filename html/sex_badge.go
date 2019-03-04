@@ -3,6 +3,7 @@ package html
 import (
 	"fmt"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -17,9 +18,9 @@ func NewSexBadge(sex *gedcom.SexNode) *SexBadge {
 	}
 }
 
-func (c *SexBadge) WriteTo(w io.Writer) (int64, error) {
-	return NewSpan(
+func (c *SexBadge) WriteHTMLTo(w io.Writer) (int64, error) {
+	return core.NewSpan(
 		fmt.Sprintf("badge badge-%s", colorClassForSex(c.sex)),
-		NewText(c.sex.String()),
-	).WriteTo(w)
+		core.NewText(c.sex.String()),
+	).WriteHTMLTo(w)
 }

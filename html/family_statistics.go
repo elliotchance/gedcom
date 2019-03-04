@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -15,7 +16,7 @@ func NewFamilyStatistics(document *gedcom.Document) *FamilyStatistics {
 	}
 }
 
-func (c *FamilyStatistics) WriteTo(w io.Writer) (int64, error) {
+func (c *FamilyStatistics) WriteHTMLTo(w io.Writer) (int64, error) {
 	total := len(c.document.Families())
 	marriageEvents := 0
 	divorceEvents := 0
@@ -32,15 +33,15 @@ func (c *FamilyStatistics) WriteTo(w io.Writer) (int64, error) {
 		}
 	}
 
-	totalFamilies := NewNumber(total)
-	marriageCount := NewNumber(marriageEvents)
-	divorceCount := NewNumber(divorceEvents)
-	totalFamiliesRow := NewKeyedTableRow("Total Families", totalFamilies, true)
-	marriageCountRow := NewKeyedTableRow("Marriage Events", marriageCount, true)
-	divorceCountRow := NewKeyedTableRow("Divorce Events", divorceCount, true)
+	totalFamilies := core.NewNumber(total)
+	marriageCount := core.NewNumber(marriageEvents)
+	divorceCount := core.NewNumber(divorceEvents)
+	totalFamiliesRow := core.NewKeyedTableRow("Total Families", totalFamilies, true)
+	marriageCountRow := core.NewKeyedTableRow("Marriage Events", marriageCount, true)
+	divorceCountRow := core.NewKeyedTableRow("Divorce Events", divorceCount, true)
 
-	s := NewComponents(totalFamiliesRow, marriageCountRow, divorceCountRow)
+	s := core.NewComponents(totalFamiliesRow, marriageCountRow, divorceCountRow)
 
-	return NewCard(NewText("Families"), noBadgeCount, NewTable("", s)).
-		WriteTo(w)
+	return core.NewCard(core.NewText("Families"), core.CardNoBadgeCount,
+		core.NewTable("", s)).WriteHTMLTo(w)
 }

@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 	"sort"
 )
@@ -16,7 +17,7 @@ func NewEventStatistics(document *gedcom.Document) *EventStatistics {
 	}
 }
 
-func (c *EventStatistics) WriteTo(w io.Writer) (int64, error) {
+func (c *EventStatistics) WriteHTMLTo(w io.Writer) (int64, error) {
 	counts := map[string]int{}
 
 	for _, individual := range c.document.Individuals() {
@@ -30,8 +31,8 @@ func (c *EventStatistics) WriteTo(w io.Writer) (int64, error) {
 		total += count
 	}
 
-	rows := []Component{
-		NewKeyedTableRow("Total", NewNumber(total), true),
+	rows := []core.Component{
+		core.NewKeyedTableRow("Total", core.NewNumber(total), true),
 	}
 
 	keys := []string{}
@@ -42,12 +43,13 @@ func (c *EventStatistics) WriteTo(w io.Writer) (int64, error) {
 	sort.Strings(keys)
 
 	for _, name := range keys {
-		number := NewNumber(counts[name])
-		tableRow := NewKeyedTableRow(name, number, true)
+		number := core.NewNumber(counts[name])
+		tableRow := core.NewKeyedTableRow(name, number, true)
 		rows = append(rows, tableRow)
 	}
 
-	table := NewTable("", NewComponents(rows...))
+	table := core.NewTable("", core.NewComponents(rows...))
 
-	return NewCard(NewText("Events"), noBadgeCount, table).WriteTo(w)
+	return core.NewCard(core.NewText("Events"), core.CardNoBadgeCount, table).
+		WriteHTMLTo(w)
 }

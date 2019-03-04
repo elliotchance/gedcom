@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -29,7 +30,7 @@ func (c *IndividualDates) IsBlank() bool {
 	return true
 }
 
-func (c *IndividualDates) WriteTo(w io.Writer) (int64, error) {
+func (c *IndividualDates) WriteHTMLTo(w io.Writer) (int64, error) {
 	isLiving := c.individual != nil && c.individual.IsLiving()
 
 	if isLiving && c.visibility == LivingVisibilityHide {
@@ -37,12 +38,12 @@ func (c *IndividualDates) WriteTo(w io.Writer) (int64, error) {
 	}
 
 	if isLiving && c.visibility == LivingVisibilityPlaceholder {
-		return NewText("living").WriteTo(w)
+		return core.NewText("living").WriteHTMLTo(w)
 	}
 
 	eventDates := c.EventDates()
 
-	return NewEventDates(eventDates).WriteTo(w)
+	return NewEventDates(eventDates).WriteHTMLTo(w)
 }
 
 func (c *IndividualDates) EventDates() []*EventDate {

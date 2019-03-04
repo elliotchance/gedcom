@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html/core"
 	"io"
 )
 
@@ -19,7 +20,7 @@ func NewFamilyInList(document *gedcom.Document, family *gedcom.FamilyNode, visib
 	}
 }
 
-func (c *FamilyInList) WriteTo(w io.Writer) (int64, error) {
+func (c *FamilyInList) WriteHTMLTo(w io.Writer) (int64, error) {
 	date := "-"
 	n := gedcom.First(gedcom.NodesWithTagPath(c.family, gedcom.TagMarriage, gedcom.TagDate))
 	if n != nil {
@@ -29,9 +30,9 @@ func (c *FamilyInList) WriteTo(w io.Writer) (int64, error) {
 	husband := NewIndividualLink(c.document, c.family.Husband().Individual(), c.visibility)
 	wife := NewIndividualLink(c.document, c.family.Wife().Individual(), c.visibility)
 
-	return NewTableRow(
-		NewTableCell(husband),
-		NewTableCell(NewText(date)).Class("text-center").NoWrap(),
-		NewTableCell(wife),
-	).WriteTo(w)
+	return core.NewTableRow(
+		core.NewTableCell(husband),
+		core.NewTableCell(core.NewText(date)).Class("text-center").NoWrap(),
+		core.NewTableCell(wife),
+	).WriteHTMLTo(w)
 }

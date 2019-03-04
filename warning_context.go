@@ -9,16 +9,15 @@ type WarningContext struct {
 	Family     *FamilyNode
 }
 
-func (context WarningContext) MarshalQ() interface{} {
-	m := map[string]string{}
+func (context WarningContext) String() string {
+	switch {
+	case context.Individual != nil:
+		return context.Individual.String()
 
-	if context.Individual != nil {
-		m["Individual"] = context.Individual.Pointer()
+	case context.Family != nil:
+		return context.Family.String()
+
+	default:
+		return "None"
 	}
-
-	if context.Family != nil {
-		m["Family"] = context.Family.Pointer()
-	}
-
-	return m
 }

@@ -22,13 +22,3 @@ func (w *UnparsableDateWarning) Name() string {
 func (w *UnparsableDateWarning) String() string {
 	return fmt.Sprintf(`Unparsable date "%s"`, w.Date.Value())
 }
-
-func (w *UnparsableDateWarning) MarshalQ() interface{} {
-	return map[string]interface{}{
-		"String":  w.String(),
-		"Name":    w.Name(),
-		"Context": w.Context.MarshalQ(),
-
-		"Date": w.Date.Value(),
-	}
-}
