@@ -8,41 +8,51 @@ import (
 
 func TestDates(t *testing.T) {
 	tests := []struct {
-		nodes gedcom.Node
+		nodes []gedcom.Node
 		want  gedcom.DateNodes
 	}{
 		{nil, nil},
 		{
-			gedcom.NewNode(gedcom.TagVersion, "foo", ""),
+			gedcom.Nodes{
+				gedcom.NewNode(gedcom.TagVersion, "foo", ""),
+			},
 			nil,
 		},
 		{
-			gedcom.NewNameNode("foo bar",
-				gedcom.NewDateNode("2 Sep 1981"),
-			),
+			gedcom.Nodes{
+				gedcom.NewNameNode("foo bar",
+					gedcom.NewDateNode("2 Sep 1981"),
+				),
+			},
 			gedcom.DateNodes{
 				gedcom.NewDateNode("2 Sep 1981"),
 			},
 		},
 		{
-			gedcom.NewNameNode("foo bar",
-				gedcom.NewDateNode("2 Sep 1981"),
-				gedcom.NewDateNode("3 Sep 1981"),
-			),
+			gedcom.Nodes{
+				gedcom.NewNameNode("foo bar",
+					gedcom.NewDateNode("2 Sep 1981"),
+					gedcom.NewDateNode("3 Sep 1981"),
+				),
+			},
 			gedcom.DateNodes{
 				gedcom.NewDateNode("2 Sep 1981"),
 				gedcom.NewDateNode("3 Sep 1981"),
 			},
 		},
 		{
-			gedcom.NewNameNode("foo bar"),
+			gedcom.Nodes{
+				gedcom.NewNameNode("foo bar"),
+			},
 			nil,
 		},
 		{
-			gedcom.NewNameNode("foo bar",
-				gedcom.NewDateNode("bar baz"),
-				gedcom.NewDateNode("3 Sep 1981"),
-			),
+			gedcom.Nodes{
+				gedcom.NewNameNode("foo bar",
+					gedcom.NewDateNode("bar baz"),
+					gedcom.NewDateNode("3 Sep 1981"),
+				),
+			},
 			[]*gedcom.DateNode{
 				gedcom.NewDateNode("bar baz"),
 				gedcom.NewDateNode("3 Sep 1981"),
@@ -52,7 +62,7 @@ func TestDates(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run("", func(t *testing.T) {
-			assert.Equal(t, test.want, gedcom.Dates(test.nodes))
+			assert.Equal(t, test.want, gedcom.Dates(test.nodes...))
 		})
 	}
 }

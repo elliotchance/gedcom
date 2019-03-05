@@ -568,23 +568,27 @@ func TestIndividualNode_LDSBaptisms(t *testing.T) {
 func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 	// ghost:ignore
 	var tests = []struct {
-		node     *gedcom.IndividualNode
-		expected *gedcom.DateNode
+		node         *gedcom.IndividualNode
+		expected     *gedcom.DateNode
+		isBirthEvent bool
 	}{
 		// Nil
 		{
-			node:     nil,
-			expected: nil,
+			node:         nil,
+			expected:     nil,
+			isBirthEvent: false,
 		},
 
 		// No dates
 		{
-			node:     individual(gedcom.NewDocument(), "P1", "", "", ""),
-			expected: nil,
+			node:         individual(gedcom.NewDocument(), "P1", "", "", ""),
+			expected:     nil,
+			isBirthEvent: false,
 		},
 		{
-			node:     gedcom.NewDocument().AddIndividual("P1"),
-			expected: nil,
+			node:         gedcom.NewDocument().AddIndividual("P1"),
+			expected:     nil,
+			isBirthEvent: false,
 		},
 
 		// A single date.
@@ -594,7 +598,8 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 					gedcom.NewDateNode("1 Aug 1980"),
 				),
 			),
-			expected: gedcom.NewDateNode("1 Aug 1980"),
+			expected:     gedcom.NewDateNode("1 Aug 1980"),
+			isBirthEvent: true,
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
@@ -602,7 +607,8 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 					gedcom.NewDateNode("Abt. Dec 1980"),
 				),
 			),
-			expected: gedcom.NewDateNode("Abt. Dec 1980"),
+			expected:     gedcom.NewDateNode("Abt. Dec 1980"),
+			isBirthEvent: false,
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
@@ -610,7 +616,8 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 					gedcom.NewDateNode("Abt. Nov 1980"),
 				),
 			),
-			expected: gedcom.NewDateNode("Abt. Nov 1980"),
+			expected:     gedcom.NewDateNode("Abt. Nov 1980"),
+			isBirthEvent: false,
 		},
 
 		// Multiple dates and other cases.
@@ -623,7 +630,8 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 					gedcom.NewDateNode("Abt. Jan 1980"),
 				),
 			),
-			expected: gedcom.NewDateNode("Abt. Jan 1980"),
+			expected:     gedcom.NewDateNode("1 Aug 1980"),
+			isBirthEvent: true,
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
@@ -632,7 +640,8 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 					gedcom.NewDateNode("23 Mar 1979"),
 				),
 			),
-			expected: gedcom.NewDateNode("23 Mar 1979"),
+			expected:     gedcom.NewDateNode("23 Mar 1979"),
+			isBirthEvent: true,
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
@@ -643,14 +652,16 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 					gedcom.NewDateNode("23 Mar 1979"),
 				),
 			),
-			expected: gedcom.NewDateNode("23 Mar 1979"),
+			expected:     gedcom.NewDateNode("1 Aug 1980"),
+			isBirthEvent: true,
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
 				gedcom.NewBirthNode(""),
 				gedcom.NewNode(gedcom.TagLDSBaptism, "", ""),
 			),
-			expected: nil,
+			expected:     nil,
+			isBirthEvent: false,
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
@@ -659,13 +670,16 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 					gedcom.NewDateNode("1 Aug 1980"),
 				),
 			),
-			expected: gedcom.NewDateNode("1 Aug 1980"),
+			expected:     gedcom.NewDateNode("1 Aug 1980"),
+			isBirthEvent: false,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run("", func(t *testing.T) {
-			got := test.node.EstimatedBirthDate()
+			got, isBirthEvent := test.node.EstimatedBirthDate()
+
+			assert.Equal(t, test.isBirthEvent, isBirthEvent)
 
 			if got == nil {
 				assert.Nil(t, test.expected)
@@ -679,23 +693,27 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 	// ghost:ignore
 	var tests = []struct {
-		node     *gedcom.IndividualNode
-		expected *gedcom.DateNode
+		node         *gedcom.IndividualNode
+		expected     *gedcom.DateNode
+		isDeathEvent bool
 	}{
 		// Nil
 		{
-			node:     nil,
-			expected: nil,
+			node:         nil,
+			expected:     nil,
+			isDeathEvent: false,
 		},
 
 		// No dates
 		{
-			node:     individual(gedcom.NewDocument(), "P1", "", "", ""),
-			expected: nil,
+			node:         individual(gedcom.NewDocument(), "P1", "", "", ""),
+			expected:     nil,
+			isDeathEvent: false,
 		},
 		{
-			node:     gedcom.NewDocument().AddIndividual("P1"),
-			expected: nil,
+			node:         gedcom.NewDocument().AddIndividual("P1"),
+			expected:     nil,
+			isDeathEvent: false,
 		},
 
 		// A single date.
@@ -705,7 +723,8 @@ func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 					gedcom.NewDateNode("1 Aug 1980"),
 				),
 			),
-			expected: gedcom.NewDateNode("1 Aug 1980"),
+			expected:     gedcom.NewDateNode("1 Aug 1980"),
+			isDeathEvent: true,
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
@@ -713,7 +732,8 @@ func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 					gedcom.NewDateNode("Abt. Dec 1980"),
 				),
 			),
-			expected: gedcom.NewDateNode("Abt. Dec 1980"),
+			expected:     gedcom.NewDateNode("Abt. Dec 1980"),
+			isDeathEvent: false,
 		},
 
 		// Multiple dates and other cases.
@@ -726,7 +746,8 @@ func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 					gedcom.NewDateNode("Jun 1980"),
 				),
 			),
-			expected: gedcom.NewDateNode("Mar 1980"),
+			expected:     gedcom.NewDateNode("Mar 1980"),
+			isDeathEvent: true,
 		},
 		{
 			// Multiple burial dates always returns the earliest.
@@ -736,7 +757,8 @@ func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 					gedcom.NewDateNode("Apr 1980"),
 				),
 			),
-			expected: gedcom.NewDateNode("Apr 1980"),
+			expected:     gedcom.NewDateNode("Apr 1980"),
+			isDeathEvent: false,
 		},
 		{
 			// Death is before burial.
@@ -748,7 +770,8 @@ func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 					gedcom.NewDateNode("3 Aug 1980"),
 				),
 			),
-			expected: gedcom.NewDateNode("1 Aug 1980"),
+			expected:     gedcom.NewDateNode("1 Aug 1980"),
+			isDeathEvent: true,
 		},
 		{
 			// Burial is before death.
@@ -760,13 +783,16 @@ func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 					gedcom.NewDateNode("1 Aug 1980"),
 				),
 			),
-			expected: gedcom.NewDateNode("3 Aug 1980"),
+			expected:     gedcom.NewDateNode("3 Aug 1980"),
+			isDeathEvent: true,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run("", func(t *testing.T) {
-			got := test.node.EstimatedDeathDate()
+			got, isDeathEvent := test.node.EstimatedDeathDate()
+
+			assert.Equal(t, test.isDeathEvent, isDeathEvent)
 
 			if got == nil {
 				assert.Nil(t, test.expected)
@@ -1476,55 +1502,55 @@ func TestIndividualNode_Burial(t *testing.T) {
 }
 
 func TestIndividualNode_AgeAt(t *testing.T) {
-	tests := []struct {
+	tests := map[string]struct {
 		individual string
 		event      string
 		start      string
 		end        string
 	}{
-		{
+		"Missing1": {
 			// No dates at all.
 			individual: " - ",
 			event:      "",
 			start:      "= ?",
 			end:        "= ?",
 		},
-		{
+		"Missing2": {
 			// Event does not have any dates.
 			individual: "3 Sep 1945 - 2 Mar 2001",
 			event:      "",
 			start:      "= ?",
 			end:        "= ?",
 		},
-		{
+		"Missing3": {
 			// Missing birth date for individual.
 			individual: " - 2 Mar 2001",
 			event:      "3 Sep 1945",
 			start:      "= ?",
 			end:        "= ?",
 		},
-		{
+		"Approx1": {
 			// Approximate birth date makes the age an estimate.
 			individual: "Abt. 1934 - 2 Mar 2001",
 			event:      "3 Sep 1945",
 			start:      "1945 - 1934 = ~10.7",
 			end:        "1945 - 1934 = ~11.7",
 		},
-		{
+		"Approx2": {
 			// Non-exact birth date makes the age an estimate.
 			individual: "1934 - 2 Mar 2001",
 			event:      "3 Sep 1945",
 			start:      "1945 - 1934 = ~10.7",
 			end:        "1945 - 1934 = ~11.7",
 		},
-		{
+		"Exact1": {
 			// Event has an exact date. This is the best case scenario.
 			individual: "3 Sep 1945 - 2 Mar 2001",
 			event:      "12 Jan 1973",
 			start:      "1973 - 1945 = 27.4",
 			end:        "1973 - 1945 = 27.4",
 		},
-		{
+		"Exact2": {
 			// Event has multiple exact dates. We must assume the min and max
 			// dates create a possible range.
 			individual: "3 Sep 1945 - 2 Mar 2001",
@@ -1532,7 +1558,7 @@ func TestIndividualNode_AgeAt(t *testing.T) {
 			start:      "1970 - 1945 = 25.2",
 			end:        "1975 - 1945 = 30.3",
 		},
-		{
+		"Approx3": {
 			// Like the previous example we have several dates but not all of
 			// them are exact.
 			individual: "3 Sep 1945 - 2 Mar 2001",
@@ -1540,7 +1566,7 @@ func TestIndividualNode_AgeAt(t *testing.T) {
 			start:      "1970 - 1945 = ~25.2",
 			end:        "1975 - 1945 = ~30.3",
 		},
-		{
+		"Approx4": {
 			// There are two date ranges that partially overlap each other to
 			// create a single larger range.
 			individual: "3 Sep 1945 - 2 Mar 2001",
@@ -1548,7 +1574,7 @@ func TestIndividualNode_AgeAt(t *testing.T) {
 			start:      "1963 - 1945 = ~17.3",
 			end:        "1969 - 1945 = ~24.3",
 		},
-		{
+		"Invalid1": {
 			// One of the dates is invalid.
 			individual: "3 Sep 1945 - 2 Mar 2001",
 			event:      "foo bar, Between 1963 and 1967",
@@ -1557,8 +1583,8 @@ func TestIndividualNode_AgeAt(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		t.Run("", func(t *testing.T) {
+	for testName, test := range tests {
+		t.Run(testName, func(t *testing.T) {
 			individualParts := strings.Split(test.individual, "-")
 			individual := gedcom.NewDocument().AddIndividual("",
 				gedcom.NewBirthNode("",
@@ -1783,4 +1809,82 @@ func TestIndividualNode_UniqueIDs(t *testing.T) {
 		gedcom.NewUniqueIDNode("AZDP-V7V"),
 		gedcom.NewUniqueIDNode("BZDP-V7V"),
 	})
+}
+
+var individualWarningTests = map[string]struct {
+	doc      func(doc *gedcom.Document)
+	expected []string
+}{
+	"None": {
+		func(doc *gedcom.Document) {
+			individual(doc, "P1", "Elliot /Chance/", "", "16 May 1989")
+		},
+		nil,
+	},
+	"DeathBeforeBurial": {
+		func(doc *gedcom.Document) {
+			elliot := individual(doc, "P1", "Elliot /Chance/", "", "1 May 1989")
+			elliot.AddBurialDate("16 May 1989")
+		},
+		nil,
+	},
+	"BurialBeforeDeath": {
+		func(doc *gedcom.Document) {
+			elliot := individual(doc, "P1", "Elliot /Chance/", "", "16 May 1989")
+			elliot.AddBurialDate("1 May 1989")
+		},
+		[]string{"The burial (1 May 1989) was before the death (16 May 1989) of Elliot Chance (d. 16 May 1989)."},
+	},
+	"BirthBeforeBaptism": {
+		func(doc *gedcom.Document) {
+			elliot := individual(doc, "P1", "Elliot /Chance/", "1 May 1989", "")
+			elliot.AddBaptismDate("16 May 1989")
+		},
+		nil,
+	},
+	"BaptismBeforeBirth": {
+		func(doc *gedcom.Document) {
+			elliot := individual(doc, "P1", "Elliot /Chance/", "16 May 1989", "")
+			elliot.AddBaptismDate("1 May 1989")
+		},
+		[]string{"The baptism (1 May 1989) was before the birth (16 May 1989) of Elliot Chance (b. 16 May 1989)."},
+	},
+	"TooOldUnknownSex": {
+		func(doc *gedcom.Document) {
+			individual(doc, "P1", "Elliot /Chance/", "16 May 1889", "2000")
+		},
+		[]string{"Elliot Chance (b. 16 May 1889, d. 2000) was 111 years old at the time of their death."},
+	},
+	"TooOldMale": {
+		func(doc *gedcom.Document) {
+			elliot := individual(doc, "P1", "Elliot /Chance/", "16 May 1889", "2000")
+			elliot.SetSex(gedcom.SexMale)
+		},
+		[]string{"Elliot Chance (b. 16 May 1889, d. 2000) was 111 years old at the time of his death."},
+	},
+	"NotTooOldWithoutDeath": {
+		func(doc *gedcom.Document) {
+			individual(doc, "P1", "Elliot /Chance/", "16 May 1789", "")
+		},
+		nil,
+	},
+	"NotTooOldFemale": {
+		func(doc *gedcom.Document) {
+			elliot := individual(doc, "P1", "Jane /Chance/", "12 Sep 1913", "7 Feb 2001")
+			elliot.SetSex(gedcom.SexFemale)
+		},
+		nil,
+	},
+}
+
+func TestIndividualNode_Warnings(t *testing.T) {
+	for testName, test := range individualWarningTests {
+		t.Run(testName, func(t *testing.T) {
+			doc := gedcom.NewDocument()
+			test.doc(doc)
+
+			p1 := doc.Individuals().ByPointer("P1")
+			assertEqual(t, p1.Warnings().Strings(), test.expected)
+		})
+	}
 }

@@ -13,6 +13,15 @@ type Nodes []Node
 // files.
 var nodeCache = &sync.Map{} // map[Node]map[Tag]Nodes{}
 
+func NewNodes(ns interface{}) (nodes Nodes) {
+	v := reflect.ValueOf(ns)
+	for i := 0; i < v.Len(); i++ {
+		nodes = append(nodes, v.Index(i).Interface().(Node))
+	}
+
+	return
+}
+
 // NodesWithTag returns the zero or more nodes that have a specific GEDCOM tag.
 // If the provided node is nil then an empty slice will always be returned.
 //

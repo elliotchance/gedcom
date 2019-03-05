@@ -60,3 +60,10 @@ func (dates DateNodes) StripZero() (validDates DateNodes) {
 
 	return
 }
+
+func (dates DateNodes) Range() DateRange {
+	start := dates.Minimum().StartDate()
+	end := dates.Maximum().EndDate()
+
+	return NewDateRange(start, end)
+}

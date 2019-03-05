@@ -229,7 +229,7 @@ type Date struct {
 // If t IsZero then a zero Date will be returned (see Date.IsZero).
 func NewDateWithTime(t time.Time, isEndOfRange bool) Date {
 	if t.IsZero() {
-		return Date{}
+		return NewZeroDate()
 	}
 
 	return Date{
@@ -243,12 +243,12 @@ func NewDateWithTime(t time.Time, isEndOfRange bool) Date {
 
 // NewDateWithNow creates a two Dates that represents the the start and end of
 // the current day. See NewDateWithTime for implementation details.
-func NewDateRangeWithNow() (Date, Date) {
+func NewDateRangeWithNow() DateRange {
 	now := time.Now()
 	start := NewDateWithTime(now, false)
 	end := NewDateWithTime(now, true)
 
-	return start, end
+	return NewDateRange(start, end)
 }
 
 func (date Date) safeParse(s string) time.Time {
@@ -545,6 +545,17 @@ func (date Date) IsAfter(date2 Date) bool {
 	rightYears := date2.Years()
 
 	return leftYears > rightYears
+}
+
+func (date Date) Sub(date2 Date) Duration {
+	a := date.Time()
+	b := date2.Time()
+
+	return Duration(a.Sub(b))
+}
+
+func NewZeroDate() Date {
+	return Date{}
 }
 
 var months = map[string]time.Month{

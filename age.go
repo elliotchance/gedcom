@@ -90,28 +90,6 @@ func (age Age) Years() float64 {
 	return float64(age.Age) / float64(Year)
 }
 
-func constraintBetweenAges(estimatedBirthDate, estimatedDeathDate Date, age time.Duration) AgeConstraint {
-	if age < 0 {
-		return AgeConstraintBeforeBirth
-	}
-
-	if estimatedBirthDate.IsZero() {
-		return AgeConstraintUnknown
-	}
-
-	if estimatedDeathDate.IsZero() {
-		return AgeConstraintUnknown
-	}
-
-	birthTime := estimatedBirthDate.Time()
-	deathTime := estimatedDeathDate.Time()
-	if age > deathTime.Sub(birthTime) {
-		return AgeConstraintAfterDeath
-	}
-
-	return AgeConstraintLiving
-}
-
 // String returns an age in one of the following forms:
 //
 //   unknown     -- if IsKnown is false

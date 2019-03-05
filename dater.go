@@ -11,13 +11,15 @@ type Dater interface {
 // Dates is safe to use with nil nodes.
 //
 // Dates will always return all dates, even dates that are invalid.
-func Dates(node Node) (result DateNodes) {
-	if IsNil(node) {
-		return
-	}
+func Dates(nodes ...Node) (result DateNodes) {
+	for _, node := range nodes {
+		if IsNil(node) {
+			continue
+		}
 
-	for _, n := range NodesWithTag(node, TagDate) {
-		result = append(result, n.(*DateNode))
+		for _, n := range NodesWithTag(node, TagDate) {
+			result = append(result, n.(*DateNode))
+		}
 	}
 
 	return
