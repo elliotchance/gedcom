@@ -343,6 +343,64 @@ var familyWarningTests = map[string]struct {
 			"The siblings John Chance (b. 16 May 1989) and Sarah Chance (b. 3 Apr 1989) were born within one month and 13 days of each other.",
 		},
 	},
+	"HusbandMarriedTooOld": {
+		func(doc *gedcom.Document) {
+			p1 := doc.AddIndividual("P1").
+				AddName("John /Chance/").
+				AddBirthDate("16 May 1889")
+
+			p2 := doc.AddIndividual("P2").
+				AddName("Sarah /Chance/").
+				AddBirthDate("3 Apr 1960").
+				SetSex(gedcom.SexFemale)
+
+			f1 := doc.AddFamilyWithHusbandAndWife("F1", p1, p2)
+			f1.AddNode(gedcom.NewNode(gedcom.TagMarriage, "", "",
+				gedcom.NewDateNode("1995")))
+		},
+		[]string{
+			"The husband John Chance (b. 16 May 1889) married at 107 years old.",
+		},
+	},
+	"WifeMarriedTooOld": {
+		func(doc *gedcom.Document) {
+			p1 := doc.AddIndividual("P1").
+				AddName("John /Chance/").
+				AddBirthDate("16 May 1960")
+
+			p2 := doc.AddIndividual("P2").
+				AddName("Sarah /Chance/").
+				AddBirthDate("3 Apr 1889").
+				SetSex(gedcom.SexFemale)
+
+			f1 := doc.AddFamilyWithHusbandAndWife("F1", p1, p2)
+			f1.AddNode(gedcom.NewNode(gedcom.TagMarriage, "", "",
+				gedcom.NewDateNode("1995")))
+		},
+		[]string{
+			"The wife Sarah Chance (b. 3 Apr 1889) married at 107 years old.",
+		},
+	},
+	"HusbandAndWifeMarriedTooOld": {
+		func(doc *gedcom.Document) {
+			p1 := doc.AddIndividual("P1").
+				AddName("John /Chance/").
+				AddBirthDate("16 May 1891")
+
+			p2 := doc.AddIndividual("P2").
+				AddName("Sarah /Chance/").
+				AddBirthDate("3 Apr 1889").
+				SetSex(gedcom.SexFemale)
+
+			f1 := doc.AddFamilyWithHusbandAndWife("F1", p1, p2)
+			f1.AddNode(gedcom.NewNode(gedcom.TagMarriage, "", "",
+				gedcom.NewDateNode("1995")))
+		},
+		[]string{
+			"The husband John Chance (b. 16 May 1891) married at 105 years old.",
+			"The wife Sarah Chance (b. 3 Apr 1889) married at 107 years old.",
+		},
+	},
 }
 
 func TestFamilyNode_Warnings(t *testing.T) {

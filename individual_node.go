@@ -752,33 +752,6 @@ func (node *IndividualNode) ageAt(at DateRange) (Age, Age) {
 	}
 
 	estimatedDeathDate, isDeathEvent := node.EstimatedDeathDate()
-
-	// If we have no idea about when they died then we can only assume they have
-	// died some point before now with a maximum possible age of 100. The
-	// maximum of their age should not be 100, but rather unknown.
-	if !estimatedDeathDate.IsValid() {
-		// This is the age range if they were to die today (or some previous
-		// point in time). That is, since we don't know the death we can assume
-		// its maximum possible time.
-		//
-		// This does not take into account an individual that has died but the
-		// date is not yet record. Obviously, that would be impossible to
-		// detect.
-		minAge, maxAge := at.Sub(estimatedBirthDate.DateRange()).Age()
-
-		// Prevent either boundary from being greater than the maximum allowed
-		// age.
-		if minAge.Years() > DefaultMaxLivingAge {
-			minAge = NewUnknownAge()
-		}
-
-		if maxAge.Years() > DefaultMaxLivingAge {
-			maxAge = NewUnknownAge()
-		}
-
-		return minAge, maxAge
-	}
-
 	birthRange := estimatedBirthDate.DateRange()
 	startAge, endAge := at.Sub(birthRange).Age()
 

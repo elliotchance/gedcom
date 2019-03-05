@@ -263,9 +263,44 @@ func (node *FamilyNode) siblingsBornTooCloseWarnings() (warnings Warnings) {
 	return
 }
 
+func (node *FamilyNode) marriedTooOld() (warnings Warnings) {
+	marriages := NodesWithTag(node, TagMarriage)
+
+	for _, marriage := range marriages {
+		if husband := node.Husband().Individual(); husband != nil {
+			_, maxAge := husband.AgeAt(marriage)
+
+			if maxAge.Years() >= DefaultMaxMarriageAge {
+				warning := NewMarriedTooOldWarning(
+					node,
+					husband,
+					maxAge.Years(),
+				)
+				warnings = append(warnings, warning)
+			}
+		}
+
+		if wife := node.Wife().Individual(); wife != nil {
+			_, maxAge := wife.AgeAt(marriage)
+
+			if maxAge.Years() >= DefaultMaxMarriageAge {
+				warning := NewMarriedTooOldWarning(
+					node,
+					wife,
+					maxAge.Years(),
+				)
+				warnings = append(warnings, warning)
+			}
+		}
+	}
+
+	return
+}
+
 func (node *FamilyNode) Warnings() (warnings Warnings) {
 	warnings = append(warnings, node.childrenBornBeforeParentsWarnings()...)
 	warnings = append(warnings, node.siblingsBornTooCloseWarnings()...)
+	warnings = append(warnings, node.marriedTooOld()...)
 
 	return
 }
