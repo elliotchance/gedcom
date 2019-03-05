@@ -275,7 +275,9 @@ func TestNewDateRangeWithNow(t *testing.T) {
 	now := time.Now()
 
 	NewDateRangeWithNow().Returns(
-		gedcom.Date{now.Day(), now.Month(), now.Year(), false, gedcom.DateConstraintExact, nil},
-		gedcom.Date{now.Day(), now.Month(), now.Year(), true, gedcom.DateConstraintExact, nil},
+		gedcom.NewDateRange(
+			gedcom.Date{now.Day(), now.Month(), now.Year(), false, gedcom.DateConstraintExact, nil},
+			gedcom.Date{now.Day(), now.Month(), now.Year(), true, gedcom.DateConstraintExact, nil},
+		),
 	)
 }

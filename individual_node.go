@@ -225,18 +225,13 @@ func (node *IndividualNode) IsLiving() bool {
 		return false
 	}
 
-	maxLivingAge := DefaultMaxLivingAge
-
-	if node.Document() != nil {
-		maxLivingAge = node.Document().MaxLivingAge
-	}
-
+	maxLivingAge := node.Document().MaxLivingAge
 	if maxLivingAge == 0 {
 		return true
 	}
 
 	nowYear := float64(time.Now().Year())
-	birthDate := node.EstimatedBirthDate()
+	birthDate, _ := node.EstimatedBirthDate()
 	birthYear := Years(birthDate)
 	age := nowYear - birthYear
 
@@ -386,24 +381,18 @@ func (node *IndividualNode) LDSBaptisms() Nodes {
 // value for anything meaningful aside from comparisons.
 //
 // If the node is nil the result will also be nil.
-func (node *IndividualNode) EstimatedBirthDate() *DateNode {
-	births := node.Births()
-	baptisms := node.Baptisms()
-	ldsBaptisms := node.LDSBaptisms()
-	potentialNodes := Compound(births, baptisms, ldsBaptisms)
-
-	bestMatch := (*DateNode)(nil)
-
-	for _, potentialNode := range potentialNodes {
-		for _, potentialDateNode := range NodesWithTag(potentialNode, TagDate) {
-			node := potentialDateNode.(*DateNode)
-			if bestMatch == nil || node.Years() < bestMatch.Years() {
-				bestMatch = node
-			}
-		}
+func (node *IndividualNode) EstimatedBirthDate() (date *DateNode, isBirthEvent bool) {
+	births := Dates(NewNodes(node.Births())...)
+	if len(births) > 0 {
+		return births.Minimum(), true
 	}
 
-	return bestMatch
+	baptisms := Dates(NewNodes(Compound(node.Baptisms(), node.LDSBaptisms()))...)
+	if len(baptisms) > 0 {
+		return baptisms.Minimum(), false
+	}
+
+	return nil, false
 }
 
 // EstimatedDeathDate attempts to find the exact or approximate death date of an
@@ -427,35 +416,19 @@ func (node *IndividualNode) EstimatedBirthDate() *DateNode {
 // value for anything meaningful aside from comparisons.
 //
 // If the node is nil the result will also be nil.
-func (node *IndividualNode) EstimatedDeathDate() *DateNode {
-	// Try to return the earliest the death date first.
-	bestMatch := (*DateNode)(nil)
-
-	for _, potentialNode := range node.Deaths() {
-		for _, potentialDateNode := range NodesWithTag(potentialNode, TagDate) {
-			node := potentialDateNode.(*DateNode)
-			if bestMatch == nil || node.Years() < bestMatch.Years() {
-				bestMatch = node
-			}
-		}
+func (node *IndividualNode) EstimatedDeathDate() (date *DateNode, isDeathEvent bool) {
+	deaths := Dates(NewNodes(node.Deaths())...)
+	if len(deaths) > 0 {
+		return deaths.Minimum(), true
+	}
+	burials := Dates(NewNodes(node.Burials())...)
+	if len(burials) > 0 {
+		return burials.Minimum(), false
 	}
 
-	if bestMatch != nil {
-		return bestMatch
-	}
+	// TODO: It might be good to include the probates as well?
 
-	// Fall back to the earliest burial date.
-	for _, potentialNode := range node.Burials() {
-		for _, potentialDateNode := range NodesWithTag(potentialNode, TagDate) {
-			node := potentialDateNode.(*DateNode)
-			if bestMatch == nil || node.Years() < bestMatch.Years() {
-				bestMatch = node
-			}
-		}
-	}
-
-	// bestMatch will be nil if there were no date nodes found.
-	return bestMatch
+	return nil, false
 }
 
 // Similarity calculates how similar two individuals are. The returned value
@@ -516,13 +489,13 @@ func (node *IndividualNode) Similarity(other *IndividualNode, options Similarity
 	}
 
 	// Compare the dates.
-	leftEstimatedBirthDate := node.EstimatedBirthDate()
-	rightEstimatedBirthDate := other.EstimatedBirthDate()
+	leftEstimatedBirthDate, _ := node.EstimatedBirthDate()
+	rightEstimatedBirthDate, _ := other.EstimatedBirthDate()
 	birthSimilarity := leftEstimatedBirthDate.
 		Similarity(rightEstimatedBirthDate, options.MaxYears)
 
-	leftEstimatedDeathDate := node.EstimatedDeathDate()
-	rightEstimatedDeathDate := other.EstimatedDeathDate()
+	leftEstimatedDeathDate, _ := node.EstimatedDeathDate()
+	rightEstimatedDeathDate, _ := other.EstimatedDeathDate()
 	deathSimilarity := leftEstimatedDeathDate.
 		Similarity(rightEstimatedDeathDate, options.MaxYears)
 
@@ -734,7 +707,20 @@ func (node *IndividualNode) Burial() (*DateNode, *PlaceNode) {
 // to try and estimate the age at the time of death instead of simply using the
 // maximum possible age (which is 100 by default).
 func (node *IndividualNode) Age() (Age, Age) {
-	return node.ageAt(NewDateRangeWithNow())
+	now := NewDateRangeWithNow()
+	startAge, endAge := node.ageAt(now)
+
+	// Unlike AgeAt, we always want to trim back to the death date.
+	if startAge.Constraint == AgeConstraintAfterDeath {
+		estimatedBirthDate, _ := node.EstimatedBirthDate()
+		estimatedDeathDate, _ := node.EstimatedDeathDate()
+		ageInYears := estimatedDeathDate.Years() - estimatedBirthDate.Years()
+
+		startAge = NewAgeWithYears(ageInYears, false, AgeConstraintAfterDeath)
+		endAge = NewAgeWithYears(ageInYears, false, AgeConstraintAfterDeath)
+	}
+
+	return startAge, endAge
 }
 
 // AgeAt follows the same logic as Age but uses an event as the comparison
@@ -746,12 +732,9 @@ func (node *IndividualNode) AgeAt(event Node) (Age, Age) {
 	dates := Dates(event).StripZero()
 
 	if len(dates) > 0 {
-		minimumEventDate := dates.Minimum()
-		maximumEventDate := dates.Maximum()
-		start := minimumEventDate.StartDate()
-		end := maximumEventDate.EndDate()
+		dateRange := dates.Range()
 
-		return node.ageAt(start, end)
+		return node.ageAt(dateRange)
 	}
 
 	// We cannot determine the date of the event so we would not know what age
@@ -759,54 +742,70 @@ func (node *IndividualNode) AgeAt(event Node) (Age, Age) {
 	return NewUnknownAge(), NewUnknownAge()
 }
 
-func (node *IndividualNode) ageAt(start, end Date) (Age, Age) {
-	estimatedBirthDate := node.EstimatedBirthDate()
+func (node *IndividualNode) ageAt(at DateRange) (Age, Age) {
+	estimatedBirthDate, isBirthEvent := node.EstimatedBirthDate()
 
+	// If we have no idea when they are born we cannot proceed with any age
+	// estimate.
 	if !estimatedBirthDate.IsValid() {
 		return NewUnknownAge(), NewUnknownAge()
 	}
 
-	estimatedDeathDate := node.EstimatedDeathDate()
-	estimatedDeathDateEnd := estimatedDeathDate.EndDate()
-	startDurationSinceBirth := start.Time().Sub(estimatedBirthDate.StartDate().Time())
-	endDurationSinceBirth := end.Time().Sub(estimatedBirthDate.StartDate().Time())
+	estimatedDeathDate, isDeathEvent := node.EstimatedDeathDate()
 
-	startConstraint := constraintBetweenAges(
-		estimatedBirthDate.StartDate(),
-		estimatedDeathDateEnd,
-		startDurationSinceBirth,
-	)
+	// If we have no idea about when they died then we can only assume they have
+	// died some point before now with a maximum possible age of 100. The
+	// maximum of their age should not be 100, but rather unknown.
+	if !estimatedDeathDate.IsValid() {
+		// This is the age range if they were to die today (or some previous
+		// point in time). That is, since we don't know the death we can assume
+		// its maximum possible time.
+		//
+		// This does not take into account an individual that has died but the
+		// date is not yet record. Obviously, that would be impossible to
+		// detect.
+		minAge, maxAge := at.Sub(estimatedBirthDate.DateRange()).Age()
 
-	startIsNotExact := !start.IsExact()
-	estimatedBirthDateIsNotExact := !estimatedBirthDate.IsExact()
+		// Prevent either boundary from being greater than the maximum allowed
+		// age.
+		if minAge.Years() > DefaultMaxLivingAge {
+			minAge = NewUnknownAge()
+		}
 
-	startAge := NewAge(
-		startDurationSinceBirth,
-		startIsNotExact || estimatedBirthDateIsNotExact,
-		startConstraint,
-	)
+		if maxAge.Years() > DefaultMaxLivingAge {
+			maxAge = NewUnknownAge()
+		}
 
-	constraint := constraintBetweenAges(
-		estimatedBirthDate.StartDate(),
-		estimatedDeathDateEnd,
-		endDurationSinceBirth,
-	)
+		return minAge, maxAge
+	}
 
-	endIsNotExact := !end.IsExact()
-	estimatedBirthEndTime := estimatedBirthDate.EndDate().Time()
-	estimatedEndTime := end.Time().Sub(estimatedBirthEndTime)
-
-	endAge := NewAge(
-		estimatedEndTime,
-		endIsNotExact || estimatedBirthDateIsNotExact,
-		constraint,
-	)
+	birthRange := estimatedBirthDate.DateRange()
+	startAge, endAge := at.Sub(birthRange).Age()
 
 	// There are some cases where the endAge can be before the startAge in some
 	// combinations of constraints. If this is the case we swap them to make the
 	// output more sensible.
 	if startAge.IsAfter(endAge) {
 		startAge, endAge = endAge, startAge
+	}
+
+	isEstimate := !isBirthEvent || !isDeathEvent ||
+		!birthRange.IsExact() || !at.IsExact()
+	startAge.IsEstimate = isEstimate
+	endAge.IsEstimate = isEstimate
+
+	switch {
+	case at.IsBefore(estimatedBirthDate.DateRange()):
+		startAge.Constraint = AgeConstraintBeforeBirth
+		endAge.Constraint = AgeConstraintBeforeBirth
+
+	case at.IsAfter(estimatedDeathDate.DateRange()):
+		startAge.Constraint = AgeConstraintAfterDeath
+		endAge.Constraint = AgeConstraintAfterDeath
+
+	default:
+		startAge.Constraint = AgeConstraintLiving
+		endAge.Constraint = AgeConstraintLiving
 	}
 
 	return startAge, endAge
@@ -967,7 +966,7 @@ type eventAndDate struct {
 	Date  *DateNode
 }
 
-func (node *IndividualNode) Warnings() (warnings Warnings) {
+func (node *IndividualNode) incorrectEventOrderWarnings() (warnings Warnings) {
 	// Event order describes the boundaries of groups of events. That is to say
 	// that any baptism or LDS baptism events must be after a birth event but
 	// also much be before the any death event.
@@ -1028,6 +1027,23 @@ func (node *IndividualNode) Warnings() (warnings Warnings) {
 			}
 		}
 	}
+
+	return
+}
+
+func (node *IndividualNode) tooOldWarnings() (warnings Warnings) {
+	if _, max := node.Age(); max.Years() > DefaultMaxLivingAge {
+		warnings = Warnings{
+			NewIndividualTooOldWarning(node, max.Years()),
+		}
+	}
+
+	return
+}
+
+func (node *IndividualNode) Warnings() (warnings Warnings) {
+	warnings = append(warnings, node.incorrectEventOrderWarnings()...)
+	warnings = append(warnings, node.tooOldWarnings()...)
 
 	return
 }

@@ -324,3 +324,11 @@ func (dr DateRange) String() string {
 
 	return fmt.Sprintf("Bet. %s and %s", start, end)
 }
+
+func (dr DateRange) Sub(dr2 DateRange) DurationRange {
+	start := dr.StartDate().Sub(dr2.StartDate())
+	end := dr.EndDate().Sub(dr2.EndDate())
+	isEstimate := !dr.IsExact() || !dr2.IsExact()
+
+	return NewDurationRange(start, end, isEstimate)
+}
