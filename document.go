@@ -18,9 +18,15 @@ import (
 	"sync"
 )
 
-// DefaultMaxLivingAge is used when creating a new document. See
-// Document.MaxLivingAge for a full description.
-const DefaultMaxLivingAge = 100.0
+const (
+	// DefaultMaxLivingAge is used when creating a new document. See
+	// Document.MaxLivingAge for a full description.
+	DefaultMaxLivingAge = 100.0
+
+	// DefaultMaxMarriageAge is the default age in which a spouse will begin to
+	// produce MarriedTooOldWarnings.
+	DefaultMaxMarriageAge = 100.0
+)
 
 // Document represents a whole GEDCOM document. It is possible for a
 // Document to contain zero Nodes, this means the GEDCOM file was empty. It
