@@ -1875,6 +1875,23 @@ var individualWarningTests = map[string]struct {
 		},
 		nil,
 	},
+	"MultipleDifferentSexes": {
+		func(doc *gedcom.Document) {
+			elliot := individual(doc, "P1", "Jane /Chance/", "12 Sep 1913", "7 Feb 2001")
+			elliot.AddNode(gedcom.NewSexNode(gedcom.SexMale))
+			elliot.AddNode(gedcom.NewSexNode(gedcom.SexFemale))
+		},
+		[]string{"Jane Chance (b. 12 Sep 1913, d. 7 Feb 2001) has multiple sexes; Male and Female."},
+	},
+	"MultipleSameSexes": {
+		func(doc *gedcom.Document) {
+			elliot := individual(doc, "P1", "Jane /Chance/", "12 Sep 1913", "7 Feb 2001")
+			elliot.AddNode(gedcom.NewSexNode(gedcom.SexMale))
+			elliot.AddNode(gedcom.NewSexNode(gedcom.SexFemale))
+			elliot.AddNode(gedcom.NewSexNode(gedcom.SexMale))
+		},
+		[]string{"Jane Chance (b. 12 Sep 1913, d. 7 Feb 2001) has multiple sexes; Male, Female and Male."},
+	},
 }
 
 func TestIndividualNode_Warnings(t *testing.T) {

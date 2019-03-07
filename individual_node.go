@@ -1014,9 +1014,21 @@ func (node *IndividualNode) tooOldWarnings() (warnings Warnings) {
 	return
 }
 
+func (node *IndividualNode) multipleSexesWarnings() Warnings {
+	sexes := castNodesWithTag(node, TagSex, (*SexNode)(nil)).([]*SexNode)
+	if len(sexes) > 1 {
+		return Warnings{
+			NewMultipleSexesWarning(node, sexes),
+		}
+	}
+
+	return nil
+}
+
 func (node *IndividualNode) Warnings() (warnings Warnings) {
 	warnings = append(warnings, node.incorrectEventOrderWarnings()...)
 	warnings = append(warnings, node.tooOldWarnings()...)
+	warnings = append(warnings, node.multipleSexesWarnings()...)
 
 	return
 }
