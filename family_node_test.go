@@ -475,6 +475,42 @@ var familyWarningTests = map[string]struct {
 		},
 		nil,
 	},
+	"HusbandAndWifeSwapped": {
+		func(doc *gedcom.Document) {
+			p1 := doc.AddIndividual("P1").
+				AddName("John /Chance/").
+				SetSex(gedcom.SexMale)
+
+			p2 := doc.AddIndividual("P2").
+				AddName("Sarah /Chance/").
+				SetSex(gedcom.SexFemale)
+
+			doc.AddFamilyWithHusbandAndWife("F1", p2, p1)
+		},
+		[]string{
+			"Sarah Chance (Female) is the husband and John Chance (Male) is the wife.",
+		},
+	},
+	"ParentsSwapped": {
+		func(doc *gedcom.Document) {
+			p1 := doc.AddIndividual("P1").
+				AddName("John /Chance/").
+				SetSex(gedcom.SexMale)
+
+			p2 := doc.AddIndividual("P2").
+				AddName("Sarah /Chance/").
+				SetSex(gedcom.SexFemale)
+
+			c1 := doc.AddIndividual("P3").
+				AddName("Jane /Chance/")
+
+			f1 := doc.AddFamilyWithHusbandAndWife("F1", p2, p1)
+			f1.AddChild(c1)
+		},
+		[]string{
+			"Sarah Chance (Female) is the father and John Chance (Male) is the mother.",
+		},
+	},
 }
 
 func TestFamilyNode_Warnings(t *testing.T) {
