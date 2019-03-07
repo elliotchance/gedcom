@@ -305,10 +305,27 @@ func (node *FamilyNode) marriedOutOfRange() (warnings Warnings) {
 	return
 }
 
+func (node *FamilyNode) inversePartnerWarnings() (warnings Warnings) {
+	husband := node.Husband().Individual()
+	wife := node.Wife().Individual()
+
+	// We only consider the case when both spouses exist, have sexes and they
+	// are exactly opposites. We do not want to catch same sex partnerships, of
+	// which GEDCOM has no reasonable way to encode this.
+	switch {
+	case husband.Sex().IsFemale() && wife.Sex().IsMale():
+		warning := NewInverseSpousesWarning(node, husband, wife)
+		warnings = append(warnings, warning)
+	}
+
+	return
+}
+
 func (node *FamilyNode) Warnings() (warnings Warnings) {
 	warnings = append(warnings, node.childrenBornBeforeParentsWarnings()...)
 	warnings = append(warnings, node.siblingsBornTooCloseWarnings()...)
 	warnings = append(warnings, node.marriedOutOfRange()...)
+	warnings = append(warnings, node.inversePartnerWarnings()...)
 
 	return
 }
