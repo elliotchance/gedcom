@@ -21,15 +21,15 @@ func (ws Warnings) WriteHTMLTo(w io.Writer) (int64, error) {
 
 	for _, warning := range ws {
 		data = append(data, []string{
-			warning.Context().String(),
 			warning.Name(),
+			warning.Context().String(),
 			warning.String(),
 		})
 	}
 
 	sort.Slice(data, func(i, j int) bool {
-		a := data[i][0]
-		b := data[j][0]
+		a := data[i][1]
+		b := data[j][1]
 
 		return a < b
 	})
@@ -37,8 +37,8 @@ func (ws Warnings) WriteHTMLTo(w io.Writer) (int64, error) {
 	rows := []core.Component{
 		core.NewTableHead(
 			"#",
-			"Context",
 			"Name",
+			"Context",
 			"Description",
 		),
 	}

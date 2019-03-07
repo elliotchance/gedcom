@@ -359,7 +359,7 @@ var familyWarningTests = map[string]struct {
 				gedcom.NewDateNode("1995")))
 		},
 		[]string{
-			"The husband John Chance (b. 16 May 1889) married at 107 years old.",
+			"The husband John Chance (b. 16 May 1889) married too old at 107 years old.",
 		},
 	},
 	"WifeMarriedTooOld": {
@@ -378,7 +378,7 @@ var familyWarningTests = map[string]struct {
 				gedcom.NewDateNode("1995")))
 		},
 		[]string{
-			"The wife Sarah Chance (b. 3 Apr 1889) married at 107 years old.",
+			"The wife Sarah Chance (b. 3 Apr 1889) married too old at 107 years old.",
 		},
 	},
 	"HusbandAndWifeMarriedTooOld": {
@@ -397,9 +397,83 @@ var familyWarningTests = map[string]struct {
 				gedcom.NewDateNode("1995")))
 		},
 		[]string{
-			"The husband John Chance (b. 16 May 1891) married at 105 years old.",
-			"The wife Sarah Chance (b. 3 Apr 1889) married at 107 years old.",
+			"The husband John Chance (b. 16 May 1891) married too old at 105 years old.",
+			"The wife Sarah Chance (b. 3 Apr 1889) married too old at 107 years old.",
 		},
+	},
+	"HusbandMarriedTooYoung": {
+		func(doc *gedcom.Document) {
+			p1 := doc.AddIndividual("P1").
+				AddName("John /Chance/").
+				AddBirthDate("16 May 1989")
+
+			p2 := doc.AddIndividual("P2").
+				AddName("Sarah /Chance/").
+				AddBirthDate("3 Apr 1960").
+				SetSex(gedcom.SexFemale)
+
+			f1 := doc.AddFamilyWithHusbandAndWife("F1", p1, p2)
+			f1.AddNode(gedcom.NewNode(gedcom.TagMarriage, "", "",
+				gedcom.NewDateNode("1999")))
+		},
+		[]string{
+			"The husband John Chance (b. 16 May 1989) married too young at 11 years old.",
+		},
+	},
+	"WifeMarriedTooYoung": {
+		func(doc *gedcom.Document) {
+			p1 := doc.AddIndividual("P1").
+				AddName("John /Chance/").
+				AddBirthDate("16 May 1960")
+
+			p2 := doc.AddIndividual("P2").
+				AddName("Sarah /Chance/").
+				AddBirthDate("3 Apr 1989").
+				SetSex(gedcom.SexFemale)
+
+			f1 := doc.AddFamilyWithHusbandAndWife("F1", p1, p2)
+			f1.AddNode(gedcom.NewNode(gedcom.TagMarriage, "", "",
+				gedcom.NewDateNode("1995")))
+		},
+		[]string{
+			"The wife Sarah Chance (b. 3 Apr 1989) married too young at 7 years old.",
+		},
+	},
+	"HusbandAndWifeMarriedAtWrongAge": {
+		func(doc *gedcom.Document) {
+			p1 := doc.AddIndividual("P1").
+				AddName("John /Chance/").
+				AddBirthDate("16 May 1891")
+
+			p2 := doc.AddIndividual("P2").
+				AddName("Sarah /Chance/").
+				AddBirthDate("3 Apr 1989").
+				SetSex(gedcom.SexFemale)
+
+			f1 := doc.AddFamilyWithHusbandAndWife("F1", p1, p2)
+			f1.AddNode(gedcom.NewNode(gedcom.TagMarriage, "", "",
+				gedcom.NewDateNode("1995")))
+		},
+		[]string{
+			"The husband John Chance (b. 16 May 1891) married too old at 105 years old.",
+			"The wife Sarah Chance (b. 3 Apr 1989) married too young at 7 years old.",
+		},
+	},
+	"NoMarriageDate": {
+		func(doc *gedcom.Document) {
+			p1 := doc.AddIndividual("P1").
+				AddName("John /Chance/").
+				AddBirthDate("16 May 1989")
+
+			p2 := doc.AddIndividual("P2").
+				AddName("Sarah /Chance/").
+				AddBirthDate("3 Apr 1960").
+				SetSex(gedcom.SexFemale)
+
+			f1 := doc.AddFamilyWithHusbandAndWife("F1", p1, p2)
+			f1.AddNode(gedcom.NewNode(gedcom.TagMarriage, "", ""))
+		},
+		nil,
 	},
 }
 

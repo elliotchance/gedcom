@@ -551,7 +551,11 @@ func (date Date) Sub(date2 Date) Duration {
 	a := date.Time()
 	b := date2.Time()
 
-	return Duration(a.Sub(b))
+	// The Time() above will set ParseError if the date is invalid.
+	isKnown := date.ParseError == nil
+	isEstimate := !date.IsExact()
+
+	return NewDuration(a.Sub(b), isKnown, isEstimate)
 }
 
 func NewZeroDate() Date {

@@ -241,8 +241,8 @@ func (node *FamilyNode) siblingsBornTooCloseWarnings() (warnings Warnings) {
 				continue
 			}
 
-			nineMonths := Duration(274 * 24 * time.Hour)
-			if min < nineMonths || max < nineMonths {
+			nineMonths := time.Duration(274 * 24 * time.Hour)
+			if min.Duration < nineMonths || max.Duration < nineMonths {
 				pair := &IndividualNodePair{
 					Left:  child1.Individual(),
 					Right: child2.Individual(),
@@ -263,34 +263,42 @@ func (node *FamilyNode) siblingsBornTooCloseWarnings() (warnings Warnings) {
 	return
 }
 
-func (node *FamilyNode) marriedTooOld() (warnings Warnings) {
+func (node *FamilyNode) appendMarriedOutOfRange(warnings Warnings, age Age, spouse *IndividualNode) Warnings {
+	if age.IsKnown && age.Years() < DefaultMinMarriageAge {
+		warning := NewMarriedOutOfRangeWarning(
+			node,
+			spouse,
+			age.Years(),
+			"young",
+		)
+		warnings = append(warnings, warning)
+	}
+
+	if age.Years() > DefaultMaxMarriageAge {
+		warning := NewMarriedOutOfRangeWarning(
+			node,
+			spouse,
+			age.Years(),
+			"old",
+		)
+		warnings = append(warnings, warning)
+	}
+
+	return warnings
+}
+
+func (node *FamilyNode) marriedOutOfRange() (warnings Warnings) {
 	marriages := NodesWithTag(node, TagMarriage)
 
 	for _, marriage := range marriages {
 		if husband := node.Husband().Individual(); husband != nil {
 			_, maxAge := husband.AgeAt(marriage)
-
-			if maxAge.Years() >= DefaultMaxMarriageAge {
-				warning := NewMarriedTooOldWarning(
-					node,
-					husband,
-					maxAge.Years(),
-				)
-				warnings = append(warnings, warning)
-			}
+			warnings = node.appendMarriedOutOfRange(warnings, maxAge, husband)
 		}
 
 		if wife := node.Wife().Individual(); wife != nil {
 			_, maxAge := wife.AgeAt(marriage)
-
-			if maxAge.Years() >= DefaultMaxMarriageAge {
-				warning := NewMarriedTooOldWarning(
-					node,
-					wife,
-					maxAge.Years(),
-				)
-				warnings = append(warnings, warning)
-			}
+			warnings = node.appendMarriedOutOfRange(warnings, maxAge, wife)
 		}
 	}
 
@@ -300,7 +308,7 @@ func (node *FamilyNode) marriedTooOld() (warnings Warnings) {
 func (node *FamilyNode) Warnings() (warnings Warnings) {
 	warnings = append(warnings, node.childrenBornBeforeParentsWarnings()...)
 	warnings = append(warnings, node.siblingsBornTooCloseWarnings()...)
-	warnings = append(warnings, node.marriedTooOld()...)
+	warnings = append(warnings, node.marriedOutOfRange()...)
 
 	return
 }
