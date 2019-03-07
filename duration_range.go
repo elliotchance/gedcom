@@ -1,23 +1,19 @@
 package gedcom
 
-import "time"
-
 type DurationRange struct {
-	Min, Max   Duration
-	IsEstimate bool
+	Min, Max Duration
 }
 
-func NewDurationRange(min, max Duration, isEstimate bool) DurationRange {
+func NewDurationRange(min, max Duration) DurationRange {
 	return DurationRange{
-		Min:        min,
-		Max:        max,
-		IsEstimate: isEstimate,
+		Min: min,
+		Max: max,
 	}
 }
 
 func (dr DurationRange) Age() (Age, Age) {
-	min := NewAge(time.Duration(dr.Min), dr.IsEstimate, AgeConstraintUnknown)
-	max := NewAge(time.Duration(dr.Max), dr.IsEstimate, AgeConstraintUnknown)
+	min := NewAge(dr.Min.Duration, dr.Min.IsEstimate, AgeConstraintUnknown)
+	max := NewAge(dr.Max.Duration, dr.Max.IsEstimate, AgeConstraintUnknown)
 
 	return min, max
 }

@@ -26,6 +26,10 @@ const (
 	// DefaultMaxMarriageAge is the default age in which a spouse will begin to
 	// produce MarriedTooOldWarnings.
 	DefaultMaxMarriageAge = 100.0
+
+	// DefaultMinMarriageAge is the default minimum age that a spouse is allowed
+	// to be married.
+	DefaultMinMarriageAge = 16.0
 )
 
 // Document represents a whole GEDCOM document. It is possible for a
