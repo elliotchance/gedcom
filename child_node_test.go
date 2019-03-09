@@ -1,10 +1,10 @@
 package gedcom_test
 
 import (
-	"testing"
 	"github.com/elliotchance/gedcom"
-	"github.com/stretchr/testify/assert"
 	"github.com/elliotchance/tf"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestChildNode_Individual(t *testing.T) {
