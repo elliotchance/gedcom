@@ -4,6 +4,7 @@ import (
 	"github.com/elliotchance/gedcom/q"
 	"github.com/elliotchance/tf"
 	"testing"
+	"github.com/stretchr/testify/assert"
 )
 
 type MyStruct struct {
@@ -16,6 +17,10 @@ func (ms *MyStruct) Foo() string {
 
 func (ms MyStruct) Baz() []string {
 	return []string{"qux", "quux"}
+}
+
+func (ms MyStruct) Panic() string {
+	panic("oh no!")
 }
 
 func TestAccessorExpr_Evaluate(t *testing.T) {
@@ -49,4 +54,10 @@ func TestAccessorExpr_Evaluate(t *testing.T) {
 		Errors(`MyStruct does not have a method or property named "Missing"`)
 	Evaluate(&q.AccessorExpr{Query: ".Missing"}, engine, ms2, nil).
 		Errors(`MyStruct does not have a method or property named "Missing"`)
+
+	// Panics
+	q := &q.AccessorExpr{Query: ".Panic"}
+	_, err := q.Evaluate(engine, ms1, nil)
+	assert.NotNil(t, err)
+	assert.Regexp(t, `^panic MyStruct.Panic: oh no!\ngoroutine `, err)
 }

@@ -3,6 +3,7 @@ package q
 import (
 	"fmt"
 	"reflect"
+	"runtime/debug"
 )
 
 // AccessorExpr is used to fetch the value of a property or to invoke a method.
@@ -64,7 +65,9 @@ func (e *AccessorExpr) Evaluate(engine *Engine, input interface{}, args []*State
 func (e *AccessorExpr) evaluateAccessor(accessor string, input interface{}) (r interface{}, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = fmt.Errorf("cannot use .%s on %s", accessor, getType(input))
+			stackTrace := string(debug.Stack())
+			err = fmt.Errorf("panic %s.%s: %v\n%s", getType(input), accessor, r,
+				stackTrace)
 		}
 	}()
 

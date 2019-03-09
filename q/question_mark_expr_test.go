@@ -39,7 +39,8 @@ func TestQuestionMarkExpr_Evaluate(t *testing.T) {
 		(*q.QuestionMarkExpr).Evaluate)
 	engine := &q.Engine{}
 
-	expected := append([]string{".Baz", ".Foo"}, functionAndVariableChoices...)
+	expected := append([]string{".Baz", ".Foo", ".Panic"},
+		functionAndVariableChoices...)
 
 	Evaluate(&q.QuestionMarkExpr{}, engine, &MyStruct{}, nil).
 		Returns(expected, nil)
