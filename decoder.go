@@ -26,6 +26,7 @@ import (
 	"io"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 // See Decoder.consumeOptionalBOM().
@@ -114,6 +115,7 @@ func (dec *Decoder) Decode() (*Document, error) {
 
 		// Add a root node to the document.
 		if indent == 0 {
+			dec.trimNodeValue(previousNode)
 			document.AddNode(node)
 			previousNode = node
 
@@ -151,15 +153,30 @@ func (dec *Decoder) Decode() (*Document, error) {
 			indents[indent] = node
 		}
 
+		dec.trimNodeValue(previousNode)
 		i.AddNode(node)
 
 		previousNode = node
 	}
 
+	dec.trimNodeValue(previousNode)
+
 	// Build the cache once.
 	document.buildPointerCache()
 
 	return document, nil
+}
+
+func (dec *Decoder) trimNodeValue(previousNode Node) {
+	// When AllowMultiLine is enabled we have to be careful to trim the
+	// surrounding spaces off the value so it can be interpreted correct.
+	//
+	// Another solution would be to ignore blank lines entirely, but then we
+	// would miss the paragraph separators in multiline text.
+	if !IsNil(previousNode) {
+		newValue := strings.TrimSpace(previousNode.RawSimpleNode().value)
+		previousNode.RawSimpleNode().value = newValue
+	}
 }
 
 func (dec *Decoder) readLine() (string, error) {

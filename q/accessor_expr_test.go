@@ -3,8 +3,8 @@ package q_test
 import (
 	"github.com/elliotchance/gedcom/q"
 	"github.com/elliotchance/tf"
-	"testing"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 type MyStruct struct {

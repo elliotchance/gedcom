@@ -312,6 +312,19 @@ func TestDecoder_Decode(t *testing.T) {
 
 			assertDocumentEqual(t, doc, actual)
 		})
+
+		t.Run(testName+"WithAllowMultiLine", func(t *testing.T) {
+			decoder := gedcom.NewDecoder(strings.NewReader(test.ged))
+			decoder.AllowMultiLine = true
+
+			actual, err := decoder.Decode()
+			assert.NoError(t, err, test.ged)
+
+			doc := gedcom.NewDocument()
+			test.expected(doc)
+
+			assertDocumentEqual(t, doc, actual)
+		})
 	}
 
 	t.Run("DoubleSpace", func(t *testing.T) {
