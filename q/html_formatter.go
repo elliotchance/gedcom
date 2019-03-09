@@ -4,7 +4,6 @@ import (
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html/core"
 	"io"
-	"os"
 	"reflect"
 )
 
@@ -18,14 +17,14 @@ func (f *HTMLFormatter) Write(result interface{}) error {
 	// Nil should be treated as a blank document.
 	if gedcom.IsNil(result) {
 		_, err := core.NewPage(pageTitle, core.NewSpace(), "").
-			WriteHTMLTo(os.Stdout)
+			WriteHTMLTo(f.Writer)
 
 		return err
 	}
 
 	if x, ok := result.(core.Component); ok {
 		row := core.NewRow(core.NewColumn(core.EntireRow, x))
-		_, err := core.NewPage(pageTitle, row, "").WriteHTMLTo(os.Stdout)
+		_, err := core.NewPage(pageTitle, row, "").WriteHTMLTo(f.Writer)
 
 		return err
 	}
