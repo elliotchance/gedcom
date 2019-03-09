@@ -26,9 +26,16 @@ func (node *ChildNode) Family() *FamilyNode {
 }
 
 func (node *ChildNode) Individual() *IndividualNode {
+	if node == nil {
+		return nil
+	}
+
 	n := node.family.document.NodeByPointer(valueToPointer(node.value))
 
-	// TODO: may not exist
+	if IsNil(n) {
+		return nil
+	}
+
 	return n.(*IndividualNode)
 }
 
