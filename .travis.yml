@@ -5,6 +5,7 @@ sudo: false
 language: go
 
 go:
+  - 1.12.x
   - 1.11.x
   - 1.10.x
   - 1.9.x
@@ -30,7 +31,7 @@ install:
   - dep ensure
 
 script:
-  - if [[ "$TRAVIS_GO_VERSION" == 1.11* ]]; then
+  - if [[ "$TRAVIS_GO_VERSION" == 1.12* ]]; then
       make checks;
       make test-coverage;
     else
@@ -38,7 +39,7 @@ script:
     fi
 
 after_success:
-  - if [[ "$TRAVIS_GO_VERSION" == 1.11* ]]; then
+  - if [[ "$TRAVIS_GO_VERSION" == 1.12* ]]; then
       bash <(curl -s https://codecov.io/bash);
     fi
 
