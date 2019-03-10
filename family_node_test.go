@@ -511,6 +511,97 @@ var familyWarningTests = map[string]struct {
 			"Sarah Chance (Female) is the father and John Chance (Male) is the mother.",
 		},
 	},
+	"SiblingsBornInTheSameYear": {
+		func(doc *gedcom.Document) {
+			p1 := doc.AddIndividual("P1").
+				AddName("John /Chance/").
+				AddBirthDate("1989")
+
+			p2 := doc.AddIndividual("P2").
+				AddName("Sarah /Chance/").
+				AddBirthDate("1989").
+				SetSex(gedcom.SexFemale)
+
+			f1 := doc.AddFamily("F1")
+			f1.AddChild(p1)
+			f1.AddChild(p2)
+		},
+		nil,
+	},
+	"SiblingsBornInTheSameYearFirstExact": {
+		func(doc *gedcom.Document) {
+			p1 := doc.AddIndividual("P1").
+				AddName("John /Chance/").
+				AddBirthDate("1 May 1989")
+
+			p2 := doc.AddIndividual("P2").
+				AddName("Sarah /Chance/").
+				AddBirthDate("1989").
+				SetSex(gedcom.SexFemale)
+
+			f1 := doc.AddFamily("F1")
+			f1.AddChild(p1)
+			f1.AddChild(p2)
+		},
+		nil,
+	},
+	"SiblingsBornInTheSameYearSecondExact": {
+		func(doc *gedcom.Document) {
+			p1 := doc.AddIndividual("P1").
+				AddName("John /Chance/").
+				AddBirthDate("1989")
+
+			p2 := doc.AddIndividual("P2").
+				AddName("Sarah /Chance/").
+				AddBirthDate("1 May 1989").
+				SetSex(gedcom.SexFemale)
+
+			f1 := doc.AddFamily("F1")
+			f1.AddChild(p1)
+			f1.AddChild(p2)
+		},
+		nil,
+	},
+	"Twins": {
+		func(doc *gedcom.Document) {
+			p1 := doc.AddIndividual("P1").
+				AddName("John /Chance/").
+				AddBirthDate("1 May 1989")
+
+			p2 := doc.AddIndividual("P2").
+				AddName("Sarah /Chance/").
+				AddBirthDate("1 May 1989").
+				SetSex(gedcom.SexFemale)
+
+			f1 := doc.AddFamily("F1")
+			f1.AddChild(p1)
+			f1.AddChild(p2)
+		},
+		nil,
+	},
+	"Triplets": {
+		func(doc *gedcom.Document) {
+			p1 := doc.AddIndividual("P1").
+				AddName("John /Chance/").
+				AddBirthDate("1 May 1989")
+
+			p2 := doc.AddIndividual("P2").
+				AddName("Sarah /Chance/").
+				AddBirthDate("1 May 1989").
+				SetSex(gedcom.SexFemale)
+
+			p3 := doc.AddIndividual("P2").
+				AddName("Jane /Chance/").
+				AddBirthDate("1 May 1989").
+				SetSex(gedcom.SexFemale)
+
+			f1 := doc.AddFamily("F1")
+			f1.AddChild(p1)
+			f1.AddChild(p2)
+			f1.AddChild(p3)
+		},
+		nil,
+	},
 }
 
 func TestFamilyNode_Warnings(t *testing.T) {

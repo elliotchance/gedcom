@@ -6,3 +6,4 @@
 /coverage.txt
 /gedcomq/gedcomq
 gedcomq/*.ged
+/gedcomq/out.html

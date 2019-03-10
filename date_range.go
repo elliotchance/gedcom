@@ -331,3 +331,10 @@ func (dr DateRange) Sub(dr2 DateRange) DurationRange {
 
 	return NewDurationRange(start, end)
 }
+
+func (dr DateRange) Duration() Duration {
+	start := dr.StartDate()
+	end := dr.EndDate()
+
+	return end.Sub(start)
+}

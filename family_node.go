@@ -223,9 +223,18 @@ func (node *FamilyNode) childrenBornBeforeParentsWarnings() (warnings Warnings) 
 
 func (node *FamilyNode) siblingsBornTooCloseWarnings() (warnings Warnings) {
 	pairs := IndividualNodePairs{}
+	nineMonths := time.Duration(274 * 24 * time.Hour)
+	twoDays := time.Duration(2 * 24 * time.Hour)
 
 	for _, child1 := range node.Children() {
 		child1Birth, _ := child1.Individual().Birth()
+
+		// If the date range is greater than 9 months we do not have enough
+		// accuracy, so bail out.
+		if child1Birth.DateRange().Duration().Duration >= nineMonths {
+			continue
+		}
+
 		for _, child2 := range node.Children() {
 			// Exclude matching siblings to themselves. Technically we do not
 			// need to do this check because children born on the same day would
@@ -241,7 +250,20 @@ func (node *FamilyNode) siblingsBornTooCloseWarnings() (warnings Warnings) {
 				continue
 			}
 
-			nineMonths := time.Duration(274 * 24 * time.Hour)
+			// If the date range is greater than 9 months we do not have enough
+			// accuracy, so bail out.
+			if child2Birth.DateRange().Duration().Duration >= nineMonths {
+				continue
+			}
+
+			// Twins or greater multiples may be born in the same day. We allow
+			// for two days to compensate for rounding. Also it's possible for
+			// multiple children to be born on either side of the midnight
+			// barrier.
+			if min.Duration < twoDays {
+				continue
+			}
+
 			if min.Duration < nineMonths || max.Duration < nineMonths {
 				pair := &IndividualNodePair{
 					Left:  child1.Individual(),
@@ -331,5 +353,16 @@ func (node *FamilyNode) Warnings() (warnings Warnings) {
 }
 
 func (node *FamilyNode) String() string {
-	return fmt.Sprintf("%s — %s", node.Husband().String(), node.Wife().String())
+	symbol := "—"
+
+	switch {
+	case len(NodesWithTag(node, TagDivorce)) > 0:
+		symbol = "⚮"
+
+	case len(NodesWithTag(node, TagMarriage)) > 0:
+		symbol = "⚭"
+	}
+
+	return fmt.Sprintf("%s %s %s", node.Husband().String(),
+		symbol, node.Wife().String())
 }
