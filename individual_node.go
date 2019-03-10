@@ -985,16 +985,20 @@ func (node *IndividualNode) incorrectEventOrderWarnings() (warnings Warnings) {
 			for _, futureGroup := range eventOrder[i+1:] {
 				for _, futureEvent := range futureGroup.Events {
 					if event.Date.IsValid() &&
-						futureEvent.Date.IsValid() &&
-						futureEvent.Date.IsBefore(event.Date) {
-						warning := NewIncorrectEventOrderWarning(
-							futureEvent.Event, futureEvent.Date.DateRange(),
-							event.Event, event.Date.DateRange(),
-						)
-						warning.SetContext(WarningContext{
-							Individual: node,
-						})
-						warnings = append(warnings, warning)
+						futureEvent.Date.IsValid() {
+						comparison := futureEvent.Date.DateRange().
+							Compare(event.Date.DateRange())
+
+						if comparison == DateRangeComparisonEntirelyBefore {
+							warning := NewIncorrectEventOrderWarning(
+								futureEvent.Event, futureEvent.Date.DateRange(),
+								event.Event, event.Date.DateRange(),
+							)
+							warning.SetContext(WarningContext{
+								Individual: node,
+							})
+							warnings = append(warnings, warning)
+						}
 					}
 				}
 			}

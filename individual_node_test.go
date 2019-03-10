@@ -1892,6 +1892,20 @@ var individualWarningTests = map[string]struct {
 		},
 		[]string{"Jane Chance (b. 12 Sep 1913, d. 7 Feb 2001) has multiple sexes; Male, Female and Male."},
 	},
+	"BurialYearSameAsExactDeath": {
+		func(doc *gedcom.Document) {
+			elliot := individual(doc, "P1", "Elliot /Chance/", "", "3 Nov 1768")
+			elliot.AddBurialDate("1768")
+		},
+		nil,
+	},
+	"BurialMonthSameAsExactDeath": {
+		func(doc *gedcom.Document) {
+			elliot := individual(doc, "P1", "Elliot /Chance/", "", "30 Jun 1931")
+			elliot.AddBurialDate("Jun 1931")
+		},
+		nil,
+	},
 }
 
 func TestIndividualNode_Warnings(t *testing.T) {
