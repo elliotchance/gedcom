@@ -2,6 +2,7 @@ package core
 
 import (
 	"io"
+	"reflect"
 )
 
 // Components is a wrapper for zero more components that rendered at the same
@@ -14,7 +15,7 @@ func NewComponents(items ...Component) *Components {
 	nonNilItems := []Component{}
 
 	for _, item := range items {
-		if item != nil {
+		if !reflect.ValueOf(item).IsNil() {
 			nonNilItems = append(nonNilItems, item)
 		}
 	}
