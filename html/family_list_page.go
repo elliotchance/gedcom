@@ -9,16 +9,14 @@ import (
 type FamilyListPage struct {
 	document          *gedcom.Document
 	googleAnalyticsID string
-	options           PublishShowOptions
-	visibility        LivingVisibility
+	options           *PublishShowOptions
 }
 
-func NewFamilyListPage(document *gedcom.Document, googleAnalyticsID string, options PublishShowOptions, visibility LivingVisibility) *FamilyListPage {
+func NewFamilyListPage(document *gedcom.Document, googleAnalyticsID string, options *PublishShowOptions) *FamilyListPage {
 	return &FamilyListPage{
 		document:          document,
 		googleAnalyticsID: googleAnalyticsID,
 		options:           options,
-		visibility:        visibility,
 	}
 }
 
@@ -28,7 +26,7 @@ func (c *FamilyListPage) WriteHTMLTo(w io.Writer) (int64, error) {
 	}
 
 	for _, family := range c.document.Families() {
-		familyInList := NewFamilyInList(c.document, family, c.visibility)
+		familyInList := NewFamilyInList(c.document, family, c.options.LivingVisibility)
 		table = append(table, familyInList)
 	}
 

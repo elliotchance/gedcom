@@ -10,10 +10,10 @@ type SourcePage struct {
 	document          *gedcom.Document
 	source            *gedcom.SourceNode
 	googleAnalyticsID string
-	options           PublishShowOptions
+	options           *PublishShowOptions
 }
 
-func NewSourcePage(document *gedcom.Document, source *gedcom.SourceNode, googleAnalyticsID string, options PublishShowOptions) *SourcePage {
+func NewSourcePage(document *gedcom.Document, source *gedcom.SourceNode, googleAnalyticsID string, options *PublishShowOptions) *SourcePage {
 	return &SourcePage{
 		document:          document,
 		source:            source,

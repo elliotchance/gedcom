@@ -11,10 +11,10 @@ import (
 type PlaceListPage struct {
 	document          *gedcom.Document
 	googleAnalyticsID string
-	options           PublishShowOptions
+	options           *PublishShowOptions
 }
 
-func NewPlaceListPage(document *gedcom.Document, googleAnalyticsID string, options PublishShowOptions) *PlaceListPage {
+func NewPlaceListPage(document *gedcom.Document, googleAnalyticsID string, options *PublishShowOptions) *PlaceListPage {
 	return &PlaceListPage{
 		document:          document,
 		googleAnalyticsID: googleAnalyticsID,
