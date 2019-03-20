@@ -9,10 +9,10 @@ import (
 type SurnameListPage struct {
 	document          *gedcom.Document
 	googleAnalyticsID string
-	options           PublishShowOptions
+	options           *PublishShowOptions
 }
 
-func NewSurnameListPage(document *gedcom.Document, googleAnalyticsID string, options PublishShowOptions) *SurnameListPage {
+func NewSurnameListPage(document *gedcom.Document, googleAnalyticsID string, options *PublishShowOptions) *SurnameListPage {
 	return &SurnameListPage{
 		document:          document,
 		googleAnalyticsID: googleAnalyticsID,

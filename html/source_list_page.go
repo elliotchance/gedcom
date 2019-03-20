@@ -9,10 +9,10 @@ import (
 type SourceListPage struct {
 	document          *gedcom.Document
 	googleAnalyticsID string
-	options           PublishShowOptions
+	options           *PublishShowOptions
 }
 
-func NewSourceListPage(document *gedcom.Document, googleAnalyticsID string, options PublishShowOptions) *SourceListPage {
+func NewSourceListPage(document *gedcom.Document, googleAnalyticsID string, options *PublishShowOptions) *SourceListPage {
 	return &SourceListPage{
 		document:          document,
 		googleAnalyticsID: googleAnalyticsID,

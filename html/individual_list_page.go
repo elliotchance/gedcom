@@ -13,17 +13,15 @@ type IndividualListPage struct {
 	document          *gedcom.Document
 	selectedLetter    rune
 	googleAnalyticsID string
-	options           PublishShowOptions
-	visibility        LivingVisibility
+	options           *PublishShowOptions
 }
 
-func NewIndividualListPage(document *gedcom.Document, selectedLetter rune, googleAnalyticsID string, options PublishShowOptions, visibility LivingVisibility) *IndividualListPage {
+func NewIndividualListPage(document *gedcom.Document, selectedLetter rune, googleAnalyticsID string, options *PublishShowOptions) *IndividualListPage {
 	return &IndividualListPage{
 		document:          document,
 		selectedLetter:    selectedLetter,
 		googleAnalyticsID: googleAnalyticsID,
 		options:           options,
-		visibility:        visibility,
 	}
 }
 
@@ -52,7 +50,7 @@ func (c *IndividualListPage) WriteHTMLTo(w io.Writer) (int64, error) {
 	lastSurname := ""
 	for _, i := range individuals {
 		if i.IsLiving() {
-			switch c.visibility {
+			switch c.options.LivingVisibility {
 			case LivingVisibilityShow:
 				// Proceed.
 
@@ -77,7 +75,7 @@ func (c *IndividualListPage) WriteHTMLTo(w io.Writer) (int64, error) {
 			lastSurname = newSurname
 		}
 
-		table = append(table, NewIndividualInList(c.document, i, c.visibility))
+		table = append(table, NewIndividualInList(c.document, i, c.options.LivingVisibility))
 	}
 
 	livingRow := core.NewRow(
@@ -88,8 +86,8 @@ func (c *IndividualListPage) WriteHTMLTo(w io.Writer) (int64, error) {
 	)
 
 	if livingCount == 0 ||
-		c.visibility == LivingVisibilityHide ||
-		c.visibility == LivingVisibilityShow {
+		c.options.LivingVisibility == LivingVisibilityHide ||
+		c.options.LivingVisibility == LivingVisibilityShow {
 		livingRow = nil
 	}
 
@@ -99,7 +97,7 @@ func (c *IndividualListPage) WriteHTMLTo(w io.Writer) (int64, error) {
 		core.NewSpace(),
 		NewIndividualIndexHeader(c.document, c.selectedLetter),
 		core.NewSpace(),
-		NewSurnameIndex(c.document, c.selectedLetter, c.visibility),
+		NewSurnameIndex(c.document, c.selectedLetter, c.options.LivingVisibility),
 		core.NewSpace(),
 		core.NewRow(
 			core.NewColumn(core.EntireRow, core.NewTable("", table...)),

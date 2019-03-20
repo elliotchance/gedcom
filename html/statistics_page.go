@@ -9,16 +9,14 @@ import (
 type StatisticsPage struct {
 	document          *gedcom.Document
 	googleAnalyticsID string
-	options           PublishShowOptions
-	visibility        LivingVisibility
+	options           *PublishShowOptions
 }
 
-func NewStatisticsPage(document *gedcom.Document, googleAnalyticsID string, options PublishShowOptions, visibility LivingVisibility) *StatisticsPage {
+func NewStatisticsPage(document *gedcom.Document, googleAnalyticsID string, options *PublishShowOptions) *StatisticsPage {
 	return &StatisticsPage{
 		document:          document,
 		googleAnalyticsID: googleAnalyticsID,
 		options:           options,
-		visibility:        visibility,
 	}
 }
 
@@ -31,7 +29,7 @@ func (c *StatisticsPage) WriteHTMLTo(w io.Writer) (int64, error) {
 			core.NewSpace(),
 			core.NewRow(
 				core.NewColumn(core.HalfRow, core.NewComponents(
-					NewIndividualStatistics(c.document, c.visibility),
+					NewIndividualStatistics(c.document, c.options.LivingVisibility),
 					core.NewSpace(),
 					NewFamilyStatistics(c.document),
 					core.NewSpace(),

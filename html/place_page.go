@@ -10,17 +10,15 @@ type PlacePage struct {
 	document          *gedcom.Document
 	placeKey          string
 	googleAnalyticsID string
-	options           PublishShowOptions
-	visibility        LivingVisibility
+	options           *PublishShowOptions
 }
 
-func NewPlacePage(document *gedcom.Document, placeKey string, googleAnalyticsID string, options PublishShowOptions, visibility LivingVisibility) *PlacePage {
+func NewPlacePage(document *gedcom.Document, placeKey string, googleAnalyticsID string, options *PublishShowOptions) *PlacePage {
 	return &PlacePage{
 		document:          document,
 		placeKey:          placeKey,
 		googleAnalyticsID: googleAnalyticsID,
 		options:           options,
-		visibility:        visibility,
 	}
 }
 
@@ -32,7 +30,7 @@ func (c *PlacePage) WriteHTMLTo(w io.Writer) (int64, error) {
 	}
 
 	for _, node := range place.nodes {
-		placeEvent := NewPlaceEvent(c.document, node, c.visibility)
+		placeEvent := NewPlaceEvent(c.document, node, c.options.LivingVisibility)
 		table = append(table, placeEvent)
 	}
 
