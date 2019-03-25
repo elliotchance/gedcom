@@ -8,35 +8,48 @@ import (
 )
 
 type IndividualIndexHeader struct {
-	document       *gedcom.Document
-	selectedLetter rune
+	document         *gedcom.Document
+	selectedLetter   rune
+	livingVisibility LivingVisibility
 }
 
-func NewIndividualIndexHeader(document *gedcom.Document, selectedLetter rune) *IndividualIndexHeader {
+func NewIndividualIndexHeader(document *gedcom.Document, selectedLetter rune, livingVisibility LivingVisibility) *IndividualIndexHeader {
 	return &IndividualIndexHeader{
-		document:       document,
-		selectedLetter: selectedLetter,
+		document:         document,
+		selectedLetter:   selectedLetter,
+		livingVisibility: livingVisibility,
 	}
 }
 
-func GetIndexLetters(document *gedcom.Document) []rune {
-	letterMap := map[rune]bool{}
-	for _, individual := range document.Individuals() {
-		letterMap[getIndexLetter(individual)] = true
-	}
+func GetIndexLetters(document *gedcom.Document, livingVisibility LivingVisibility) []rune {
+	document.PublishIndexLettersMutex.Lock()
 
-	letters := []rune{}
-	if _, ok := letterMap[symbolLetter]; ok {
-		letters = []rune{symbolLetter}
-	}
+	if document.PublishIndexLetters == nil {
+		letterMap := map[rune]bool{}
+		for _, individual := range document.Individuals() {
+			switch livingVisibility {
+			case LivingVisibilityShow, LivingVisibilityPlaceholder:
+				letterMap[getIndexLetter(individual)] = true
+			case LivingVisibilityHide:
+				// nothing
+			}
+		}
 
-	for i := rune('a'); i <= rune('z'); i++ {
-		if _, ok := letterMap[i]; ok {
-			letters = append(letters, i)
+		document.PublishIndexLetters = []rune{}
+		if _, ok := letterMap[symbolLetter]; ok {
+			document.PublishIndexLetters = []rune{symbolLetter}
+		}
+
+		for i := rune('a'); i <= rune('z'); i++ {
+			if _, ok := letterMap[i]; ok {
+				document.PublishIndexLetters = append(document.PublishIndexLetters, i)
+			}
 		}
 	}
 
-	return letters
+	document.PublishIndexLettersMutex.Unlock()
+
+	return document.PublishIndexLetters
 }
 
 func getIndexLetter(individual *gedcom.IndividualNode) rune {
@@ -44,7 +57,7 @@ func getIndexLetter(individual *gedcom.IndividualNode) rune {
 
 	switch {
 	case name == "", name[0] < 'a', name[0] > 'z':
-		name = "#"
+		return symbolLetter
 	}
 
 	return rune(name[0])
@@ -53,7 +66,7 @@ func getIndexLetter(individual *gedcom.IndividualNode) rune {
 func (c *IndividualIndexHeader) WriteHTMLTo(w io.Writer) (int64, error) {
 	pills := []core.Component{}
 
-	for _, letter := range GetIndexLetters(c.document) {
+	for _, letter := range GetIndexLetters(c.document, c.livingVisibility) {
 		pills = append(pills,
 			NewIndividualIndexLetter(letter, letter == c.selectedLetter))
 	}

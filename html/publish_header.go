@@ -35,7 +35,7 @@ func NewPublishHeader(document *gedcom.Document, extraTab string, selectedTab st
 }
 
 func (c *PublishHeader) WriteHTMLTo(w io.Writer) (int64, error) {
-	letters := GetIndexLetters(c.document)
+	letters := GetIndexLetters(c.document, c.options.LivingVisibility)
 
 	items := []*core.NavItem{}
 
