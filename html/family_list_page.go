@@ -10,13 +10,15 @@ type FamilyListPage struct {
 	document          *gedcom.Document
 	googleAnalyticsID string
 	options           *PublishShowOptions
+	indexLetters      []rune
 }
 
-func NewFamilyListPage(document *gedcom.Document, googleAnalyticsID string, options *PublishShowOptions) *FamilyListPage {
+func NewFamilyListPage(document *gedcom.Document, googleAnalyticsID string, options *PublishShowOptions, indexLetters []rune) *FamilyListPage {
 	return &FamilyListPage{
 		document:          document,
 		googleAnalyticsID: googleAnalyticsID,
 		options:           options,
+		indexLetters:      indexLetters,
 	}
 }
 
@@ -31,7 +33,7 @@ func (c *FamilyListPage) WriteHTMLTo(w io.Writer) (int64, error) {
 	}
 
 	column := core.NewColumn(core.EntireRow, core.NewTable("", table...))
-	header := NewPublishHeader(c.document, "", selectedFamiliesTab, c.options)
+	header := NewPublishHeader(c.document, "", selectedFamiliesTab, c.options, c.indexLetters)
 	components := core.NewComponents(header, core.NewRow(column))
 
 	return core.NewPage("Families", components, c.googleAnalyticsID).

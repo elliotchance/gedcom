@@ -13,14 +13,16 @@ type IndividualPage struct {
 	individual        *gedcom.IndividualNode
 	googleAnalyticsID string
 	options           *PublishShowOptions
+	indexLetters      []rune
 }
 
-func NewIndividualPage(document *gedcom.Document, individual *gedcom.IndividualNode, googleAnalyticsID string, options *PublishShowOptions) *IndividualPage {
+func NewIndividualPage(document *gedcom.Document, individual *gedcom.IndividualNode, googleAnalyticsID string, options *PublishShowOptions, indexLetters []rune) *IndividualPage {
 	return &IndividualPage{
 		document:          document,
 		individual:        individual,
 		googleAnalyticsID: googleAnalyticsID,
 		options:           options,
+		indexLetters:      indexLetters,
 	}
 }
 
@@ -34,7 +36,7 @@ func (c *IndividualPage) WriteHTMLTo(w io.Writer) (int64, error) {
 	return core.NewPage(
 		name.String(),
 		core.NewComponents(
-			NewPublishHeader(c.document, name.String(), selectedExtraTab, c.options),
+			NewPublishHeader(c.document, name.String(), selectedExtraTab, c.options, c.indexLetters),
 			NewAllParentButtons(c.document, c.individual, c.options.LivingVisibility),
 			core.NewBigTitle(1, individualName),
 			core.NewBigTitle(3, individualDates),

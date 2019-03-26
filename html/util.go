@@ -157,7 +157,7 @@ func colorClassForIndividual(individual *gedcom.IndividualNode) string {
 	return colorClassForSex(individual.Sex())
 }
 
-func getUniqueKey(document *gedcom.Document, s string) string {
+func getUniqueKey(individualMap map[string]*gedcom.IndividualNode, s string) string {
 	i := -1
 	for {
 		i += 1
@@ -167,7 +167,7 @@ func getUniqueKey(document *gedcom.Document, s string) string {
 			testString = fmt.Sprintf("%s-%d", s, i)
 		}
 
-		if _, ok := document.PublishIndividualMap[testString]; ok {
+		if _, ok := individualMap[testString]; ok {
 			continue
 		}
 

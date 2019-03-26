@@ -11,14 +11,16 @@ type PlacePage struct {
 	placeKey          string
 	googleAnalyticsID string
 	options           *PublishShowOptions
+	indexLetters      []rune
 }
 
-func NewPlacePage(document *gedcom.Document, placeKey string, googleAnalyticsID string, options *PublishShowOptions) *PlacePage {
+func NewPlacePage(document *gedcom.Document, placeKey string, googleAnalyticsID string, options *PublishShowOptions, indexLetters []rune) *PlacePage {
 	return &PlacePage{
 		document:          document,
 		placeKey:          placeKey,
 		googleAnalyticsID: googleAnalyticsID,
 		options:           options,
+		indexLetters:      indexLetters,
 	}
 }
 
@@ -37,7 +39,7 @@ func (c *PlacePage) WriteHTMLTo(w io.Writer) (int64, error) {
 	return core.NewPage(
 		place.PrettyName,
 		core.NewComponents(
-			NewPublishHeader(c.document, place.PrettyName, selectedExtraTab, c.options),
+			NewPublishHeader(c.document, place.PrettyName, selectedExtraTab, c.options, c.indexLetters),
 			core.NewBigTitle(1, core.NewText(place.PrettyName)),
 			core.NewSpace(),
 			core.NewRow(

@@ -12,13 +12,15 @@ type PlaceListPage struct {
 	document          *gedcom.Document
 	googleAnalyticsID string
 	options           *PublishShowOptions
+	indexLetters      []rune
 }
 
-func NewPlaceListPage(document *gedcom.Document, googleAnalyticsID string, options *PublishShowOptions) *PlaceListPage {
+func NewPlaceListPage(document *gedcom.Document, googleAnalyticsID string, options *PublishShowOptions, indexLetters []rune) *PlaceListPage {
 	return &PlaceListPage{
 		document:          document,
 		googleAnalyticsID: googleAnalyticsID,
 		options:           options,
+		indexLetters:      indexLetters,
 	}
 }
 
@@ -71,7 +73,8 @@ func (c *PlaceListPage) WriteHTMLTo(w io.Writer) (int64, error) {
 	}
 
 	return core.NewPage("Places", core.NewComponents(
-		NewPublishHeader(c.document, "", selectedPlacesTab, c.options),
+		NewPublishHeader(c.document, "", selectedPlacesTab, c.options,
+			c.indexLetters),
 		core.NewNavPillsRow(pills),
 		core.NewSpace(),
 		core.NewRow(

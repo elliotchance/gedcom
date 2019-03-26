@@ -9,30 +9,16 @@ import (
 var alnumOrDashRegexp = regexp.MustCompile("[^a-z_0-9-]+")
 
 func GetIndividuals(document *gedcom.Document) map[string]*gedcom.IndividualNode {
-	document.PublishIndividualMapMutex.Lock()
-
-	if document.PublishIndividualMap != nil {
-		return document.PublishIndividualMap
-	}
+	individualMap := map[string]*gedcom.IndividualNode{}
 
 	for _, individual := range document.Individuals() {
 		name := individual.Name().String()
 
-		key := getUniqueKey(document, alnumOrDashRegexp.
+		key := getUniqueKey(individualMap, alnumOrDashRegexp.
 			ReplaceAllString(strings.ToLower(name), "-"))
 
-		document.PublishIndividualSyncedMap.Store(key, individual)
+		individualMap[key] = individual
 	}
 
-	document.PublishIndividualMap = map[string]*gedcom.IndividualNode{}
-
-	document.PublishIndividualSyncedMap.Range(func(key, value interface{}) bool {
-		document.PublishIndividualMap[key.(string)] = value.(*gedcom.IndividualNode)
-
-		return true
-	})
-
-	document.PublishIndividualMapMutex.Unlock()
-
-	return document.PublishIndividualMap
+	return individualMap
 }
