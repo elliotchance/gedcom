@@ -95,7 +95,7 @@ func (c *IndividualListPage) WriteHTMLTo(w io.Writer) (int64, error) {
 		NewPublishHeader(c.document, "", selectedIndividualsTab, c.options),
 		livingRow,
 		core.NewSpace(),
-		NewIndividualIndexHeader(c.document, c.selectedLetter),
+		NewIndividualIndexHeader(c.document, c.selectedLetter, c.options.LivingVisibility),
 		core.NewSpace(),
 		NewSurnameIndex(c.document, c.selectedLetter, c.options.LivingVisibility),
 		core.NewSpace(),

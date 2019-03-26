@@ -64,7 +64,7 @@ func (publisher *Publisher) Files(channelSize int) chan *core.File {
 
 func (publisher *Publisher) sendIndividualFiles(files chan *core.File) {
 	if publisher.options.ShowIndividuals {
-		for _, letter := range GetIndexLetters(publisher.doc) {
+		for _, letter := range GetIndexLetters(publisher.doc, publisher.options.LivingVisibility) {
 			files <- core.NewFile(
 				PageIndividuals(letter),
 				NewIndividualListPage(publisher.doc, letter,
@@ -159,5 +159,6 @@ func (publisher *Publisher) sendFiles(files chan *core.File) {
 	publisher.sendPlaceFiles(files)
 	publisher.sendFamilyFiles(files)
 	publisher.sendSurnameFiles(files)
+	publisher.sendSourceFiles(files)
 	publisher.sendStatisticsFiles(files)
 }

@@ -3,8 +3,8 @@ package html_test
 import (
 	"testing"
 
-	"github.com/elliotchance/gedcom/html"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/html"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -33,6 +33,25 @@ var publisherTests = map[string]struct {
 			"places.html",
 			"families.html",
 			"surnames.html",
+			"sources.html",
+			"statistics.html",
+		},
+	},
+	"HideLettersForInvisible": {
+		options: &html.PublishShowOptions{
+			ShowIndividuals:  true,
+			ShowPlaces:       true,
+			ShowFamilies:     true,
+			ShowSurnames:     true,
+			ShowSources:      true,
+			ShowStatistics:   true,
+			LivingVisibility: html.LivingVisibilityHide,
+		},
+		files: []string{
+			"places.html",
+			"families.html",
+			"surnames.html",
+			"sources.html",
 			"statistics.html",
 		},
 	},
@@ -44,9 +63,12 @@ func TestPublisher_Files(t *testing.T) {
 			doc := gedcom.NewDocument()
 			p1 := doc.AddIndividual("P1")
 			p1.AddName("Elliot /Chance/")
+			p1.AddBirthDate("2019")
 			doc.AddFamilyWithHusbandAndWife("F1", p1, nil)
 
 			publisher := html.NewPublisher(doc, test.options)
+
+			assert.True(t, p1.IsLiving())
 
 			var files []string
 			for file := range publisher.Files(1) {
