@@ -14,14 +14,16 @@ type IndividualListPage struct {
 	selectedLetter    rune
 	googleAnalyticsID string
 	options           *PublishShowOptions
+	indexLetters      []rune
 }
 
-func NewIndividualListPage(document *gedcom.Document, selectedLetter rune, googleAnalyticsID string, options *PublishShowOptions) *IndividualListPage {
+func NewIndividualListPage(document *gedcom.Document, selectedLetter rune, googleAnalyticsID string, options *PublishShowOptions, indexLetters []rune) *IndividualListPage {
 	return &IndividualListPage{
 		document:          document,
 		selectedLetter:    selectedLetter,
 		googleAnalyticsID: googleAnalyticsID,
 		options:           options,
+		indexLetters:      indexLetters,
 	}
 }
 
@@ -92,10 +94,10 @@ func (c *IndividualListPage) WriteHTMLTo(w io.Writer) (int64, error) {
 	}
 
 	return core.NewPage("Individuals", core.NewComponents(
-		NewPublishHeader(c.document, "", selectedIndividualsTab, c.options),
+		NewPublishHeader(c.document, "", selectedIndividualsTab, c.options, c.indexLetters),
 		livingRow,
 		core.NewSpace(),
-		NewIndividualIndexHeader(c.document, c.selectedLetter, c.options.LivingVisibility),
+		NewIndividualIndexHeader(c.document, c.selectedLetter, c.options.LivingVisibility, c.indexLetters),
 		core.NewSpace(),
 		NewSurnameIndex(c.document, c.selectedLetter, c.options.LivingVisibility),
 		core.NewSpace(),

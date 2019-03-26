@@ -65,13 +65,6 @@ type Document struct {
 	pointerCache sync.Map // map[string]Node
 
 	families FamilyNodes
-
-	PublishIndexLetters      []rune
-	PublishIndexLettersMutex sync.Mutex
-
-	PublishIndividualSyncedMap sync.Map // map[string]*gedcom.IndividualNode
-	PublishIndividualMap       map[string]*IndividualNode
-	PublishIndividualMapMutex  sync.Mutex
 }
 
 // String will render the entire GEDCOM document.

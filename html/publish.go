@@ -22,6 +22,8 @@ type Publisher struct {
 	options           *PublishShowOptions
 	fileWriter        core.FileWriter
 	GoogleAnalyticsID string
+	indexLetters      []rune
+	individuals       map[string]*gedcom.IndividualNode
 }
 
 // NewPublisher generates the pages to be rendered for a published website.
@@ -31,8 +33,10 @@ type Publisher struct {
 // If you only wish to generate files you should use a DirectoryFileWriter.
 func NewPublisher(doc *gedcom.Document, options *PublishShowOptions) *Publisher {
 	return &Publisher{
-		doc:     doc,
-		options: options,
+		doc:          doc,
+		options:      options,
+		indexLetters: GetIndexLetters(doc, options.LivingVisibility),
+		individuals:  GetIndividuals(doc),
 	}
 }
 
@@ -64,16 +68,16 @@ func (publisher *Publisher) Files(channelSize int) chan *core.File {
 
 func (publisher *Publisher) sendIndividualFiles(files chan *core.File) {
 	if publisher.options.ShowIndividuals {
-		for _, letter := range GetIndexLetters(publisher.doc, publisher.options.LivingVisibility) {
+		for _, letter := range publisher.indexLetters {
 			files <- core.NewFile(
 				PageIndividuals(letter),
 				NewIndividualListPage(publisher.doc, letter,
-					publisher.GoogleAnalyticsID, publisher.options),
+					publisher.GoogleAnalyticsID, publisher.options,
+					publisher.indexLetters),
 			)
 		}
 
-		individuals := GetIndividuals(publisher.doc)
-		for _, individual := range individuals {
+		for _, individual := range publisher.individuals {
 			if individual.IsLiving() {
 				switch publisher.options.LivingVisibility {
 				case LivingVisibilityHide,
@@ -85,7 +89,7 @@ func (publisher *Publisher) sendIndividualFiles(files chan *core.File) {
 				}
 			}
 
-			page := NewIndividualPage(publisher.doc, individual, publisher.GoogleAnalyticsID, publisher.options)
+			page := NewIndividualPage(publisher.doc, individual, publisher.GoogleAnalyticsID, publisher.options, publisher.indexLetters)
 			pageName := PageIndividual(publisher.doc, individual, publisher.options.LivingVisibility)
 			files <- core.NewFile(pageName, page)
 		}
@@ -94,7 +98,8 @@ func (publisher *Publisher) sendIndividualFiles(files chan *core.File) {
 
 func (publisher *Publisher) sendPlaceFiles(files chan *core.File) {
 	if publisher.options.ShowPlaces {
-		page := NewPlaceListPage(publisher.doc, publisher.GoogleAnalyticsID, publisher.options)
+		page := NewPlaceListPage(publisher.doc, publisher.GoogleAnalyticsID,
+			publisher.options, publisher.indexLetters)
 		files <- core.NewFile(PagePlaces(), page)
 
 		// Sort the places so that the generated page names will be more
@@ -110,7 +115,7 @@ func (publisher *Publisher) sendPlaceFiles(files chan *core.File) {
 
 		for _, key := range placeKeys {
 			place := places[key]
-			page := NewPlacePage(publisher.doc, key, publisher.GoogleAnalyticsID, publisher.options)
+			page := NewPlacePage(publisher.doc, key, publisher.GoogleAnalyticsID, publisher.options, publisher.indexLetters)
 			files <- core.NewFile(PagePlace(publisher.doc, place.PrettyName), page)
 		}
 	}
@@ -120,7 +125,7 @@ func (publisher *Publisher) sendFamilyFiles(files chan *core.File) {
 	if publisher.options.ShowFamilies {
 		files <- core.NewFile(
 			PageFamilies(),
-			NewFamilyListPage(publisher.doc, publisher.GoogleAnalyticsID, publisher.options),
+			NewFamilyListPage(publisher.doc, publisher.GoogleAnalyticsID, publisher.options, publisher.indexLetters),
 		)
 	}
 }
@@ -130,17 +135,20 @@ func (publisher *Publisher) sendSurnameFiles(files chan *core.File) {
 		files <- core.NewFile(
 			PageSurnames(),
 			NewSurnameListPage(publisher.doc, publisher.GoogleAnalyticsID,
-				publisher.options))
+				publisher.options, publisher.indexLetters))
 	}
 }
 
 func (publisher *Publisher) sendSourceFiles(files chan *core.File) {
 	if publisher.options.ShowSources {
 		files <- core.NewFile(PageSources(),
-			NewSourceListPage(publisher.doc, publisher.GoogleAnalyticsID, publisher.options))
+			NewSourceListPage(publisher.doc, publisher.GoogleAnalyticsID,
+				publisher.options, publisher.indexLetters))
 
 		for _, source := range publisher.doc.Sources() {
-			page := NewSourcePage(publisher.doc, source, publisher.GoogleAnalyticsID, publisher.options)
+			page := NewSourcePage(publisher.doc, source,
+				publisher.GoogleAnalyticsID, publisher.options,
+				publisher.indexLetters)
 			files <- core.NewFile(PageSource(source), page)
 		}
 	}
@@ -150,7 +158,7 @@ func (publisher *Publisher) sendStatisticsFiles(files chan *core.File) {
 	if publisher.options.ShowStatistics {
 		files <- core.NewFile(PageStatistics(),
 			NewStatisticsPage(publisher.doc, publisher.GoogleAnalyticsID,
-				publisher.options))
+				publisher.options, publisher.indexLetters))
 	}
 }
 

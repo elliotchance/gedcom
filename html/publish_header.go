@@ -19,24 +19,24 @@ const (
 // PublishHeader is the tabbed section at the top of each page. The PublishHeader will be the
 // same on all pages except that some pages will use an extra tab for that page.
 type PublishHeader struct {
-	document    *gedcom.Document
-	extraTab    string
-	selectedTab string
-	options     *PublishShowOptions
+	document     *gedcom.Document
+	extraTab     string
+	selectedTab  string
+	options      *PublishShowOptions
+	indexLetters []rune
 }
 
-func NewPublishHeader(document *gedcom.Document, extraTab string, selectedTab string, options *PublishShowOptions) *PublishHeader {
+func NewPublishHeader(document *gedcom.Document, extraTab string, selectedTab string, options *PublishShowOptions, indexLetters []rune) *PublishHeader {
 	return &PublishHeader{
-		document:    document,
-		extraTab:    extraTab,
-		selectedTab: selectedTab,
-		options:     options,
+		document:     document,
+		extraTab:     extraTab,
+		selectedTab:  selectedTab,
+		options:      options,
+		indexLetters: indexLetters,
 	}
 }
 
 func (c *PublishHeader) WriteHTMLTo(w io.Writer) (int64, error) {
-	letters := GetIndexLetters(c.document, c.options.LivingVisibility)
-
 	items := []*core.NavItem{}
 
 	if c.options.ShowIndividuals {
@@ -45,7 +45,7 @@ func (c *PublishHeader) WriteHTMLTo(w io.Writer) (int64, error) {
 		item := core.NewNavItem(
 			title,
 			c.selectedTab == selectedIndividualsTab,
-			PageIndividuals(letters[0]),
+			PageIndividuals(c.indexLetters[0]),
 		)
 		items = append(items, item)
 	}
