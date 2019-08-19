@@ -47,6 +47,20 @@ type Decoder struct {
 	// When enabled any line than cannot be parsed will be considered an
 	// extension of the previous line (including the new line character).
 	AllowMultiLine bool
+
+	// AllowInvalidIndents allows a child node to have an indent greater than +1
+	// of the parent. AllowInvalidIndents is disabled by default because if this
+	// happens the GEDCOM file is broken in some possibly serious way and
+	// certainly not a valid GEDCOM file.
+	//
+	// The biggest problem with having the indents wrongly aligned is that nodes
+	// that are expected to be a certain depth (such as NPFX inside a NAME) will
+	// probably break or interfere with a traversal algorithm that is not
+	// expecting the node to be there/at that level.
+	//
+	// Another important thing to note is that the incorrect indent level will
+	// not be retained when writing the Document back to a GEDCOM.
+	AllowInvalidIndents bool
 }
 
 // Create a new decoder to parse a reader that contain GEDCOM data.
@@ -124,6 +138,18 @@ func (dec *Decoder) Decode() (*Document, error) {
 			indents = Nodes{node}
 
 			continue
+		}
+
+		if indent-1 >= len(indents) {
+			// This means the file is not valid. I have seen it in very rare
+			// cases. See full explanation in AllowInvalidIndents.
+			if dec.AllowInvalidIndents {
+				indent = len(indents)
+			} else {
+				panic(fmt.Sprintf(
+					"indent is too large - missing parent? at line %d: %s",
+					lineNumber, line))
+			}
 		}
 
 		i := indents[indent-1]
