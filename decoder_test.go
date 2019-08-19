@@ -379,6 +379,29 @@ func TestDecoder_Decode(t *testing.T) {
 			assertDocumentEqual(t, doc, actual)
 		}
 	})
+
+	t.Run("IndentTooBig", func(t *testing.T) {
+		decoder := gedcom.NewDecoder(strings.NewReader("0 @I59238932@ INDI\n2 NPFX Mrs William Cornens\n1 SEX F"))
+
+		assert.PanicsWithValue(t, "indent is too large - missing parent? at line 2: 2 NPFX Mrs William Cornens", func() {
+			_, _ = decoder.Decode()
+		})
+	})
+
+	t.Run("IndentTooBigAllowed", func(t *testing.T) {
+		decoder := gedcom.NewDecoder(strings.NewReader("0 @I59238932@ INDI\n2 NPFX Mrs William Cornens\n1 SEX F"))
+		decoder.AllowInvalidIndents = true
+
+		actual, err := decoder.Decode()
+		if assert.NoError(t, err) {
+			doc := gedcom.NewDocument()
+			doc.AddIndividual("I59238932",
+				gedcom.NewNode(gedcom.TagFromString("NPFX"), "Mrs William Cornens", ""),
+				gedcom.NewNode(gedcom.TagFromString("SEX"), "F", ""))
+
+			assertDocumentEqual(t, doc, actual)
+		}
+	})
 }
 
 func trimSpaces(s string) string {

@@ -36,6 +36,7 @@ var (
 	optionSort                      string // see optionSort constants.
 	optionPreferPointerAbove        float64
 	optionAllowMultiLine            bool
+	optionAllowInvalidIndents       bool
 )
 
 var filterFlags = &gedcom.FilterFlags{}
@@ -54,6 +55,7 @@ func newDocumentFromGEDCOMFile(path string) (*gedcom.Document, error) {
 
 	decoder := gedcom.NewDecoder(file)
 	decoder.AllowMultiLine = optionAllowMultiLine
+	decoder.AllowInvalidIndents = optionAllowInvalidIndents
 
 	return decoder.Decode()
 }
@@ -263,6 +265,21 @@ func parseCLIFlags() {
 
 			When enabled any line than cannot be parsed will be considered an
 			extension of the previous line (including the new line character).
+			`))
+
+	flag.BoolVar(&optionAllowInvalidIndents, "allow-invalid-indents", false,
+		util.CLIDescription(`
+			When enabled, -allow-invalid-indents allows a child node to have an
+            indent greater than +1 of the parent. -allow-invalid-indents is
+            disabled by default because if this happens the GEDCOM file is
+            broken in some possibly serious way and certainly not a valid GEDCOM
+            file.
+
+            The biggest problem with having the indents wrongly aligned is that
+            nodes that are expected to be a certain depth (such as NPFX inside a
+            NAME) will probably break or interfere with a traversal algorithm
+            that is not expecting the node to be there/at that level. This may
+            lead to unexpected behavior.
 			`))
 
 	filterFlags.SetupCLI()
