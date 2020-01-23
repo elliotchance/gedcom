@@ -30,15 +30,15 @@ var individualNodesTests = map[string]struct {
 	WantMerge   gedcom.IndividualNodes
 }{
 	"BothDocumentsEmpty": {
-		Doc1: gedcom.NewDocument(),
-		Doc2: gedcom.NewDocument(),
+		Doc1:                      gedcom.NewDocument(),
+		Doc2:                      gedcom.NewDocument(),
 		MinimumWeightedSimilarity: 0.0,
 		PreferPointerAbove:        1.0,
 		WantCompare:               gedcom.IndividualComparisons{},
 	},
 	"Doc2Empty": {
-		Doc1: gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot}),
-		Doc2: gedcom.NewDocument(),
+		Doc1:                      gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot}),
+		Doc2:                      gedcom.NewDocument(),
 		MinimumWeightedSimilarity: 0.0,
 		PreferPointerAbove:        1.0,
 		WantCompare: gedcom.IndividualComparisons{
@@ -49,8 +49,8 @@ var individualNodesTests = map[string]struct {
 		},
 	},
 	"Doc1Empty": {
-		Doc1: gedcom.NewDocument(),
-		Doc2: gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot}),
+		Doc1:                      gedcom.NewDocument(),
+		Doc2:                      gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot}),
 		MinimumWeightedSimilarity: 0.0,
 		PreferPointerAbove:        1.0,
 		WantCompare: gedcom.IndividualComparisons{
@@ -61,8 +61,8 @@ var individualNodesTests = map[string]struct {
 		},
 	},
 	"SameIndividualInBothDocuments": {
-		Doc1: gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot}),
-		Doc2: gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot}),
+		Doc1:                      gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot}),
+		Doc2:                      gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot}),
 		MinimumWeightedSimilarity: 0.0,
 		PreferPointerAbove:        1.0,
 		WantCompare: gedcom.IndividualComparisons{
@@ -73,8 +73,8 @@ var individualNodesTests = map[string]struct {
 		},
 	},
 	"SameIndividualsInDifferentOrder": {
-		Doc1: gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot, john, jane}),
-		Doc2: gedcom.NewDocumentWithNodes(gedcom.Nodes{jane, elliot, john}),
+		Doc1:                      gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot, john, jane}),
+		Doc2:                      gedcom.NewDocumentWithNodes(gedcom.Nodes{jane, elliot, john}),
 		MinimumWeightedSimilarity: 0.0,
 		PreferPointerAbove:        1.0,
 		WantCompare: gedcom.IndividualComparisons{
@@ -89,8 +89,8 @@ var individualNodesTests = map[string]struct {
 		},
 	},
 	"ZeroMinimumSimilarity": {
-		Doc1: gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot, jane}),
-		Doc2: gedcom.NewDocumentWithNodes(gedcom.Nodes{jane, john}),
+		Doc1:                      gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot, jane}),
+		Doc2:                      gedcom.NewDocumentWithNodes(gedcom.Nodes{jane, john}),
 		MinimumWeightedSimilarity: 0.0,
 		PreferPointerAbove:        1.0,
 		WantCompare: gedcom.IndividualComparisons{
@@ -116,8 +116,8 @@ var individualNodesTests = map[string]struct {
 		},
 	},
 	"OneMatch": {
-		Doc1: gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot, jane}),
-		Doc2: gedcom.NewDocumentWithNodes(gedcom.Nodes{jane, john}),
+		Doc1:                      gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot, jane}),
+		Doc2:                      gedcom.NewDocumentWithNodes(gedcom.Nodes{jane, john}),
 		MinimumWeightedSimilarity: 0.75,
 		PreferPointerAbove:        1.0,
 		WantCompare: gedcom.IndividualComparisons{
@@ -132,8 +132,8 @@ var individualNodesTests = map[string]struct {
 		},
 	},
 	"NoMatches": {
-		Doc1: gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot, jane}),
-		Doc2: gedcom.NewDocumentWithNodes(gedcom.Nodes{bob, john}),
+		Doc1:                      gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot, jane}),
+		Doc2:                      gedcom.NewDocumentWithNodes(gedcom.Nodes{bob, john}),
 		MinimumWeightedSimilarity: 0.9,
 		PreferPointerAbove:        1.0,
 		WantCompare: gedcom.IndividualComparisons{
@@ -152,8 +152,8 @@ var individualNodesTests = map[string]struct {
 	"AlwaysUsePointer": {
 		// John and Jane are both P2. Even though they are completely different
 		// we force pointers to match with a prefer value of 0.0.
-		Doc1: gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot, jane}),
-		Doc2: gedcom.NewDocumentWithNodes(gedcom.Nodes{bob, john}),
+		Doc1:                      gedcom.NewDocumentWithNodes(gedcom.Nodes{elliot, jane}),
+		Doc2:                      gedcom.NewDocumentWithNodes(gedcom.Nodes{bob, john}),
 		MinimumWeightedSimilarity: 0.9,
 		PreferPointerAbove:        0.0,
 		WantCompare: gedcom.IndividualComparisons{

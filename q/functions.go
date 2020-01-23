@@ -10,5 +10,5 @@ var Functions = map[string]Expression{
 	"Last":                         &LastExpr{},
 	"Length":                       &LengthExpr{},
 	"MergeDocumentsAndIndividuals": &MergeDocumentsAndIndividualsExpr{},
-	"Only": &OnlyExpr{},
+	"Only":                         &OnlyExpr{},
 }
