@@ -63,10 +63,22 @@ func TestResidenceNode_Equals(t *testing.T) {
 	Equals(n1, gedcom.NewNameNode("foo")).Returns(false)
 
 	// General cases.
-	Equals(n1, n1).Returns(false)
-	Equals(n1, n2).Returns(false)
+	Equals(n1, n1).Returns(true)
+	Equals(n1, n2).Returns(true)
 	Equals(n1, n3).Returns(false)
 	Equals(n3, n4).Returns(true)
+
+	// Residences are equal if they contain the same place but both do not
+	// specify a date.
+	r1 := gedcom.NewResidenceNode("",
+		gedcom.NewSourceNode("@S619368194@", ""),
+		gedcom.NewPlaceNode("Worcestershire"),
+	)
+	r2 := gedcom.NewResidenceNode("",
+		gedcom.NewPlaceNode("Worcestershire"),
+		gedcom.NewSourceNode("@S619368193@", "", gedcom.NewNode(gedcom.TagFromString("_APID"), "1,2056::540816", "")),
+	)
+	Equals(r1, r2).Returns(true)
 }
 
 func TestResidenceNode_Years(t *testing.T) {

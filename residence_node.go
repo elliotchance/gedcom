@@ -50,6 +50,16 @@ func (node *ResidenceNode) Equals(node2 Node) bool {
 				}
 			}
 		}
+
+		// Residences are equal if they contain the same place but both do not
+		// specify a date. NodesWithTag would be expensive to run all the time,
+		// so only use it when we know both sides do not have a date.
+		if len(leftDates)+len(rightDates) == 0 {
+			leftPlaces := NodesWithTag(node, TagPlace)
+			rightPlaces := NodesWithTag(node2, TagPlace)
+
+			return DeepEqualNodes(leftPlaces, rightPlaces)
+		}
 	}
 
 	return false
