@@ -1,10 +1,7 @@
-# This is a weird way of telling Travis to use the fast container-based test
-# runner instead of the slow VM-based runner.
-sudo: false
-
 language: go
 
 go:
+  - 1.13.x
   - 1.12.x
   - 1.11.x
   - 1.10.x
@@ -14,10 +11,6 @@ stages:
   - Test
   - name: Release
     if: tag =~ ^v
-
-# Only clone the most recent commit.
-git:
-  depth: 1
 
 before_install:
   - DEP_VERSION="0.4.1"
@@ -31,7 +24,7 @@ install:
   - dep ensure
 
 script:
-  - if [[ "$TRAVIS_GO_VERSION" == 1.12* ]]; then
+  - if [[ "$TRAVIS_GO_VERSION" == 1.13* ]]; then
       make checks;
       make test-coverage;
     else
@@ -39,7 +32,7 @@ script:
     fi
 
 after_success:
-  - if [[ "$TRAVIS_GO_VERSION" == 1.12* ]]; then
+  - if [[ "$TRAVIS_GO_VERSION" == 1.13* ]]; then
       bash <(curl -s https://codecov.io/bash);
     fi
 
