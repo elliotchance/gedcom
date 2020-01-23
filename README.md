@@ -9,14 +9,6 @@ github.com/elliotchance/gedcom
 
 ---
 
-### You can use most of the tools right now for free at:
-### [https://gedcom.app](https://gedcom.app).
-
-**Have questions? Want to get help or give feedback? Discuss new features? Join the chat:
-[![Join the chat at https://gitter.im/gedcom-app/community](https://badges.gitter.im/gedcom-app/community.svg)](https://gitter.im/gedcom-app/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)**
-
----
-
 `github.com/elliotchance/gedcom` is an advanced Go-style library and set of
 command-line tools for dealing with
 [GEDCOM files](https://en.wikipedia.org/wiki/GEDCOM).
@@ -37,8 +29,7 @@ What Can It Do?
 query GEDCOM files with a CLI tool. It can output CSV, JSON and other GEDCOM
 files.
 
-* Render GEDCOM files as **fully static HTML websites**. See an example at
-[http://dechauncy.family](http://dechauncy.family).
+* Render GEDCOM files as **fully static HTML websites**.
 
 * **Compare GEDCOM files** from the same or different providers to find
 differences using the very advanced and configurable tool:
