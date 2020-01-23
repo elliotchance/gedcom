@@ -25,8 +25,6 @@ zip:
 	rm -rf bin
 	mkdir bin
 	go build -o bin/gedcom2html$(EXT) ./gedcom2html
-	go build -o bin/gedcom2json$(EXT) ./gedcom2json
-	go build -o bin/gedcom2text$(EXT) ./gedcom2text
 	go build -o bin/gedcomdiff$(EXT) ./gedcomdiff
 	go build -o bin/gedcomq$(EXT) ./gedcomq
 	go build -o bin/gedcomtune$(EXT) ./gedcomtune
