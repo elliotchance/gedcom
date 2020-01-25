@@ -20,6 +20,6 @@ zip:
 	go build -o bin/gedcomdiff$(EXT) ./gedcomdiff
 	go build -o bin/gedcomq$(EXT) ./gedcomq
 	go build -o bin/gedcomtune$(EXT) ./gedcomtune
-	zip gedcom-$(GOOS)-$(GOARCH).zip -r bin
+	zip gedcom-$(NAME).zip -r bin
 
 .PHONY: test zip
