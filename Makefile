@@ -13,14 +13,6 @@ test-coverage:
 		fi \
 	done
 
-check-go-fmt:
-	exit $$(go fmt ./... | wc -l)
-
-check-ghost:
-	exit $$(ghost -max-line-complexity 2 -ignore-tests $$(find . -name "*.go" | grep -v vendor))
-
-checks: check-go-fmt check-ghost
-
 zip:
 	rm -rf bin
 	mkdir bin

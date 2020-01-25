@@ -1,44 +1,19 @@
 language: go
 
-go:
-  - 1.13.x
-  - 1.12.x
-  - 1.11.x
-  - 1.10.x
-  - 1.9.x
-
-stages:
-  - Test
-  - name: Release
-    if: tag =~ ^v
-
-before_install:
-  - DEP_VERSION="0.4.1"
-  # Download the binary to bin folder in $GOPATH
-  - curl -L -s https://github.com/golang/dep/releases/download/v${DEP_VERSION}/dep-linux-amd64 -o $GOPATH/bin/dep
-  # Make the binary executable
-  - chmod +x $GOPATH/bin/dep
-
-install:
-  - go get -u github.com/elliotchance/ghost
-  - dep ensure
-
-script:
-  - if [[ "$TRAVIS_GO_VERSION" == 1.13* ]]; then
-      make checks;
-      make test-coverage;
-    else
-      make test;
-    fi
-
-after_success:
-  - if [[ "$TRAVIS_GO_VERSION" == 1.13* ]]; then
-      bash <(curl -s https://codecov.io/bash);
-    fi
+go: 1.13.x
 
 jobs:
   include:
+    - stage: Test
+      script:
+        - $(exit $(go fmt ./... | wc -l))
+        - make test-coverage
+
+      after_success:
+        - bash <(curl -s https://codecov.io/bash)
+
     - stage: Release
+      if: tag =~ ^v
       script:
         - GOOS=linux GOARCH=amd64 EXT="" make zip
         - GOOS=darwin GOARCH=amd64 EXT="" make zip
