@@ -15,10 +15,9 @@ jobs:
     - stage: Release
       if: tag =~ ^v
       script:
-        - GOOS=linux GOARCH=amd64 EXT="" make zip
-        - GOOS=darwin GOARCH=amd64 EXT="" make zip
-        - GOOS=windows GOARCH=amd64 EXT=".exe" make zip
-        - GOOS=windows GOARCH=386 EXT=".exe" make zip
+        - GOOS=linux GOARCH=amd64 NAME=linux EXT="" make zip
+        - GOOS=darwin GOARCH=amd64 NAME=macos EXT="" make zip
+        - GOOS=windows GOARCH=amd64 NAME=windows EXT=".exe" make zip
 
       deploy:
         provider: releases
@@ -26,10 +25,9 @@ jobs:
           secure: j1woYgRSru2tvqeVDXFJsWSkZi/am7a/+/tuM8j61G28hZ/tz6AKvFHqjbCl/vRIp6Yx3B+wieCKNxyH25iTKIhTL3y6p8RATaABdrZXnVlZDw+4svkkA1dAyTkueST4S2jtVxLeCca4FVIXd2NCnau3kzBWG+TzRvWo6mc592vFA3POv1VBD9eYYEwnwR0vmU4VzWjHaPex+ENua08PGKhOIO4trGg/AtsJvQl8W50ecanrL7h+tFRQUSkZvTT0RHJEGpvFPd101Kl+hI+h2y1Sdoo94OdAhzoDu59yaVxBiz/ScOOxWjpIAkgix5AkwKk5JXKONrP+eFSe+BgjIU9LiH2El9fyubKRq0/QrUNnaIF/+eCDznGE+G99/qkZkrfBwHlqNzktdQnLriqT1Of3wnja5jVOrOypzkdeza943oAOrDI/ShwL6mWShjjCJ3Qio7C+ljJkSdEQjhgzlqhioVigMZdX7KGEDPn/VtoV8snL6ckj3rLXKBno8UQmDZp0xH1sFNOliO/6Id2XgwcSV6WWYdOm3s1foK6kJrUwBeJ2JMvXVxJGQHl6bc9AOxLPTy2puUCOjgenNRSkaNBXJtEtMDpzspYBQpJ0+lhyCOw+tVYTbXat7hAo3kAoTgv26Qo/VQF9soe2iXChsltMlFBYyZKb0wVjTRWUxm8=
         skip_cleanup: true
         file:
-          - gedcom-linux-amd64.zip
-          - gedcom-darwin-amd64.zip
-          - gedcom-windows-amd64.zip
-          - gedcom-windows-386.zip
+          - gedcom-linux.zip
+          - gedcom-macos.zip
+          - gedcom-windows.zip
         on:
           repo: elliotchance/gedcom
           all_branches: true
