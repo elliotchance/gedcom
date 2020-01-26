@@ -8,7 +8,7 @@ import (
 )
 
 // Theses constants are used with JaroWinkler. They have been calculated using
-// the gedcomtune command.
+// the "gedcom tune" command.
 const (
 	DefaultJaroWinklerBoostThreshold = 0.0
 	DefaultJaroWinklerPrefixSize     = 8
@@ -32,7 +32,7 @@ const (
 // this to happen, it introduces two more parameters: the boostThreshold and the
 // prefixSize. These are commonly set to 0.7 and 4, respectively. However, you
 // should use DefaultJaroWinklerBoostThreshold and DefaultJaroWinklerPrefixSize
-// as they have been calcuated by the gedcomtune command.
+// as they have been calculated by the "gedcom tune" command.
 //
 // The code and comment above has been copied from:
 //

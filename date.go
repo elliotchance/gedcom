@@ -46,7 +46,7 @@ import (
 // DateNode.Similarity. This value may change in time if a more accurate default
 // is found.
 //
-// The gedcomtune tool was used to find an ideal value for this. Generally
+// The "gedcom tune" tool was used to find an ideal value for this. Generally
 // speaking 2 - 3 years yielded much the same result. Any further in either
 // direction led to a drop in accuracy for matching individuals.
 const DefaultMaxYearsForSimilarity = float64(3)

@@ -1,9 +1,5 @@
 /.idea
 .DS_Store
-/gedcom2html/sync.sh
 /vendor
 /gh-md-toc
 /coverage.txt
-/gedcomq/gedcomq
-gedcomq/*.ged
-/gedcomq/out.html

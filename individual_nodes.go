@@ -15,7 +15,7 @@ import (
 // accurate figure is found or the algorithm is generally tuned with different
 // weightings.
 //
-// The value was chosen by running comparison experiments with gedcomtune, a
+// The value was chosen by running comparison experiments with "gedcom tune", a
 // tool to try and find ideal values for constants like this.
 const DefaultMinimumSimilarity = 0.733
 

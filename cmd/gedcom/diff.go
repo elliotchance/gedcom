@@ -1,12 +1,13 @@
-// Gedcomdiff is a tool for comparing GEDCOM files and producing a HTML report.
+// "gedcom diff" is a tool for comparing GEDCOM files and producing a HTML
+// report.
 //
 // Usage
 //
-//   gedcomdiff -left-gedcom file1.ged -right-gedcom file2.ged -output out.html
+//   gedcom diff -left-gedcom file1.ged -right-gedcom file2.ged -output out.html
 //
 // For a complete list of options use:
 //
-//   gedcomdiff -help
+//   gedcom diff -help
 //
 package main
 
@@ -23,31 +24,7 @@ import (
 	"time"
 )
 
-var (
-	optionLeftGedcomFile            string
-	optionRightGedcomFile           string
-	optionOutputFile                string
-	optionShow                      string // see optionShow constants.
-	optionGoogleAnalyticsID         string
-	optionProgress                  bool
-	optionJobs                      int
-	optionMinimumSimilarity         float64
-	optionMinimumWeightedSimilarity float64
-	optionSort                      string // see optionSort constants.
-	optionPreferPointerAbove        float64
-	optionAllowMultiLine            bool
-	optionAllowInvalidIndents       bool
-)
-
-var filterFlags = &gedcom.FilterFlags{}
-
-func check(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func newDocumentFromGEDCOMFile(path string) (*gedcom.Document, error) {
+func newDocumentFromGEDCOMFile(path string, optionAllowMultiLine, optionAllowInvalidIndents bool) (*gedcom.Document, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -60,112 +37,21 @@ func newDocumentFromGEDCOMFile(path string) (*gedcom.Document, error) {
 	return decoder.Decode()
 }
 
-func main() {
-	parseCLIFlags()
+func runDiffCommand() {
+	var optionLeftGedcomFile string
+	var optionRightGedcomFile string
+	var optionOutputFile string
+	var optionShow string // see optionShow constants.
+	var optionGoogleAnalyticsID string
+	var optionProgress bool
+	var optionJobs int
+	var optionMinimumSimilarity float64
+	var optionMinimumWeightedSimilarity float64
+	var optionSort string // see optionSort constants.
+	var optionPreferPointerAbove float64
+	var optionAllowMultiLine bool
+	var optionAllowInvalidIndents bool
 
-	similarityOptions := gedcom.NewSimilarityOptions()
-	similarityOptions.MinimumWeightedSimilarity = optionMinimumWeightedSimilarity
-	similarityOptions.PreferPointerAbove = optionPreferPointerAbove
-	similarityOptions.MinimumSimilarity = optionMinimumSimilarity
-
-	compareOptions := gedcom.NewIndividualNodesCompareOptions()
-	compareOptions.SimilarityOptions = similarityOptions
-	compareOptions.Notifier = make(chan gedcom.Progress)
-	compareOptions.NotifierStep = 100
-	compareOptions.Jobs = optionJobs
-
-	// Gracefully handle a ctrl+c.
-	signaller := make(chan os.Signal, 1)
-	signal.Notify(signaller, os.Interrupt)
-	go func() {
-		<-signaller
-
-		defer func() {
-			// The panic may occur if crtl+c happens after the comparisons after
-			// the comparisons are finished but it's still rendering the output.
-			//
-			// We tried our best, exit with a failure code.
-			recover()
-			log.Fatal("aborted")
-		}()
-
-		// This is the correct way to abort the comparisons.
-		close(compareOptions.Notifier)
-	}()
-
-	leftGedcom, err := newDocumentFromGEDCOMFile(optionLeftGedcomFile)
-	check(err)
-
-	rightGedcom, err := newDocumentFromGEDCOMFile(optionRightGedcomFile)
-	check(err)
-
-	// Run compare.
-	leftIndividuals := leftGedcom.Individuals()
-	rightIndividuals := rightGedcom.Individuals()
-
-	out, err := os.Create(optionOutputFile)
-	check(err)
-
-	var comparisons gedcom.IndividualComparisons
-
-	go func() {
-		comparisons = leftIndividuals.Compare(rightIndividuals, compareOptions)
-	}()
-
-	if optionProgress {
-		progressBar := pb.StartNew(0).Prefix("Comparing Documents")
-		progressBar.SetRefreshRate(500 * time.Millisecond)
-		progressBar.ShowElapsedTime = true
-		progressBar.ShowTimeLeft = true
-
-		for n := range compareOptions.Notifier {
-			progressBar.SetTotal64(n.Total)
-			progressBar.Set64(n.Done)
-		}
-
-		progressBar.Finish()
-	} else {
-		// Wait for notifier channel to be closed.
-		for range compareOptions.Notifier {
-		}
-	}
-
-	diffProgress := make(chan gedcom.Progress)
-
-	page := html.NewDiffPage(comparisons, filterFlags, optionGoogleAnalyticsID,
-		optionShow, optionSort, diffProgress, compareOptions, html.LivingVisibilityShow)
-
-	go func() {
-		_, err = page.WriteHTMLTo(out)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		close(diffProgress)
-	}()
-
-	if optionProgress {
-		progressBar := pb.StartNew(0).Prefix("Comparing Individuals")
-		progressBar.SetRefreshRate(500 * time.Millisecond)
-		progressBar.ShowElapsedTime = true
-		progressBar.ShowTimeLeft = true
-
-		for p := range diffProgress {
-			if p.Total != 0 {
-				progressBar.SetTotal64(p.Total)
-			}
-
-			progressBar.Add64(p.Add)
-		}
-
-		progressBar.Finish()
-	} else {
-		for range diffProgress {
-		}
-	}
-}
-
-func parseCLIFlags() {
 	// Input files. Must be provided.
 	flag.StringVar(&optionLeftGedcomFile, "left-gedcom", "",
 		"Required. Left GEDCOM file.")
@@ -282,24 +168,24 @@ func parseCLIFlags() {
             lead to unexpected behavior.
 			`))
 
+	filterFlags := &gedcom.FilterFlags{}
 	filterFlags.SetupCLI()
 
-	flag.Parse()
+	err := flag.CommandLine.Parse(os.Args[2:])
+	if err != nil {
+		fatalln(err)
+	}
 
-	validateOptions()
-}
-
-func validateOptions() {
 	if optionLeftGedcomFile == "" {
-		log.Fatalf(`-left-gedcom is required`)
+		fatalln(`-left-gedcom is required`)
 	}
 
 	if optionRightGedcomFile == "" {
-		log.Fatalf(`-right-gedcom is required`)
+		fatalln(`-right-gedcom is required`)
 	}
 
 	if optionOutputFile == "" {
-		log.Fatalf(`-output is required`)
+		fatalln(`-output is required`)
 	}
 
 	optionShowValues := gedcom.NewStringSet(
@@ -309,7 +195,7 @@ func validateOptions() {
 	)
 
 	if !optionShowValues.Has(optionShow) {
-		log.Fatalf(`invalid "-show" value: %s`, optionShow)
+		fatalln(`invalid "-show" value: %s`, optionShow)
 	}
 
 	optionSortValues := gedcom.NewStringSet(
@@ -318,6 +204,109 @@ func validateOptions() {
 	)
 
 	if !optionSortValues.Has(optionSort) {
-		log.Fatalf(`invalid "-sort" value: %s`, optionSort)
+		fatalln(`invalid "-sort" value: %s`, optionSort)
+	}
+
+	similarityOptions := gedcom.NewSimilarityOptions()
+	similarityOptions.MinimumWeightedSimilarity = optionMinimumWeightedSimilarity
+	similarityOptions.PreferPointerAbove = optionPreferPointerAbove
+	similarityOptions.MinimumSimilarity = optionMinimumSimilarity
+
+	compareOptions := gedcom.NewIndividualNodesCompareOptions()
+	compareOptions.SimilarityOptions = similarityOptions
+	compareOptions.Notifier = make(chan gedcom.Progress)
+	compareOptions.NotifierStep = 100
+	compareOptions.Jobs = optionJobs
+
+	// Gracefully handle a ctrl+c.
+	signaller := make(chan os.Signal, 1)
+	signal.Notify(signaller, os.Interrupt)
+	go func() {
+		<-signaller
+
+		defer func() {
+			// The panic may occur if crtl+c happens after the comparisons after
+			// the comparisons are finished but it's still rendering the output.
+			//
+			// We tried our best, exit with a failure code.
+			recover()
+			log.Fatal("aborted")
+		}()
+
+		// This is the correct way to abort the comparisons.
+		close(compareOptions.Notifier)
+	}()
+
+	leftGedcom, err := newDocumentFromGEDCOMFile(
+		optionLeftGedcomFile, optionAllowMultiLine, optionAllowInvalidIndents)
+	check(err)
+
+	rightGedcom, err := newDocumentFromGEDCOMFile(
+		optionRightGedcomFile, optionAllowMultiLine, optionAllowInvalidIndents)
+	check(err)
+
+	// Run compare.
+	leftIndividuals := leftGedcom.Individuals()
+	rightIndividuals := rightGedcom.Individuals()
+
+	out, err := os.Create(optionOutputFile)
+	check(err)
+
+	var comparisons gedcom.IndividualComparisons
+
+	go func() {
+		comparisons = leftIndividuals.Compare(rightIndividuals, compareOptions)
+	}()
+
+	if optionProgress {
+		progressBar := pb.StartNew(0).Prefix("Comparing Documents")
+		progressBar.SetRefreshRate(500 * time.Millisecond)
+		progressBar.ShowElapsedTime = true
+		progressBar.ShowTimeLeft = true
+
+		for n := range compareOptions.Notifier {
+			progressBar.SetTotal64(n.Total)
+			progressBar.Set64(n.Done)
+		}
+
+		progressBar.Finish()
+	} else {
+		// Wait for notifier channel to be closed.
+		for range compareOptions.Notifier {
+		}
+	}
+
+	diffProgress := make(chan gedcom.Progress)
+
+	page := html.NewDiffPage(comparisons, filterFlags, optionGoogleAnalyticsID,
+		optionShow, optionSort, diffProgress, compareOptions, html.LivingVisibilityShow)
+
+	go func() {
+		_, err = page.WriteHTMLTo(out)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		close(diffProgress)
+	}()
+
+	if optionProgress {
+		progressBar := pb.StartNew(0).Prefix("Comparing Individuals")
+		progressBar.SetRefreshRate(500 * time.Millisecond)
+		progressBar.ShowElapsedTime = true
+		progressBar.ShowTimeLeft = true
+
+		for p := range diffProgress {
+			if p.Total != 0 {
+				progressBar.SetTotal64(p.Total)
+			}
+
+			progressBar.Add64(p.Add)
+		}
+
+		progressBar.Finish()
+	} else {
+		for range diffProgress {
+		}
 	}
 }

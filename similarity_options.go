@@ -37,7 +37,7 @@ type SimilarityOptions struct {
 	// function. They affect the properties of names are compared. The default
 	// values for each of these can be found in the constants
 	// DefaultJaroWinklerBoostThreshold and DefaultJaroWinklerPrefixSize. Their
-	// values have been chosen with gedcomtune.
+	// values have been chosen with "gedcom tune".
 	JaroBoostThreshold float64
 	JaroPrefixSize     int
 

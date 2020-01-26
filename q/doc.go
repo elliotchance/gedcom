@@ -1,4 +1,4 @@
-// Package q is the gedcomq parser and engine.
+// Package q is the "gedcom query" parser and engine.
 //
 // Language Basics
 //
