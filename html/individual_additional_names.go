@@ -20,16 +20,16 @@ func NewIndividualAdditionalNames(individual *gedcom.IndividualNode) *Individual
 
 func (c *IndividualAdditionalNames) WriteHTMLTo(w io.Writer) (int64, error) {
 	rows := []core.Component{}
-	names := c.individual.Names()
+	names := c.individual.Names()[1:]
 
 	for _, name := range names {
-		row := core.NewKeyedTableRow(name.Type().String(), core.NewText(name.String()),
-			name.Type() != "")
+		row := core.NewKeyedTableRow(
+			name.Type().String(), core.NewText(name.String()), true)
 		rows = append(rows, row)
 	}
 
 	table := core.NewTable("", rows...)
 
-	return core.NewCard(core.NewText("Additional Names"), len(names)-1, table).
+	return core.NewCard(core.NewText("Additional Names"), len(names), table).
 		WriteHTMLTo(w)
 }
