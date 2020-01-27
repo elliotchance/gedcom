@@ -103,11 +103,11 @@ func (node *IndividualNode) Spouses() (spouses IndividualNodes) {
 			continue
 		}
 
-		if husband.Pointer() == node.Pointer() {
+		if husband.IsIndividual(node) {
 			spouses = append(spouses, wife.Individual())
 		}
 
-		if wife.Pointer() == node.Pointer() {
+		if wife.IsIndividual(node) {
 			spouses = append(spouses, husband.Individual())
 		}
 	}

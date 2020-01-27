@@ -49,7 +49,7 @@ func GetIndexLetters(document *gedcom.Document, livingVisibility LivingVisibilit
 }
 
 func getIndexLetter(individual *gedcom.IndividualNode) rune {
-	name := strings.ToLower(individual.Name().String())
+	name := strings.ToLower(individual.Name().Surname())
 
 	switch {
 	case name == "", name[0] < 'a', name[0] > 'z':
