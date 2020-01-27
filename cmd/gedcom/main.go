@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/elliotchance/gedcom/gui"
 	"log"
 	"os"
 	"strings"
@@ -19,7 +20,8 @@ func check(err error) {
 
 func usage() string {
 	lines := []string{
-		"Missing command, use one of:",
+		"Commands:",
+		fmt.Sprintf("\t%s           - Run GUI", os.Args[0]),
 		fmt.Sprintf("\t%s diff      - Compare gedcom files", os.Args[0]),
 		fmt.Sprintf("\t%s publish   - Publish as HTML", os.Args[0]),
 		fmt.Sprintf("\t%s query     - Query with gedcomq", os.Args[0]),
@@ -31,10 +33,14 @@ func usage() string {
 
 func main() {
 	if len(os.Args) < 2 {
-		fatalln(usage())
+		gui.RunApp()
+		os.Exit(0)
 	}
 
 	switch os.Args[1] {
+	case "-help":
+		fmt.Println(usage())
+
 	case "diff":
 		runDiffCommand()
 
