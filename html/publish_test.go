@@ -28,7 +28,7 @@ var publisherTests = map[string]struct {
 			LivingVisibility: html.LivingVisibilityShow,
 		},
 		files: []string{
-			"individuals-e.html",
+			"individuals-c.html",
 			"elliot-chance.html",
 			"places.html",
 			"families.html",
