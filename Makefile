@@ -14,6 +14,7 @@ test-coverage:
 	done
 
 zip:
+	sed -i "s/unknown version/$(TRAVIS_TAG)/" cmd/gedcom/version.go
 	rm -rf bin
 	mkdir bin
 	go build -o bin/gedcom$(EXT) ./cmd/gedcom
