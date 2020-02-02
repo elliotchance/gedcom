@@ -7,16 +7,17 @@ import (
 
 type FilterFlags struct {
 	// Specific exclusions.
-	NoEvents      bool
-	NoResidences  bool
-	NoPlaces      bool
-	NoSources     bool
-	NoMaps        bool
-	NoChanges     bool
-	NoObjects     bool
-	NoLabels      bool
-	NoCensuses    bool
-	NoEmptyDeaths bool
+	NoEvents         bool
+	NoResidences     bool
+	NoPlaces         bool
+	NoSources        bool
+	NoMaps           bool
+	NoChanges        bool
+	NoObjects        bool
+	NoLabels         bool
+	NoCensuses       bool
+	NoEmptyDeaths    bool
+	NoDuplicateNames bool
 
 	// Only vitals (name, birth, baptism, death and burial).
 	OnlyVitals bool
@@ -41,6 +42,7 @@ func (ff *FilterFlags) SetupCLI() {
 	flag.BoolVar(&ff.NoObjects, "no-objects", false, "Exclude objects.")
 	flag.BoolVar(&ff.NoLabels, "no-labels", false, "Exclude labels.")
 	flag.BoolVar(&ff.NoCensuses, "no-censuses", false, "Exclude censuses.")
+	flag.BoolVar(&ff.NoDuplicateNames, "no-duplicate-names", false, "Exclude names that are duplicates.")
 
 	flag.BoolVar(&ff.NoEmptyDeaths, "no-empty-deaths", false, util.CLIDescription(
 		`Remove death nodes (DEAT) that do not have children. This is caused by
@@ -101,6 +103,12 @@ func (ff *FilterFlags) FilterFunctions() []FilterFunction {
 
 	if ff.OnlyOfficial {
 		filters = append(filters, OfficialTagFilter())
+	}
+
+	// This must be before NameFormat because NameFormat may simplify/destroy
+	// NAME nodes.
+	if ff.NoDuplicateNames {
+		filters = append(filters, RemoveDuplicateNamesFilter())
 	}
 
 	if ff.NameFormat != "unmodified" {

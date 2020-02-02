@@ -37,7 +37,30 @@ func TestFilter(t *testing.T) {
 		},
 		{
 			filter: func(node gedcom.Node) (gedcom.Node, bool) {
+				return node.ShallowCopy(), false
+			},
+			expected: `0 @P1@ INDI
+`,
+		},
+		{
+			filter: func(node gedcom.Node) (gedcom.Node, bool) {
 				return node, false
+			},
+			expected: `0 @P1@ INDI
+1 NAME Elliot /Chance/
+1 BIRT
+2 DATE 6 MAY 1989
+`,
+		},
+		{
+			filter: func(node gedcom.Node) (gedcom.Node, bool) {
+				if node.Tag().Is(gedcom.TagIndividual) {
+					// false means it will not traverse children, since an
+					// individual can never be inside of another individual.
+					return node.ShallowCopy(), false
+				}
+
+				return nil, false
 			},
 			expected: `0 @P1@ INDI
 `,
@@ -53,6 +76,9 @@ func TestFilter(t *testing.T) {
 				return nil, false
 			},
 			expected: `0 @P1@ INDI
+1 NAME Elliot /Chance/
+1 BIRT
+2 DATE 6 MAY 1989
 `,
 		},
 		{

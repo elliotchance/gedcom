@@ -88,6 +88,10 @@ func filter(root Node, fn FilterFunction, entityMap entityMap) Node {
 				result.AddNode(newNode)
 			}
 		}
+	} else {
+		for _, child := range newRoot.Nodes() {
+			result.AddNode(child)
+		}
 	}
 
 	return result
@@ -209,6 +213,34 @@ func RemoveEmptyDeathTagFilter() FilterFunction {
 			return nil, false
 		}
 
+		return node, true
+	}
+}
+
+func RemoveDuplicateNamesFilter() FilterFunction {
+	return func(node Node) (Node, bool) {
+		if individual, ok := node.(*IndividualNode); ok {
+			newIndividual := newIndividualNode(individual.Document(),
+				individual.Pointer())
+			names := map[string]bool{}
+
+			for _, n := range individual.children {
+				if name, isName := n.(*NameNode); isName {
+					nameString := name.String()
+					if names[nameString] == true {
+						continue
+					}
+
+					names[nameString] = true
+				}
+				newIndividual.AddNode(n)
+			}
+
+			return newIndividual, false
+		}
+
+		// Individuals can only exist on the root level so there's no need to
+		// recurse.
 		return node, true
 	}
 }
