@@ -1,5 +1,7 @@
 package gedcom
 
+import "github.com/elliotchance/gedcom/tag"
+
 // BirthNode is the event of entering into life.
 type BirthNode struct {
 	*SimpleNode
@@ -8,7 +10,7 @@ type BirthNode struct {
 // NewBirthNode creates a new BIRT node.
 func NewBirthNode(value string, children ...Node) *BirthNode {
 	return &BirthNode{
-		newSimpleNode(TagBirth, value, "", children...),
+		newSimpleNode(tag.TagBirth, value, "", children...),
 	}
 }
 

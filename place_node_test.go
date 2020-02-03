@@ -1,6 +1,7 @@
 package gedcom_test
 
 import (
+	"github.com/elliotchance/gedcom/tag"
 	"testing"
 
 	"github.com/elliotchance/gedcom"
@@ -86,7 +87,7 @@ func TestNewPlaceNode(t *testing.T) {
 
 	assert.NotNil(t, node)
 	assert.IsType(t, node, (*gedcom.PlaceNode)(nil))
-	assert.Equal(t, gedcom.TagPlace, node.Tag())
+	assert.Equal(t, tag.TagPlace, node.Tag())
 	assert.Equal(t, gedcom.Nodes{child}, node.Nodes())
 	assert.Equal(t, "foo", node.Value())
 	assert.Equal(t, "", node.Pointer())
@@ -190,7 +191,7 @@ func TestPlaceNode_PhoneticVariations(t *testing.T) {
 			expected: []*gedcom.PhoneticVariationNode{},
 		},
 		{
-			node: gedcom.NewNode(gedcom.TagPlace, "", "P1",
+			node: gedcom.NewNode(tag.TagPlace, "", "P1",
 				gedcom.NewPhoneticVariationNode(""),
 			).(*gedcom.PlaceNode),
 			expected: []*gedcom.PhoneticVariationNode{
@@ -198,18 +199,18 @@ func TestPlaceNode_PhoneticVariations(t *testing.T) {
 			},
 		},
 		{
-			node: gedcom.NewNode(gedcom.TagPlace, "", "P1",
+			node: gedcom.NewNode(tag.TagPlace, "", "P1",
 				gedcom.NewPhoneticVariationNode(""),
-				gedcom.NewNode(gedcom.TagDeath, "", ""),
+				gedcom.NewNode(tag.TagDeath, "", ""),
 			).(*gedcom.PlaceNode),
 			expected: []*gedcom.PhoneticVariationNode{
 				gedcom.NewPhoneticVariationNode(""),
 			},
 		},
 		{
-			node: gedcom.NewNode(gedcom.TagPlace, "", "P1",
+			node: gedcom.NewNode(tag.TagPlace, "", "P1",
 				gedcom.NewPhoneticVariationNode("foo"),
-				gedcom.NewNode(gedcom.TagDeath, "", ""),
+				gedcom.NewNode(tag.TagDeath, "", ""),
 				gedcom.NewPhoneticVariationNode("bar"),
 			).(*gedcom.PlaceNode),
 			expected: []*gedcom.PhoneticVariationNode{
@@ -245,7 +246,7 @@ func TestPlaceNode_RomanizedVariations(t *testing.T) {
 			expected: []*gedcom.RomanizedVariationNode{},
 		},
 		{
-			node: gedcom.NewNode(gedcom.TagPlace, "", "P1",
+			node: gedcom.NewNode(tag.TagPlace, "", "P1",
 				gedcom.NewRomanizedVariationNode(""),
 			).(*gedcom.PlaceNode),
 			expected: []*gedcom.RomanizedVariationNode{
@@ -253,18 +254,18 @@ func TestPlaceNode_RomanizedVariations(t *testing.T) {
 			},
 		},
 		{
-			node: gedcom.NewNode(gedcom.TagPlace, "", "P1",
+			node: gedcom.NewNode(tag.TagPlace, "", "P1",
 				gedcom.NewRomanizedVariationNode(""),
-				gedcom.NewNode(gedcom.TagDeath, "", ""),
+				gedcom.NewNode(tag.TagDeath, "", ""),
 			).(*gedcom.PlaceNode),
 			expected: []*gedcom.RomanizedVariationNode{
 				gedcom.NewRomanizedVariationNode(""),
 			},
 		},
 		{
-			node: gedcom.NewNode(gedcom.TagPlace, "", "P1",
+			node: gedcom.NewNode(tag.TagPlace, "", "P1",
 				gedcom.NewRomanizedVariationNode("foo"),
-				gedcom.NewNode(gedcom.TagDeath, "", ""),
+				gedcom.NewNode(tag.TagDeath, "", ""),
 				gedcom.NewRomanizedVariationNode("bar"),
 			).(*gedcom.PlaceNode),
 			expected: []*gedcom.RomanizedVariationNode{
@@ -347,7 +348,7 @@ func TestPlaceNode_Notes(t *testing.T) {
 			expected: []*gedcom.NoteNode{},
 		},
 		{
-			node: gedcom.NewNode(gedcom.TagPlace, "", "P1",
+			node: gedcom.NewNode(tag.TagPlace, "", "P1",
 				gedcom.NewNoteNode(""),
 			).(*gedcom.PlaceNode),
 			expected: []*gedcom.NoteNode{
@@ -355,18 +356,18 @@ func TestPlaceNode_Notes(t *testing.T) {
 			},
 		},
 		{
-			node: gedcom.NewNode(gedcom.TagPlace, "", "P1",
+			node: gedcom.NewNode(tag.TagPlace, "", "P1",
 				gedcom.NewNoteNode(""),
-				gedcom.NewNode(gedcom.TagDeath, "", ""),
+				gedcom.NewNode(tag.TagDeath, "", ""),
 			).(*gedcom.PlaceNode),
 			expected: []*gedcom.NoteNode{
 				gedcom.NewNoteNode(""),
 			},
 		},
 		{
-			node: gedcom.NewNode(gedcom.TagPlace, "", "P1",
+			node: gedcom.NewNode(tag.TagPlace, "", "P1",
 				gedcom.NewNoteNode("foo"),
-				gedcom.NewNode(gedcom.TagDeath, "", ""),
+				gedcom.NewNode(tag.TagDeath, "", ""),
 				gedcom.NewNoteNode("bar"),
 			).(*gedcom.PlaceNode),
 			expected: []*gedcom.NoteNode{

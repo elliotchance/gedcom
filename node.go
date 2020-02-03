@@ -13,6 +13,7 @@ package gedcom
 
 import (
 	"fmt"
+	"github.com/elliotchance/gedcom/tag"
 	"reflect"
 )
 
@@ -25,7 +26,7 @@ type Node interface {
 
 	// The node itself.
 	RawSimpleNode() *SimpleNode
-	Tag() Tag
+	Tag() tag.Tag
 	Value() string
 	Pointer() string
 

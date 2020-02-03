@@ -1,5 +1,7 @@
 package gedcom
 
+import "github.com/elliotchance/gedcom/tag"
+
 const (
 	SexMale    = "M"
 	SexFemale  = "F"
@@ -15,7 +17,7 @@ type SexNode struct {
 // should use one of the constants; SexMale, SexFemale or SexUnknown.
 func NewSexNode(value string) *SexNode {
 	return &SexNode{
-		newSimpleNode(TagSex, value, ""),
+		newSimpleNode(tag.TagSex, value, ""),
 	}
 }
 

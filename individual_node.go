@@ -2,6 +2,7 @@ package gedcom
 
 import (
 	"fmt"
+	"github.com/elliotchance/gedcom/tag"
 	"strings"
 	"time"
 )
@@ -27,7 +28,7 @@ type SpouseChildren map[*IndividualNode]ChildNodes
 
 func newIndividualNode(document *Document, pointer string, children ...Node) *IndividualNode {
 	return &IndividualNode{
-		newSimpleDocumentNode(document, TagIndividual, "", pointer, children...),
+		newSimpleDocumentNode(document, tag.TagIndividual, "", pointer, children...),
 		false, false, nil, nil, nil,
 	}
 }
@@ -40,7 +41,7 @@ func (node *IndividualNode) Name() *NameNode {
 		return nil
 	}
 
-	nameTag := First(NodesWithTag(node, TagName))
+	nameTag := First(NodesWithTag(node, tag.TagName))
 	if nameTag != nil {
 		return nameTag.(*NameNode)
 	}
@@ -54,7 +55,7 @@ func (node *IndividualNode) Names() []*NameNode {
 		return nil
 	}
 
-	nameTags := NodesWithTag(node, TagName)
+	nameTags := NodesWithTag(node, tag.TagName)
 	names := make([]*NameNode, len(nameTags))
 
 	for i, name := range nameTags {
@@ -66,7 +67,7 @@ func (node *IndividualNode) Names() []*NameNode {
 
 // If the node is nil the result will be SexUnknown.
 func (node *IndividualNode) Sex() *SexNode {
-	n := First(NodesWithTag(node, TagSex))
+	n := First(NodesWithTag(node, tag.TagSex))
 	if IsNil(n) {
 		return nil
 	}
@@ -246,7 +247,7 @@ func (node *IndividualNode) Births() (nodes []*BirthNode) {
 		return nil
 	}
 
-	for _, n := range NodesWithTag(node, TagBirth) {
+	for _, n := range NodesWithTag(node, tag.TagBirth) {
 		nodes = append(nodes, n.(*BirthNode))
 	}
 
@@ -258,7 +259,7 @@ func (node *IndividualNode) Births() (nodes []*BirthNode) {
 //
 // If the node is nil the result will also be nil.
 func (node *IndividualNode) Baptisms() []*BaptismNode {
-	nodes := NodesWithTag(node, TagBaptism)
+	nodes := NodesWithTag(node, tag.TagBaptism)
 
 	return nodes.CastTo((*BaptismNode)(nil)).([]*BaptismNode)
 }
@@ -269,7 +270,7 @@ func (node *IndividualNode) Baptisms() []*BaptismNode {
 //
 // If the node is nil the result will also be nil.
 func (node *IndividualNode) Deaths() []*DeathNode {
-	nodes := NodesWithTag(node, TagDeath)
+	nodes := NodesWithTag(node, tag.TagDeath)
 
 	return nodes.CastTo((*DeathNode)(nil)).([]*DeathNode)
 }
@@ -278,7 +279,7 @@ func (node *IndividualNode) Deaths() []*DeathNode {
 //
 // If the node is nil the result will also be nil.
 func (node *IndividualNode) Burials() []*BurialNode {
-	nodes := NodesWithTag(node, TagBurial)
+	nodes := NodesWithTag(node, tag.TagBurial)
 
 	return nodes.CastTo((*BurialNode)(nil)).([]*BurialNode)
 }
@@ -356,7 +357,7 @@ func (node *IndividualNode) SpouseChildren() SpouseChildren {
 //
 // If the node is nil the result will also be nil.
 func (node *IndividualNode) LDSBaptisms() Nodes {
-	return NodesWithTag(node, TagLDSBaptism)
+	return NodesWithTag(node, tag.TagLDSBaptism)
 }
 
 // EstimatedBirthDate attempts to find the exact or approximate birth date of an
@@ -839,7 +840,7 @@ func (node *IndividualNode) UniqueIDs() (nodes []*UniqueIDNode) {
 		return nil
 	}
 
-	for _, n := range NodesWithTag(node, UnofficialTagUniqueID) {
+	for _, n := range NodesWithTag(node, tag.UnofficialTagUniqueID) {
 		nodes = append(nodes, n.(*UniqueIDNode))
 	}
 
@@ -900,9 +901,9 @@ func (node *IndividualNode) AddBirthDate(birthDate string) *IndividualNode {
 // SetSex adds or replaces tge gender of an individual. You should use one of
 // the SexMale, SexFemale or SexUnknown constants.
 func (node *IndividualNode) SetSex(sex string) *IndividualNode {
-	existingSex := First(NodesWithTag(node, TagSex))
+	existingSex := First(NodesWithTag(node, tag.TagSex))
 	if existingSex == nil {
-		node.AddNode(NewNode(TagSex, string(sex), ""))
+		node.AddNode(NewNode(tag.TagSex, string(sex), ""))
 	} else {
 		existingSex.RawSimpleNode().value = string(sex)
 	}
@@ -944,20 +945,20 @@ func (node *IndividualNode) incorrectEventOrderWarnings() (warnings Warnings) {
 	// that any baptism or LDS baptism events must be after a birth event but
 	// also much be before the any death event.
 	eventOrder := []*struct {
-		Tags   []Tag
+		Tags   []tag.Tag
 		Events []eventAndDate
 	}{
 		{
-			Tags: []Tag{TagBirth},
+			Tags: []tag.Tag{tag.TagBirth},
 		},
 		{
-			Tags: []Tag{TagBaptism, TagLDSBaptism},
+			Tags: []tag.Tag{tag.TagBaptism, tag.TagLDSBaptism},
 		},
 		{
-			Tags: []Tag{TagDeath},
+			Tags: []tag.Tag{tag.TagDeath},
 		},
 		{
-			Tags: []Tag{TagBurial},
+			Tags: []tag.Tag{tag.TagBurial},
 		},
 	}
 
@@ -965,10 +966,10 @@ func (node *IndividualNode) incorrectEventOrderWarnings() (warnings Warnings) {
 	// Each of the dates found in events are partnered with the original event
 	// as we will need both if it turns into a warning.
 	for _, group := range eventOrder {
-		for _, tag := range group.Tags {
-			nodes := NodesWithTag(node, tag)
+		for _, t := range group.Tags {
+			nodes := NodesWithTag(node, t)
 			for _, node := range nodes {
-				for _, date := range NodesWithTag(node, TagDate) {
+				for _, date := range NodesWithTag(node, tag.TagDate) {
 					group.Events = append(group.Events, eventAndDate{
 						Event: node,
 						Date:  date.(*DateNode),
@@ -1019,7 +1020,7 @@ func (node *IndividualNode) tooOldWarnings() (warnings Warnings) {
 }
 
 func (node *IndividualNode) multipleSexesWarnings() Warnings {
-	sexes := castNodesWithTag(node, TagSex, (*SexNode)(nil)).([]*SexNode)
+	sexes := castNodesWithTag(node, tag.TagSex, (*SexNode)(nil)).([]*SexNode)
 	if len(sexes) > 1 {
 		return Warnings{
 			NewMultipleSexesWarning(node, sexes),

@@ -1,6 +1,7 @@
 package gedcom_test
 
 import (
+	"github.com/elliotchance/gedcom/tag"
 	"testing"
 
 	"github.com/elliotchance/gedcom"
@@ -103,7 +104,7 @@ func TestValue(t *testing.T) {
 		want string
 	}{
 		{nil, ""},
-		{gedcom.NewNode(gedcom.TagVersion, "foo", ""), "foo"},
+		{gedcom.NewNode(tag.TagVersion, "foo", ""), "foo"},
 		{gedcom.NewNameNode("foo bar"), "foo bar"},
 	}
 
@@ -156,7 +157,7 @@ func TestPointer(t *testing.T) {
 		want string
 	}{
 		{nil, ""},
-		{gedcom.NewNode(gedcom.TagVersion, "foo", "a"), "a"},
+		{gedcom.NewNode(tag.TagVersion, "foo", "a"), "a"},
 		{gedcom.NewDocument().AddIndividual("b"), "b"},
 		{gedcom.NewDocument().AddFamily("c"), "c"},
 	}

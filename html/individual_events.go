@@ -3,6 +3,7 @@ package html
 import (
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html/core"
+	"github.com/elliotchance/gedcom/tag"
 	"io"
 	"sort"
 )
@@ -35,18 +36,18 @@ func (c *IndividualEvents) WriteHTMLTo(w io.Writer) (int64, error) {
 	}
 
 	for _, family := range c.individual.Families() {
-		marriage := gedcom.First(gedcom.NodesWithTag(family, gedcom.TagMarriage))
+		marriage := gedcom.First(gedcom.NodesWithTag(family, tag.TagMarriage))
 		if marriage == nil {
 			continue
 		}
 
-		date := gedcom.First(gedcom.NodesWithTag(marriage, gedcom.TagDate))
+		date := gedcom.First(gedcom.NodesWithTag(marriage, tag.TagDate))
 		if date == nil {
 			continue
 		}
 
 		place := ""
-		if p := gedcom.First(gedcom.NodesWithTag(marriage, gedcom.TagPlace)); p != nil {
+		if p := gedcom.First(gedcom.NodesWithTag(marriage, tag.TagPlace)); p != nil {
 			place = p.Value()
 		}
 

@@ -1,6 +1,7 @@
 package gedcom_test
 
 import (
+	"github.com/elliotchance/gedcom/tag"
 	"testing"
 
 	"github.com/elliotchance/gedcom"
@@ -12,7 +13,7 @@ func TestNewResidenceNode(t *testing.T) {
 	child := gedcom.NewNameNode("")
 	node := gedcom.NewResidenceNode("foo", child)
 
-	assert.Equal(t, gedcom.TagResidence, node.Tag())
+	assert.Equal(t, tag.TagResidence, node.Tag())
 	assert.Equal(t, gedcom.Nodes{child}, node.Nodes())
 	assert.Equal(t, "foo", node.Value())
 	assert.Equal(t, "", node.Pointer())
@@ -76,7 +77,7 @@ func TestResidenceNode_Equals(t *testing.T) {
 	)
 	r2 := gedcom.NewResidenceNode("",
 		gedcom.NewPlaceNode("Worcestershire"),
-		gedcom.NewSourceNode("@S619368193@", "", gedcom.NewNode(gedcom.TagFromString("_APID"), "1,2056::540816", "")),
+		gedcom.NewSourceNode("@S619368193@", "", gedcom.NewNode(tag.TagFromString("_APID"), "1,2056::540816", "")),
 	)
 	Equals(r1, r2).Returns(true)
 }

@@ -1,6 +1,7 @@
 package gedcom
 
 import (
+	"github.com/elliotchance/gedcom/tag"
 	"reflect"
 	"sync"
 )
@@ -26,7 +27,7 @@ func NewNodes(ns interface{}) (nodes Nodes) {
 // If the provided node is nil then an empty slice will always be returned.
 //
 // If the node is nil the result will also be nil.
-func NodesWithTag(node Node, tag Tag) (result Nodes) {
+func NodesWithTag(node Node, tag tag.Tag) (result Nodes) {
 	if v1, ok1 := nodeCache.Load(node); ok1 {
 		if v2, ok2 := v1.(*sync.Map).Load(tag); ok2 {
 			return v2.(Nodes)
@@ -63,7 +64,7 @@ func NodesWithTag(node Node, tag Tag) (result Nodes) {
 //   birthPlaces := NodesWithTagPath(individual, TagBirth, TagPlace)
 //
 // If the node is nil the result will also be nil.
-func NodesWithTagPath(node Node, tagPath ...Tag) Nodes {
+func NodesWithTagPath(node Node, tagPath ...tag.Tag) Nodes {
 	if IsNil(node) {
 		return nil
 	}
@@ -75,7 +76,7 @@ func NodesWithTagPath(node Node, tagPath ...Tag) Nodes {
 	return nodesWithTagPath(node, tagPath...)
 }
 
-func nodesWithTagPath(node Node, tagPath ...Tag) Nodes {
+func nodesWithTagPath(node Node, tagPath ...tag.Tag) Nodes {
 	if len(tagPath) == 0 {
 		return Nodes{node}
 	}
@@ -126,11 +127,11 @@ func (nodes Nodes) CastTo(t interface{}) interface{} {
 	return slice.Interface()
 }
 
-func castNodesWithTag(node Node, tag Tag, t interface{}) interface{} {
+func castNodesWithTag(node Node, tag tag.Tag, t interface{}) interface{} {
 	return NodesWithTag(node, tag).CastTo(t)
 }
 
-func DeleteNodesWithTag(node Node, tag Tag) {
+func DeleteNodesWithTag(node Node, tag tag.Tag) {
 	for _, n := range node.Nodes() {
 		if n.Tag().Is(tag) {
 			node.DeleteNode(n)

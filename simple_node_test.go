@@ -1,6 +1,7 @@
 package gedcom_test
 
 import (
+	"github.com/elliotchance/gedcom/tag"
 	"testing"
 
 	"github.com/elliotchance/gedcom"
@@ -9,7 +10,7 @@ import (
 )
 
 func TestSimpleNode_ChildNodes(t *testing.T) {
-	node := gedcom.NewNode(gedcom.TagText, "", "")
+	node := gedcom.NewNode(tag.TagText, "", "")
 
 	assert.Len(t, node.Nodes(), 0)
 }
@@ -31,18 +32,18 @@ func TestSimpleNode_Equals(t *testing.T) {
 
 	left := []*gedcom.SimpleNode{
 		(*gedcom.SimpleNode)(nil),
-		gedcom.NewNode(gedcom.TagVersion, "", "").(*gedcom.SimpleNode),
-		gedcom.NewNode(gedcom.TagVersion, "a", "").(*gedcom.SimpleNode),
-		gedcom.NewNode(gedcom.TagVersion, "", "b").(*gedcom.SimpleNode),
-		gedcom.NewNode(gedcom.TagVersion, "a", "b").(*gedcom.SimpleNode),
+		gedcom.NewNode(tag.TagVersion, "", "").(*gedcom.SimpleNode),
+		gedcom.NewNode(tag.TagVersion, "a", "").(*gedcom.SimpleNode),
+		gedcom.NewNode(tag.TagVersion, "", "b").(*gedcom.SimpleNode),
+		gedcom.NewNode(tag.TagVersion, "a", "b").(*gedcom.SimpleNode),
 	}
 
 	right := gedcom.Nodes{
 		(*gedcom.SimpleNode)(nil),
-		gedcom.NewNode(gedcom.TagVersion, "", "").(*gedcom.SimpleNode),
-		gedcom.NewNode(gedcom.TagVersion, "a", "").(*gedcom.SimpleNode),
-		gedcom.NewNode(gedcom.TagVersion, "", "b").(*gedcom.SimpleNode),
-		gedcom.NewNode(gedcom.TagVersion, "a", "b").(*gedcom.SimpleNode),
+		gedcom.NewNode(tag.TagVersion, "", "").(*gedcom.SimpleNode),
+		gedcom.NewNode(tag.TagVersion, "a", "").(*gedcom.SimpleNode),
+		gedcom.NewNode(tag.TagVersion, "", "b").(*gedcom.SimpleNode),
+		gedcom.NewNode(tag.TagVersion, "a", "b").(*gedcom.SimpleNode),
 		gedcom.NewNameNode(""),
 	}
 
@@ -67,7 +68,7 @@ func TestSimpleNode_Equals(t *testing.T) {
 func TestSimpleNode_Tag(t *testing.T) {
 	Tag := tf.Function(t, (*gedcom.SimpleNode).Tag)
 
-	Tag((*gedcom.SimpleNode)(nil)).Returns(gedcom.Tag{})
+	Tag((*gedcom.SimpleNode)(nil)).Returns(tag.Tag{})
 }
 
 func TestSimpleNode_Value(t *testing.T) {
@@ -113,15 +114,15 @@ func TestSimpleNode_GEDCOMLine(t *testing.T) {
 	GEDCOMLine := tf.NamedFunction(t, "SimpleNode_GEDCOMLine",
 		(*gedcom.SimpleNode).GEDCOMLine)
 
-	GEDCOMLine(gedcom.NewNode(gedcom.TagBirth, "foo", "72").(*gedcom.BirthNode).SimpleNode, 0).
+	GEDCOMLine(gedcom.NewNode(tag.TagBirth, "foo", "72").(*gedcom.BirthNode).SimpleNode, 0).
 		Returns("0 @72@ BIRT foo")
 
-	GEDCOMLine(gedcom.NewNode(gedcom.TagDeath, "bar", "baz").(*gedcom.DeathNode).SimpleNode, 3).Returns("3 @baz@ DEAT bar")
+	GEDCOMLine(gedcom.NewNode(tag.TagDeath, "bar", "baz").(*gedcom.DeathNode).SimpleNode, 3).Returns("3 @baz@ DEAT bar")
 
 	GEDCOMLine(gedcom.NewDateNode("3 SEP 1945").SimpleNode, 2).
 		Returns("2 DATE 3 SEP 1945")
 
-	GEDCOMLine(gedcom.NewNode(gedcom.TagBirth, "foo", "72").(*gedcom.BirthNode).SimpleNode, -1).
+	GEDCOMLine(gedcom.NewNode(tag.TagBirth, "foo", "72").(*gedcom.BirthNode).SimpleNode, -1).
 		Returns("@72@ BIRT foo")
 }
 

@@ -1,5 +1,7 @@
 package gedcom
 
+import "github.com/elliotchance/gedcom/tag"
+
 // LongitudeNode represents a value indicating a coordinate position on a line,
 // plane, or space.
 //
@@ -11,6 +13,6 @@ type LongitudeNode struct {
 // NewLongitudeNode creates a new LONG node.
 func NewLongitudeNode(value string, children ...Node) *LongitudeNode {
 	return &LongitudeNode{
-		newSimpleNode(TagLongitude, value, "", children...),
+		newSimpleNode(tag.TagLongitude, value, "", children...),
 	}
 }

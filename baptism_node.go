@@ -1,5 +1,7 @@
 package gedcom
 
+import "github.com/elliotchance/gedcom/tag"
+
 // BaptismNode is event of baptism (not LDS), performed in infancy or later.
 //
 // See also BAPL and CHR.
@@ -10,7 +12,7 @@ type BaptismNode struct {
 // NewBaptismNode creates a new BAPM node.
 func NewBaptismNode(value string, children ...Node) *BaptismNode {
 	return &BaptismNode{
-		newSimpleNode(TagBaptism, value, "", children...),
+		newSimpleNode(tag.TagBaptism, value, "", children...),
 	}
 }
 

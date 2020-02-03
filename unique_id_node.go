@@ -1,6 +1,9 @@
 package gedcom
 
-import "strings"
+import (
+	"github.com/elliotchance/gedcom/tag"
+	"strings"
+)
 
 // UniqueIDNode represents a _UID.
 //
@@ -41,7 +44,7 @@ type UniqueIDNode struct {
 
 func NewUniqueIDNode(value string, children ...Node) *UniqueIDNode {
 	return &UniqueIDNode{
-		newSimpleNode(UnofficialTagUniqueID, value, "", children...),
+		newSimpleNode(tag.UnofficialTagUniqueID, value, "", children...),
 	}
 }
 

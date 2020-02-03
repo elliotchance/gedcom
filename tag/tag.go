@@ -1,4 +1,4 @@
-package gedcom
+package tag
 
 import "fmt"
 

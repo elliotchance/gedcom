@@ -2,6 +2,7 @@ package gedcom
 
 import (
 	"fmt"
+	"github.com/elliotchance/gedcom/tag"
 )
 
 // DateNode represents a DATE node.
@@ -20,7 +21,7 @@ type DateNode struct {
 // NewDateNode creates a new DATE node.
 func NewDateNode(value string, children ...Node) *DateNode {
 	return &DateNode{
-		newSimpleNode(TagDate, value, "", children...),
+		newSimpleNode(tag.TagDate, value, "", children...),
 		false, DateRange{},
 	}
 }

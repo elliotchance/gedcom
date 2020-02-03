@@ -1,5 +1,7 @@
 package gedcom
 
+import "github.com/elliotchance/gedcom/tag"
+
 // DeathNode is the event when mortal life terminates.
 type DeathNode struct {
 	*SimpleNode
@@ -8,7 +10,7 @@ type DeathNode struct {
 // NewDeathNode creates a new DEAT node.
 func NewDeathNode(value string, children ...Node) *DeathNode {
 	return &DeathNode{
-		newSimpleNode(TagDeath, value, "", children...),
+		newSimpleNode(tag.TagDeath, value, "", children...),
 	}
 }
 

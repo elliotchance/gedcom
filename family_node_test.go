@@ -1,6 +1,7 @@
 package gedcom_test
 
 import (
+	"github.com/elliotchance/gedcom/tag"
 	"testing"
 
 	"github.com/elliotchance/gedcom"
@@ -355,7 +356,7 @@ var familyWarningTests = map[string]struct {
 				SetSex(gedcom.SexFemale)
 
 			f1 := doc.AddFamilyWithHusbandAndWife("F1", p1, p2)
-			f1.AddNode(gedcom.NewNode(gedcom.TagMarriage, "", "",
+			f1.AddNode(gedcom.NewNode(tag.TagMarriage, "", "",
 				gedcom.NewDateNode("1995")))
 		},
 		[]string{
@@ -374,7 +375,7 @@ var familyWarningTests = map[string]struct {
 				SetSex(gedcom.SexFemale)
 
 			f1 := doc.AddFamilyWithHusbandAndWife("F1", p1, p2)
-			f1.AddNode(gedcom.NewNode(gedcom.TagMarriage, "", "",
+			f1.AddNode(gedcom.NewNode(tag.TagMarriage, "", "",
 				gedcom.NewDateNode("1995")))
 		},
 		[]string{
@@ -393,7 +394,7 @@ var familyWarningTests = map[string]struct {
 				SetSex(gedcom.SexFemale)
 
 			f1 := doc.AddFamilyWithHusbandAndWife("F1", p1, p2)
-			f1.AddNode(gedcom.NewNode(gedcom.TagMarriage, "", "",
+			f1.AddNode(gedcom.NewNode(tag.TagMarriage, "", "",
 				gedcom.NewDateNode("1995")))
 		},
 		[]string{
@@ -413,7 +414,7 @@ var familyWarningTests = map[string]struct {
 				SetSex(gedcom.SexFemale)
 
 			f1 := doc.AddFamilyWithHusbandAndWife("F1", p1, p2)
-			f1.AddNode(gedcom.NewNode(gedcom.TagMarriage, "", "",
+			f1.AddNode(gedcom.NewNode(tag.TagMarriage, "", "",
 				gedcom.NewDateNode("1999")))
 		},
 		[]string{
@@ -432,7 +433,7 @@ var familyWarningTests = map[string]struct {
 				SetSex(gedcom.SexFemale)
 
 			f1 := doc.AddFamilyWithHusbandAndWife("F1", p1, p2)
-			f1.AddNode(gedcom.NewNode(gedcom.TagMarriage, "", "",
+			f1.AddNode(gedcom.NewNode(tag.TagMarriage, "", "",
 				gedcom.NewDateNode("1995")))
 		},
 		[]string{
@@ -451,7 +452,7 @@ var familyWarningTests = map[string]struct {
 				SetSex(gedcom.SexFemale)
 
 			f1 := doc.AddFamilyWithHusbandAndWife("F1", p1, p2)
-			f1.AddNode(gedcom.NewNode(gedcom.TagMarriage, "", "",
+			f1.AddNode(gedcom.NewNode(tag.TagMarriage, "", "",
 				gedcom.NewDateNode("1995")))
 		},
 		[]string{
@@ -471,7 +472,7 @@ var familyWarningTests = map[string]struct {
 				SetSex(gedcom.SexFemale)
 
 			f1 := doc.AddFamilyWithHusbandAndWife("F1", p1, p2)
-			f1.AddNode(gedcom.NewNode(gedcom.TagMarriage, "", ""))
+			f1.AddNode(gedcom.NewNode(tag.TagMarriage, "", ""))
 		},
 		nil,
 	},

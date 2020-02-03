@@ -2,6 +2,7 @@ package gedcom_test
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/tag"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -15,7 +16,7 @@ func TestPlaces(t *testing.T) {
 		{nil, nil},
 		{
 			gedcom.Nodes{
-				gedcom.NewNode(gedcom.TagVersion, "foo", ""),
+				gedcom.NewNode(tag.TagVersion, "foo", ""),
 			},
 			nil,
 		},

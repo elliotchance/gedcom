@@ -1,6 +1,7 @@
 package gedcom_test
 
 import (
+	"github.com/elliotchance/gedcom/tag"
 	"testing"
 
 	"github.com/elliotchance/gedcom"
@@ -13,7 +14,7 @@ func TestNewFormatNode(t *testing.T) {
 
 	assert.NotNil(t, node)
 	assert.IsType(t, node, (*gedcom.FormatNode)(nil))
-	assert.Equal(t, gedcom.TagFormat, node.Tag())
+	assert.Equal(t, tag.TagFormat, node.Tag())
 	assert.Equal(t, gedcom.Nodes{child}, node.Nodes())
 	assert.Equal(t, "foo", node.Value())
 	assert.Equal(t, "", node.Pointer())

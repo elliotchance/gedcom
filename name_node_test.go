@@ -1,6 +1,7 @@
 package gedcom_test
 
 import (
+	"github.com/elliotchance/gedcom/tag"
 	"testing"
 
 	"github.com/elliotchance/gedcom"
@@ -135,8 +136,8 @@ var nameTests = []struct {
 		// The GivenName overrides the givenName name if provided. When multiple
 		// GivenNames are provided then it will always use the first one.
 		node: gedcom.NewNameNode("First /Last/ II",
-			gedcom.NewNode(gedcom.TagGivenName, " Other  Name ", ""),
-			gedcom.NewNode(gedcom.TagGivenName, "Uh-oh", ""),
+			gedcom.NewNode(tag.TagGivenName, " Other  Name ", ""),
+			gedcom.NewNode(tag.TagGivenName, "Uh-oh", ""),
 		),
 		title:         "",
 		prefix:        "",
@@ -151,8 +152,8 @@ var nameTests = []struct {
 		// The Surname overrides the surname name if provided. When multiple
 		// Surnames are provided then it will always use the first one.
 		node: gedcom.NewNameNode("First /Last/ II",
-			gedcom.NewNode(gedcom.TagSurname, " Other  name ", ""),
-			gedcom.NewNode(gedcom.TagSurname, "uh-oh", ""),
+			gedcom.NewNode(tag.TagSurname, " Other  name ", ""),
+			gedcom.NewNode(tag.TagSurname, "uh-oh", ""),
 		),
 		title:         "",
 		prefix:        "",
@@ -165,8 +166,8 @@ var nameTests = []struct {
 	},
 	{
 		node: gedcom.NewNameNode("First /Last/ Esq.",
-			gedcom.NewNode(gedcom.TagNamePrefix, " Mr ", ""),
-			gedcom.NewNode(gedcom.TagNamePrefix, "Dr", ""),
+			gedcom.NewNode(tag.TagNamePrefix, " Mr ", ""),
+			gedcom.NewNode(tag.TagNamePrefix, "Dr", ""),
 		),
 		title:         "",
 		prefix:        "Mr",
@@ -182,9 +183,9 @@ var nameTests = []struct {
 		// When multiple name suffixes are provided then it will always use the
 		// first one.
 		node: gedcom.NewNameNode("First /Last/ Suffix",
-			gedcom.NewNode(gedcom.TagNameSuffix, " Esq. ", ""),
-			gedcom.NewNode(gedcom.TagNameSuffix, "Dr", ""),
-			gedcom.NewNode(gedcom.TagNamePrefix, "Sir", ""),
+			gedcom.NewNode(tag.TagNameSuffix, " Esq. ", ""),
+			gedcom.NewNode(tag.TagNameSuffix, "Dr", ""),
+			gedcom.NewNode(tag.TagNamePrefix, "Sir", ""),
 		),
 		title:         "",
 		prefix:        "Sir",
@@ -197,8 +198,8 @@ var nameTests = []struct {
 	},
 	{
 		node: gedcom.NewNameNode("First /Last/ Esq.",
-			gedcom.NewNode(gedcom.TagSurnamePrefix, " Foo ", ""),
-			gedcom.NewNode(gedcom.TagSurnamePrefix, "Bar", ""),
+			gedcom.NewNode(tag.TagSurnamePrefix, " Foo ", ""),
+			gedcom.NewNode(tag.TagSurnamePrefix, "Bar", ""),
 		),
 		title:         "",
 		prefix:        "",
@@ -211,8 +212,8 @@ var nameTests = []struct {
 	},
 	{
 		node: gedcom.NewNameNode("First /Last/ Esq.",
-			gedcom.NewNode(gedcom.TagTitle, " Grand  Duke ", ""),
-			gedcom.NewNode(gedcom.TagTitle, "Nobody", ""),
+			gedcom.NewNode(tag.TagTitle, " Grand  Duke ", ""),
+			gedcom.NewNode(tag.TagTitle, "Nobody", ""),
 		),
 		title:         "Grand Duke",
 		prefix:        "",
@@ -302,12 +303,12 @@ func TestNameNode_Format(t *testing.T) {
 	Format(nil, "%f %l").Returns("")
 
 	name := gedcom.NewNameNode("",
-		gedcom.NewNode(gedcom.TagGivenName, "Given", ""),
-		gedcom.NewNode(gedcom.TagSurname, "Surname", ""),
-		gedcom.NewNode(gedcom.TagNamePrefix, "Prefix", ""),
-		gedcom.NewNode(gedcom.TagNameSuffix, "Suffix", ""),
-		gedcom.NewNode(gedcom.TagSurnamePrefix, "SurnamePrefix", ""),
-		gedcom.NewNode(gedcom.TagTitle, "Title", ""),
+		gedcom.NewNode(tag.TagGivenName, "Given", ""),
+		gedcom.NewNode(tag.TagSurname, "Surname", ""),
+		gedcom.NewNode(tag.TagNamePrefix, "Prefix", ""),
+		gedcom.NewNode(tag.TagNameSuffix, "Suffix", ""),
+		gedcom.NewNode(tag.TagSurnamePrefix, "SurnamePrefix", ""),
+		gedcom.NewNode(tag.TagTitle, "Title", ""),
 	)
 
 	Format(name, "").Returns("")

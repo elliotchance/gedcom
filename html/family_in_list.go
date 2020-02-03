@@ -3,6 +3,7 @@ package html
 import (
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html/core"
+	"github.com/elliotchance/gedcom/tag"
 	"io"
 )
 
@@ -22,7 +23,7 @@ func NewFamilyInList(document *gedcom.Document, family *gedcom.FamilyNode, visib
 
 func (c *FamilyInList) WriteHTMLTo(w io.Writer) (int64, error) {
 	date := "-"
-	n := gedcom.First(gedcom.NodesWithTagPath(c.family, gedcom.TagMarriage, gedcom.TagDate))
+	n := gedcom.First(gedcom.NodesWithTagPath(c.family, tag.TagMarriage, tag.TagDate))
 	if n != nil {
 		date = n.Value()
 	}

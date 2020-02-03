@@ -1,5 +1,7 @@
 package gedcom
 
+import "github.com/elliotchance/gedcom/tag"
+
 // EventNode is a noteworthy happening related to an individual, a group, or an
 // organization.
 type EventNode struct {
@@ -9,7 +11,7 @@ type EventNode struct {
 // EventNode creates a new EVEN node.
 func NewEventNode(value string, children ...Node) *EventNode {
 	return &EventNode{
-		newSimpleNode(TagEvent, value, "", children...),
+		newSimpleNode(tag.TagEvent, value, "", children...),
 	}
 }
 

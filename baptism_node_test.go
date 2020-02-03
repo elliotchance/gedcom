@@ -1,6 +1,7 @@
 package gedcom_test
 
 import (
+	"github.com/elliotchance/gedcom/tag"
 	"testing"
 
 	"github.com/elliotchance/gedcom"
@@ -12,7 +13,7 @@ func TestNewBaptismNode(t *testing.T) {
 	child := gedcom.NewNameNode("")
 	node := gedcom.NewBaptismNode("foo", child)
 
-	assert.Equal(t, gedcom.TagBaptism, node.Tag())
+	assert.Equal(t, tag.TagBaptism, node.Tag())
 	assert.Equal(t, gedcom.Nodes{child}, node.Nodes())
 	assert.Equal(t, "foo", node.Value())
 	assert.Equal(t, "", node.Pointer())

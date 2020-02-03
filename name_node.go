@@ -1,6 +1,7 @@
 package gedcom
 
 import (
+	"github.com/elliotchance/gedcom/tag"
 	"regexp"
 	"strings"
 	"unicode"
@@ -14,7 +15,7 @@ type NameNode struct {
 
 func NewNameNode(value string, children ...Node) *NameNode {
 	return &NameNode{
-		newSimpleNode(TagName, value, "", children...),
+		newSimpleNode(tag.TagName, value, "", children...),
 	}
 }
 
@@ -32,7 +33,7 @@ func (node *NameNode) GivenName() string {
 	}
 
 	// GivenName is the proper first name.
-	givenNames := NodesWithTag(node, TagGivenName)
+	givenNames := NodesWithTag(node, tag.TagGivenName)
 	if len(givenNames) > 0 {
 		return CleanSpace(givenNames[0].Value())
 	}
@@ -48,7 +49,7 @@ func (node *NameNode) Surname() string {
 	}
 
 	// Surname is the proper last name.
-	surnames := NodesWithTag(node, TagSurname)
+	surnames := NodesWithTag(node, tag.TagSurname)
 	if len(surnames) > 0 {
 		return CleanSpace(surnames[0].Value())
 	}
@@ -72,7 +73,7 @@ func (node *NameNode) Prefix() string {
 
 	// NamePrefix is the proper name prefix. If it is not provided then no
 	// prefix should be returned.
-	namePrefixes := NodesWithTag(node, TagNamePrefix)
+	namePrefixes := NodesWithTag(node, tag.TagNamePrefix)
 	if len(namePrefixes) > 0 {
 		return CleanSpace(namePrefixes[0].Value())
 	}
@@ -86,7 +87,7 @@ func (node *NameNode) Suffix() string {
 	}
 
 	// NameSuffix is the proper name suffix.
-	nameSuffixes := NodesWithTag(node, TagNameSuffix)
+	nameSuffixes := NodesWithTag(node, tag.TagNameSuffix)
 	if len(nameSuffixes) > 0 {
 		return CleanSpace(nameSuffixes[0].Value())
 	}
@@ -101,7 +102,7 @@ func (node *NameNode) SurnamePrefix() string {
 	}
 
 	// SurnameSuffix is the proper surname prefix.
-	surnamePrefixes := NodesWithTag(node, TagSurnamePrefix)
+	surnamePrefixes := NodesWithTag(node, tag.TagSurnamePrefix)
 	if len(surnamePrefixes) > 0 {
 		return CleanSpace(surnamePrefixes[0].Value())
 	}
@@ -116,7 +117,7 @@ func (node *NameNode) Title() string {
 	}
 
 	// Title is the proper individual title.
-	titles := NodesWithTag(node, TagTitle)
+	titles := NodesWithTag(node, tag.TagTitle)
 	if len(titles) > 0 {
 		return CleanSpace(titles[0].Value())
 	}
@@ -136,7 +137,7 @@ func (node *NameNode) Type() NameType {
 		return NameTypeNormal
 	}
 
-	if nameType := First(NodesWithTag(node, TagType)); nameType != nil {
+	if nameType := First(NodesWithTag(node, tag.TagType)); nameType != nil {
 		return NameType(nameType.Value())
 	}
 

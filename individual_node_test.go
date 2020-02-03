@@ -2,6 +2,7 @@ package gedcom_test
 
 import (
 	"fmt"
+	"github.com/elliotchance/gedcom/tag"
 	"strings"
 	"testing"
 
@@ -37,7 +38,7 @@ var individualTests = []struct {
 	{
 		node: gedcom.NewDocument().AddIndividual("P1",
 			gedcom.NewNameNode("Joe /Bloggs/"),
-			gedcom.NewNode(gedcom.TagVersion, "", ""),
+			gedcom.NewNode(tag.TagVersion, "", ""),
 			gedcom.NewNameNode("John /Doe/"),
 		),
 		names: []*gedcom.NameNode{
@@ -48,7 +49,7 @@ var individualTests = []struct {
 	},
 	{
 		node: gedcom.NewDocument().AddIndividual("P1",
-			gedcom.NewNode(gedcom.TagSex, "M", ""),
+			gedcom.NewNode(tag.TagSex, "M", ""),
 		),
 		names: []*gedcom.NameNode{},
 		sex:   gedcom.NewSexNode(gedcom.SexMale),
@@ -56,7 +57,7 @@ var individualTests = []struct {
 	{
 		node: gedcom.NewDocument().AddIndividual("P2",
 			gedcom.NewNameNode("Joan /Bloggs/"),
-			gedcom.NewNode(gedcom.TagSex, "F", ""),
+			gedcom.NewNode(tag.TagSex, "F", ""),
 		),
 		names: []*gedcom.NameNode{
 			gedcom.NewNameNode("Joan /Bloggs/"),
@@ -118,7 +119,7 @@ func TestIndividualNode_Births(t *testing.T) {
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
 				gedcom.NewBirthNode(""),
-				gedcom.NewNode(gedcom.TagDeath, "", ""),
+				gedcom.NewNode(tag.TagDeath, "", ""),
 			),
 			births: []*gedcom.BirthNode{
 				gedcom.NewBirthNode(""),
@@ -127,7 +128,7 @@ func TestIndividualNode_Births(t *testing.T) {
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
 				gedcom.NewBirthNode("foo"),
-				gedcom.NewNode(gedcom.TagDeath, "", ""),
+				gedcom.NewNode(tag.TagDeath, "", ""),
 				gedcom.NewBirthNode("bar"),
 			),
 			births: []*gedcom.BirthNode{
@@ -164,7 +165,7 @@ func TestIndividualNode_Baptisms(t *testing.T) {
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
-				gedcom.NewNode(gedcom.TagBaptism, "", ""),
+				gedcom.NewNode(tag.TagBaptism, "", ""),
 			),
 			baptisms: []*gedcom.BaptismNode{
 				gedcom.NewBaptismNode(""),
@@ -172,14 +173,14 @@ func TestIndividualNode_Baptisms(t *testing.T) {
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
-				gedcom.NewNode(gedcom.TagLDSBaptism, "", ""),
+				gedcom.NewNode(tag.TagLDSBaptism, "", ""),
 			),
 			baptisms: []*gedcom.BaptismNode{},
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
-				gedcom.NewNode(gedcom.TagBaptism, "", ""),
-				gedcom.NewNode(gedcom.TagDeath, "", ""),
+				gedcom.NewNode(tag.TagBaptism, "", ""),
+				gedcom.NewNode(tag.TagDeath, "", ""),
 			),
 			baptisms: []*gedcom.BaptismNode{
 				gedcom.NewBaptismNode(""),
@@ -187,9 +188,9 @@ func TestIndividualNode_Baptisms(t *testing.T) {
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
-				gedcom.NewNode(gedcom.TagBaptism, "foo", ""),
-				gedcom.NewNode(gedcom.TagDeath, "", ""),
-				gedcom.NewNode(gedcom.TagBaptism, "bar", ""),
+				gedcom.NewNode(tag.TagBaptism, "foo", ""),
+				gedcom.NewNode(tag.TagDeath, "", ""),
+				gedcom.NewNode(tag.TagBaptism, "bar", ""),
 			),
 			baptisms: []*gedcom.BaptismNode{
 				gedcom.NewBaptismNode("foo"),
@@ -225,7 +226,7 @@ func TestIndividualNode_Deaths(t *testing.T) {
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
-				gedcom.NewNode(gedcom.TagDeath, "", ""),
+				gedcom.NewNode(tag.TagDeath, "", ""),
 			),
 			deaths: []*gedcom.DeathNode{
 				gedcom.NewDeathNode(""),
@@ -233,7 +234,7 @@ func TestIndividualNode_Deaths(t *testing.T) {
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
-				gedcom.NewNode(gedcom.TagDeath, "", ""),
+				gedcom.NewNode(tag.TagDeath, "", ""),
 				gedcom.NewBirthNode(""),
 			),
 			deaths: []*gedcom.DeathNode{
@@ -242,9 +243,9 @@ func TestIndividualNode_Deaths(t *testing.T) {
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
-				gedcom.NewNode(gedcom.TagDeath, "foo", ""),
-				gedcom.NewNode(gedcom.TagBurial, "", ""),
-				gedcom.NewNode(gedcom.TagDeath, "bar", ""),
+				gedcom.NewNode(tag.TagDeath, "foo", ""),
+				gedcom.NewNode(tag.TagBurial, "", ""),
+				gedcom.NewNode(tag.TagDeath, "bar", ""),
 			),
 			deaths: []*gedcom.DeathNode{
 				gedcom.NewDeathNode("foo"),
@@ -280,7 +281,7 @@ func TestIndividualNode_Burials(t *testing.T) {
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
-				gedcom.NewNode(gedcom.TagBurial, "", ""),
+				gedcom.NewNode(tag.TagBurial, "", ""),
 			),
 			burials: []*gedcom.BurialNode{
 				gedcom.NewBurialNode(""),
@@ -288,7 +289,7 @@ func TestIndividualNode_Burials(t *testing.T) {
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
-				gedcom.NewNode(gedcom.TagBurial, "", ""),
+				gedcom.NewNode(tag.TagBurial, "", ""),
 				gedcom.NewBirthNode(""),
 			),
 			burials: []*gedcom.BurialNode{
@@ -297,9 +298,9 @@ func TestIndividualNode_Burials(t *testing.T) {
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
-				gedcom.NewNode(gedcom.TagBurial, "foo", ""),
-				gedcom.NewNode(gedcom.TagBaptism, "", ""),
-				gedcom.NewNode(gedcom.TagBurial, "bar", ""),
+				gedcom.NewNode(tag.TagBurial, "foo", ""),
+				gedcom.NewNode(tag.TagBaptism, "", ""),
+				gedcom.NewNode(tag.TagBurial, "bar", ""),
 			),
 			burials: []*gedcom.BurialNode{
 				gedcom.NewBurialNode("foo"),
@@ -524,36 +525,36 @@ func TestIndividualNode_LDSBaptisms(t *testing.T) {
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
-				gedcom.NewNode(gedcom.TagLDSBaptism, "", ""),
+				gedcom.NewNode(tag.TagLDSBaptism, "", ""),
 			),
 			baptisms: gedcom.Nodes{
-				gedcom.NewNode(gedcom.TagLDSBaptism, "", ""),
+				gedcom.NewNode(tag.TagLDSBaptism, "", ""),
 			},
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
-				gedcom.NewNode(gedcom.TagBaptism, "", ""),
+				gedcom.NewNode(tag.TagBaptism, "", ""),
 			),
 			baptisms: gedcom.Nodes{},
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
-				gedcom.NewNode(gedcom.TagLDSBaptism, "", ""),
-				gedcom.NewNode(gedcom.TagDeath, "", ""),
+				gedcom.NewNode(tag.TagLDSBaptism, "", ""),
+				gedcom.NewNode(tag.TagDeath, "", ""),
 			),
 			baptisms: gedcom.Nodes{
-				gedcom.NewNode(gedcom.TagLDSBaptism, "", ""),
+				gedcom.NewNode(tag.TagLDSBaptism, "", ""),
 			},
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
-				gedcom.NewNode(gedcom.TagLDSBaptism, "foo", ""),
-				gedcom.NewNode(gedcom.TagDeath, "", ""),
-				gedcom.NewNode(gedcom.TagLDSBaptism, "bar", ""),
+				gedcom.NewNode(tag.TagLDSBaptism, "foo", ""),
+				gedcom.NewNode(tag.TagDeath, "", ""),
+				gedcom.NewNode(tag.TagLDSBaptism, "bar", ""),
 			),
 			baptisms: gedcom.Nodes{
-				gedcom.NewNode(gedcom.TagLDSBaptism, "foo", ""),
-				gedcom.NewNode(gedcom.TagLDSBaptism, "bar", ""),
+				gedcom.NewNode(tag.TagLDSBaptism, "foo", ""),
+				gedcom.NewNode(tag.TagLDSBaptism, "bar", ""),
 			},
 		},
 	}
@@ -603,7 +604,7 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
-				gedcom.NewNode(gedcom.TagBaptism, "", "",
+				gedcom.NewNode(tag.TagBaptism, "", "",
 					gedcom.NewDateNode("Abt. Dec 1980"),
 				),
 			),
@@ -612,7 +613,7 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
-				gedcom.NewNode(gedcom.TagLDSBaptism, "", "",
+				gedcom.NewNode(tag.TagLDSBaptism, "", "",
 					gedcom.NewDateNode("Abt. Nov 1980"),
 				),
 			),
@@ -626,7 +627,7 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 				gedcom.NewBirthNode("",
 					gedcom.NewDateNode("1 Aug 1980"),
 				),
-				gedcom.NewNode(gedcom.TagBaptism, "", "",
+				gedcom.NewNode(tag.TagBaptism, "", "",
 					gedcom.NewDateNode("Abt. Jan 1980"),
 				),
 			),
@@ -648,7 +649,7 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 				gedcom.NewBirthNode("",
 					gedcom.NewDateNode("1 Aug 1980"),
 				),
-				gedcom.NewNode(gedcom.TagLDSBaptism, "", "",
+				gedcom.NewNode(tag.TagLDSBaptism, "", "",
 					gedcom.NewDateNode("23 Mar 1979"),
 				),
 			),
@@ -658,7 +659,7 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
 				gedcom.NewBirthNode(""),
-				gedcom.NewNode(gedcom.TagLDSBaptism, "", ""),
+				gedcom.NewNode(tag.TagLDSBaptism, "", ""),
 			),
 			expected:     nil,
 			isBirthEvent: false,
@@ -666,7 +667,7 @@ func TestIndividualNode_EstimatedBirthDate(t *testing.T) {
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
 				gedcom.NewBirthNode(""),
-				gedcom.NewNode(gedcom.TagLDSBaptism, "", "",
+				gedcom.NewNode(tag.TagLDSBaptism, "", "",
 					gedcom.NewDateNode("1 Aug 1980"),
 				),
 			),
@@ -719,7 +720,7 @@ func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 		// A single date.
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
-				gedcom.NewNode(gedcom.TagDeath, "", "",
+				gedcom.NewNode(tag.TagDeath, "", "",
 					gedcom.NewDateNode("1 Aug 1980"),
 				),
 			),
@@ -728,7 +729,7 @@ func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
-				gedcom.NewNode(gedcom.TagBurial, "", "",
+				gedcom.NewNode(tag.TagBurial, "", "",
 					gedcom.NewDateNode("Abt. Dec 1980"),
 				),
 			),
@@ -740,7 +741,7 @@ func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 		{
 			// Multiple death dates always returns the earliest.
 			node: gedcom.NewDocument().AddIndividual("P1",
-				gedcom.NewNode(gedcom.TagDeath, "", "",
+				gedcom.NewNode(tag.TagDeath, "", "",
 					gedcom.NewDateNode("1 Aug 1980"),
 					gedcom.NewDateNode("Mar 1980"),
 					gedcom.NewDateNode("Jun 1980"),
@@ -752,7 +753,7 @@ func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 		{
 			// Multiple burial dates always returns the earliest.
 			node: gedcom.NewDocument().AddIndividual("P1",
-				gedcom.NewNode(gedcom.TagBurial, "", "",
+				gedcom.NewNode(tag.TagBurial, "", "",
 					gedcom.NewDateNode("3 Aug 1980"),
 					gedcom.NewDateNode("Apr 1980"),
 				),
@@ -763,10 +764,10 @@ func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 		{
 			// Death is before burial.
 			node: gedcom.NewDocument().AddIndividual("P1",
-				gedcom.NewNode(gedcom.TagDeath, "", "",
+				gedcom.NewNode(tag.TagDeath, "", "",
 					gedcom.NewDateNode("1 Aug 1980"),
 				),
-				gedcom.NewNode(gedcom.TagBurial, "", "",
+				gedcom.NewNode(tag.TagBurial, "", "",
 					gedcom.NewDateNode("3 Aug 1980"),
 				),
 			),
@@ -776,10 +777,10 @@ func TestIndividualNode_EstimatedDeathDate(t *testing.T) {
 		{
 			// Burial is before death.
 			node: gedcom.NewDocument().AddIndividual("P1",
-				gedcom.NewNode(gedcom.TagDeath, "", "",
+				gedcom.NewNode(tag.TagDeath, "", "",
 					gedcom.NewDateNode("3 Aug 1980"),
 				),
-				gedcom.NewNode(gedcom.TagBurial, "", "",
+				gedcom.NewNode(tag.TagBurial, "", "",
 					gedcom.NewDateNode("1 Aug 1980"),
 				),
 			),
@@ -1380,7 +1381,7 @@ func TestIndividualNode_AllEvents(t *testing.T) {
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
 				gedcom.NewBirthNode(""),
-				gedcom.NewNode(gedcom.TagNote, "", ""),
+				gedcom.NewNode(tag.TagNote, "", ""),
 			),
 			events: gedcom.Nodes{
 				gedcom.NewBirthNode(""),
@@ -1389,22 +1390,22 @@ func TestIndividualNode_AllEvents(t *testing.T) {
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
 				gedcom.NewBirthNode(""),
-				gedcom.NewNode(gedcom.TagDeath, "", ""),
+				gedcom.NewNode(tag.TagDeath, "", ""),
 			),
 			events: gedcom.Nodes{
 				gedcom.NewBirthNode(""),
-				gedcom.NewNode(gedcom.TagDeath, "", ""),
+				gedcom.NewNode(tag.TagDeath, "", ""),
 			},
 		},
 		{
 			node: gedcom.NewDocument().AddIndividual("P1",
 				gedcom.NewBirthNode("foo"),
-				gedcom.NewNode(gedcom.TagDeath, "", ""),
+				gedcom.NewNode(tag.TagDeath, "", ""),
 				gedcom.NewBirthNode("bar"),
 			),
 			events: gedcom.Nodes{
 				gedcom.NewBirthNode("foo"),
-				gedcom.NewNode(gedcom.TagDeath, "", ""),
+				gedcom.NewNode(tag.TagDeath, "", ""),
 				gedcom.NewBirthNode("bar"),
 			},
 		},
@@ -1767,19 +1768,19 @@ func TestIndividualNode_FamilySearchIDs(t *testing.T) {
 
 	FamilySearchIDs(gedcom.NewDocument().AddIndividual("",
 		gedcom.NewNameNode(""),
-		gedcom.NewFamilySearchIDNode(gedcom.UnofficialTagFamilySearchID1, "LZDP-V7V"),
+		gedcom.NewFamilySearchIDNode(tag.UnofficialTagFamilySearchID1, "LZDP-V7V"),
 	)).Returns([]*gedcom.FamilySearchIDNode{
-		gedcom.NewFamilySearchIDNode(gedcom.UnofficialTagFamilySearchID1, "LZDP-V7V"),
+		gedcom.NewFamilySearchIDNode(tag.UnofficialTagFamilySearchID1, "LZDP-V7V"),
 	})
 
 	FamilySearchIDs(gedcom.NewDocument().AddIndividual("",
-		gedcom.NewFamilySearchIDNode(gedcom.UnofficialTagFamilySearchID2, "AZDP-V7V"),
-		gedcom.NewFamilySearchIDNode(gedcom.UnofficialTagFamilySearchID1, "BZDP-V7V"),
-		gedcom.NewFamilySearchIDNode(gedcom.UnofficialTagFamilySearchID2, "CZDP-V7V"),
+		gedcom.NewFamilySearchIDNode(tag.UnofficialTagFamilySearchID2, "AZDP-V7V"),
+		gedcom.NewFamilySearchIDNode(tag.UnofficialTagFamilySearchID1, "BZDP-V7V"),
+		gedcom.NewFamilySearchIDNode(tag.UnofficialTagFamilySearchID2, "CZDP-V7V"),
 	)).Returns([]*gedcom.FamilySearchIDNode{
-		gedcom.NewFamilySearchIDNode(gedcom.UnofficialTagFamilySearchID1, "BZDP-V7V"),
-		gedcom.NewFamilySearchIDNode(gedcom.UnofficialTagFamilySearchID2, "AZDP-V7V"),
-		gedcom.NewFamilySearchIDNode(gedcom.UnofficialTagFamilySearchID2, "CZDP-V7V"),
+		gedcom.NewFamilySearchIDNode(tag.UnofficialTagFamilySearchID1, "BZDP-V7V"),
+		gedcom.NewFamilySearchIDNode(tag.UnofficialTagFamilySearchID2, "AZDP-V7V"),
+		gedcom.NewFamilySearchIDNode(tag.UnofficialTagFamilySearchID2, "CZDP-V7V"),
 	})
 }
 

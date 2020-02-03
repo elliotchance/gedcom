@@ -1,5 +1,7 @@
 package gedcom
 
+import "github.com/elliotchance/gedcom/tag"
+
 // BurialNode is the event of the proper disposing of the mortal remains of a
 // deceased person.
 type BurialNode struct {
@@ -9,7 +11,7 @@ type BurialNode struct {
 // NewBurialNode creates a new BURI node.
 func NewBurialNode(value string, children ...Node) *BurialNode {
 	return &BurialNode{
-		newSimpleNode(TagBurial, value, "", children...),
+		newSimpleNode(tag.TagBurial, value, "", children...),
 	}
 }
 

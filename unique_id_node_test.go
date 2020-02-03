@@ -3,6 +3,7 @@ package gedcom_test
 import (
 	"errors"
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/tag"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -42,7 +43,7 @@ func TestNewUniqueIDNode(t *testing.T) {
 
 	assert.NotNil(t, node)
 	assert.IsType(t, node, (*gedcom.UniqueIDNode)(nil))
-	assert.Equal(t, gedcom.UnofficialTagUniqueID, node.Tag())
+	assert.Equal(t, tag.UnofficialTagUniqueID, node.Tag())
 	assert.Equal(t, gedcom.Nodes{child}, node.Nodes())
 	assert.Equal(t, "foo", node.Value())
 	assert.Equal(t, "", node.Pointer())

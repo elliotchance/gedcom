@@ -1,6 +1,9 @@
 package gedcom
 
-import "strings"
+import (
+	"github.com/elliotchance/gedcom/tag"
+	"strings"
+)
 
 // PlaceNode represents a jurisdictional name to identify the place or location
 // of an event.
@@ -17,7 +20,7 @@ type PlaceNode struct {
 // http://wiki-en.genealogy.net/GEDCOM/PLAC-Tag
 func NewPlaceNode(value string, children ...Node) *PlaceNode {
 	return &PlaceNode{
-		newSimpleNode(TagPlace, value, "", children...),
+		newSimpleNode(tag.TagPlace, value, "", children...),
 	}
 }
 
@@ -121,7 +124,7 @@ func (node *PlaceNode) Country() string {
 //
 // See JurisdictionalName() for a more reliable way to determine the Format.
 func (node *PlaceNode) Format() *FormatNode {
-	n := First(NodesWithTag(node, TagFormat))
+	n := First(NodesWithTag(node, tag.TagFormat))
 
 	if IsNil(n) {
 		return nil
@@ -141,7 +144,7 @@ func (node *PlaceNode) Format() *FormatNode {
 func (node *PlaceNode) PhoneticVariations() []*PhoneticVariationNode {
 	t := (*PhoneticVariationNode)(nil)
 
-	return castNodesWithTag(node, TagPhonetic, t).([]*PhoneticVariationNode)
+	return castNodesWithTag(node, tag.TagPhonetic, t).([]*PhoneticVariationNode)
 }
 
 // RomanizedVariations of the place name are written in the same form prescribed
@@ -156,11 +159,11 @@ func (node *PlaceNode) PhoneticVariations() []*PhoneticVariationNode {
 func (node *PlaceNode) RomanizedVariations() []*RomanizedVariationNode {
 	t := (*RomanizedVariationNode)(nil)
 
-	return castNodesWithTag(node, TagRomanized, t).([]*RomanizedVariationNode)
+	return castNodesWithTag(node, tag.TagRomanized, t).([]*RomanizedVariationNode)
 }
 
 func (node *PlaceNode) Map() *MapNode {
-	n := First(NodesWithTag(node, TagMap))
+	n := First(NodesWithTag(node, tag.TagMap))
 
 	if IsNil(n) {
 		return nil
@@ -172,7 +175,7 @@ func (node *PlaceNode) Map() *MapNode {
 func (node *PlaceNode) Notes() []*NoteNode {
 	t := (*NoteNode)(nil)
 
-	return castNodesWithTag(node, TagNote, t).([]*NoteNode)
+	return castNodesWithTag(node, tag.TagNote, t).([]*NoteNode)
 }
 
 // JurisdictionalEntities returns the name, county, state and country.

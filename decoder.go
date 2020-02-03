@@ -23,6 +23,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"github.com/elliotchance/gedcom/tag"
 	"io"
 	"regexp"
 	"strconv"
@@ -248,7 +249,7 @@ func parseLine(line string, document *Document, family *FamilyNode) (Node, int, 
 	}
 
 	// Tag (required).
-	tag := TagFromString(parts[3])
+	tag := tag.TagFromString(parts[3])
 
 	// Value (optional).
 	value := parts[4]
@@ -261,112 +262,112 @@ func parseLine(line string, document *Document, family *FamilyNode) (Node, int, 
 //
 // If the node tag is recognised as a more specific type, such as *DateNode then
 // that will be returned. Otherwise a *SimpleNode will be used.
-func NewNode(tag Tag, value, pointer string, children ...Node) Node {
+func NewNode(tag tag.Tag, value, pointer string, children ...Node) Node {
 	return newNodeWithChildren(nil, nil, tag, value, pointer, children)
 }
 
-func newNode(document *Document, family *FamilyNode, tag Tag, value, pointer string) Node {
+func newNode(document *Document, family *FamilyNode, tag tag.Tag, value, pointer string) Node {
 	return newNodeWithChildren(document, family, tag, value, pointer, nil)
 }
 
-func newNodeWithChildren(document *Document, family *FamilyNode, tag Tag, value, pointer string, children Nodes) Node {
+func newNodeWithChildren(document *Document, family *FamilyNode, t tag.Tag, value, pointer string, children Nodes) Node {
 	var node Node
 
-	switch tag {
-	case TagBaptism:
+	switch t {
+	case tag.TagBaptism:
 		node = NewBaptismNode(value, children...)
 
-	case TagBirth:
+	case tag.TagBirth:
 		node = NewBirthNode(value, children...)
 
-	case TagBurial:
+	case tag.TagBurial:
 		node = NewBurialNode(value, children...)
 
-	case TagChild:
-		needsFamily(family, tag)
+	case tag.TagChild:
+		needsFamily(family, t)
 
 		node = newChildNode(family, value, children...)
 
-	case TagDate:
+	case tag.TagDate:
 		node = NewDateNode(value, children...)
 
-	case TagDeath:
+	case tag.TagDeath:
 		node = NewDeathNode(value, children...)
 
-	case TagEvent:
+	case tag.TagEvent:
 		node = NewEventNode(value, children...)
 
-	case TagFamily:
-		needsDocument(document, tag)
+	case tag.TagFamily:
+		needsDocument(document, t)
 
 		node = newFamilyNode(document, pointer, children...)
 
-	case UnofficialTagFamilySearchID1, UnofficialTagFamilySearchID2:
-		node = NewFamilySearchIDNode(tag, value, children...)
+	case tag.UnofficialTagFamilySearchID1, tag.UnofficialTagFamilySearchID2:
+		node = NewFamilySearchIDNode(t, value, children...)
 
-	case TagFormat:
+	case tag.TagFormat:
 		node = NewFormatNode(value, children...)
 
-	case TagHusband:
-		needsFamily(family, tag)
+	case tag.TagHusband:
+		needsFamily(family, t)
 
 		node = newHusbandNode(family, value, children...)
 
-	case TagIndividual:
-		needsDocument(document, tag)
+	case tag.TagIndividual:
+		needsDocument(document, t)
 
 		node = newIndividualNode(document, pointer, children...)
 
-	case TagLatitude:
+	case tag.TagLatitude:
 		node = NewLatitudeNode(value, children...)
 
-	case TagLongitude:
+	case tag.TagLongitude:
 		node = NewLongitudeNode(value, children...)
 
-	case TagMap:
+	case tag.TagMap:
 		node = NewMapNode(value, children...)
 
-	case TagName:
+	case tag.TagName:
 		node = NewNameNode(value, children...)
 
-	case TagNickname:
+	case tag.TagNickname:
 		node = NewNicknameNode(value, children...)
 
-	case TagNote:
+	case tag.TagNote:
 		node = NewNoteNode(value, children...)
 
-	case TagPhonetic:
+	case tag.TagPhonetic:
 		node = NewPhoneticVariationNode(value, children...)
 
-	case TagPlace:
+	case tag.TagPlace:
 		node = NewPlaceNode(value, children...)
 
-	case TagResidence:
+	case tag.TagResidence:
 		node = NewResidenceNode(value, children...)
 
-	case TagRomanized:
+	case tag.TagRomanized:
 		node = NewRomanizedVariationNode(value, children...)
 
-	case TagSex:
+	case tag.TagSex:
 		node = NewSexNode(value)
 
-	case TagSource:
+	case tag.TagSource:
 		node = NewSourceNode(value, pointer, children...)
 
-	case TagType:
+	case tag.TagType:
 		node = NewTypeNode(value, children...)
 
-	case UnofficialTagUniqueID:
+	case tag.UnofficialTagUniqueID:
 		node = NewUniqueIDNode(value, children...)
 
-	case TagWife:
-		needsFamily(family, tag)
+	case tag.TagWife:
+		needsFamily(family, t)
 
 		node = newWifeNode(family, value, children...)
 	}
 
 	if IsNil(node) {
-		node = newSimpleNode(tag, value, pointer, children...)
+		node = newSimpleNode(t, value, pointer, children...)
 	} else {
 		simpleNode := node.RawSimpleNode()
 		simpleNode.pointer = pointer
@@ -375,13 +376,13 @@ func newNodeWithChildren(document *Document, family *FamilyNode, tag Tag, value,
 	return node
 }
 
-func needsDocument(document *Document, tag Tag) {
+func needsDocument(document *Document, tag tag.Tag) {
 	if document == nil {
 		panic(fmt.Sprintf("cannot create %s without a document", tag))
 	}
 }
 
-func needsFamily(family *FamilyNode, tag Tag) {
+func needsFamily(family *FamilyNode, tag tag.Tag) {
 	if family == nil {
 		panic(fmt.Sprintf("cannot create %s without a family", tag))
 	}

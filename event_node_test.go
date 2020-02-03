@@ -1,6 +1,7 @@
 package gedcom_test
 
 import (
+	"github.com/elliotchance/gedcom/tag"
 	"testing"
 
 	"github.com/elliotchance/gedcom"
@@ -12,7 +13,7 @@ func TestNewEventNode(t *testing.T) {
 	child := gedcom.NewNameNode("")
 	node := gedcom.NewEventNode("foo", child)
 
-	assert.Equal(t, gedcom.TagEvent, node.Tag())
+	assert.Equal(t, tag.TagEvent, node.Tag())
 	assert.Equal(t, gedcom.Nodes{child}, node.Nodes())
 	assert.Equal(t, "foo", node.Value())
 	assert.Equal(t, "", node.Pointer())
@@ -53,7 +54,7 @@ func TestEventNode_Equals(t *testing.T) {
 		gedcom.NewDateNode("Oct 1943"),
 	)
 	n5 := gedcom.NewEventNode("",
-		gedcom.NewNode(gedcom.TagType, "Domicilie", ""),
+		gedcom.NewNode(tag.TagType, "Domicilie", ""),
 		gedcom.NewPlaceNode("Washington, District of Columbia, District of Columbia, United States"),
 	)
 

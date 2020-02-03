@@ -1,5 +1,7 @@
 package gedcom
 
+import "github.com/elliotchance/gedcom/tag"
+
 // ResidenceNode is the act of dwelling at an address for a period of time.
 type ResidenceNode struct {
 	*SimpleNode
@@ -8,7 +10,7 @@ type ResidenceNode struct {
 // NewResidenceNode creates a new RESI node.
 func NewResidenceNode(value string, children ...Node) *ResidenceNode {
 	return &ResidenceNode{
-		newSimpleNode(TagResidence, value, "", children...),
+		newSimpleNode(tag.TagResidence, value, "", children...),
 	}
 }
 
@@ -55,8 +57,8 @@ func (node *ResidenceNode) Equals(node2 Node) bool {
 		// specify a date. NodesWithTag would be expensive to run all the time,
 		// so only use it when we know both sides do not have a date.
 		if len(leftDates)+len(rightDates) == 0 {
-			leftPlaces := NodesWithTag(node, TagPlace)
-			rightPlaces := NodesWithTag(node2, TagPlace)
+			leftPlaces := NodesWithTag(node, tag.TagPlace)
+			rightPlaces := NodesWithTag(node2, tag.TagPlace)
 
 			return DeepEqualNodes(leftPlaces, rightPlaces)
 		}

@@ -1,6 +1,7 @@
 package gedcom_test
 
 import (
+	"github.com/elliotchance/gedcom/tag"
 	"testing"
 
 	"github.com/elliotchance/gedcom"
@@ -9,27 +10,27 @@ import (
 
 var familySearchIDNodeTests = map[string]struct {
 	node  *gedcom.FamilySearchIDNode
-	tag   gedcom.Tag
+	tag   tag.Tag
 	value string
 }{
 	"1": {
-		node:  gedcom.NewFamilySearchIDNode(gedcom.UnofficialTagFamilySearchID1, "LZDP-V7V"),
-		tag:   gedcom.UnofficialTagFamilySearchID1,
+		node:  gedcom.NewFamilySearchIDNode(tag.UnofficialTagFamilySearchID1, "LZDP-V7V"),
+		tag:   tag.UnofficialTagFamilySearchID1,
 		value: "LZDP-V7V",
 	},
 	"2": {
-		node:  gedcom.NewFamilySearchIDNode(gedcom.UnofficialTagFamilySearchID2, "ZZDP-V7V"),
-		tag:   gedcom.UnofficialTagFamilySearchID2,
+		node:  gedcom.NewFamilySearchIDNode(tag.UnofficialTagFamilySearchID2, "ZZDP-V7V"),
+		tag:   tag.UnofficialTagFamilySearchID2,
 		value: "ZZDP-V7V",
 	},
 }
 
 func TestNewFamilySearchIDNode(t *testing.T) {
-	node := gedcom.NewFamilySearchIDNode(gedcom.UnofficialTagFamilySearchID2, "LZDP-V7V")
+	node := gedcom.NewFamilySearchIDNode(tag.UnofficialTagFamilySearchID2, "LZDP-V7V")
 
 	assert.NotNil(t, node)
 	assert.IsType(t, node, (*gedcom.FamilySearchIDNode)(nil))
-	assert.Equal(t, gedcom.UnofficialTagFamilySearchID2, node.Tag())
+	assert.Equal(t, tag.UnofficialTagFamilySearchID2, node.Tag())
 	assert.Equal(t, gedcom.Nodes(nil), node.Nodes())
 	assert.Equal(t, "LZDP-V7V", node.Value())
 	assert.Equal(t, "", node.Pointer())
@@ -44,8 +45,8 @@ func TestNewFamilySearchIDNode_String(t *testing.T) {
 }
 
 func TestFamilySearchIDNodeTags(t *testing.T) {
-	assert.Equal(t, []gedcom.Tag{
-		gedcom.UnofficialTagFamilySearchID1,
-		gedcom.UnofficialTagFamilySearchID2,
+	assert.Equal(t, []tag.Tag{
+		tag.UnofficialTagFamilySearchID1,
+		tag.UnofficialTagFamilySearchID2,
 	}, gedcom.FamilySearchIDNodeTags())
 }

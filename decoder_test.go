@@ -1,6 +1,7 @@
 package gedcom_test
 
 import (
+	"github.com/elliotchance/gedcom/tag"
 	"strings"
 	"testing"
 
@@ -23,30 +24,30 @@ var decoderTests = map[string]struct {
 	"OnlyRoot": {
 		"0 HEAD",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagHeader, "", ""))
+			doc.AddNode(gedcom.NewNode(tag.TagHeader, "", ""))
 		},
 	},
 	"OneChild1": {
 		"0 HEAD\n1 CHAR UTF-8",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagHeader, "", "",
-				gedcom.NewNode(gedcom.TagCharacterSet, "UTF-8", ""),
+			doc.AddNode(gedcom.NewNode(tag.TagHeader, "", "",
+				gedcom.NewNode(tag.TagCharacterSet, "UTF-8", ""),
 			))
 		},
 	},
 	"OneChild2": {
 		"0 HEAD\n\n1 CHAR UTF-8\n",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagHeader, "", "",
-				gedcom.NewNode(gedcom.TagCharacterSet, "UTF-8", ""),
+			doc.AddNode(gedcom.NewNode(tag.TagHeader, "", "",
+				gedcom.NewNode(tag.TagCharacterSet, "UTF-8", ""),
 			))
 		},
 	},
 	"TwoChildren": {
 		"0 HEAD\n1 CHAR UTF-8\n1 @S1@ SOUR Ancestry.com Family Trees",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagHeader, "", "",
-				gedcom.NewNode(gedcom.TagCharacterSet, "UTF-8", ""),
+			doc.AddNode(gedcom.NewNode(tag.TagHeader, "", "",
+				gedcom.NewNode(tag.TagCharacterSet, "UTF-8", ""),
 				gedcom.NewSourceNode("Ancestry.com Family Trees", "S1"),
 			))
 		},
@@ -54,16 +55,16 @@ var decoderTests = map[string]struct {
 	"TwoIdenticalChildren": {
 		"0 HEAD\n1 CHAR UTF-8\n1 CHAR UTF-8",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagHeader, "", "",
-				gedcom.NewNode(gedcom.TagCharacterSet, "UTF-8", ""),
-				gedcom.NewNode(gedcom.TagCharacterSet, "UTF-8", ""),
+			doc.AddNode(gedcom.NewNode(tag.TagHeader, "", "",
+				gedcom.NewNode(tag.TagCharacterSet, "UTF-8", ""),
+				gedcom.NewNode(tag.TagCharacterSet, "UTF-8", ""),
 			))
 		},
 	},
 	"SpaceInValue": {
 		"0 HEAD\n1 @S1@ SOUR Ancestry.com Family Trees",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagHeader, "", "",
+			doc.AddNode(gedcom.NewNode(tag.TagHeader, "", "",
 				gedcom.NewSourceNode("Ancestry.com Family Trees", "S1"),
 			))
 		},
@@ -71,7 +72,7 @@ var decoderTests = map[string]struct {
 	"SimpleChild": {
 		"0 HEAD\n1 BIRT",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagHeader, "", "",
+			doc.AddNode(gedcom.NewNode(tag.TagHeader, "", "",
 				gedcom.NewBirthNode(""),
 			))
 		},
@@ -79,9 +80,9 @@ var decoderTests = map[string]struct {
 	"ThreeDeep1": {
 		"0 HEAD\n1 GEDC\n2 VERS (2010.3)",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagHeader, "", "",
-				gedcom.NewNode(gedcom.TagGedcomInformation, "", "",
-					gedcom.NewNode(gedcom.TagVersion, "(2010.3)", ""),
+			doc.AddNode(gedcom.NewNode(tag.TagHeader, "", "",
+				gedcom.NewNode(tag.TagGedcomInformation, "", "",
+					gedcom.NewNode(tag.TagVersion, "(2010.3)", ""),
 				),
 			))
 		},
@@ -89,9 +90,9 @@ var decoderTests = map[string]struct {
 	"ThreeDeep2": {
 		"0 HEAD\n1 GEDC\n2 VERS 5.5",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagHeader, "", "",
-				gedcom.NewNode(gedcom.TagGedcomInformation, "", "",
-					gedcom.NewNode(gedcom.TagVersion, "5.5", ""),
+			doc.AddNode(gedcom.NewNode(tag.TagHeader, "", "",
+				gedcom.NewNode(tag.TagGedcomInformation, "", "",
+					gedcom.NewNode(tag.TagVersion, "5.5", ""),
 				),
 			))
 		},
@@ -99,8 +100,8 @@ var decoderTests = map[string]struct {
 	"FORM": {
 		"0 HEAD\n1 GEDC\n2 FORM LINEAGE-LINKED",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagHeader, "", "",
-				gedcom.NewNode(gedcom.TagGedcomInformation, "", "",
+			doc.AddNode(gedcom.NewNode(tag.TagHeader, "", "",
+				gedcom.NewNode(tag.TagGedcomInformation, "", "",
 					gedcom.NewFormatNode("LINEAGE-LINKED"),
 				),
 			))
@@ -109,7 +110,7 @@ var decoderTests = map[string]struct {
 	"PLAC": {
 		"0 HEAD\n1 BIRT\n2 PLAC Camperdown, Nsw, Australia",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagHeader, "", "",
+			doc.AddNode(gedcom.NewNode(tag.TagHeader, "", "",
 				gedcom.NewBirthNode("",
 					gedcom.NewPlaceNode("Camperdown, Nsw, Australia"),
 				),
@@ -119,7 +120,7 @@ var decoderTests = map[string]struct {
 	"NAME": {
 		"0 HEAD\n1 NAME Elliot Rupert de Peyster /Chance/",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagHeader, "", "",
+			doc.AddNode(gedcom.NewNode(tag.TagHeader, "", "",
 				gedcom.NewNameNode("Elliot Rupert de Peyster /Chance/"),
 			))
 		},
@@ -127,15 +128,15 @@ var decoderTests = map[string]struct {
 	"Pointer": {
 		"0 HEAD\n0 @P1@ INDI",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagHeader, "", ""))
+			doc.AddNode(gedcom.NewNode(tag.TagHeader, "", ""))
 			doc.AddIndividual("P1")
 		},
 	},
 	"NestedPointer": {
 		"0 HEAD\n1 SEX M\n0 @P1@ INDI",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagHeader, "", "",
-				gedcom.NewNode(gedcom.TagSex, "M", ""),
+			doc.AddNode(gedcom.NewNode(tag.TagHeader, "", "",
+				gedcom.NewNode(tag.TagSex, "M", ""),
 			))
 			doc.AddIndividual("P1")
 		},
@@ -143,26 +144,26 @@ var decoderTests = map[string]struct {
 	"SEX": {
 		"0 HEAD\n1 SEX M",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagHeader, "", "",
-				gedcom.NewNode(gedcom.TagSex, "M", ""),
+			doc.AddNode(gedcom.NewNode(tag.TagHeader, "", "",
+				gedcom.NewNode(tag.TagSex, "M", ""),
 			))
 		},
 	},
 	"Nested1": {
 		"0 HEAD\n1 BIRT\n2 PLAC Camperdown, Nsw, Australia\n1 SEX M",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagHeader, "", "",
+			doc.AddNode(gedcom.NewNode(tag.TagHeader, "", "",
 				gedcom.NewBirthNode("",
 					gedcom.NewPlaceNode("Camperdown, Nsw, Australia"),
 				),
-				gedcom.NewNode(gedcom.TagSex, "M", ""),
+				gedcom.NewNode(tag.TagSex, "M", ""),
 			))
 		},
 	},
 	"MultipleRoots": {
 		"0 HEAD\n0 @P1@ INDI\n1 BIRT",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagHeader, "", ""))
+			doc.AddNode(gedcom.NewNode(tag.TagHeader, "", ""))
 			doc.AddIndividual("P1",
 				gedcom.NewBirthNode(""),
 			)
@@ -171,8 +172,8 @@ var decoderTests = map[string]struct {
 	"Nested2": {
 		"0 HEAD\n1 GEDC\n2 FORM LINEAGE-LINKED\n0 @P1@ INDI",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagHeader, "", "",
-				gedcom.NewNode(gedcom.TagGedcomInformation, "", "",
+			doc.AddNode(gedcom.NewNode(tag.TagHeader, "", "",
+				gedcom.NewNode(tag.TagGedcomInformation, "", "",
 					gedcom.NewFormatNode("LINEAGE-LINKED"),
 				),
 			))
@@ -182,52 +183,52 @@ var decoderTests = map[string]struct {
 	"Nested3": {
 		"0 HEAD0\n1 HEAD1\n2 HEAD2\n3 HEAD3\n0 HEAD00",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagFromString("HEAD0"), "", "",
-				gedcom.NewNode(gedcom.TagFromString("HEAD1"), "", "",
-					gedcom.NewNode(gedcom.TagFromString("HEAD2"), "", "",
-						gedcom.NewNode(gedcom.TagFromString("HEAD3"), "", ""),
+			doc.AddNode(gedcom.NewNode(tag.TagFromString("HEAD0"), "", "",
+				gedcom.NewNode(tag.TagFromString("HEAD1"), "", "",
+					gedcom.NewNode(tag.TagFromString("HEAD2"), "", "",
+						gedcom.NewNode(tag.TagFromString("HEAD3"), "", ""),
 					),
 				),
 			))
-			doc.AddNode(gedcom.NewNode(gedcom.TagFromString("HEAD00"), "", ""))
+			doc.AddNode(gedcom.NewNode(tag.TagFromString("HEAD00"), "", ""))
 		},
 	},
 	"Nested4": {
 		"0 HEAD0\n1 HEAD1\n2 HEAD2\n3 HEAD3\n1 HEAD10",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagFromString("HEAD0"), "", "",
-				gedcom.NewNode(gedcom.TagFromString("HEAD1"), "", "",
-					gedcom.NewNode(gedcom.TagFromString("HEAD2"), "", "",
-						gedcom.NewNode(gedcom.TagFromString("HEAD3"), "", ""),
+			doc.AddNode(gedcom.NewNode(tag.TagFromString("HEAD0"), "", "",
+				gedcom.NewNode(tag.TagFromString("HEAD1"), "", "",
+					gedcom.NewNode(tag.TagFromString("HEAD2"), "", "",
+						gedcom.NewNode(tag.TagFromString("HEAD3"), "", ""),
 					),
 				),
-				gedcom.NewNode(gedcom.TagFromString("HEAD10"), "", ""),
+				gedcom.NewNode(tag.TagFromString("HEAD10"), "", ""),
 			))
 		},
 	},
 	"BadTag1": {
 		"0 HEAD0\r1 HEAD1",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagFromString("HEAD0"), "", "",
-				gedcom.NewNode(gedcom.TagFromString("HEAD1"), "", ""),
+			doc.AddNode(gedcom.NewNode(tag.TagFromString("HEAD0"), "", "",
+				gedcom.NewNode(tag.TagFromString("HEAD1"), "", ""),
 			))
 		},
 	},
 	"WindowsLineEnding": {
 		"0 HEAD0\r\n1 HEAD1",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagFromString("HEAD0"), "", "",
-				gedcom.NewNode(gedcom.TagFromString("HEAD1"), "", ""),
+			doc.AddNode(gedcom.NewNode(tag.TagFromString("HEAD0"), "", "",
+				gedcom.NewNode(tag.TagFromString("HEAD1"), "", ""),
 			))
 		},
 	},
 	"BadTag2": {
 		"0 HEAD0\n1 HEAD1\n1 HEAD10\n2 HEAD2",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagFromString("HEAD0"), "", "",
-				gedcom.NewNode(gedcom.TagFromString("HEAD1"), "", ""),
-				gedcom.NewNode(gedcom.TagFromString("HEAD10"), "", "",
-					gedcom.NewNode(gedcom.TagFromString("HEAD2"), "", ""),
+			doc.AddNode(gedcom.NewNode(tag.TagFromString("HEAD0"), "", "",
+				gedcom.NewNode(tag.TagFromString("HEAD1"), "", ""),
+				gedcom.NewNode(tag.TagFromString("HEAD10"), "", "",
+					gedcom.NewNode(tag.TagFromString("HEAD2"), "", ""),
 				),
 			))
 		},
@@ -235,7 +236,7 @@ var decoderTests = map[string]struct {
 	"SpaceWithoutValue": {
 		"0 HEAD\n1 BIRT ",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagHeader, "", "",
+			doc.AddNode(gedcom.NewNode(tag.TagHeader, "", "",
 				gedcom.NewBirthNode(""),
 			))
 		},
@@ -247,7 +248,7 @@ var decoderTests = map[string]struct {
 				gedcom.NewBirthNode("",
 					gedcom.NewDateNode("1851"),
 				),
-				gedcom.NewNode(gedcom.TagDeath, "", "",
+				gedcom.NewNode(tag.TagDeath, "", "",
 					gedcom.NewDateNode("1856"),
 				),
 			)
@@ -294,7 +295,7 @@ var decoderTests = map[string]struct {
 	"NonGreedyConsume": {
 		"0 @uh@ NAME oh@ok",
 		func(doc *gedcom.Document) {
-			doc.AddNode(gedcom.NewNode(gedcom.TagName, "oh@ok", "uh"))
+			doc.AddNode(gedcom.NewNode(tag.TagName, "oh@ok", "uh"))
 		},
 	},
 }
@@ -336,7 +337,7 @@ func TestDecoder_Decode(t *testing.T) {
 		assert.NoError(t, err)
 
 		doc := gedcom.NewDocument()
-		doc.AddNode(gedcom.NewNode(gedcom.TagFromString("_PUBLISH"), "", ""))
+		doc.AddNode(gedcom.NewNode(tag.TagFromString("_PUBLISH"), "", ""))
 
 		assertDocumentEqual(t, doc, actual)
 	})
@@ -345,8 +346,8 @@ func TestDecoder_Decode(t *testing.T) {
 		ged := "\xEF\xBB\xBF0 HEAD\n1 CHAR UTF-8"
 		decoder := gedcom.NewDecoder(strings.NewReader(ged))
 		expected := gedcom.NewDocumentWithNodes(gedcom.Nodes{
-			gedcom.NewNode(gedcom.TagHeader, "", "",
-				gedcom.NewNode(gedcom.TagCharacterSet, "UTF-8", ""),
+			gedcom.NewNode(tag.TagHeader, "", "",
+				gedcom.NewNode(tag.TagCharacterSet, "UTF-8", ""),
 			),
 		})
 		expected.HasBOM = true
@@ -374,7 +375,7 @@ func TestDecoder_Decode(t *testing.T) {
 		actual, err := decoder.Decode()
 		if assert.NoError(t, err) {
 			doc := gedcom.NewDocument()
-			doc.AddNode(gedcom.NewNode(gedcom.TagFromString("TEXT"), "Karen Marie McMillan<br>Gender: Female<br>Birth: Aug 21 1957 - \n\n\t&nbsp;Texas, USA", ""))
+			doc.AddNode(gedcom.NewNode(tag.TagFromString("TEXT"), "Karen Marie McMillan<br>Gender: Female<br>Birth: Aug 21 1957 - \n\n\t&nbsp;Texas, USA", ""))
 
 			assertDocumentEqual(t, doc, actual)
 		}
@@ -396,8 +397,8 @@ func TestDecoder_Decode(t *testing.T) {
 		if assert.NoError(t, err) {
 			doc := gedcom.NewDocument()
 			doc.AddIndividual("I59238932",
-				gedcom.NewNode(gedcom.TagFromString("NPFX"), "Mrs William Cornens", ""),
-				gedcom.NewNode(gedcom.TagFromString("SEX"), "F", ""))
+				gedcom.NewNode(tag.TagFromString("NPFX"), "Mrs William Cornens", ""),
+				gedcom.NewNode(tag.TagFromString("SEX"), "F", ""))
 
 			assertDocumentEqual(t, doc, actual)
 		}
@@ -441,32 +442,32 @@ func TestNewNode(t *testing.T) {
 	// Nodes that require a document like Individual and Family are not included
 	// in this tests.
 	for _, test := range []struct {
-		tag      gedcom.Tag
+		tag      tag.Tag
 		expected gedcom.Node
 	}{
-		{gedcom.TagBaptism, gedcom.NewBaptismNode(v)},
-		{gedcom.TagBirth, gedcom.NewBirthNode(v)},
-		{gedcom.TagBurial, gedcom.NewBurialNode(v)},
-		{gedcom.TagDate, gedcom.NewDateNode(v)},
-		{gedcom.TagDeath, gedcom.NewDeathNode(v)},
-		{gedcom.TagEvent, gedcom.NewEventNode(v)},
-		{gedcom.UnofficialTagFamilySearchID1, gedcom.NewFamilySearchIDNode(gedcom.UnofficialTagFamilySearchID1, v)},
-		{gedcom.UnofficialTagFamilySearchID2, gedcom.NewFamilySearchIDNode(gedcom.UnofficialTagFamilySearchID2, v)},
-		{gedcom.TagFormat, gedcom.NewFormatNode(v)},
-		{gedcom.TagLatitude, gedcom.NewLatitudeNode(v)},
-		{gedcom.TagLongitude, gedcom.NewLongitudeNode(v)},
-		{gedcom.TagMap, gedcom.NewMapNode(v)},
-		{gedcom.TagName, gedcom.NewNameNode(v)},
-		{gedcom.TagNote, gedcom.NewNoteNode(v)},
-		{gedcom.TagNickname, gedcom.NewNicknameNode(v)},
-		{gedcom.TagPhonetic, gedcom.NewPhoneticVariationNode(v)},
-		{gedcom.TagPlace, gedcom.NewPlaceNode(v)},
-		{gedcom.TagResidence, gedcom.NewResidenceNode(v)},
-		{gedcom.TagRomanized, gedcom.NewRomanizedVariationNode(v)},
-		{gedcom.TagSource, gedcom.NewSourceNode(v, p)},
-		{gedcom.TagType, gedcom.NewTypeNode(v)},
-		{gedcom.TagVersion, gedcom.NewNode(gedcom.TagVersion, v, p)},
-		{gedcom.UnofficialTagUniqueID, gedcom.NewUniqueIDNode(v)},
+		{tag.TagBaptism, gedcom.NewBaptismNode(v)},
+		{tag.TagBirth, gedcom.NewBirthNode(v)},
+		{tag.TagBurial, gedcom.NewBurialNode(v)},
+		{tag.TagDate, gedcom.NewDateNode(v)},
+		{tag.TagDeath, gedcom.NewDeathNode(v)},
+		{tag.TagEvent, gedcom.NewEventNode(v)},
+		{tag.UnofficialTagFamilySearchID1, gedcom.NewFamilySearchIDNode(tag.UnofficialTagFamilySearchID1, v)},
+		{tag.UnofficialTagFamilySearchID2, gedcom.NewFamilySearchIDNode(tag.UnofficialTagFamilySearchID2, v)},
+		{tag.TagFormat, gedcom.NewFormatNode(v)},
+		{tag.TagLatitude, gedcom.NewLatitudeNode(v)},
+		{tag.TagLongitude, gedcom.NewLongitudeNode(v)},
+		{tag.TagMap, gedcom.NewMapNode(v)},
+		{tag.TagName, gedcom.NewNameNode(v)},
+		{tag.TagNote, gedcom.NewNoteNode(v)},
+		{tag.TagNickname, gedcom.NewNicknameNode(v)},
+		{tag.TagPhonetic, gedcom.NewPhoneticVariationNode(v)},
+		{tag.TagPlace, gedcom.NewPlaceNode(v)},
+		{tag.TagResidence, gedcom.NewResidenceNode(v)},
+		{tag.TagRomanized, gedcom.NewRomanizedVariationNode(v)},
+		{tag.TagSource, gedcom.NewSourceNode(v, p)},
+		{tag.TagType, gedcom.NewTypeNode(v)},
+		{tag.TagVersion, gedcom.NewNode(tag.TagVersion, v, p)},
+		{tag.UnofficialTagUniqueID, gedcom.NewUniqueIDNode(v)},
 	} {
 		t.Run(test.tag.String(), func(t *testing.T) {
 			assertEqual(t, test.expected, gedcom.NewNode(test.tag, v, p))

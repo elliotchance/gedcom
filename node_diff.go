@@ -29,6 +29,7 @@ package gedcom
 
 import (
 	"fmt"
+	"github.com/elliotchance/gedcom/tag"
 	"sort"
 	"strings"
 	"unicode"
@@ -310,8 +311,8 @@ func (nd *NodeDiff) Sort() {
 func (nd *NodeDiff) isLessThan(nd2 *NodeDiff) bool {
 	left, right := nd.LeftNode(), nd2.LeftNode()
 
-	if left.Tag().sortValue != right.Tag().sortValue {
-		return left.Tag().sortValue < right.Tag().sortValue
+	if left.Tag().SortValue() != right.Tag().SortValue() {
+		return left.Tag().SortValue() < right.Tag().SortValue()
 	}
 
 	y1, ok1 := left.(Yearer)
@@ -360,7 +361,7 @@ func (nd *NodeDiff) RightNode() Node {
 	return n
 }
 
-func (nd *NodeDiff) Tag() Tag {
+func (nd *NodeDiff) Tag() tag.Tag {
 	if nd.Left != nil {
 		return nd.Left.Tag()
 	}

@@ -2,6 +2,7 @@ package gedcom
 
 import (
 	"fmt"
+	"github.com/elliotchance/gedcom/tag"
 	"time"
 )
 
@@ -15,7 +16,7 @@ type FamilyNode struct {
 
 func newFamilyNode(document *Document, pointer string, children ...Node) *FamilyNode {
 	return &FamilyNode{
-		newSimpleDocumentNode(document, TagFamily, "", pointer, children...),
+		newSimpleDocumentNode(document, tag.TagFamily, "", pointer, children...),
 		false, false, nil, nil,
 	}
 }
@@ -35,7 +36,7 @@ func (node *FamilyNode) Husband() (husband *HusbandNode) {
 		node.cachedHusband = true
 	}()
 
-	possibleHusband := First(NodesWithTag(node, TagHusband))
+	possibleHusband := First(NodesWithTag(node, tag.TagHusband))
 
 	if IsNil(possibleHusband) {
 		return nil
@@ -59,7 +60,7 @@ func (node *FamilyNode) Wife() (wife *WifeNode) {
 		node.cachedWife = true
 	}()
 
-	possibleWife := First(NodesWithTag(node, TagWife))
+	possibleWife := First(NodesWithTag(node, tag.TagWife))
 
 	if IsNil(possibleWife) {
 		return nil
@@ -78,7 +79,7 @@ func (node *FamilyNode) Children() ChildNodes {
 
 	children := ChildNodes{}
 
-	for _, n := range NodesWithTag(node, TagChild) {
+	for _, n := range NodesWithTag(node, tag.TagChild) {
 		children = append(children, n.(*ChildNode))
 	}
 
@@ -93,7 +94,7 @@ func (node *FamilyNode) HasChild(individual *IndividualNode) bool {
 		return false
 	}
 
-	for _, n := range NodesWithTag(node, TagChild) {
+	for _, n := range NodesWithTag(node, tag.TagChild) {
 		if n.Value() == "@"+individual.Pointer()+"@" {
 			return true
 		}
@@ -139,7 +140,7 @@ func (node *FamilyNode) AddChild(individual *IndividualNode) *ChildNode {
 
 func (node *FamilyNode) SetHusband(individual *IndividualNode) *FamilyNode {
 	if individual == nil {
-		DeleteNodesWithTag(node, TagHusband)
+		DeleteNodesWithTag(node, tag.TagHusband)
 
 		return node
 	}
@@ -149,7 +150,7 @@ func (node *FamilyNode) SetHusband(individual *IndividualNode) *FamilyNode {
 
 func (node *FamilyNode) SetWife(individual *IndividualNode) *FamilyNode {
 	if individual == nil {
-		DeleteNodesWithTag(node, TagWife)
+		DeleteNodesWithTag(node, tag.TagWife)
 
 		return node
 	}
@@ -164,7 +165,7 @@ func (node *FamilyNode) SetWifePointer(pointer string) *FamilyNode {
 		wife.value = value
 	}
 
-	node.AddNode(newNode(nil, node, TagWife, value, ""))
+	node.AddNode(newNode(nil, node, tag.TagWife, value, ""))
 	node.cachedWife = false
 
 	return node
@@ -177,7 +178,7 @@ func (node *FamilyNode) SetHusbandPointer(pointer string) *FamilyNode {
 		husband.value = value
 	}
 
-	husbandNode := newNode(nil, node, TagHusband, value, "")
+	husbandNode := newNode(nil, node, tag.TagHusband, value, "")
 	node.AddNode(husbandNode)
 	node.cachedHusband = false
 
@@ -310,7 +311,7 @@ func (node *FamilyNode) appendMarriedOutOfRange(warnings Warnings, age Age, spou
 }
 
 func (node *FamilyNode) marriedOutOfRange() (warnings Warnings) {
-	marriages := NodesWithTag(node, TagMarriage)
+	marriages := NodesWithTag(node, tag.TagMarriage)
 
 	for _, marriage := range marriages {
 		if husband := node.Husband().Individual(); husband != nil {
@@ -356,10 +357,10 @@ func (node *FamilyNode) String() string {
 	symbol := "—"
 
 	switch {
-	case len(NodesWithTag(node, TagDivorce)) > 0:
+	case len(NodesWithTag(node, tag.TagDivorce)) > 0:
 		symbol = "⚮"
 
-	case len(NodesWithTag(node, TagMarriage)) > 0:
+	case len(NodesWithTag(node, tag.TagMarriage)) > 0:
 		symbol = "⚭"
 	}
 

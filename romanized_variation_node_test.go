@@ -2,6 +2,7 @@ package gedcom_test
 
 import (
 	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/tag"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -12,7 +13,7 @@ func TestNewRomanizedVariationNode(t *testing.T) {
 
 	assert.NotNil(t, node)
 	assert.IsType(t, node, (*gedcom.RomanizedVariationNode)(nil))
-	assert.Equal(t, gedcom.TagRomanized, node.Tag())
+	assert.Equal(t, tag.TagRomanized, node.Tag())
 	assert.Equal(t, gedcom.Nodes{child}, node.Nodes())
 	assert.Equal(t, "foo", node.Value())
 	assert.Equal(t, "", node.Pointer())

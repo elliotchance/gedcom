@@ -1,5 +1,7 @@
 package gedcom
 
+import "github.com/elliotchance/gedcom/tag"
+
 // HusbandNode is an individual in the family role of a married man or father.
 type HusbandNode struct {
 	*SimpleNode
@@ -8,7 +10,7 @@ type HusbandNode struct {
 
 func newHusbandNode(family *FamilyNode, value string, children ...Node) *HusbandNode {
 	return &HusbandNode{
-		newSimpleNode(TagHusband, value, "", children...),
+		newSimpleNode(tag.TagHusband, value, "", children...),
 		family,
 	}
 }

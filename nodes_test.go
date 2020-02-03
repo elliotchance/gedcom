@@ -1,6 +1,7 @@
 package gedcom_test
 
 import (
+	"github.com/elliotchance/gedcom/tag"
 	"testing"
 
 	"github.com/elliotchance/gedcom"
@@ -10,46 +11,46 @@ import (
 
 var nodesWithTagTests = []struct {
 	node gedcom.Node
-	tag  gedcom.Tag
+	tag  tag.Tag
 	want gedcom.Nodes
 }{
-	{nil, gedcom.TagHeader, nil},
-	{gedcom.NewNameNode(""), gedcom.TagHeader, gedcom.Nodes{}},
+	{nil, tag.TagHeader, nil},
+	{gedcom.NewNameNode(""), tag.TagHeader, gedcom.Nodes{}},
 	{
 		gedcom.NewNameNode("",
-			gedcom.NewNode(gedcom.TagSurname, "", ""),
+			gedcom.NewNode(tag.TagSurname, "", ""),
 		),
-		gedcom.TagHeader,
+		tag.TagHeader,
 		gedcom.Nodes{},
 	},
 	{
 		gedcom.NewNameNode("",
-			gedcom.NewNode(gedcom.TagSurname, "", ""),
+			gedcom.NewNode(tag.TagSurname, "", ""),
 		),
-		gedcom.TagSurname,
+		tag.TagSurname,
 		gedcom.Nodes{
-			gedcom.NewNode(gedcom.TagSurname, "", ""),
+			gedcom.NewNode(tag.TagSurname, "", ""),
 		},
 	},
 	{
 		gedcom.NewNameNode("",
-			gedcom.NewNode(gedcom.TagHeader, "", ""),
-			gedcom.NewNode(gedcom.TagSurname, "", ""),
+			gedcom.NewNode(tag.TagHeader, "", ""),
+			gedcom.NewNode(tag.TagSurname, "", ""),
 		),
-		gedcom.TagSurname,
+		tag.TagSurname,
 		gedcom.Nodes{
-			gedcom.NewNode(gedcom.TagSurname, "", ""),
+			gedcom.NewNode(tag.TagSurname, "", ""),
 		},
 	},
 	{
 		gedcom.NewNameNode("",
-			gedcom.NewNode(gedcom.TagSurname, "", ""),
-			gedcom.NewNode(gedcom.TagSurname, "", ""),
+			gedcom.NewNode(tag.TagSurname, "", ""),
+			gedcom.NewNode(tag.TagSurname, "", ""),
 		),
-		gedcom.TagSurname,
+		tag.TagSurname,
 		gedcom.Nodes{
-			gedcom.NewNode(gedcom.TagSurname, "", ""),
-			gedcom.NewNode(gedcom.TagSurname, "", ""),
+			gedcom.NewNode(tag.TagSurname, "", ""),
+			gedcom.NewNode(tag.TagSurname, "", ""),
 		},
 	},
 }
@@ -66,93 +67,93 @@ func TestNodesWithTagPath(t *testing.T) {
 	// ghost:ignore
 	tests := []struct {
 		node    gedcom.Node
-		tagPath []gedcom.Tag
+		tagPath []tag.Tag
 		want    gedcom.Nodes
 	}{
 		{
 			gedcom.NewNameNode("",
-				gedcom.NewNode(gedcom.TagSurname, "", ""),
+				gedcom.NewNode(tag.TagSurname, "", ""),
 			),
-			[]gedcom.Tag{},
+			[]tag.Tag{},
 			gedcom.Nodes{},
 		},
 		{
 			gedcom.NewNameNode("",
-				gedcom.NewNode(gedcom.TagSurname, "", "",
-					gedcom.NewNode(gedcom.TagText, "", ""),
+				gedcom.NewNode(tag.TagSurname, "", "",
+					gedcom.NewNode(tag.TagText, "", ""),
 				),
 			),
-			[]gedcom.Tag{gedcom.TagSurname},
+			[]tag.Tag{tag.TagSurname},
 			gedcom.Nodes{
-				gedcom.NewNode(gedcom.TagSurname, "", "",
-					gedcom.NewNode(gedcom.TagText, "", ""),
+				gedcom.NewNode(tag.TagSurname, "", "",
+					gedcom.NewNode(tag.TagText, "", ""),
 				),
 			},
 		},
 		{
 			gedcom.NewNameNode("",
-				gedcom.NewNode(gedcom.TagSurname, "", "",
-					gedcom.NewNode(gedcom.TagText, "", ""),
+				gedcom.NewNode(tag.TagSurname, "", "",
+					gedcom.NewNode(tag.TagText, "", ""),
 				),
 			),
-			[]gedcom.Tag{gedcom.TagSurname, gedcom.TagText},
+			[]tag.Tag{tag.TagSurname, tag.TagText},
 			gedcom.Nodes{
-				gedcom.NewNode(gedcom.TagText, "", ""),
+				gedcom.NewNode(tag.TagText, "", ""),
 			},
 		},
 		{
 			gedcom.NewNameNode("",
-				gedcom.NewNode(gedcom.TagSurname, "", "",
-					gedcom.NewNode(gedcom.TagText, "", "1"),
+				gedcom.NewNode(tag.TagSurname, "", "",
+					gedcom.NewNode(tag.TagText, "", "1"),
 				),
-				gedcom.NewNode(gedcom.TagSurname, "", "",
-					gedcom.NewNode(gedcom.TagText, "", "2"),
+				gedcom.NewNode(tag.TagSurname, "", "",
+					gedcom.NewNode(tag.TagText, "", "2"),
 				),
 			),
-			[]gedcom.Tag{gedcom.TagSurname, gedcom.TagText},
+			[]tag.Tag{tag.TagSurname, tag.TagText},
 			gedcom.Nodes{
-				gedcom.NewNode(gedcom.TagText, "", "1"),
-				gedcom.NewNode(gedcom.TagText, "", "2"),
+				gedcom.NewNode(tag.TagText, "", "1"),
+				gedcom.NewNode(tag.TagText, "", "2"),
 			},
 		},
 		{
 			gedcom.NewNameNode("",
-				gedcom.NewNode(gedcom.TagSurname, "", "",
-					gedcom.NewNode(gedcom.TagText, "", "1"),
-					gedcom.NewNode(gedcom.TagText, "", "2"),
+				gedcom.NewNode(tag.TagSurname, "", "",
+					gedcom.NewNode(tag.TagText, "", "1"),
+					gedcom.NewNode(tag.TagText, "", "2"),
 				),
 			),
-			[]gedcom.Tag{gedcom.TagSurname, gedcom.TagText},
+			[]tag.Tag{tag.TagSurname, tag.TagText},
 			gedcom.Nodes{
-				gedcom.NewNode(gedcom.TagText, "", "1"),
-				gedcom.NewNode(gedcom.TagText, "", "2"),
+				gedcom.NewNode(tag.TagText, "", "1"),
+				gedcom.NewNode(tag.TagText, "", "2"),
 			},
 		},
 		{
 			gedcom.NewNameNode("",
-				gedcom.NewNode(gedcom.TagSurname, "", "",
-					gedcom.NewNode(gedcom.TagText, "", ""),
+				gedcom.NewNode(tag.TagSurname, "", "",
+					gedcom.NewNode(tag.TagText, "", ""),
 				),
 			),
-			[]gedcom.Tag{gedcom.TagGivenName, gedcom.TagText},
+			[]tag.Tag{tag.TagGivenName, tag.TagText},
 			gedcom.Nodes{},
 		},
 		{
 			gedcom.NewNameNode("",
-				gedcom.NewNode(gedcom.TagSurname, "", "",
-					gedcom.NewNode(gedcom.TagText, "", ""),
+				gedcom.NewNode(tag.TagSurname, "", "",
+					gedcom.NewNode(tag.TagText, "", ""),
 				),
 			),
-			[]gedcom.Tag{gedcom.TagSurname, gedcom.TagSurname},
+			[]tag.Tag{tag.TagSurname, tag.TagSurname},
 			gedcom.Nodes{},
 		},
 		{
 			gedcom.NewNameNode("",
-				gedcom.NewNode(gedcom.TagSurname, "", "",
-					gedcom.NewNode(gedcom.TagText, "", ""),
+				gedcom.NewNode(tag.TagSurname, "", "",
+					gedcom.NewNode(tag.TagText, "", ""),
 				),
 			),
-			[]gedcom.Tag{gedcom.TagSurname, gedcom.TagGivenName},
+			[]tag.Tag{tag.TagSurname, tag.TagGivenName},
 			gedcom.Nodes{},
 		},
 	}
@@ -175,8 +176,8 @@ func TestNodesWithTagPath(t *testing.T) {
 }
 
 func TestHasNestedNode(t *testing.T) {
-	surname := gedcom.NewNode(gedcom.TagSurname, "", "")
-	givenName := gedcom.NewNode(gedcom.TagGivenName, "", "")
+	surname := gedcom.NewNode(tag.TagSurname, "", "")
+	givenName := gedcom.NewNode(tag.TagGivenName, "", "")
 
 	// ghost:ignore
 	tests := []struct {
@@ -225,7 +226,7 @@ func TestHasNestedNode(t *testing.T) {
 			gedcom.NewNameNode("",
 				surname,
 			),
-			gedcom.NewNode(gedcom.TagSurname, "", ""),
+			gedcom.NewNode(tag.TagSurname, "", ""),
 			false,
 		},
 		{
@@ -237,7 +238,7 @@ func TestHasNestedNode(t *testing.T) {
 		},
 		{
 			gedcom.NewNameNode("",
-				gedcom.NewNode(gedcom.TagGivenName, "", "",
+				gedcom.NewNode(tag.TagGivenName, "", "",
 					givenName,
 				),
 			),

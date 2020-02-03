@@ -13,6 +13,7 @@ package gedcom
 
 import (
 	"bytes"
+	"github.com/elliotchance/gedcom/tag"
 	"os"
 	"strings"
 	"sync"
@@ -210,7 +211,7 @@ func (doc *Document) addPointerToCache(node Node) {
 
 	// Clear cache.
 	switch node.Tag() {
-	case TagFamily:
+	case tag.TagFamily:
 		doc.families = nil
 	}
 }

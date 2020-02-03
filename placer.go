@@ -1,5 +1,7 @@
 package gedcom
 
+import "github.com/elliotchance/gedcom/tag"
+
 type Placer interface {
 	Places() []*PlaceNode
 }
@@ -13,7 +15,7 @@ func Places(nodes ...Node) (result []*PlaceNode) {
 			continue
 		}
 
-		for _, n := range NodesWithTag(node, TagPlace) {
+		for _, n := range NodesWithTag(node, tag.TagPlace) {
 			result = append(result, n.(*PlaceNode))
 		}
 	}

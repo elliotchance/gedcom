@@ -1,5 +1,7 @@
 package gedcom
 
+import "github.com/elliotchance/gedcom/tag"
+
 // Dater is implemented by nodes that are reasonably expected to have dates
 // associated with them, such as events.
 type Dater interface {
@@ -17,7 +19,7 @@ func Dates(nodes ...Node) (result DateNodes) {
 			continue
 		}
 
-		for _, n := range NodesWithTag(node, TagDate) {
+		for _, n := range NodesWithTag(node, tag.TagDate) {
 			result = append(result, n.(*DateNode))
 		}
 	}

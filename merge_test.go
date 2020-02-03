@@ -1,6 +1,7 @@
 package gedcom_test
 
 import (
+	"github.com/elliotchance/gedcom/tag"
 	"testing"
 
 	"github.com/elliotchance/gedcom"
@@ -16,30 +17,30 @@ func TestMergeNodes(t *testing.T) {
 		error                 string
 	}{
 		"1": {
-			left: gedcom.NewNode(gedcom.TagBirth, "", "P1",
+			left: gedcom.NewNode(tag.TagBirth, "", "P1",
 				gedcom.NewDateNode("3 Sep 1943"),
 			),
-			right: gedcom.NewNode(gedcom.TagBirth, "", "P2",
+			right: gedcom.NewNode(tag.TagBirth, "", "P2",
 				gedcom.NewDateNode("14 Apr 1947"),
 			),
-			expected: gedcom.NewNode(gedcom.TagBirth, "", "P1",
+			expected: gedcom.NewNode(tag.TagBirth, "", "P1",
 				gedcom.NewDateNode("3 Sep 1943"),
 				gedcom.NewDateNode("14 Apr 1947"),
 			),
 		},
 		"2": {
-			left: gedcom.NewNode(gedcom.TagBirth, "", "P1",
+			left: gedcom.NewNode(tag.TagBirth, "", "P1",
 				gedcom.NewDateNode("3 Sep 1943"),
 			),
-			right: gedcom.NewNode(gedcom.TagBirth, "", "P1",
+			right: gedcom.NewNode(tag.TagBirth, "", "P1",
 				gedcom.NewDateNode("3 Sep 1943"),
 			),
-			expected: gedcom.NewNode(gedcom.TagBirth, "", "P1",
+			expected: gedcom.NewNode(tag.TagBirth, "", "P1",
 				gedcom.NewDateNode("3 Sep 1943"),
 			),
 		},
 		"3": {
-			left: gedcom.NewNode(gedcom.TagBirth, "", "P1",
+			left: gedcom.NewNode(tag.TagBirth, "", "P1",
 				gedcom.NewDateNode("3 Sep 1943"),
 			),
 			right: gedcom.NewDateNode("3 Sep 1943"),
@@ -78,13 +79,13 @@ func TestMergeNodes(t *testing.T) {
 			),
 		},
 		"NilLeft": {
-			right: gedcom.NewNode(gedcom.TagBirth, "", "P2",
+			right: gedcom.NewNode(tag.TagBirth, "", "P2",
 				gedcom.NewDateNode("14 Apr 1947"),
 			),
 			error: "left is nil",
 		},
 		"NilRight": {
-			left: gedcom.NewNode(gedcom.TagBirth, "", "P2",
+			left: gedcom.NewNode(tag.TagBirth, "", "P2",
 				gedcom.NewDateNode("14 Apr 1947"),
 			),
 			error: "right is nil",
@@ -98,13 +99,13 @@ func TestMergeNodes(t *testing.T) {
 			expected: elliot,
 		},
 		"EqualNodes": {
-			left: gedcom.NewNode(gedcom.TagBirth, "", "P1",
+			left: gedcom.NewNode(tag.TagBirth, "", "P1",
 				gedcom.NewUniqueIDNode("EE13561DDB204985BFFDEEBF82A5226C"),
 			),
-			right: gedcom.NewNode(gedcom.TagBirth, "", "P2",
+			right: gedcom.NewNode(tag.TagBirth, "", "P2",
 				gedcom.NewUniqueIDNode("EE13561DDB204985BFFDEEBF82A5226C5B2E"),
 			),
-			expected: gedcom.NewNode(gedcom.TagBirth, "", "P1",
+			expected: gedcom.NewNode(tag.TagBirth, "", "P1",
 				gedcom.NewUniqueIDNode("EE13561DDB204985BFFDEEBF82A5226C"),
 			),
 		},

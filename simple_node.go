@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/elliotchance/gedcom/tag"
 	"sync"
 )
 
 // SimpleNode is used as the default node type when there is no more appropriate
 // or specific type to use.
 type SimpleNode struct {
-	tag      Tag
+	tag      tag.Tag
 	value    string
 	pointer  string
 	children Nodes
@@ -20,7 +21,7 @@ type SimpleNode struct {
 //
 // Unlike all of the other node types this constructor is not public because it
 // is used internally by NewNode if a specific node type can not be determined.
-func newSimpleNode(tag Tag, value, pointer string, children ...Node) *SimpleNode {
+func newSimpleNode(tag tag.Tag, value, pointer string, children ...Node) *SimpleNode {
 	return &SimpleNode{
 		tag:      tag,
 		value:    value,
@@ -30,9 +31,9 @@ func newSimpleNode(tag Tag, value, pointer string, children ...Node) *SimpleNode
 }
 
 // If the node is nil the result will be an empty tag.
-func (node *SimpleNode) Tag() Tag {
+func (node *SimpleNode) Tag() tag.Tag {
 	if node == nil {
-		return Tag{}
+		return tag.Tag{}
 	}
 
 	return node.tag

@@ -1,5 +1,7 @@
 package gedcom
 
+import "github.com/elliotchance/gedcom/tag"
+
 // TypeNode represents a further qualification to the meaning of the associated
 // superior tag.
 //
@@ -13,6 +15,6 @@ type TypeNode struct {
 // NewTypeNode creates a new TYPE node.
 func NewTypeNode(value string, children ...Node) *TypeNode {
 	return &TypeNode{
-		newSimpleNode(TagType, value, "", children...),
+		newSimpleNode(tag.TagType, value, "", children...),
 	}
 }

@@ -1,6 +1,9 @@
 package gedcom
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/elliotchance/gedcom/tag"
+)
 
 // ChildNode is the natural, adopted, or sealed (LDS) child of a father and a
 // mother.
@@ -11,7 +14,7 @@ type ChildNode struct {
 
 func newChildNode(family *FamilyNode, value string, children ...Node) *ChildNode {
 	return &ChildNode{
-		newSimpleNode(TagChild, value, "", children...),
+		newSimpleNode(tag.TagChild, value, "", children...),
 		family,
 	}
 }

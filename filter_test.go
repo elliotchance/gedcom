@@ -1,6 +1,7 @@
 package gedcom_test
 
 import (
+	"github.com/elliotchance/gedcom/tag"
 	"testing"
 
 	"github.com/elliotchance/gedcom"
@@ -54,7 +55,7 @@ func TestFilter(t *testing.T) {
 		},
 		{
 			filter: func(node gedcom.Node) (gedcom.Node, bool) {
-				if node.Tag().Is(gedcom.TagIndividual) {
+				if node.Tag().Is(tag.TagIndividual) {
 					// false means it will not traverse children, since an
 					// individual can never be inside of another individual.
 					return node.ShallowCopy(), false
@@ -67,7 +68,7 @@ func TestFilter(t *testing.T) {
 		},
 		{
 			filter: func(node gedcom.Node) (gedcom.Node, bool) {
-				if node.Tag().Is(gedcom.TagIndividual) {
+				if node.Tag().Is(tag.TagIndividual) {
 					// false means it will not traverse children, since an
 					// individual can never be inside of another individual.
 					return node, false
@@ -85,7 +86,7 @@ func TestFilter(t *testing.T) {
 			filter: func(node gedcom.Node) (gedcom.Node, bool) {
 				t := node.Tag()
 				return gedcom.NodeCondition(
-					t.Is(gedcom.TagIndividual) || t.Is(gedcom.TagName),
+					t.Is(tag.TagIndividual) || t.Is(tag.TagName),
 					node,
 					nil,
 				), true
@@ -98,7 +99,7 @@ func TestFilter(t *testing.T) {
 			filter: func(node gedcom.Node) (gedcom.Node, bool) {
 				t := node.Tag()
 				return gedcom.NodeCondition(
-					t.Is(gedcom.TagIndividual) || t.Is(gedcom.TagDate),
+					t.Is(tag.TagIndividual) || t.Is(tag.TagDate),
 					node,
 					nil,
 				), true
@@ -110,7 +111,7 @@ func TestFilter(t *testing.T) {
 			filter: func(node gedcom.Node) (gedcom.Node, bool) {
 				t := node.Tag()
 				return gedcom.NodeCondition(
-					t.Is(gedcom.TagIndividual) || t.Is(gedcom.TagBirth),
+					t.Is(tag.TagIndividual) || t.Is(tag.TagBirth),
 					node,
 					nil,
 				), true
@@ -123,7 +124,7 @@ func TestFilter(t *testing.T) {
 			filter: func(node gedcom.Node) (gedcom.Node, bool) {
 				t := node.Tag()
 				return gedcom.NodeCondition(
-					t.Is(gedcom.TagIndividual) || t.Is(gedcom.TagBirth) || t.Is(gedcom.TagDate),
+					t.Is(tag.TagIndividual) || t.Is(tag.TagBirth) || t.Is(tag.TagDate),
 					node,
 					nil,
 				), true
@@ -135,7 +136,7 @@ func TestFilter(t *testing.T) {
 		},
 		{
 			filter: func(node gedcom.Node) (gedcom.Node, bool) {
-				if node.Tag().Is(gedcom.TagName) {
+				if node.Tag().Is(tag.TagName) {
 					return gedcom.NewDateNode("1 APR 1943"), true
 				}
 
@@ -165,24 +166,24 @@ func TestWhitelistTagFilter(t *testing.T) {
 	)
 
 	for _, test := range []struct {
-		tags     []gedcom.Tag
+		tags     []tag.Tag
 		expected string
 	}{
 		{
-			tags:     []gedcom.Tag{},
+			tags:     []tag.Tag{},
 			expected: ``,
 		},
 		{
-			tags: []gedcom.Tag{gedcom.TagIndividual},
+			tags: []tag.Tag{tag.TagIndividual},
 			expected: `0 @P1@ INDI
 `,
 		},
 		{
-			tags:     []gedcom.Tag{gedcom.TagBirth},
+			tags:     []tag.Tag{tag.TagBirth},
 			expected: ``,
 		},
 		{
-			tags: []gedcom.Tag{gedcom.TagBirth, gedcom.TagIndividual},
+			tags: []tag.Tag{tag.TagBirth, tag.TagIndividual},
 			expected: `0 @P1@ INDI
 1 BIRT
 `,
@@ -205,11 +206,11 @@ func TestBlacklistTagFilter(t *testing.T) {
 	)
 
 	for _, test := range []struct {
-		tags     []gedcom.Tag
+		tags     []tag.Tag
 		expected string
 	}{
 		{
-			tags: []gedcom.Tag{},
+			tags: []tag.Tag{},
 			expected: `0 @P1@ INDI
 1 NAME Elliot /Chance/
 1 BIRT
@@ -217,17 +218,17 @@ func TestBlacklistTagFilter(t *testing.T) {
 `,
 		},
 		{
-			tags:     []gedcom.Tag{gedcom.TagIndividual},
+			tags:     []tag.Tag{tag.TagIndividual},
 			expected: ``,
 		},
 		{
-			tags: []gedcom.Tag{gedcom.TagBirth},
+			tags: []tag.Tag{tag.TagBirth},
 			expected: `0 @P1@ INDI
 1 NAME Elliot /Chance/
 `,
 		},
 		{
-			tags:     []gedcom.Tag{gedcom.TagBirth, gedcom.TagIndividual},
+			tags:     []tag.Tag{tag.TagBirth, tag.TagIndividual},
 			expected: ``,
 		},
 	} {
@@ -241,7 +242,7 @@ func TestBlacklistTagFilter(t *testing.T) {
 
 func TestOfficialTagFilter(t *testing.T) {
 	root := gedcom.NewDocument().AddIndividual("P1",
-		gedcom.NewNode(gedcom.UnofficialTagCreated, "Elliot /Chance/", "",
+		gedcom.NewNode(tag.UnofficialTagCreated, "Elliot /Chance/", "",
 			gedcom.NewDateNode("3 Mar 2007"),
 		),
 		gedcom.NewBirthNode("",
@@ -294,7 +295,7 @@ func TestSimpleNameFilter(t *testing.T) {
 					gedcom.NewDateNode("6 MAY 1989"),
 				),
 				gedcom.NewNameNode("Elliot /Chance/",
-					gedcom.NewNode(gedcom.TagSurname, "Smith", ""),
+					gedcom.NewNode(tag.TagSurname, "Smith", ""),
 				),
 			),
 			format: gedcom.NameFormatGEDCOM,
@@ -307,8 +308,8 @@ func TestSimpleNameFilter(t *testing.T) {
 		{
 			root: gedcom.NewDocument().AddIndividual("P1",
 				gedcom.NewNameNode("",
-					gedcom.NewNode(gedcom.TagGivenName, "Bob", ""),
-					gedcom.NewNode(gedcom.TagSurname, "Smith", ""),
+					gedcom.NewNode(tag.TagGivenName, "Bob", ""),
+					gedcom.NewNode(tag.TagSurname, "Smith", ""),
 				),
 				gedcom.NewBirthNode("",
 					gedcom.NewDateNode("6 MAY 1989"),
@@ -338,8 +339,8 @@ func TestSimpleNameFilter(t *testing.T) {
 		{
 			root: gedcom.NewDocument().AddIndividual("P1",
 				gedcom.NewNameNode("",
-					gedcom.NewNode(gedcom.TagGivenName, "Bob", ""),
-					gedcom.NewNode(gedcom.TagSurname, "Smith", ""),
+					gedcom.NewNode(tag.TagGivenName, "Bob", ""),
+					gedcom.NewNode(tag.TagSurname, "Smith", ""),
 				),
 				gedcom.NewBirthNode("",
 					gedcom.NewDateNode("6 MAY 1989"),
@@ -386,7 +387,7 @@ func TestOnlyVitalsTagFilter(t *testing.T) {
 					gedcom.NewDateNode("6 MAY 1989"),
 				),
 				gedcom.NewNameNode("Elliot /Chance/",
-					gedcom.NewNode(gedcom.TagSurname, "Smith", ""),
+					gedcom.NewNode(tag.TagSurname, "Smith", ""),
 				),
 			),
 			expected: `0 @P1@ INDI
@@ -399,8 +400,8 @@ func TestOnlyVitalsTagFilter(t *testing.T) {
 		"ComplexName2AndBirthPlace": {
 			root: gedcom.NewDocument().AddIndividual("P1",
 				gedcom.NewNameNode("",
-					gedcom.NewNode(gedcom.TagGivenName, "Bob", ""),
-					gedcom.NewNode(gedcom.TagSurname, "Smith", ""),
+					gedcom.NewNode(tag.TagGivenName, "Bob", ""),
+					gedcom.NewNode(tag.TagSurname, "Smith", ""),
 				),
 				gedcom.NewBirthNode("",
 					gedcom.NewPlaceNode("Sydney, Australia"),
@@ -417,8 +418,8 @@ func TestOnlyVitalsTagFilter(t *testing.T) {
 		"Source": {
 			root: gedcom.NewSourceNode("", "P1",
 				gedcom.NewNameNode("",
-					gedcom.NewNode(gedcom.TagGivenName, "Bob", ""),
-					gedcom.NewNode(gedcom.TagSurname, "Smith", ""),
+					gedcom.NewNode(tag.TagGivenName, "Bob", ""),
+					gedcom.NewNode(tag.TagSurname, "Smith", ""),
 				),
 				gedcom.NewBirthNode("",
 					gedcom.NewPlaceNode("Sydney, Australia"),
@@ -429,13 +430,13 @@ func TestOnlyVitalsTagFilter(t *testing.T) {
 		"IndividualNote": {
 			root: gedcom.NewDocument().AddIndividual("P1",
 				gedcom.NewNameNode("",
-					gedcom.NewNode(gedcom.TagGivenName, "Bob", ""),
-					gedcom.NewNode(gedcom.TagSurname, "Smith", ""),
+					gedcom.NewNode(tag.TagGivenName, "Bob", ""),
+					gedcom.NewNode(tag.TagSurname, "Smith", ""),
 				),
 				gedcom.NewBirthNode("",
 					gedcom.NewPlaceNode("Sydney, Australia"),
 				),
-				gedcom.NewNode(gedcom.TagNote, "foo", ""),
+				gedcom.NewNode(tag.TagNote, "foo", ""),
 			),
 			expected: `0 @P1@ INDI
 1 NAME
@@ -448,8 +449,8 @@ func TestOnlyVitalsTagFilter(t *testing.T) {
 		"Burial": {
 			root: gedcom.NewDocument().AddIndividual("P1",
 				gedcom.NewNameNode("",
-					gedcom.NewNode(gedcom.TagGivenName, "Bob", ""),
-					gedcom.NewNode(gedcom.TagTitle, "Smith", ""),
+					gedcom.NewNode(tag.TagGivenName, "Bob", ""),
+					gedcom.NewNode(tag.TagTitle, "Smith", ""),
 				),
 				gedcom.NewBurialNode("",
 					gedcom.NewPlaceNode("6 MAY 1989"),
@@ -468,8 +469,8 @@ func TestOnlyVitalsTagFilter(t *testing.T) {
 		"Baptism": {
 			root: gedcom.NewDocument().AddIndividual("P1",
 				gedcom.NewNameNode("",
-					gedcom.NewNode(gedcom.TagNameSuffix, "Bob", ""),
-					gedcom.NewNode(gedcom.TagSurnamePrefix, "Smith", ""),
+					gedcom.NewNode(tag.TagNameSuffix, "Bob", ""),
+					gedcom.NewNode(tag.TagSurnamePrefix, "Smith", ""),
 				),
 				gedcom.NewBaptismNode("",
 					gedcom.NewPlaceNode("6 MAY 1989"),

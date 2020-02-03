@@ -20,6 +20,8 @@
 // OfficialTagFilter, SimpleNameFilter and WhitelistTagFilter.
 package gedcom
 
+import "github.com/elliotchance/gedcom/tag"
+
 // FilterFunction is used with the Filter function.
 //
 // The node (as passed in through the parameter) will be replaced with newNode.
@@ -120,7 +122,7 @@ func shallowCopyNode(node Node, document *Document, family *FamilyNode) Node {
 // This is the opposite of BlacklistTagFilter.
 //
 // See the Filter() function.
-func WhitelistTagFilter(tags ...Tag) FilterFunction {
+func WhitelistTagFilter(tags ...tag.Tag) FilterFunction {
 	return func(node Node) (Node, bool) {
 		for _, tag := range tags {
 			if tag.Is(node.Tag()) {
@@ -137,7 +139,7 @@ func WhitelistTagFilter(tags ...Tag) FilterFunction {
 // This is the opposite of WhitelistTagFilter.
 //
 // See the Filter function.
-func BlacklistTagFilter(tags ...Tag) FilterFunction {
+func BlacklistTagFilter(tags ...tag.Tag) FilterFunction {
 	return func(node Node) (Node, bool) {
 		for _, tag := range tags {
 			if tag.Is(node.Tag()) {
@@ -171,7 +173,7 @@ func SimpleNameFilter(format NameFormat) FilterFunction {
 			newNode := newNode(
 				nil,
 				nil,
-				TagName,
+				tag.TagName,
 				name.Format(format),
 				name.Pointer(),
 			)
@@ -190,15 +192,15 @@ func SimpleNameFilter(format NameFormat) FilterFunction {
 func OnlyVitalsTagFilter() FilterFunction {
 	return WhitelistTagFilter(
 		// Level 0: We have to allow this for the children.
-		TagIndividual,
+		tag.TagIndividual,
 
 		// Level 1.
-		TagName, TagBirth, TagBaptism, TagDeath, TagBurial,
+		tag.TagName, tag.TagBirth, tag.TagBaptism, tag.TagDeath, tag.TagBurial,
 
 		// Level 2: These should only ever appear as direct children of the tags
 		// above.
-		TagGivenName, TagSurname, TagSurnamePrefix, TagNamePrefix,
-		TagNameSuffix, TagTitle, TagDate, TagPlace,
+		tag.TagGivenName, tag.TagSurname, tag.TagSurnamePrefix, tag.TagNamePrefix,
+		tag.TagNameSuffix, tag.TagTitle, tag.TagDate, tag.TagPlace,
 	)
 }
 

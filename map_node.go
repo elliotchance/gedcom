@@ -1,5 +1,7 @@
 package gedcom
 
+import "github.com/elliotchance/gedcom/tag"
+
 // MapNode pertains to a representation of measurements usually presented in a
 // graphical form.
 //
@@ -11,7 +13,7 @@ type MapNode struct {
 // NewMapNode creates a new MAP node.
 func NewMapNode(value string, children ...Node) *MapNode {
 	return &MapNode{
-		newSimpleNode(TagMap, value, "", children...),
+		newSimpleNode(tag.TagMap, value, "", children...),
 	}
 }
 
@@ -28,7 +30,7 @@ func NewMapNode(value string, children ...Node) *MapNode {
 // seconds value by 3600 and adding the results together. This sum becomes the
 // fractional part of the degree’s value.
 func (node *MapNode) Latitude() *LatitudeNode {
-	n := First(NodesWithTag(node, TagLatitude))
+	n := First(NodesWithTag(node, tag.TagLatitude))
 
 	if IsNil(n) {
 		return nil
@@ -46,7 +48,7 @@ func (node *MapNode) Latitude() *LatitudeNode {
 // For example: 168 degrees, 9 minutes, and 3.4 seconds East would be formatted
 // as E168.150944.
 func (node *MapNode) Longitude() *LongitudeNode {
-	n := First(NodesWithTag(node, TagLongitude))
+	n := First(NodesWithTag(node, tag.TagLongitude))
 
 	if IsNil(n) {
 		return nil

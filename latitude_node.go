@@ -1,5 +1,7 @@
 package gedcom
 
+import "github.com/elliotchance/gedcom/tag"
+
 // LatitudeNode represents a value indicating a coordinate position on a line,
 // plane, or space.
 //
@@ -11,6 +13,6 @@ type LatitudeNode struct {
 // NewLatitudeNode creates a new LATI node.
 func NewLatitudeNode(value string, children ...Node) *LatitudeNode {
 	return &LatitudeNode{
-		newSimpleNode(TagLatitude, value, "", children...),
+		newSimpleNode(tag.TagLatitude, value, "", children...),
 	}
 }

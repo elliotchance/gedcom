@@ -2,6 +2,7 @@ package gedcom
 
 import (
 	"flag"
+	"github.com/elliotchance/gedcom/tag"
 	"github.com/elliotchance/gedcom/util"
 )
 
@@ -78,19 +79,19 @@ func (ff *FilterFlags) SetupCLI() {
 }
 
 func (ff *FilterFlags) FilterFunctions() []FilterFunction {
-	m := map[*bool]Tag{
-		&ff.NoEvents:     TagEvent,
-		&ff.NoResidences: TagResidence,
-		&ff.NoPlaces:     TagPlace,
-		&ff.NoSources:    TagSource,
-		&ff.NoMaps:       TagMap,
-		&ff.NoChanges:    TagChange,
-		&ff.NoObjects:    TagObject,
-		&ff.NoLabels:     TagLabel,
-		&ff.NoCensuses:   TagCensus,
+	m := map[*bool]tag.Tag{
+		&ff.NoEvents:     tag.TagEvent,
+		&ff.NoResidences: tag.TagResidence,
+		&ff.NoPlaces:     tag.TagPlace,
+		&ff.NoSources:    tag.TagSource,
+		&ff.NoMaps:       tag.TagMap,
+		&ff.NoChanges:    tag.TagChange,
+		&ff.NoObjects:    tag.TagObject,
+		&ff.NoLabels:     tag.TagLabel,
+		&ff.NoCensuses:   tag.TagCensus,
 	}
 
-	blacklistTags := []Tag{TagFamilyChild, TagFamilySpouse}
+	blacklistTags := []tag.Tag{tag.TagFamilyChild, tag.TagFamilySpouse}
 	for k, v := range m {
 		if *k {
 			blacklistTags = append(blacklistTags, v)

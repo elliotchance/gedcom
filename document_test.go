@@ -2,6 +2,7 @@ package gedcom_test
 
 import (
 	"errors"
+	"github.com/elliotchance/gedcom/tag"
 	"testing"
 
 	"fmt"
@@ -40,7 +41,7 @@ var documentTests = []struct {
 			gedcom.NewDocument().AddIndividual("P1",
 				gedcom.NewNameNode("Joe /Bloggs/"),
 			),
-			gedcom.NewNode(gedcom.TagVersion, "", ""),
+			gedcom.NewNode(tag.TagVersion, "", ""),
 			gedcom.NewDocument().AddIndividual("P2",
 				gedcom.NewNameNode("John /Doe/"),
 			),

@@ -1,5 +1,7 @@
 package gedcom
 
+import "github.com/elliotchance/gedcom/tag"
+
 // Indicates the method used in transforming the text to the phonetic variation.
 //
 // These constants can be used for PhoneticVariationNode.Type.Value. The value
@@ -24,7 +26,7 @@ type PhoneticVariationNode struct {
 // NewPhoneticVariationNode creates a new FONE node.
 func NewPhoneticVariationNode(value string, children ...Node) *PhoneticVariationNode {
 	return &PhoneticVariationNode{
-		newSimpleNode(TagPhonetic, value, "", children...),
+		newSimpleNode(tag.TagPhonetic, value, "", children...),
 	}
 }
 

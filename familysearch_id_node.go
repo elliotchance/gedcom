@@ -1,5 +1,7 @@
 package gedcom
 
+import "github.com/elliotchance/gedcom/tag"
+
 // FamilySearchIDNode is the unique identifier for the person on
 // FamilySearch.org. A FamilySearch ID always takes the form of:
 //
@@ -14,7 +16,7 @@ type FamilySearchIDNode struct {
 	*SimpleNode
 }
 
-func NewFamilySearchIDNode(tag Tag, value string, children ...Node) *FamilySearchIDNode {
+func NewFamilySearchIDNode(tag tag.Tag, value string, children ...Node) *FamilySearchIDNode {
 	return &FamilySearchIDNode{
 		newSimpleNode(tag, value, "", children...),
 	}
@@ -22,9 +24,9 @@ func NewFamilySearchIDNode(tag Tag, value string, children ...Node) *FamilySearc
 
 // FamilySearchIDNodeTags returns all of the known GEDCOM tags that can be
 // represented by a FamilySearchIDNode.
-func FamilySearchIDNodeTags() []Tag {
-	return []Tag{
-		UnofficialTagFamilySearchID1,
-		UnofficialTagFamilySearchID2,
+func FamilySearchIDNodeTags() []tag.Tag {
+	return []tag.Tag{
+		tag.UnofficialTagFamilySearchID1,
+		tag.UnofficialTagFamilySearchID2,
 	}
 }

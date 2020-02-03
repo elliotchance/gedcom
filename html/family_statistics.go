@@ -3,6 +3,7 @@ package html
 import (
 	"github.com/elliotchance/gedcom"
 	"github.com/elliotchance/gedcom/html/core"
+	"github.com/elliotchance/gedcom/tag"
 	"io"
 )
 
@@ -22,12 +23,12 @@ func (c *FamilyStatistics) WriteHTMLTo(w io.Writer) (int64, error) {
 	divorceEvents := 0
 
 	for _, family := range c.document.Families() {
-		n := gedcom.First(gedcom.NodesWithTagPath(family, gedcom.TagMarriage))
+		n := gedcom.First(gedcom.NodesWithTagPath(family, tag.TagMarriage))
 		if n != nil {
 			marriageEvents += 1
 		}
 
-		n = gedcom.First(gedcom.NodesWithTagPath(family, gedcom.TagDivorce))
+		n = gedcom.First(gedcom.NodesWithTagPath(family, tag.TagDivorce))
 		if n != nil {
 			divorceEvents += 1
 		}

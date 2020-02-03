@@ -1,11 +1,13 @@
 package gedcom
 
+import "github.com/elliotchance/gedcom/tag"
+
 type simpleDocumentNode struct {
 	*SimpleNode
 	document *Document
 }
 
-func newSimpleDocumentNode(document *Document, tag Tag, value, pointer string, children ...Node) *simpleDocumentNode {
+func newSimpleDocumentNode(document *Document, tag tag.Tag, value, pointer string, children ...Node) *simpleDocumentNode {
 	return &simpleDocumentNode{
 		SimpleNode: newSimpleNode(tag, value, pointer, children...),
 		document:   document,
