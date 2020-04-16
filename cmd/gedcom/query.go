@@ -46,7 +46,7 @@ func runQueryCommand() {
 		fatalln(err)
 	}
 
-	docs := []*gedcom.Document{}
+	var mutDocs []*gedcom.Document
 
 	for _, gedcomFile := range gedcomFiles {
 		doc, err := gedcom.NewDocumentFromGEDCOMFile(gedcomFile)
@@ -54,14 +54,14 @@ func runQueryCommand() {
 			fatalln(err)
 		}
 
-		docs = append(docs, doc)
+		mutDocs = append(mutDocs, doc)
 	}
 
-	if len(docs) == 0 {
+	if len(mutDocs) == 0 {
 		fatalln("you must provide at least one gedcom file")
 	}
 
-	result, err := engine.Evaluate(docs)
+	result, err := engine.Evaluate(mutDocs)
 	if err != nil {
 		fatalln(err)
 	}

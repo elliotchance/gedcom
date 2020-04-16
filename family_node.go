@@ -286,7 +286,7 @@ func (node *FamilyNode) siblingsBornTooCloseWarnings() (warnings Warnings) {
 	return
 }
 
-func (node *FamilyNode) appendMarriedOutOfRange(warnings Warnings, age Age, spouse *IndividualNode) Warnings {
+func (node *FamilyNode) appendMarriedOutOfRange(mutWarnings Warnings, age Age, spouse *IndividualNode) Warnings {
 	if age.IsKnown && age.Years() < DefaultMinMarriageAge {
 		warning := NewMarriedOutOfRangeWarning(
 			node,
@@ -294,7 +294,7 @@ func (node *FamilyNode) appendMarriedOutOfRange(warnings Warnings, age Age, spou
 			age.Years(),
 			"young",
 		)
-		warnings = append(warnings, warning)
+		mutWarnings = append(mutWarnings, warning)
 	}
 
 	if age.Years() > DefaultMaxMarriageAge {
@@ -304,10 +304,10 @@ func (node *FamilyNode) appendMarriedOutOfRange(warnings Warnings, age Age, spou
 			age.Years(),
 			"old",
 		)
-		warnings = append(warnings, warning)
+		mutWarnings = append(mutWarnings, warning)
 	}
 
-	return warnings
+	return mutWarnings
 }
 
 func (node *FamilyNode) marriedOutOfRange() (warnings Warnings) {
@@ -344,26 +344,28 @@ func (node *FamilyNode) inversePartnerWarnings() (warnings Warnings) {
 	return
 }
 
-func (node *FamilyNode) Warnings() (warnings Warnings) {
-	warnings = append(warnings, node.childrenBornBeforeParentsWarnings()...)
-	warnings = append(warnings, node.siblingsBornTooCloseWarnings()...)
-	warnings = append(warnings, node.marriedOutOfRange()...)
-	warnings = append(warnings, node.inversePartnerWarnings()...)
+func (node *FamilyNode) Warnings() (mutWarnings Warnings) {
+	mutWarnings = append(mutWarnings, node.childrenBornBeforeParentsWarnings()...)
+	mutWarnings = append(mutWarnings, node.siblingsBornTooCloseWarnings()...)
+	mutWarnings = append(mutWarnings, node.marriedOutOfRange()...)
+	mutWarnings = append(mutWarnings, node.inversePartnerWarnings()...)
 
 	return
 }
 
 func (node *FamilyNode) String() string {
-	symbol := "—"
+	return fmt.Sprintf("%s %s %s", node.Husband().String(),
+		node.symbol(), node.Wife().String())
+}
 
+func (node *FamilyNode) symbol() string {
 	switch {
 	case len(NodesWithTag(node, tag.TagDivorce)) > 0:
-		symbol = "⚮"
+		return "⚮"
 
 	case len(NodesWithTag(node, tag.TagMarriage)) > 0:
-		symbol = "⚭"
+		return "⚭"
 	}
 
-	return fmt.Sprintf("%s %s %s", node.Husband().String(),
-		symbol, node.Wife().String())
+	return "-"
 }

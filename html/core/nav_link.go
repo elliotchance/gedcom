@@ -20,10 +20,7 @@ func NewNavLink(text, link string, isSelected bool) *NavLink {
 }
 
 func (c *NavLink) WriteHTMLTo(w io.Writer) (int64, error) {
-	active := ""
-	if c.isSelected {
-		active = "active"
-	}
+	active := activeIf(c.isSelected)
 
 	return NewTag("li", map[string]string{
 		"class": "nav-item",

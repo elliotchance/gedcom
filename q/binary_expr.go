@@ -36,7 +36,7 @@ func (e *BinaryExpr) Evaluate(engine *Engine, input interface{}, args []*Stateme
 
 	// If it is a slice we need to Evaluate each one.
 	if in.Kind() == reflect.Slice {
-		results := reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(true)), 0, in.Len())
+		mutResults := reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(true)), 0, in.Len())
 
 		for i := 0; i < in.Len(); i++ {
 			result, err := e.Evaluate(engine, in.Index(i).Interface(), args)
@@ -44,10 +44,10 @@ func (e *BinaryExpr) Evaluate(engine *Engine, input interface{}, args []*Stateme
 				return nil, err
 			}
 
-			results = reflect.Append(results, reflect.ValueOf(result))
+			mutResults = reflect.Append(mutResults, reflect.ValueOf(result))
 		}
 
-		return results.Interface(), nil
+		return mutResults.Interface(), nil
 	}
 
 	left, err := e.Left.Evaluate(engine, input, args)

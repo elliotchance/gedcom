@@ -72,18 +72,22 @@ func wordInWords(word, words string) bool {
 //
 // If the constraint is invalid then an empty string will be returned.
 func (constraint DateConstraint) String() string {
-	words := ""
-
-	switch constraint {
-	case DateConstraintAbout:
-		words = DateWordsAbout
-
-	case DateConstraintAfter:
-		words = DateWordsAfter
-
-	case DateConstraintBefore:
-		words = DateWordsBefore
-	}
+	words := constraint.constraintWords()
 
 	return strings.Split(words, "|")[0]
+}
+
+func (constraint DateConstraint) constraintWords() string {
+	switch constraint {
+	case DateConstraintAbout:
+		return DateWordsAbout
+
+	case DateConstraintAfter:
+		return DateWordsAfter
+
+	case DateConstraintBefore:
+		return DateWordsBefore
+	}
+
+	return ""
 }

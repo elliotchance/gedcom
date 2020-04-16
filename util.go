@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func valueToPointer(val string) string {
@@ -26,13 +27,13 @@ func valueToPointer(val string) string {
 // receive an integer from a string value.
 //
 // If the string cannot be parsed to an integer then 0 is returned.
-func Atoi(s string) int {
+func Atoi(mutS string) int {
 	// Trim off leading zeros and surrounding spaces as they affect how the
 	// integer may be parsed.
-	s = strings.TrimLeft(s, "0")
-	s = strings.TrimSpace(s)
+	mutS = strings.TrimLeft(mutS, "0")
+	mutS = strings.TrimSpace(mutS)
 
-	i, _ := strconv.Atoi(s)
+	i, _ := strconv.Atoi(mutS)
 
 	return i
 }
@@ -45,15 +46,13 @@ func Atoi(s string) int {
 // CleanSpace is used in many places throughout the library to clean values that
 // are known to not place any significance on their spaces. Such as individual
 // and place names.
-func CleanSpace(s string) string {
+func CleanSpace(s0 string) string {
 	// Replace twice if there is an odd number of spaces in a row.
-	s = strings.Replace(s, "  ", " ", -1)
-	s = strings.Replace(s, "  ", " ", -1)
+	s1 := strings.Replace(s0, "  ", " ", -1)
+	s2 := strings.Replace(s1, "  ", " ", -1)
 
 	// Trim whatever spaces are left on either side.
-	s = strings.TrimSpace(s)
-
-	return s
+	return strings.TrimSpace(s2)
 }
 
 // First returns the first non-nil node of nodes. If the length of nodes is zero
@@ -112,7 +111,7 @@ func Value(node Node) string {
 // Using nil as a Node or including nil as one of the elements for Nodes will
 // be ignored, so you should not receive any nil values in the output.
 func Compound(nodes ...interface{}) Nodes {
-	result := Nodes{}
+	mutResult := Nodes{}
 
 	for _, n := range nodes {
 		v := reflect.ValueOf(n)
@@ -124,16 +123,16 @@ func Compound(nodes ...interface{}) Nodes {
 		case reflect.Slice:
 			for i := 0; i < v.Len(); i++ {
 				if j := v.Index(i).Interface(); j != nil {
-					result = append(result, j.(Node))
+					mutResult = append(mutResult, j.(Node))
 				}
 			}
 
 		default:
-			result = append(result, v.Interface().(Node))
+			mutResult = append(mutResult, v.Interface().(Node))
 		}
 	}
 
-	return result
+	return mutResult
 }
 
 // NodeCondition is a convenience method for inline conditionals.
@@ -165,38 +164,38 @@ func String(node Node) string {
 	return node.String()
 }
 
-func maxInt64(values ...int64) (r int64) {
+func maxInt64(values ...int64) int64 {
 	valuesLen := len(values)
 
 	if valuesLen == 0 {
-		return
+		return 0
 	}
 
-	r = values[0]
+	mutMaximumValue := values[0]
 	for i := 1; i < valuesLen; i++ {
-		if values[i] > r {
-			r = values[i]
+		if values[i] > mutMaximumValue {
+			mutMaximumValue = values[i]
 		}
 	}
 
-	return
+	return mutMaximumValue
 }
 
-func maxInt(values ...int) (r int) {
+func maxInt(values ...int) int {
 	valuesLen := len(values)
 
 	if valuesLen == 0 {
-		return
+		return 0
 	}
 
-	r = values[0]
+	mutMaximumValue := values[0]
 	for i := 1; i < valuesLen; i++ {
-		if values[i] > r {
-			r = values[i]
+		if values[i] > mutMaximumValue {
+			mutMaximumValue = values[i]
 		}
 	}
 
-	return
+	return mutMaximumValue
 }
 
 // DateAndPlace is a convenience method for fetching a date and place from a
@@ -218,4 +217,12 @@ func DateAndPlace(nodes ...Node) (date *DateNode, place *PlaceNode) {
 	}
 
 	return
+}
+
+func positiveDuration(d time.Duration) time.Duration {
+	if d < 0 {
+		return -d
+	}
+
+	return d
 }

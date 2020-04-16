@@ -19,7 +19,7 @@ type FirstExpr struct{}
 // There must be exactly one argument and it must be 0 or greater. If the number
 // is greater than the length of the slice all elements are returned.
 func (e *FirstExpr) Evaluate(engine *Engine, input interface{}, args []*Statement) (interface{}, error) {
-	in := reflect.ValueOf(input)
+	mutIn := reflect.ValueOf(input)
 
 	if len(args) != 1 {
 		return nil, fmt.Errorf("function First() must take a single argument")
@@ -30,13 +30,13 @@ func (e *FirstExpr) Evaluate(engine *Engine, input interface{}, args []*Statemen
 	}
 
 	// Convert into a slice if needed.
-	if in.Kind() != reflect.Slice {
-		s := reflect.MakeSlice(reflect.SliceOf(in.Type()), 1, 1)
-		s.Index(0).Set(in)
-		in = reflect.ValueOf(s.Interface())
+	if mutIn.Kind() != reflect.Slice {
+		s := reflect.MakeSlice(reflect.SliceOf(mutIn.Type()), 1, 1)
+		s.Index(0).Set(mutIn)
+		mutIn = reflect.ValueOf(s.Interface())
 	}
 
-	if in.IsNil() {
+	if mutIn.IsNil() {
 		return nil, nil
 	}
 
@@ -50,9 +50,9 @@ func (e *FirstExpr) Evaluate(engine *Engine, input interface{}, args []*Statemen
 		return nil, err
 	}
 
-	if len := in.Len(); max >= len {
+	if len := mutIn.Len(); max >= len {
 		max = len
 	}
 
-	return in.Slice(0, max).Interface(), nil
+	return mutIn.Slice(0, max).Interface(), nil
 }

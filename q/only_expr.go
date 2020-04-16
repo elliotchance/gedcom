@@ -22,7 +22,7 @@ func (e *OnlyExpr) Evaluate(engine *Engine, input interface{}, args []*Statement
 	}
 
 	inputSliceType := TypeOfSliceElement(input)
-	results := reflect.MakeSlice(reflect.SliceOf(inputSliceType), 0, 0)
+	mutResults := reflect.MakeSlice(reflect.SliceOf(inputSliceType), 0, 0)
 
 	condition := args[0]
 	for i := 0; i < in.Len(); i++ {
@@ -32,9 +32,9 @@ func (e *OnlyExpr) Evaluate(engine *Engine, input interface{}, args []*Statement
 		}
 
 		if shouldAppend, ok := result.(bool); ok && shouldAppend {
-			results = reflect.Append(results, in.Index(i))
+			mutResults = reflect.Append(mutResults, in.Index(i))
 		}
 	}
 
-	return results.Interface(), nil
+	return mutResults.Interface(), nil
 }

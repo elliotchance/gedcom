@@ -14,15 +14,15 @@ type DateNodes []*DateNode
 //
 // If the slice is nil or contains zero elements then nil will be returned.
 func (dates DateNodes) Minimum() *DateNode {
-	min := (*DateNode)(nil)
+	mutMin := (*DateNode)(nil)
 
 	for _, date := range dates {
-		if min == nil || date.StartDate().Years() < min.StartDate().Years() {
-			min = date
+		if mutMin == nil || date.StartDate().Years() < mutMin.StartDate().Years() {
+			mutMin = date
 		}
 	}
 
-	return min
+	return mutMin
 }
 
 // Maximum returns the date node with the maximum Years value from the provided

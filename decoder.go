@@ -79,18 +79,15 @@ func NewDecoder(r io.Reader) *Decoder {
 // Document will be returned with zero nodes.
 func (dec *Decoder) Decode() (*Document, error) {
 	document := NewDocument()
-	indents := Nodes{}
+	mutIndents := Nodes{}
 	var family *FamilyNode
 
 	document.HasBOM = dec.consumeOptionalBOM()
 
-	finished := false
-	lineNumber := 0
-
 	// Only used when AllowMultiLine is enabled.
 	var previousNode Node
 
-	for !finished {
+	for lineNumber, finished := 0, false; !finished; {
 		lineNumber++
 
 		line, err := dec.readLine()
@@ -111,7 +108,7 @@ func (dec *Decoder) Decode() (*Document, error) {
 			continue
 		}
 
-		node, indent, err := parseLine(line, document, family)
+		node, mutIndent, err := parseLine(line, document, family)
 		if err != nil {
 			if dec.AllowMultiLine && previousNode != nil {
 				previousNode.RawSimpleNode().value += "\n" + line
@@ -129,23 +126,23 @@ func (dec *Decoder) Decode() (*Document, error) {
 		}
 
 		// Add a root node to the document.
-		if indent == 0 {
+		if mutIndent == 0 {
 			dec.trimNodeValue(previousNode)
 			document.AddNode(node)
 			previousNode = node
 
 			// There can be multiple root nodes so make sure we always reset all
-			// indent pointers.
-			indents = Nodes{node}
+			// mutIndent pointers.
+			mutIndents = Nodes{node}
 
 			continue
 		}
 
-		if indent-1 >= len(indents) {
+		if mutIndent-1 >= len(mutIndents) {
 			// This means the file is not valid. I have seen it in very rare
 			// cases. See full explanation in AllowInvalidIndents.
 			if dec.AllowInvalidIndents {
-				indent = len(indents)
+				mutIndent = len(mutIndents)
 			} else {
 				panic(fmt.Sprintf(
 					"indent is too large - missing parent? at line %d: %s",
@@ -153,31 +150,31 @@ func (dec *Decoder) Decode() (*Document, error) {
 			}
 		}
 
-		i := indents[indent-1]
+		i := mutIndents[mutIndent-1]
 
 		switch {
-		case indent >= len(indents):
+		case mutIndent >= len(mutIndents):
 			// Descending one level. It is not valid for a child to have an
-			// indent that is more than one greater than the parent. This would
+			// mutIndent that is more than one greater than the parent. This would
 			// be a corrupt GEDCOM and lead to a panic.
-			indents = append(indents, node)
+			mutIndents = append(mutIndents, node)
 
-		case indent < len(indents)-1:
+		case mutIndent < len(mutIndents)-1:
 			// Moving back to a parent. It is possible for this leap to be
-			// greater than one so trim the indent levels back as many times as
-			// needed to represent the new indent level.
-			indents = indents[:indent+1]
-			indents[indent] = node
+			// greater than one so trim the mutIndent levels back as many times as
+			// needed to represent the new mutIndent level.
+			mutIndents = mutIndents[:mutIndent+1]
+			mutIndents[mutIndent] = node
 
 		default:
-			// This case would be "indent == len(indents)-1" (the indent does
+			// This case would be "mutIndent == len(mutIndents)-1" (the mutIndent does
 			// not change from the previous line). However, since it is the only
 			// other logical possibility there is no need to evaluate it for the
 			// case condition.
 			//
-			// Make sure we update the current indent with the new node so that
+			// Make sure we update the current mutIndent with the new node so that
 			// children get place on this node and not the previous one.
-			indents[indent] = node
+			mutIndents[mutIndent] = node
 		}
 
 		dec.trimNodeValue(previousNode)
@@ -242,11 +239,7 @@ func parseLine(line string, document *Document, family *FamilyNode) (Node, int, 
 	indent, _ := strconv.Atoi(parts[1])
 
 	// Pointer (optional).
-	pointer := ""
-	if parts[2] != "" {
-		// Trim off the surrounding '@'.
-		pointer = parts[2][1 : len(parts[2])-2]
-	}
+	pointer := trimPointer(parts[2])
 
 	// Tag (required).
 	tag := tag.TagFromString(parts[3])
@@ -255,6 +248,15 @@ func parseLine(line string, document *Document, family *FamilyNode) (Node, int, 
 	value := parts[4]
 
 	return newNode(document, family, tag, value, pointer), indent, nil
+}
+
+func trimPointer(p string) string {
+	if p != "" {
+		// Trim off the surrounding '@'.
+		return p[1 : len(p)-2]
+	}
+
+	return ""
 }
 
 // NewNode creates a node with no children. It is also the correct way to

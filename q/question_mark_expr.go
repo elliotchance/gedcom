@@ -31,39 +31,39 @@ type QuestionMarkExpr struct{}
 //   ]
 //
 func (e *QuestionMarkExpr) Evaluate(engine *Engine, input interface{}, args []*Statement) (interface{}, error) {
-	in := reflect.TypeOf(input)
+	mutIn := reflect.TypeOf(input)
 
-	if in.Kind() == reflect.Slice {
+	if mutIn.Kind() == reflect.Slice {
 		value := reflect.Zero(TypeOfSliceElement(input)).Interface()
 
 		return e.Evaluate(engine, value, nil)
 	}
 
-	if in.Kind() != reflect.Ptr {
-		in = reflect.New(in).Type()
+	if mutIn.Kind() != reflect.Ptr {
+		mutIn = reflect.New(mutIn).Type()
 	}
 
-	options := []string{}
+	mutOptions := []string{}
 
 	// Accessors
-	for i := 0; i < in.NumMethod(); i++ {
-		methodName := "." + in.Method(i).Name
-		options = append(options, methodName)
+	for i := 0; i < mutIn.NumMethod(); i++ {
+		methodName := "." + mutIn.Method(i).Name
+		mutOptions = append(mutOptions, methodName)
 	}
 
 	// Functions
 	for function := range Functions {
-		options = append(options, function)
+		mutOptions = append(mutOptions, function)
 	}
 
 	// Variables
 	for _, statement := range engine.Statements {
 		if statement.VariableName != "" {
-			options = append(options, statement.VariableName)
+			mutOptions = append(mutOptions, statement.VariableName)
 		}
 	}
 
-	sort.Strings(options)
+	sort.Strings(mutOptions)
 
-	return options, nil
+	return mutOptions, nil
 }

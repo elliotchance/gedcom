@@ -15,7 +15,7 @@ func (e *MergeDocumentsAndIndividualsExpr) Evaluate(engine *Engine, input interf
 		return nil, errors.New("MergeDocumentsAndIndividuals must take two arguments")
 	}
 
-	documents := []*gedcom.Document{}
+	mutDocuments := []*gedcom.Document{}
 
 	for argNumber, arg := range args {
 		value, err := arg.Evaluate(engine, nil)
@@ -24,7 +24,7 @@ func (e *MergeDocumentsAndIndividualsExpr) Evaluate(engine *Engine, input interf
 		}
 
 		if doc, ok := value.(*gedcom.Document); ok {
-			documents = append(documents, doc)
+			mutDocuments = append(mutDocuments, doc)
 		} else {
 			return nil, fmt.Errorf(
 				"argument %d of MergeDocumentsAndIndividuals is not a Document",
@@ -35,5 +35,5 @@ func (e *MergeDocumentsAndIndividualsExpr) Evaluate(engine *Engine, input interf
 	mergeFn := gedcom.EqualityMergeFunction
 	options := gedcom.NewIndividualNodesCompareOptions()
 
-	return gedcom.MergeDocumentsAndIndividuals(documents[0], documents[1], mergeFn, options)
+	return gedcom.MergeDocumentsAndIndividuals(mutDocuments[0], mutDocuments[1], mergeFn, options)
 }

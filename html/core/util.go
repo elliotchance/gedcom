@@ -49,3 +49,11 @@ func appendSprintf(w io.Writer, format string, args ...interface{}) int64 {
 func writeNothing() (int64, error) {
 	return 0, nil
 }
+
+func activeIf(condition bool) string {
+	if condition {
+		return "active"
+	}
+
+	return ""
+}

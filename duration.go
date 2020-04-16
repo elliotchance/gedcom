@@ -20,13 +20,9 @@ func NewExactDuration(duration time.Duration) Duration {
 }
 
 func NewDuration(duration time.Duration, isKnown, isEstimate bool) Duration {
-	// Durations must always be positive.
-	if duration < 0 {
-		duration = -duration
-	}
-
 	return Duration{
-		Duration:   duration,
+		// Durations must always be positive.
+		Duration:   positiveDuration(duration),
 		IsEstimate: isEstimate,
 		IsKnown:    isKnown,
 	}

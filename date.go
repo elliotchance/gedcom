@@ -283,24 +283,36 @@ func (date Date) Time() time.Time {
 		// represent the start of the year 0.
 	}
 
+	return date.safeParseOrCorrectZero(d)
+}
+
+func (date Date) safeParseOrCorrectZero(d string) time.Time {
 	result := date.safeParse(d)
 
 	// If the safeParse could not parse the date it will return a zero date.
 	// Make sure we don't try to adjust the zero date.
 	if date.IsEndOfRange && !result.IsZero() {
-		switch {
-		case date.Day != 0:
-			result = result.AddDate(0, 0, 1)
-		case date.Month != 0:
-			result = result.AddDate(0, 1, 0)
-		case date.Year != 0:
-			result = result.AddDate(1, 0, 0)
-		}
+		years, months, days := date.timeOffsetFromZeros()
 
-		result = result.Add(-time.Nanosecond)
+		return result.AddDate(years, months, days).Add(-time.Nanosecond)
 	}
 
 	return result
+}
+
+func (date Date) timeOffsetFromZeros() (years, months, days int) {
+	switch {
+	case date.Day != 0:
+		return 0, 0, 1
+
+	case date.Month != 0:
+		return 0, 1, 0
+
+	case date.Year != 0:
+		return 1, 0, 0
+	}
+
+	return 0, 0, 0
 }
 
 // String returns the date in one of the three forms:
@@ -316,25 +328,38 @@ func (date Date) Time() time.Time {
 //   Bef.
 //
 func (date Date) String() string {
-	day := ""
-	if date.Day != 0 {
-		day = strconv.Itoa(date.Day)
-	}
-
-	monthName := ""
-	if date.Month != 0 {
-		monthName = date.Month.String()[:3]
-	}
-
-	year := ""
-	if date.Year != 0 {
-		year = strconv.Itoa(date.Year)
-	}
+	day := date.dayAsString()
+	monthName := date.monthName()
+	year := date.yearAsString()
 
 	rawDate := fmt.Sprintf("%s %s %s %s",
 		date.Constraint.String(), day, monthName, year)
 
 	return CleanSpace(rawDate)
+}
+
+func (date Date) yearAsString() string {
+	if date.Year != 0 {
+		return strconv.Itoa(date.Year)
+	}
+
+	return ""
+}
+
+func (date Date) monthName() string {
+	if date.Month != 0 {
+		return date.Month.String()[:3]
+	}
+
+	return ""
+}
+
+func (date Date) dayAsString() string {
+	if date.Day != 0 {
+		return strconv.Itoa(date.Day)
+	}
+
+	return ""
 }
 
 // Is compares two dates. Dates are only considered to be the same if the day,

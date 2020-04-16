@@ -16,21 +16,21 @@ func (e *CombineExpr) Evaluate(engine *Engine, input interface{}, args []*Statem
 		return nil, nil
 	}
 
-	// Build a new slice with all elements.
+	// Build a new mutSlice with all elements.
 	firstArg, err := args[0].Evaluate(engine, input)
 	if err != nil {
 		return nil, err
 	}
 
-	slice := reflect.MakeSlice(reflect.TypeOf(firstArg), 0, 0)
+	mutSlice := reflect.MakeSlice(reflect.TypeOf(firstArg), 0, 0)
 	for _, arg := range args {
 		argValue, err := arg.Evaluate(engine, input)
 		if err != nil {
 			return nil, err
 		}
 
-		slice = reflect.AppendSlice(slice, reflect.ValueOf(argValue))
+		mutSlice = reflect.AppendSlice(mutSlice, reflect.ValueOf(argValue))
 	}
 
-	return slice.Interface(), nil
+	return mutSlice.Interface(), nil
 }

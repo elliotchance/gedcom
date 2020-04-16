@@ -17,14 +17,18 @@ var uuidRegexp = regexp.MustCompile(`^[0-9a-f]{32}$`)
 //
 // An error is returned if there is more than 32 hexadecimal characters.
 func NewUUIDFromString(s string) (UUID, error) {
-	s2 := strings.Replace(s, "-", "", -1)
-	s2 = strings.ToLower(s2)
-	if !uuidRegexp.MatchString(s2) {
+	withoutDashes := strings.Replace(s, "-", "", -1)
+	lowerCaseWithoutDashes := strings.ToLower(withoutDashes)
+	if !uuidRegexp.MatchString(lowerCaseWithoutDashes) {
 		return "", fmt.Errorf("invalid UUID: " + s)
 	}
 
 	uuid := fmt.Sprintf("%s-%s-%s-%s-%s",
-		s2[:8], s2[8:12], s2[12:16], s2[16:20], s2[20:])
+		lowerCaseWithoutDashes[:8],
+		lowerCaseWithoutDashes[8:12],
+		lowerCaseWithoutDashes[12:16],
+		lowerCaseWithoutDashes[16:20],
+		lowerCaseWithoutDashes[20:])
 
 	return UUID(uuid), nil
 }

@@ -163,11 +163,11 @@ func runTuneCommand() {
 	}
 
 	// Calculate ideal score.
-	idealScore := 0
+	mutIdealScore := 0
 	for _, i1 := range gedcom1.Individuals() {
 		for _, i2 := range gedcom2.Individuals() {
 			if i1.Pointer() == i2.Pointer() {
-				idealScore += 1
+				mutIdealScore++
 			}
 		}
 	}
@@ -187,11 +187,11 @@ func runTuneCommand() {
 			options.JaroBoostThreshold = random(tuneFlags.optionsJaroBoostMin, tuneFlags.optionsJaroBoostMax)
 			options.JaroPrefixSize = int(random(float64(tuneFlags.optionsJaroPrefixSizeMin), float64(tuneFlags.optionsJaroPrefixSizeMax)))
 
-			run(gedcom1, gedcom2, idealScore, options)
+			run(gedcom1, gedcom2, mutIdealScore, options)
 		}
 	}
 
-	runMinimumSimilarity(gedcom1, gedcom2, idealScore, options, tuneFlags)
+	runMinimumSimilarity(gedcom1, gedcom2, mutIdealScore, options, tuneFlags)
 }
 
 func random(min, max float64) float64 {
@@ -267,17 +267,17 @@ func run(gedcom1, gedcom2 *gedcom.Document, idealScore int, options gedcom.Simil
 
 	comparisons := gedcom1.Individuals().Compare(gedcom2.Individuals(), compareOptions)
 
-	score := 0.0
+	mutScore := 0.0
 	for _, comparison := range comparisons {
 		if comparison.Left != nil && comparison.Right != nil {
 			if comparison.Left.Pointer() == comparison.Right.Pointer() {
-				score += 1
+				mutScore++
 			} else {
-				score -= 1
+				mutScore--
 			}
 		}
 	}
 
-	adjustedScore := score / float64(idealScore)
+	adjustedScore := mutScore / float64(idealScore)
 	fmt.Printf("%s, Score:%.6f\n", options, adjustedScore)
 }

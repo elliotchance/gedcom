@@ -21,10 +21,7 @@ func NewNavItem(content Component, isActive bool, href string) *NavItem {
 }
 
 func (c *NavItem) WriteHTMLTo(w io.Writer) (int64, error) {
-	active := ""
-	if c.isActive {
-		active = "active"
-	}
+	active := activeIf(c.isActive)
 
 	return NewTag("li", map[string]string{
 		"class": "nav-item",

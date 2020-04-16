@@ -15,13 +15,13 @@ func NewTableHead(columns ...string) *TableHead {
 }
 
 func (c *TableHead) WriteHTMLTo(w io.Writer) (int64, error) {
-	n := appendString(w, `<thead><tr>`)
+	mutN := appendString(w, `<thead><tr>`)
 
 	for _, column := range c.columns {
-		n += appendSprintf(w, `<th scope="col">%s</th>`, column)
+		mutN += appendSprintf(w, `<th scope="col">%s</th>`, column)
 	}
 
-	n += appendString(w, `</tr></thead>`)
+	mutN += appendString(w, `</tr></thead>`)
 
-	return n, nil
+	return mutN, nil
 }

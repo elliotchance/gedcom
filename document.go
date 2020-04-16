@@ -96,15 +96,15 @@ func (doc *Document) GEDCOMString(indent int) string {
 
 // Individuals returns all of the people in the document.
 func (doc *Document) Individuals() IndividualNodes {
-	individuals := IndividualNodes{}
+	mutIndividuals := IndividualNodes{}
 
 	for _, node := range doc.Nodes() {
 		if n, ok := node.(*IndividualNode); ok {
-			individuals = append(individuals, n)
+			mutIndividuals = append(mutIndividuals, n)
 		}
 	}
 
-	return individuals
+	return mutIndividuals
 }
 
 func (doc *Document) buildPointerCache() {

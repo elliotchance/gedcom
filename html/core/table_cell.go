@@ -42,28 +42,32 @@ func (c *TableCell) Header() *TableCell {
 }
 
 func (c *TableCell) WriteHTMLTo(w io.Writer) (int64, error) {
-	htmlTag := "td"
-	if c.isHeader {
-		htmlTag = "th"
-	}
-
-	n := appendSprintf(w, `<%s scope="col"`, htmlTag)
+	htmlTag := c.htmlTag()
+	mutN := appendSprintf(w, `<%s scope="col"`, htmlTag)
 
 	if c.class != "" {
-		n += appendSprintf(w, ` class="%s"`, c.class)
+		mutN += appendSprintf(w, ` class="%s"`, c.class)
 	}
 
 	if c.noWrap {
-		n += appendString(w, ` nowrap="nowrap"`)
+		mutN += appendString(w, ` nowrap="nowrap"`)
 	}
 
 	if c.style != "" {
-		n += appendSprintf(w, ` style="%s"`, c.style)
+		mutN += appendSprintf(w, ` style="%s"`, c.style)
 	}
 
-	n += appendString(w, `>`)
-	n += appendComponent(w, c.content)
-	n += appendSprintf(w, `</%s>`, htmlTag)
+	mutN += appendString(w, `>`)
+	mutN += appendComponent(w, c.content)
+	mutN += appendSprintf(w, `</%s>`, htmlTag)
 
-	return n, nil
+	return mutN, nil
+}
+
+func (c *TableCell) htmlTag() string {
+	if c.isHeader {
+		return "th"
+	}
+
+	return "td"
 }

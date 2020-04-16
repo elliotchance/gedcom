@@ -56,7 +56,7 @@ func (e *LastExpr) Evaluate(engine *Engine, input interface{}, args []*Statement
 	}
 
 	l := in.Len()
-	start := l - x
+	start := math.Ml - x
 
 	if start < 0 {
 		start = 0

@@ -41,12 +41,12 @@ func (enc *Encoder) renderNode(indent int, node Node) error {
 	}
 
 	for _, child := range node.Nodes() {
-		nextIndent := indent + 1
+		mutNextIndent := indent + 1
 		if indent == NoIndent {
-			nextIndent = NoIndent
+			mutNextIndent = NoIndent
 		}
 
-		err = enc.renderNode(nextIndent, child)
+		err = enc.renderNode(mutNextIndent, child)
 		if err != nil {
 			return err
 		}

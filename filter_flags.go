@@ -98,34 +98,34 @@ func (ff *FilterFlags) FilterFunctions() []FilterFunction {
 		}
 	}
 
-	filters := []FilterFunction{
+	mutFilters := []FilterFunction{
 		BlacklistTagFilter(blacklistTags...),
 	}
 
 	if ff.OnlyOfficial {
-		filters = append(filters, OfficialTagFilter())
+		mutFilters = append(mutFilters, OfficialTagFilter())
 	}
 
 	// This must be before NameFormat because NameFormat may simplify/destroy
 	// NAME nodes.
 	if ff.NoDuplicateNames {
-		filters = append(filters, RemoveDuplicateNamesFilter())
+		mutFilters = append(mutFilters, RemoveDuplicateNamesFilter())
 	}
 
 	if ff.NameFormat != "unmodified" {
 		format, _ := NewNameFormatByName(ff.NameFormat)
-		filters = append(filters, SimpleNameFilter(format))
+		mutFilters = append(mutFilters, SimpleNameFilter(format))
 	}
 
 	if ff.OnlyVitals {
-		filters = append(filters, OnlyVitalsTagFilter())
+		mutFilters = append(mutFilters, OnlyVitalsTagFilter())
 	}
 
 	if ff.NoEmptyDeaths {
-		filters = append(filters, RemoveEmptyDeathTagFilter())
+		mutFilters = append(mutFilters, RemoveEmptyDeathTagFilter())
 	}
 
-	return filters
+	return mutFilters
 }
 
 func (ff *FilterFlags) Filter(node Node) Node {

@@ -155,10 +155,10 @@ func (node *NameNode) Type() NameType {
 //
 // Even this uses the NameFormatGEDCOM it may return a different value from
 // Format(NameFormatGEDCOM) because any empty surnames will be removed.
-func (node *NameNode) GedcomName() (name string) {
-	name = node.Format(NameFormatGEDCOM)
-	name = strings.Replace(name, "//", "", -1)
-	name = CleanSpace(name)
+func (node *NameNode) GedcomName() (mutName string) {
+	mutName = node.Format(NameFormatGEDCOM)
+	mutName = strings.Replace(mutName, "//", "", -1)
+	mutName = CleanSpace(mutName)
 
 	return
 }
@@ -168,46 +168,48 @@ func (node *NameNode) GedcomName() (name string) {
 // There are some common formats described with the NameFormat constants. See
 // NameFormat for a full description.
 func (node *NameNode) Format(format NameFormat) string {
-	result := ""
+	mutResult := ""
 	formatLen := len(format)
 
 	for i := 0; i < formatLen; i++ {
 		if format[i] == '%' && i < formatLen-1 {
 			nextLetter := format[i+1]
-
-			switch nextLetter {
-			case '%':
-				result += "%"
-
-			case 'f', 'F':
-				result += renderNameComponent(nextLetter, node.GivenName())
-
-			case 'l', 'L':
-				result += renderNameComponent(nextLetter, node.Surname())
-
-			case 'm', 'M':
-				result += renderNameComponent(nextLetter, node.SurnamePrefix())
-
-			case 'p', 'P':
-				result += renderNameComponent(nextLetter, node.Prefix())
-
-			case 's', 'S':
-				result += renderNameComponent(nextLetter, node.Suffix())
-
-			case 't', 'T':
-				result += renderNameComponent(nextLetter, node.Title())
-
-			default:
-				result += "%" + string(nextLetter)
-			}
-
+			mutResult += node.renderNextLetter(nextLetter)
 			i++
 		} else {
-			result += string(format[i])
+			mutResult += string(format[i])
 		}
 	}
 
-	return CleanSpace(result)
+	return CleanSpace(mutResult)
+}
+
+func (node *NameNode) renderNextLetter(nextLetter uint8) string {
+	switch nextLetter {
+	case '%':
+		return "%"
+
+	case 'f', 'F':
+		return renderNameComponent(nextLetter, node.GivenName())
+
+	case 'l', 'L':
+		return renderNameComponent(nextLetter, node.Surname())
+
+	case 'm', 'M':
+		return renderNameComponent(nextLetter, node.SurnamePrefix())
+
+	case 'p', 'P':
+		return renderNameComponent(nextLetter, node.Prefix())
+
+	case 's', 'S':
+		return renderNameComponent(nextLetter, node.Suffix())
+
+	case 't', 'T':
+		return renderNameComponent(nextLetter, node.Title())
+
+	default:
+		return "%" + string(nextLetter)
+	}
 }
 
 func renderNameComponent(letter byte, namePart string) string {

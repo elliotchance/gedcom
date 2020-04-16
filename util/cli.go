@@ -23,18 +23,18 @@ func WrapToMargin(s string, width int) (r string) {
 
 	for _, line := range lines {
 		words := strings.Split(line, " ")
-		newLine := ""
+		mutNewLine := ""
 
 		for _, word := range words {
-			if len(newLine)+len(word)+1 > width {
-				r += strings.TrimSpace(newLine) + "\n"
-				newLine = word
+			if len(mutNewLine)+len(word)+1 > width {
+				r += strings.TrimSpace(mutNewLine) + "\n"
+				mutNewLine = word
 			} else {
-				newLine += " " + word
+				mutNewLine += " " + word
 			}
 		}
 
-		r += strings.TrimSpace(newLine) + "\n"
+		r += strings.TrimSpace(mutNewLine) + "\n"
 	}
 
 	// Remove last new line.

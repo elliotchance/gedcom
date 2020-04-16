@@ -152,10 +152,10 @@ func (node *UniqueIDNode) Equals(node2 Node) bool {
 }
 
 func (node UniqueIDNode) cleanValue() string {
-	s := node.Value()
-	s = strings.Replace(s, "{", "", -1)
-	s = strings.Replace(s, "}", "", -1)
-	s = strings.Replace(s, "-", "", -1)
+	mutS := node.Value()
+	mutS = strings.Replace(mutS, "{", "", -1)
+	mutS = strings.Replace(mutS, "}", "", -1)
+	mutS = strings.Replace(mutS, "-", "", -1)
 
-	return s
+	return mutS
 }

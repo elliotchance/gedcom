@@ -32,25 +32,25 @@ func (c *IndividualListPage) WriteHTMLTo(w io.Writer) (int64, error) {
 		core.NewTableHead("Name", "Birth", "Death"),
 	}
 
-	individuals := gedcom.IndividualNodes{}
+	mutIndividuals := gedcom.IndividualNodes{}
 
 	for _, individual := range c.document.Individuals() {
 		if surnameStartsWith(individual, c.selectedLetter) {
-			individuals = append(individuals, individual)
+			mutIndividuals = append(mutIndividuals, individual)
 		}
 	}
 
-	// Sort individuals by name.
-	sort.Slice(individuals, func(i, j int) bool {
-		left := individuals[i].Name().Format(gedcom.NameFormatIndex)
-		right := individuals[j].Name().Format(gedcom.NameFormatIndex)
+	// Sort mutIndividuals by name.
+	sort.Slice(mutIndividuals, func(i, j int) bool {
+		left := mutIndividuals[i].Name().Format(gedcom.NameFormatIndex)
+		right := mutIndividuals[j].Name().Format(gedcom.NameFormatIndex)
 
 		return left < right
 	})
 
 	livingCount := 0
 	lastSurname := ""
-	for _, i := range individuals {
+	for _, i := range mutIndividuals {
 		if i.IsLiving() {
 			switch c.options.LivingVisibility {
 			case LivingVisibilityShow:
@@ -82,7 +82,7 @@ func (c *IndividualListPage) WriteHTMLTo(w io.Writer) (int64, error) {
 
 	livingRow := core.NewRow(
 		core.NewColumn(core.EntireRow, core.NewText(fmt.Sprintf(
-			"%d individuals are hidden because they are living.",
+			"%d mutIndividuals are hidden because they are living.",
 			livingCount,
 		))),
 	)

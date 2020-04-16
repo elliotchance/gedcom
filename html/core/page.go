@@ -24,10 +24,10 @@ func (c *Page) WriteHTMLTo(w io.Writer) (int64, error) {
 	footer := NewFooterRow()
 	title := NewTag("title", nil, NewText(c.title))
 
-	n := appendString(w, `<html><head><meta charset="UTF-8">`)
-	n += appendComponent(w, googleAnalytics)
-	n += appendComponent(w, title)
-	n += appendString(w, `<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+	mutN := appendString(w, `<html><head><meta charset="UTF-8">`)
+	mutN += appendComponent(w, googleAnalytics)
+	mutN += appendComponent(w, title)
+	mutN += appendString(w, `<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/font/octicons.css"/>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
@@ -35,9 +35,9 @@ func (c *Page) WriteHTMLTo(w io.Writer) (int64, error) {
 	<body>
 		<div class="container">`)
 
-	n += appendComponent(w, c.body)
-	n += appendComponent(w, footer)
-	n += appendString(w, `</div></body></html>`)
+	mutN += appendComponent(w, c.body)
+	mutN += appendComponent(w, footer)
+	mutN += appendString(w, `</div></body></html>`)
 
-	return n, nil
+	return mutN, nil
 }

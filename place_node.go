@@ -41,11 +41,11 @@ func NewPlaceNode(value string, children ...Node) *PlaceNode {
 func (node *PlaceNode) JurisdictionalName() string {
 	name := Value(node.Format())
 
-	if name == "" {
-		name = Value(node)
+	if name != "" {
+		return name
 	}
 
-	return name
+	return Value(node)
 }
 
 // Name is the first part of the JurisdictionalName().

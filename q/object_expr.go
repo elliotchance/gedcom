@@ -13,7 +13,7 @@ func (e *ObjectExpr) Evaluate(engine *Engine, input interface{}, args []*Stateme
 	// If it is a slice we need to Evaluate each one.
 	if in.Kind() == reflect.Slice {
 		mapType := reflect.TypeOf([]map[string]interface{}{})
-		results := reflect.MakeSlice(mapType, 0, 0)
+		mutResults := reflect.MakeSlice(mapType, 0, 0)
 
 		for i := 0; i < in.Len(); i++ {
 			result, err := e.Evaluate(engine, in.Index(i).Interface(), nil)
@@ -21,10 +21,10 @@ func (e *ObjectExpr) Evaluate(engine *Engine, input interface{}, args []*Stateme
 				return nil, err
 			}
 
-			results = reflect.Append(results, reflect.ValueOf(result))
+			mutResults = reflect.Append(mutResults, reflect.ValueOf(result))
 		}
 
-		return results.Interface(), nil
+		return mutResults.Interface(), nil
 	}
 
 	// Evaluate single.

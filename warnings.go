@@ -34,7 +34,7 @@ func (ws Warnings) WriteHTMLTo(w io.Writer) (int64, error) {
 		return a < b
 	})
 
-	rows := []core.Component{
+	mutRows := []core.Component{
 		core.NewTableHead(
 			"#",
 			"Name",
@@ -44,7 +44,7 @@ func (ws Warnings) WriteHTMLTo(w io.Writer) (int64, error) {
 	}
 
 	for i, row := range data {
-		rows = append(rows, core.NewTableRow(
+		mutRows = append(mutRows, core.NewTableRow(
 			core.NewTableCell(core.NewNumber(i+1)),
 			core.NewTableCell(core.NewText(row[0])),
 			core.NewTableCell(core.NewText(row[1])),
@@ -52,5 +52,5 @@ func (ws Warnings) WriteHTMLTo(w io.Writer) (int64, error) {
 		))
 	}
 
-	return core.NewTable("", rows...).WriteHTMLTo(w)
+	return core.NewTable("", mutRows...).WriteHTMLTo(w)
 }

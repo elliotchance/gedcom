@@ -113,14 +113,19 @@ func (age Age) String() string {
 	// ghost:ignore
 	months := int((age.Years() - float64(years)) * 12)
 
-	estimateSign := ""
-	if age.IsEstimate && years+months > 0 {
-		estimateSign = "~ "
-	}
+	estimateSign := age.estimateSign(years, months)
 
 	if months == 0 {
 		return fmt.Sprintf("%s%dy", estimateSign, years)
 	}
 
 	return fmt.Sprintf("%s%dy %dm", estimateSign, years, months)
+}
+
+func (age Age) estimateSign(years, months int) string {
+	if age.IsEstimate && years+months > 0 {
+		return "~ "
+	}
+
+	return ""
 }

@@ -119,10 +119,7 @@ func (t *Tokens) Consume(expected ...TokenKind) (tokens []Token, err error) {
 	originalPosition := t.Position
 
 	for _, kind := range expected {
-		p := Token{Kind: TokenEOF}
-		if t.Position < len(t.Tokens) {
-			p = t.Tokens[t.Position]
-		}
+		p := t.tokenOrEOF()
 
 		if p.Kind == kind {
 			tokens = append(tokens, p)
@@ -134,6 +131,14 @@ func (t *Tokens) Consume(expected ...TokenKind) (tokens []Token, err error) {
 	}
 
 	return
+}
+
+func (t *Tokens) tokenOrEOF() Token {
+	if t.Position < len(t.Tokens) {
+		return t.Tokens[t.Position]
+	}
+
+	return Token{Kind: TokenEOF}
 }
 
 func (t *Tokens) Rollback(position int, err *error) {

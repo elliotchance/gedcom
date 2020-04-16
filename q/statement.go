@@ -14,16 +14,16 @@ type Statement struct {
 }
 
 // Evaluate executes all of the expressions and returns the final result.
-func (v *Statement) Evaluate(engine *Engine, input interface{}) (interface{}, error) {
+func (v *Statement) Evaluate(engine *Engine, mutInput interface{}) (interface{}, error) {
 	var err error
 
 	for _, expression := range v.Expressions {
-		input, err = expression.Evaluate(engine, input, nil)
+		mutInput, err = expression.Evaluate(engine, mutInput, nil)
 
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	return input, nil
+	return mutInput, nil
 }

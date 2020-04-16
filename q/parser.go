@@ -36,12 +36,14 @@ func (p *Parser) ParseString(q string) (engine *Engine, err error) {
 func (p *Parser) consumeStatements(separator TokenKind) (statements []*Statement, err error) {
 	defer p.tokens.Rollback(p.tokens.Position, &err)
 
-	statement, err := p.consumeStatement()
-	if err != nil {
-		return nil, err
-	}
+	{
+		statement, err := p.consumeStatement()
+		if err != nil {
+			return nil, err
+		}
 
-	statements = append(statements, statement)
+		statements = append(statements, statement)
+	}
 
 	for {
 		statement, err := p.consumeNextStatement(separator)
@@ -137,15 +139,17 @@ func (p *Parser) consumeNextExpression() (_ Expression, err error) {
 }
 
 //   Expressions := Expression NextExpression...
-func (p *Parser) consumeExpressions() (expressions []Expression, err error) {
+func (p *Parser) consumeExpressions() (mutExpressions []Expression, err error) {
 	defer p.tokens.Rollback(p.tokens.Position, &err)
 
-	v, err := p.consumeExpression()
-	if err != nil {
-		return nil, err
-	}
+	{
+		v, err := p.consumeExpression()
+		if err != nil {
+			return nil, err
+		}
 
-	expressions = append(expressions, v)
+		mutExpressions = append(mutExpressions, v)
+	}
 
 	for {
 		v, err := p.consumeNextExpression()
@@ -153,7 +157,7 @@ func (p *Parser) consumeExpressions() (expressions []Expression, err error) {
 			break
 		}
 
-		expressions = append(expressions, v)
+		mutExpressions = append(mutExpressions, v)
 	}
 
 	return
@@ -203,15 +207,15 @@ end:
 func (p *Parser) consumeConstant() (_ *ConstantExpr, err error) {
 	defer p.tokens.Rollback(p.tokens.Position, &err)
 
-	t, err := p.tokens.Consume(TokenNumber)
+	tNumber, err := p.tokens.Consume(TokenNumber)
 	if err == nil {
-		return &ConstantExpr{Value: t[0].Value}, err
+		return &ConstantExpr{Value: tNumber[0].Value}, err
 	}
 
-	t, err = p.tokens.Consume(TokenString)
+	tString, err := p.tokens.Consume(TokenString)
 	if err == nil {
 		// Trim off "".
-		return &ConstantExpr{Value: t[0].Value[1 : len(t[0].Value)-1]}, err
+		return &ConstantExpr{Value: tString[0].Value[1 : len(tString[0].Value)-1]}, err
 	}
 
 	return nil, errors.New("no constant found")
@@ -367,12 +371,14 @@ func (p *Parser) consumeObjectWithKeys() (expr Expression, err error) {
 func (p *Parser) consumeKeyValues() (data map[string]*Statement, err error) {
 	defer p.tokens.Rollback(p.tokens.Position, &err)
 
-	key, value, err := p.consumeKeyValue()
-	if err != nil {
-		return nil, err
-	}
+	{
+		key, value, err := p.consumeKeyValue()
+		if err != nil {
+			return nil, err
+		}
 
-	data = map[string]*Statement{key: value}
+		data = map[string]*Statement{key: value}
+	}
 
 	for {
 		key, value, err := p.consumeNextKeyValue()

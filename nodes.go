@@ -48,9 +48,9 @@ func NodesWithTag(node Node, tag tag.Tag) (result Nodes) {
 
 	nodes := Nodes{}
 	n := node.Nodes()
-	for _, node := range n {
-		if node.Tag().Is(tag) {
-			nodes = append(nodes, node)
+	for _, node2 := range n {
+		if node2.Tag().Is(tag) {
+			nodes = append(nodes, node2)
 		}
 	}
 

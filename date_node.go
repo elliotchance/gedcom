@@ -37,10 +37,10 @@ func (node *DateNode) DateRange() (dateRange DateRange) {
 		return node.parsedDateRange
 	}
 
-	defer func(node *DateNode) {
+	defer func() {
 		node.parsedDateRange = dateRange
 		node.alreadyParsed = true
-	}(node)
+	}()
 
 	return NewDateRangeWithString(node.Value())
 }
