@@ -10,5 +10,6 @@ var Functions = map[string]Expression{
 	"Last":                         &LastExpr{},
 	"Length":                       &LengthExpr{},
 	"MergeDocumentsAndIndividuals": &MergeDocumentsAndIndividualsExpr{},
+	"NodesWithTagPath":             &NodesWithTagPathExpr{},
 	"Only":                         &OnlyExpr{},
 }
