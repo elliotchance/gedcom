@@ -113,6 +113,28 @@
 //
 // Merges two documents while also merging similar individuals.
 //
+//   NodesWithTagPaths(Tags...)
+//
+// NodesWithTagPath returns all of the nodes that have an exact tag path. The
+// number of nodes returned can be zero and tag must match the tag path
+// completely and exactly.
+//
+// Find all Death nodes that belong to all individuals:
+//
+//   .Individuals | NodesWithTagPath("DEAT")
+//
+// From the individuals find all the Date nodes within only the Birth nodes.
+//
+//   .Individuals | NodesWithTagPath("BIRT", "DATE")
+//
+// Combine all of the birth and death dates:
+//
+//   Births are .Individuals | NodesWithTagPath("BIRT", "DATE") | {type: "birth", date: .String};
+//   Deaths are .Individuals | NodesWithTagPath("DEAT", "DATE") | {type: "death", date: .String};
+//   Combine(Births, Deaths)
+//
+// If the node is nil the result will also be nil.
+//
 //   Only(condition)
 //
 // The Only function returns a new slice that only contains the entities that

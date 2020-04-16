@@ -31,6 +31,7 @@ var functionAndVariableChoices = []string{
 	"Last",
 	"Length",
 	"MergeDocumentsAndIndividuals",
+	"NodesWithTagPath",
 	"Only",
 }
 
