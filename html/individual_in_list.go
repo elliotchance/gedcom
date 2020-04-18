@@ -12,13 +12,15 @@ type IndividualInList struct {
 	individual *gedcom.IndividualNode
 	document   *gedcom.Document
 	visibility LivingVisibility
+	placesMap  map[string]*place
 }
 
-func NewIndividualInList(document *gedcom.Document, individual *gedcom.IndividualNode, visibility LivingVisibility) *IndividualInList {
+func NewIndividualInList(document *gedcom.Document, individual *gedcom.IndividualNode, visibility LivingVisibility, placesMap map[string]*place) *IndividualInList {
 	return &IndividualInList{
 		individual: individual,
 		document:   document,
 		visibility: visibility,
+		placesMap:  placesMap,
 	}
 }
 
@@ -32,9 +34,9 @@ func (c *IndividualInList) WriteHTMLTo(w io.Writer) (int64, error) {
 	birthDateText := core.NewText(gedcom.String(birthDate))
 	deathDateText := core.NewText(gedcom.String(deathDate))
 
-	link := NewIndividualLink(c.document, c.individual, c.visibility)
-	birthPlaceLink := NewPlaceLink(c.document, birthPlaceName)
-	deathPlaceLink := NewPlaceLink(c.document, deathPlaceName)
+	link := NewIndividualLink(c.document, c.individual, c.visibility, c.placesMap)
+	birthPlaceLink := NewPlaceLink(c.document, birthPlaceName, c.placesMap)
+	deathPlaceLink := NewPlaceLink(c.document, deathPlaceName, c.placesMap)
 	birthLines := core.NewLines(birthDateText, birthPlaceLink)
 	deathLines := core.NewLines(deathDateText, deathPlaceLink)
 

@@ -14,15 +14,17 @@ type IndividualPage struct {
 	googleAnalyticsID string
 	options           *PublishShowOptions
 	indexLetters      []rune
+	placesMap         map[string]*place
 }
 
-func NewIndividualPage(document *gedcom.Document, individual *gedcom.IndividualNode, googleAnalyticsID string, options *PublishShowOptions, indexLetters []rune) *IndividualPage {
+func NewIndividualPage(document *gedcom.Document, individual *gedcom.IndividualNode, googleAnalyticsID string, options *PublishShowOptions, indexLetters []rune, placesMap map[string]*place) *IndividualPage {
 	return &IndividualPage{
 		document:          document,
 		individual:        individual,
 		googleAnalyticsID: googleAnalyticsID,
 		options:           options,
 		indexLetters:      indexLetters,
+		placesMap:         placesMap,
 	}
 }
 
@@ -36,8 +38,10 @@ func (c *IndividualPage) WriteHTMLTo(w io.Writer) (int64, error) {
 	return core.NewPage(
 		name.String(),
 		core.NewComponents(
-			NewPublishHeader(c.document, name.String(), selectedExtraTab, c.options, c.indexLetters),
-			NewAllParentButtons(c.document, c.individual, c.options.LivingVisibility),
+			NewPublishHeader(c.document, name.String(), selectedExtraTab,
+				c.options, c.indexLetters, c.placesMap),
+			NewAllParentButtons(c.document, c.individual,
+				c.options.LivingVisibility, c.placesMap),
 			core.NewBigTitle(1, individualName),
 			core.NewBigTitle(3, individualDates),
 			core.NewHorizontalRuleRow(),
@@ -46,9 +50,11 @@ func (c *IndividualPage) WriteHTMLTo(w io.Writer) (int64, error) {
 				core.NewColumn(core.HalfRow, NewIndividualAdditionalNames(c.individual)),
 			),
 			core.NewSpace(),
-			newIndividualEvents(c.document, c.individual, c.options.LivingVisibility),
+			NewIndividualEvents(c.document, c.individual,
+				c.options.LivingVisibility, c.placesMap),
 			core.NewSpace(),
-			NewPartnersAndChildren(c.document, c.individual, c.options.LivingVisibility),
+			NewPartnersAndChildren(c.document, c.individual,
+				c.options.LivingVisibility, c.placesMap),
 		),
 		c.googleAnalyticsID,
 	).WriteHTMLTo(w)

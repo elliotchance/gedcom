@@ -11,14 +11,16 @@ type StatisticsPage struct {
 	googleAnalyticsID string
 	options           *PublishShowOptions
 	indexLetters      []rune
+	placesMap         map[string]*place
 }
 
-func NewStatisticsPage(document *gedcom.Document, googleAnalyticsID string, options *PublishShowOptions, indexLetters []rune) *StatisticsPage {
+func NewStatisticsPage(document *gedcom.Document, googleAnalyticsID string, options *PublishShowOptions, indexLetters []rune, placesMap map[string]*place) *StatisticsPage {
 	return &StatisticsPage{
 		document:          document,
 		googleAnalyticsID: googleAnalyticsID,
 		options:           options,
 		indexLetters:      indexLetters,
+		placesMap:         placesMap,
 	}
 }
 
@@ -27,7 +29,7 @@ func (c *StatisticsPage) WriteHTMLTo(w io.Writer) (int64, error) {
 		"Statistics",
 		core.NewComponents(
 			NewPublishHeader(c.document, "", selectedStatisticsTab, c.options,
-				c.indexLetters),
+				c.indexLetters, c.placesMap),
 			core.NewBigTitle(1, core.NewText("Statistics")),
 			core.NewSpace(),
 			core.NewRow(
@@ -38,7 +40,7 @@ func (c *StatisticsPage) WriteHTMLTo(w io.Writer) (int64, error) {
 					core.NewSpace(),
 					NewSourceStatistics(c.document),
 					core.NewSpace(),
-					newPlaceStatistics(c.document),
+					newPlaceStatistics(c.document, c.placesMap),
 				)),
 				core.NewColumn(core.HalfRow, NewEventStatistics(c.document)),
 			),

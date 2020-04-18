@@ -11,14 +11,16 @@ type SourceListPage struct {
 	googleAnalyticsID string
 	options           *PublishShowOptions
 	indexLetters      []rune
+	placesMap         map[string]*place
 }
 
-func NewSourceListPage(document *gedcom.Document, googleAnalyticsID string, options *PublishShowOptions, indexLetters []rune) *SourceListPage {
+func NewSourceListPage(document *gedcom.Document, googleAnalyticsID string, options *PublishShowOptions, indexLetters []rune, placesMap map[string]*place) *SourceListPage {
 	return &SourceListPage{
 		document:          document,
 		googleAnalyticsID: googleAnalyticsID,
 		options:           options,
 		indexLetters:      indexLetters,
+		placesMap:         placesMap,
 	}
 }
 
@@ -32,7 +34,8 @@ func (c *SourceListPage) WriteHTMLTo(w io.Writer) (int64, error) {
 	}
 
 	return core.NewPage("Sources", core.NewComponents(
-		NewPublishHeader(c.document, "", selectedSourcesTab, c.options, c.indexLetters),
+		NewPublishHeader(c.document, "", selectedSourcesTab, c.options,
+			c.indexLetters, c.placesMap),
 		core.NewRow(
 			core.NewColumn(core.EntireRow, core.NewTable("", table...)),
 		),

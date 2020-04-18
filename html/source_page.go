@@ -12,15 +12,17 @@ type SourcePage struct {
 	googleAnalyticsID string
 	options           *PublishShowOptions
 	indexLetters      []rune
+	placesMap         map[string]*place
 }
 
-func NewSourcePage(document *gedcom.Document, source *gedcom.SourceNode, googleAnalyticsID string, options *PublishShowOptions, indexLetters []rune) *SourcePage {
+func NewSourcePage(document *gedcom.Document, source *gedcom.SourceNode, googleAnalyticsID string, options *PublishShowOptions, indexLetters []rune, placesMap map[string]*place) *SourcePage {
 	return &SourcePage{
 		document:          document,
 		source:            source,
 		googleAnalyticsID: googleAnalyticsID,
 		options:           options,
 		indexLetters:      indexLetters,
+		placesMap:         placesMap,
 	}
 }
 
@@ -36,8 +38,8 @@ func (c *SourcePage) WriteHTMLTo(w io.Writer) (int64, error) {
 	return core.NewPage(
 		c.source.Title(),
 		core.NewComponents(
-			NewPublishHeader(c.document, "Source", selectedExtraTab, c.options,
-				c.indexLetters),
+			NewPublishHeader(c.document, "Source", selectedExtraTab,
+				c.options, c.indexLetters, c.placesMap),
 			core.NewBigTitle(1, core.NewText(c.source.Title())),
 			core.NewSpace(),
 			core.NewRow(

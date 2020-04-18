@@ -11,14 +11,16 @@ type SurnameListPage struct {
 	googleAnalyticsID string
 	options           *PublishShowOptions
 	indexLetters      []rune
+	placesMap         map[string]*place
 }
 
-func NewSurnameListPage(document *gedcom.Document, googleAnalyticsID string, options *PublishShowOptions, indexLetters []rune) *SurnameListPage {
+func NewSurnameListPage(document *gedcom.Document, googleAnalyticsID string, options *PublishShowOptions, indexLetters []rune, placesMap map[string]*place) *SurnameListPage {
 	return &SurnameListPage{
 		document:          document,
 		googleAnalyticsID: googleAnalyticsID,
 		options:           options,
 		indexLetters:      indexLetters,
+		placesMap:         placesMap,
 	}
 }
 
@@ -33,7 +35,7 @@ func (c *SurnameListPage) WriteHTMLTo(w io.Writer) (int64, error) {
 
 	return core.NewPage("Surnames", core.NewComponents(
 		NewPublishHeader(c.document, "", selectedSurnamesTab, c.options,
-			c.indexLetters),
+			c.indexLetters, c.placesMap),
 		core.NewRow(
 			core.NewColumn(core.EntireRow, core.NewTable("", table...)),
 		),

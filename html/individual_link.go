@@ -13,13 +13,15 @@ type IndividualLink struct {
 	individual *gedcom.IndividualNode
 	document   *gedcom.Document
 	visibility LivingVisibility
+	placesMap  map[string]*place
 }
 
-func NewIndividualLink(document *gedcom.Document, individual *gedcom.IndividualNode, visibility LivingVisibility) *IndividualLink {
+func NewIndividualLink(document *gedcom.Document, individual *gedcom.IndividualNode, visibility LivingVisibility, placesMap map[string]*place) *IndividualLink {
 	return &IndividualLink{
 		individual: individual,
 		document:   document,
 		visibility: visibility,
+		placesMap:  placesMap,
 	}
 }
 
@@ -42,7 +44,7 @@ func (c *IndividualLink) WriteHTMLTo(w io.Writer) (int64, error) {
 		UnknownEmphasis)
 	text := core.NewComponents(dot, individualName)
 
-	link := PageIndividual(c.document, c.individual, c.visibility)
+	link := PageIndividual(c.document, c.individual, c.visibility, c.placesMap)
 
 	return core.NewLink(text, link).WriteHTMLTo(w)
 }

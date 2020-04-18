@@ -12,13 +12,15 @@ type PartnersAndChildren struct {
 	individual *gedcom.IndividualNode
 	document   *gedcom.Document
 	visibility LivingVisibility
+	placesMap  map[string]*place
 }
 
-func NewPartnersAndChildren(document *gedcom.Document, individual *gedcom.IndividualNode, visibility LivingVisibility) *PartnersAndChildren {
+func NewPartnersAndChildren(document *gedcom.Document, individual *gedcom.IndividualNode, visibility LivingVisibility, placesMap map[string]*place) *PartnersAndChildren {
 	return &PartnersAndChildren{
 		individual: individual,
 		document:   document,
 		visibility: visibility,
+		placesMap:  placesMap,
 	}
 }
 
@@ -47,7 +49,8 @@ func (c *PartnersAndChildren) WriteHTMLTo(w io.Writer) (int64, error) {
 		rows = append(rows, core.NewHorizontalRuleRow())
 
 		columns := []*core.Column{
-			core.NewColumn(core.QuarterRow, NewIndividualButton(c.document, spouse, c.visibility)),
+			core.NewColumn(core.QuarterRow, NewIndividualButton(c.document,
+				spouse, c.visibility, c.placesMap)),
 		}
 
 		family := c.individual.FamilyWithSpouse(spouse)
@@ -73,7 +76,8 @@ func (c *PartnersAndChildren) WriteHTMLTo(w io.Writer) (int64, error) {
 
 		columns := []*core.Column{
 			core.NewColumn(core.QuarterRow,
-				NewIndividualButton(c.document, nil, c.visibility)),
+				NewIndividualButton(c.document, nil, c.visibility,
+					c.placesMap)),
 		}
 
 		columns, rows = partnerSection(family, c, columns, rows)
@@ -128,7 +132,7 @@ func partnerSection(family *gedcom.FamilyNode, c *PartnersAndChildren, columns [
 
 		button := core.NewComponents(
 			svg,
-			NewIndividualButton(c.document, child, c.visibility),
+			NewIndividualButton(c.document, child, c.visibility, c.placesMap),
 		)
 		columns = append(columns, core.NewColumn(3, button))
 
