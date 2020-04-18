@@ -42,7 +42,10 @@ import (
 // 2. If the nodes should not or could not be merged, then nil is returned.
 //
 // A MergeFunction can be used with MergeNodeSlices.
-type MergeFunction func(left, right Node) Node
+//
+// The document parameter is used as the destination for merged nodes that need
+// to be attached to a document (such as individuals).
+type MergeFunction func(left, right Node, document *Document) Node
 
 // MergeNodes returns a new node that merges children from both nodes.
 //
@@ -51,7 +54,11 @@ type MergeFunction func(left, right Node) Node
 //
 // The node returned and all of the merged children will be created as new
 // nodes as to not interfere with the original input.
-func MergeNodes(left, right Node) (Node, error) {
+//
+// The document must not be nil and will be used to attach the new nodes to
+// (since some nodes require a document, such as individuals). You may supply
+// the same document.
+func MergeNodes(left, right Node, document *Document) (Node, error) {
 	if IsNil(left) {
 		return nil, errors.New("left is nil")
 	}
@@ -69,12 +76,12 @@ func MergeNodes(left, right Node) (Node, error) {
 			leftTag.Tag(), rightTag.Tag())
 	}
 
-	r := DeepCopy(left)
+	r := DeepCopy(left, document)
 
 	for _, child := range right.Nodes() {
 		for _, n := range r.Nodes() {
 			if n.Equals(child) {
-				newNodes := MergeNodeSlices(child.Nodes(), n.Nodes(),
+				newNodes := MergeNodeSlices(child.Nodes(), n.Nodes(), document,
 					EqualityMergeFunction)
 				n.SetNodes(newNodes)
 				goto next
@@ -118,7 +125,11 @@ func MergeNodes(left, right Node) (Node, error) {
 // 5. Merges can only happen between a node on the left with a node on the
 // right. Even if two nodes in the left could be merged they will not be. The
 // same goes for all of the elements in the right slice.
-func MergeNodeSlices(left, right Nodes, mergeFn MergeFunction) Nodes {
+//
+// The document must not be nil and will be used to attach the new nodes to
+// (since some nodes require a document, such as individuals). You may supply
+// the same document.
+func MergeNodeSlices(left, right Nodes, document *Document, mergeFn MergeFunction) Nodes {
 	newSlice := Nodes{}
 
 	// Be careful to duplicate the right slice. I'm not sure why this is
@@ -130,7 +141,7 @@ func MergeNodeSlices(left, right Nodes, mergeFn MergeFunction) Nodes {
 
 	// We start by adding all of the items on the left.
 	for _, node := range left {
-		newSlice = append(newSlice, DeepCopy(node))
+		newSlice = append(newSlice, DeepCopy(node, document))
 	}
 
 	// Each of the items on the right must be compared with all of the items in
@@ -164,7 +175,7 @@ func MergeNodeSlices(left, right Nodes, mergeFn MergeFunction) Nodes {
 			}
 
 			for j, node2 := range right {
-				merged := mergeFn(node, node2)
+				merged := mergeFn(node, node2, document)
 				if !IsNil(merged) {
 					// Remove the current node, and append the new merged one.
 					// This will change the order, but the order of nodes
@@ -191,7 +202,7 @@ func MergeNodeSlices(left, right Nodes, mergeFn MergeFunction) Nodes {
 		if !found {
 			// See the comment above about why we need to mark the new right
 			// node as already merged.
-			newNode := DeepCopy(right[0])
+			newNode := DeepCopy(right[0], document)
 			alreadyMerged.Add(newNode)
 
 			newSlice = append(newSlice, newNode)
@@ -214,7 +225,11 @@ func MergeNodeSlices(left, right Nodes, mergeFn MergeFunction) Nodes {
 //
 // Individuals will not be merged amongst each other, only appended to the final
 // document. To merge similar individuals see MergeDocumentsAndIndividuals.
-func MergeDocuments(left, right *Document, mergeFn MergeFunction) *Document {
+//
+// The document (third parameter) must not be nil and will be used to attach the
+// new nodes to (since some nodes require a document, such as individuals). You
+// may supply the same document.
+func MergeDocuments(left, right *Document, document *Document, mergeFn MergeFunction) *Document {
 	var leftNodes, rightNodes Nodes
 
 	if left != nil {
@@ -225,24 +240,25 @@ func MergeDocuments(left, right *Document, mergeFn MergeFunction) *Document {
 		rightNodes = right.Nodes()
 	}
 
-	newNodes := MergeNodeSlices(leftNodes, rightNodes, mergeFn)
+	newNodes := MergeNodeSlices(leftNodes, rightNodes, document, mergeFn)
 
 	return NewDocumentWithNodes(newNodes)
 }
 
 // MergeDocumentsAndIndividuals merges two documents while also merging similar
-// individuals.
+// individuals. A new document will be returned.
 //
 // The MergeFunction must not be nil, but may return nil. It will only be used
 // for nodes that are not individuals. See MergeFunction for usage.
 //
-// The options must be provided, see
+// The options must be provided.
 func MergeDocumentsAndIndividuals(left, right *Document, mergeFn MergeFunction, options *IndividualNodesCompareOptions) (*Document, error) {
 	// Merge individuals.
 	leftIndividuals := individuals(left)
 	rightIndividuals := individuals(right)
 
-	mergedIndividuals, err := leftIndividuals.Merge(rightIndividuals, options)
+	document := NewDocument()
+	mergedIndividuals, err := leftIndividuals.Merge(rightIndividuals, document, options)
 	if err != nil {
 		return nil, err
 	}
@@ -251,7 +267,7 @@ func MergeDocumentsAndIndividuals(left, right *Document, mergeFn MergeFunction, 
 	leftOther := nonIndividuals(left)
 	rightOther := nonIndividuals(right)
 
-	mergedOther := MergeNodeSlices(leftOther, rightOther, mergeFn)
+	mergedOther := MergeNodeSlices(leftOther, rightOther, document, mergeFn)
 
 	allNodes := append(mergedIndividuals.Nodes(), mergedOther...)
 
@@ -267,8 +283,11 @@ func MergeDocumentsAndIndividuals(left, right *Document, mergeFn MergeFunction, 
 //
 // The minimumSimilarity should be value between 0.0 and 1.0. The options must
 // not be nil, you should use NewSimilarityOptions() for sensible defaults.
+//
+// The document must not be nil and will determine where the merged nodes will
+// end up. This is important for nodes that need to be attached to a document.
 func IndividualBySurroundingSimilarityMergeFunction(minimumSimilarity float64, options SimilarityOptions) MergeFunction {
-	return func(left, right Node) Node {
+	return func(left, right Node, document *Document) Node {
 		leftIndividual, leftOK := left.(*IndividualNode)
 		rightIndividual, rightOK := right.(*IndividualNode)
 
@@ -282,7 +301,7 @@ func IndividualBySurroundingSimilarityMergeFunction(minimumSimilarity float64, o
 		if similarity.WeightedSimilarity() > minimumSimilarity {
 			// Ignore the error here because left and right must be the same
 			// type.
-			mergedIndividuals, _ := MergeNodes(left, right)
+			mergedIndividuals, _ := MergeNodes(left, right, document)
 
 			return mergedIndividuals
 		}
@@ -295,9 +314,12 @@ func IndividualBySurroundingSimilarityMergeFunction(minimumSimilarity float64, o
 // EqualityMergeFunction is a MergeFunction that will return a merged node if
 // the node are considered equal (with Equals). This is probably the most
 // generic case when doing general merges.
-func EqualityMergeFunction(left, right Node) Node {
+//
+// The document must not be nil and will be used to attach the merged nodes as
+// some nodes need a document to be created (such as Individual nodes).
+func EqualityMergeFunction(left, right Node, document *Document) Node {
 	if left.Equals(right) {
-		merged, err := MergeNodes(left, right)
+		merged, err := MergeNodes(left, right, document)
 		if err != nil {
 			return nil
 		}

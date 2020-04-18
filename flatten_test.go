@@ -22,13 +22,15 @@ func TestFlatten(t *testing.T) {
 	)
 
 	t.Run("Nil", func(t *testing.T) {
-		actual := gedcom.Flatten(nil)
+		doc := gedcom.NewDocument()
+		actual := gedcom.Flatten(doc, nil)
 
 		assert.Nil(t, actual)
 	})
 
 	t.Run("NoChildren", func(t *testing.T) {
-		actual := gedcom.Flatten(dateNode1)
+		doc := gedcom.NewDocument()
+		actual := gedcom.Flatten(doc, dateNode1)
 
 		if assert.Len(t, actual, 1) {
 			assert.True(t, actual[0] == dateNode1)
@@ -36,7 +38,8 @@ func TestFlatten(t *testing.T) {
 	})
 
 	t.Run("Birth", func(t *testing.T) {
-		actual := gedcom.Flatten(birthNode)
+		doc := gedcom.NewDocument()
+		actual := gedcom.Flatten(doc, birthNode)
 
 		if assert.Len(t, actual, 2) {
 			assert.True(t, actual[0] == birthNode)
@@ -45,7 +48,8 @@ func TestFlatten(t *testing.T) {
 	})
 
 	t.Run("Death", func(t *testing.T) {
-		actual := gedcom.Flatten(deathNode)
+		doc := gedcom.NewDocument()
+		actual := gedcom.Flatten(doc, deathNode)
 
 		if assert.Len(t, actual, 3) {
 			assert.True(t, actual[0] == deathNode)
@@ -55,7 +59,8 @@ func TestFlatten(t *testing.T) {
 	})
 
 	t.Run("Individual", func(t *testing.T) {
-		actual := gedcom.Flatten(individualNode)
+		doc := gedcom.NewDocument()
+		actual := gedcom.Flatten(doc, individualNode)
 
 		if assert.Len(t, actual, 6) {
 			assert.True(t, actual[0] == individualNode)
@@ -68,7 +73,8 @@ func TestFlatten(t *testing.T) {
 	})
 
 	t.Run("DeepCopy", func(t *testing.T) {
-		actual := gedcom.Flatten(gedcom.DeepCopy(individualNode))
+		doc := gedcom.NewDocument()
+		actual := gedcom.Flatten(doc, gedcom.DeepCopy(individualNode, doc))
 
 		if assert.Len(t, actual, 6) {
 			assert.True(t, actual[0] != individualNode)

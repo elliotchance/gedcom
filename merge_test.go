@@ -110,7 +110,8 @@ func TestMergeNodes(t *testing.T) {
 		},
 	} {
 		t.Run(testName, func(t *testing.T) {
-			actual, err := gedcom.MergeNodes(test.left, test.right)
+			doc := gedcom.NewDocument()
+			actual, err := gedcom.MergeNodes(test.left, test.right, doc)
 
 			if test.error == "" {
 				assert.NoError(t, err)
@@ -132,7 +133,7 @@ func TestMergeNodeSlices(t *testing.T) {
 		"1": {
 			left:  gedcom.Nodes{},
 			right: gedcom.Nodes{},
-			mergeFn: func(left, right gedcom.Node) gedcom.Node {
+			mergeFn: func(left, right gedcom.Node, document *gedcom.Document) gedcom.Node {
 				return nil
 			},
 			expected: gedcom.Nodes{},
@@ -144,7 +145,7 @@ func TestMergeNodeSlices(t *testing.T) {
 			right: gedcom.Nodes{
 				gedcom.NewDateNode("14 Apr 1947"),
 			},
-			mergeFn: func(left, right gedcom.Node) gedcom.Node {
+			mergeFn: func(left, right gedcom.Node, document *gedcom.Document) gedcom.Node {
 				return nil
 			},
 			expected: gedcom.Nodes{
@@ -161,7 +162,7 @@ func TestMergeNodeSlices(t *testing.T) {
 				gedcom.NewPlaceNode("Queensland, Australia"),
 				gedcom.NewDateNode("14 Apr 1947"),
 			},
-			mergeFn: func(left, right gedcom.Node) gedcom.Node {
+			mergeFn: func(left, right gedcom.Node, document *gedcom.Document) gedcom.Node {
 				return nil
 			},
 			expected: gedcom.Nodes{
@@ -180,7 +181,7 @@ func TestMergeNodeSlices(t *testing.T) {
 				gedcom.NewPlaceNode("Queensland, Australia"),
 				gedcom.NewDateNode("14 Apr 1947"),
 			},
-			mergeFn: func(left, right gedcom.Node) gedcom.Node {
+			mergeFn: func(left, right gedcom.Node, document *gedcom.Document) gedcom.Node {
 				if left.Tag().Is(right.Tag()) {
 					return left.ShallowCopy()
 				}
@@ -204,7 +205,7 @@ func TestMergeNodeSlices(t *testing.T) {
 				gedcom.NewDateNode("15 Apr 1947"),
 				gedcom.NewDateNode("16 Apr 1947"),
 			},
-			mergeFn: func(left, right gedcom.Node) gedcom.Node {
+			mergeFn: func(left, right gedcom.Node, document *gedcom.Document) gedcom.Node {
 				// Always consider it a merge.
 				return left.ShallowCopy()
 			},
@@ -222,7 +223,7 @@ func TestMergeNodeSlices(t *testing.T) {
 				gedcom.NewDateNode("15 Apr 1947"),
 				gedcom.NewDateNode("16 Apr 1947"),
 			},
-			mergeFn: func(left, right gedcom.Node) gedcom.Node {
+			mergeFn: func(left, right gedcom.Node, document *gedcom.Document) gedcom.Node {
 				return nil
 			},
 			expected: gedcom.Nodes{
@@ -237,7 +238,7 @@ func TestMergeNodeSlices(t *testing.T) {
 				gedcom.NewDateNode("15 Apr 1947"),
 				gedcom.NewDateNode("16 Apr 1947"),
 			},
-			mergeFn: func(left, right gedcom.Node) gedcom.Node {
+			mergeFn: func(left, right gedcom.Node, document *gedcom.Document) gedcom.Node {
 				return nil
 			},
 			expected: gedcom.Nodes{
@@ -247,13 +248,14 @@ func TestMergeNodeSlices(t *testing.T) {
 			},
 		},
 		"BothNil": {
-			mergeFn: func(left, right gedcom.Node) gedcom.Node {
+			mergeFn: func(left, right gedcom.Node, document *gedcom.Document) gedcom.Node {
 				return nil
 			},
 		},
 	} {
 		t.Run(testName, func(t *testing.T) {
-			actual := gedcom.MergeNodeSlices(test.left, test.right, test.mergeFn)
+			doc := gedcom.NewDocument()
+			actual := gedcom.MergeNodeSlices(test.left, test.right, doc, test.mergeFn)
 
 			actualDoc := gedcom.NewDocumentWithNodes(actual)
 			expectedDoc := gedcom.NewDocumentWithNodes(test.expected)
@@ -272,7 +274,7 @@ var mergeDocumentsTests = map[string]struct {
 }{
 	"LeftNil": {
 		right: gedcom.NewDocument(),
-		mergeFn: func(left, right gedcom.Node) gedcom.Node {
+		mergeFn: func(left, right gedcom.Node, document *gedcom.Document) gedcom.Node {
 			return nil
 		},
 		expectedDoc:               gedcom.NewDocument(),
@@ -280,14 +282,14 @@ var mergeDocumentsTests = map[string]struct {
 	},
 	"RightNil": {
 		left: gedcom.NewDocument(),
-		mergeFn: func(left, right gedcom.Node) gedcom.Node {
+		mergeFn: func(left, right gedcom.Node, document *gedcom.Document) gedcom.Node {
 			return nil
 		},
 		expectedDoc:               gedcom.NewDocument(),
 		expectedDocAndIndividuals: gedcom.NewDocument(),
 	},
 	"BothNil": {
-		mergeFn: func(left, right gedcom.Node) gedcom.Node {
+		mergeFn: func(left, right gedcom.Node, document *gedcom.Document) gedcom.Node {
 			return nil
 		},
 		expectedDoc:               gedcom.NewDocument(),
@@ -302,7 +304,7 @@ var mergeDocumentsTests = map[string]struct {
 			gedcom.NewPlaceNode("Queensland, Australia"),
 			gedcom.NewDateNode("14 Apr 1947"),
 		}),
-		mergeFn: func(left, right gedcom.Node) gedcom.Node {
+		mergeFn: func(left, right gedcom.Node, document *gedcom.Document) gedcom.Node {
 			return nil
 		},
 		expectedDoc: gedcom.NewDocumentWithNodes(gedcom.Nodes{
@@ -327,7 +329,7 @@ var mergeDocumentsTests = map[string]struct {
 			gedcom.NewPlaceNode("Queensland, Australia"),
 			gedcom.NewDateNode("14 Apr 1947"),
 		}),
-		mergeFn: func(left, right gedcom.Node) gedcom.Node {
+		mergeFn: func(left, right gedcom.Node, document *gedcom.Document) gedcom.Node {
 			if left.Tag().Is(right.Tag()) {
 				return left.ShallowCopy()
 			}
@@ -413,6 +415,35 @@ var mergeDocumentsTests = map[string]struct {
 			gedcom.NewPlaceNode("Sydney, Australia"),
 		}),
 	},
+
+	// https://github.com/elliotchance/gedcom/issues/301
+	"Issue301": {
+		left: newDocumentFromString(`
+0 HEAD
+0 @F0000@ FAM
+1 HUSB @I0000@
+`),
+		right: newDocumentFromString(`
+0 HEAD
+0 @F0000@ FAM
+1 HUSB @I0000@
+`),
+		// This must be EqualityMergeFunction because the original issue used
+		// MergeDocumentsAndIndividuals() in q and this is the mergeFn that it
+		// uses.
+		mergeFn:           gedcom.EqualityMergeFunction,
+		minimumSimilarity: gedcom.DefaultMinimumSimilarity,
+		expectedDoc: newDocumentFromString(`
+0 HEAD
+0 @F0000@ FAM
+1 HUSB @I0000@
+`),
+		expectedDocAndIndividuals: newDocumentFromString(`
+0 HEAD
+0 @F0000@ FAM
+1 HUSB @I0000@
+`),
+	},
 }
 
 func TestMergeDocuments(t *testing.T) {
@@ -421,7 +452,8 @@ func TestMergeDocuments(t *testing.T) {
 			beforeLeft := test.left.String()
 			beforeRight := test.right.String()
 
-			actual := gedcom.MergeDocuments(test.left, test.right, test.mergeFn)
+			doc := gedcom.NewDocument()
+			actual := gedcom.MergeDocuments(test.left, test.right, doc, test.mergeFn)
 
 			// Make sure the original documents were not modified.
 			assert.Equal(t, beforeLeft, test.left.String())
@@ -504,7 +536,8 @@ func TestIndividualBySurroundingSimilarityMergeFunction(t *testing.T) {
 			}
 
 			mergerFn := gedcom.IndividualBySurroundingSimilarityMergeFunction(0.75, options)
-			actual := mergerFn(test.left, test.right)
+			doc := gedcom.NewDocument()
+			actual := mergerFn(test.left, test.right, doc)
 
 			assertNodeEqual(t, test.expected, actual)
 		})
@@ -532,4 +565,13 @@ func TestMergeDocumentsAndIndividuals(t *testing.T) {
 			assert.Equal(t, test.expectedDocAndIndividuals.String(), actual.String())
 		})
 	}
+}
+
+func newDocumentFromString(ged string) *gedcom.Document {
+	doc, err := gedcom.NewDocumentFromString(ged)
+	if err != nil {
+		panic(err)
+	}
+
+	return doc
 }
