@@ -127,13 +127,13 @@ func (ff *FilterFlags) FilterFunctions() []FilterFunction {
 	return filters
 }
 
-func (ff *FilterFlags) Filter(node Node) Node {
+func (ff *FilterFlags) Filter(node Node, document *Document) Node {
 	if IsNil(node) {
 		return nil
 	}
 
 	for _, filter := range ff.FilterFunctions() {
-		node = Filter(node, filter)
+		node = Filter(node, document, filter)
 	}
 
 	return node

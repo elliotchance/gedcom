@@ -24,8 +24,10 @@ func TestFilterFlags_Filter(t *testing.T) {
 			NameFormat:       "unmodified",
 		}
 
+		doc := gedcom.NewDocument()
+
 		assert.Equal(t, doc2.Nodes()[0].GEDCOMString(0),
-			ff.Filter(doc1.Nodes()[0]).GEDCOMString(0))
+			ff.Filter(doc1.Nodes()[0], doc).GEDCOMString(0))
 	})
 
 	t.Run("NoDuplicateNamesWithModifiedNames", func(t *testing.T) {
@@ -45,7 +47,9 @@ func TestFilterFlags_Filter(t *testing.T) {
 			NameFormat:       string(gedcom.NameFormatGEDCOM),
 		}
 
+		doc := gedcom.NewDocument()
+
 		assert.Equal(t, doc2.Nodes()[0].GEDCOMString(0),
-			ff.Filter(doc1.Nodes()[0]).GEDCOMString(0))
+			ff.Filter(doc1.Nodes()[0], doc).GEDCOMString(0))
 	})
 }

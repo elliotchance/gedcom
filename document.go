@@ -352,7 +352,7 @@ func (doc *Document) Warnings() (warnings Warnings) {
 			context.Family = family
 		}
 
-		Filter(node, func(node Node) (newNode Node, traverseChildren bool) {
+		Filter(node, doc, func(node Node) (newNode Node, traverseChildren bool) {
 			if warner, ok := node.(Warner); ok {
 				for _, warning := range warner.Warnings() {
 					warning.SetContext(context)

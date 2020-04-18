@@ -46,33 +46,20 @@ type FilterFunction func(node Node) (newNode Node, traverseChildren bool)
 // Some nodes, such as an IndividualNode or FamilyNode cannot be created without
 // being attached to a document. Filter will attach these to a new document
 // which can be accessed through their respective Document() method.
-func Filter(root Node, fn FilterFunction) Node {
+func Filter(root Node, document *Document, fn FilterFunction) Node {
 	entityMap := entityMap{}
 
-	return filter(root, fn, entityMap)
+	return filter(root, fn, entityMap, document, nil)
 }
 
-func filter(root Node, fn FilterFunction, entityMap entityMap) Node {
+func filter(root Node, fn FilterFunction, entityMap entityMap, document *Document, family *FamilyNode) Node {
 	newRoot, keepTraversing := fn(root)
 	if IsNil(newRoot) {
 		return nil
 	}
 
-	var document *Document
-	var family *FamilyNode
-
-	if documentNoder, ok := newRoot.(DocumentNoder); ok {
-		document = entityMap.GetOrAssign(documentNoder.Document(), func() interface{} {
-			return NewDocument()
-		}).(*Document)
-	}
-
 	if familyNoder, ok := newRoot.(FamilyNoder); ok {
 		fam := familyNoder.Family()
-
-		document = entityMap.GetOrAssign(fam.Document(), func() interface{} {
-			return NewDocument()
-		}).(*Document)
 
 		family = entityMap.GetOrAssign(fam, func() interface{} {
 			return document.AddFamily(fam.Pointer())
@@ -83,7 +70,7 @@ func filter(root Node, fn FilterFunction, entityMap entityMap) Node {
 
 	if keepTraversing {
 		for _, child := range root.Nodes() {
-			newNode := filter(child, fn, entityMap)
+			newNode := filter(child, fn, entityMap, document, family)
 			if newNode != nil {
 				result.AddNode(newNode)
 			}

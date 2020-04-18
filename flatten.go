@@ -17,14 +17,16 @@ package gedcom
 //
 //   Flatten(DeepCopy(node))
 //
-func Flatten(node Node) Nodes {
+// The document must be provided for nodes that need a document context (such as
+// individuals). You may pass in the same document.
+func Flatten(document *Document, node Node) Nodes {
 	if IsNil(node) {
 		return nil
 	}
 
 	result := Nodes{}
 
-	Filter(node, func(node Node) (newNode Node, traverseChildren bool) {
+	Filter(node, document, func(node Node) (newNode Node, traverseChildren bool) {
 		result = append(result, node)
 
 		return node, true

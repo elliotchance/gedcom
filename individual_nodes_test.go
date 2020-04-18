@@ -669,7 +669,8 @@ func TestIndividualNodes_Merge(t *testing.T) {
 
 			individuals1 := test.Doc1.Individuals()
 			individuals2 := test.Doc2.Individuals()
-			got, err := individuals1.Merge(individuals2, compareOptions)
+			doc := gedcom.NewDocument()
+			got, err := individuals1.Merge(individuals2, doc, compareOptions)
 
 			assert.NoError(t, err)
 			assertIndividualNodes(t, test.WantMerge, got)

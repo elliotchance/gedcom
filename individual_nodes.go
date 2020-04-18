@@ -550,7 +550,11 @@ func (nodes IndividualNodes) Compare(other IndividualNodes, options *IndividualN
 // those details here.
 //
 // Any individuals that do not match on either side will be appended to the end.
-func (nodes IndividualNodes) Merge(other IndividualNodes, options *IndividualNodesCompareOptions) (IndividualNodes, error) {
+//
+// The document must not be nil and will be used to attach the new nodes to
+// (since some nodes require a document, such as individuals). You may supply
+// the same document.
+func (nodes IndividualNodes) Merge(other IndividualNodes, document *Document, options *IndividualNodesCompareOptions) (IndividualNodes, error) {
 	comparisons := nodes.Compare(other, options)
 	merged := IndividualNodes{}
 
@@ -560,7 +564,7 @@ func (nodes IndividualNodes) Merge(other IndividualNodes, options *IndividualNod
 
 		switch {
 		case left != nil && right != nil:
-			node, err := MergeNodes(left, right)
+			node, err := MergeNodes(left, right, document)
 			if err != nil {
 				return nil, err
 			}

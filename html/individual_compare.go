@@ -102,12 +102,15 @@ func (c *IndividualCompare) writeHTMLTo(w io.Writer) (int64, error) {
 		name = core.NewEmpty()
 	}
 
+	// We don't want the filters below to modify the original nodes in any way.
+	doc := gedcom.NewDocument()
+
 	if !gedcom.IsNil(left) {
-		left = c.filterFlags.Filter(left).(*gedcom.IndividualNode)
+		left = c.filterFlags.Filter(left, doc).(*gedcom.IndividualNode)
 	}
 
 	if !gedcom.IsNil(right) {
-		right = c.filterFlags.Filter(right).(*gedcom.IndividualNode)
+		right = c.filterFlags.Filter(right, doc).(*gedcom.IndividualNode)
 	}
 
 	diff := gedcom.CompareNodes(left, right)

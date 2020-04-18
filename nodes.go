@@ -142,13 +142,17 @@ func DeleteNodesWithTag(node Node, tag Tag) {
 // single slice.
 //
 // If any of the nodes are nil they will be ignored.
-func (nodes Nodes) FlattenAll(result Nodes) {
+//
+// The document parameter is required for copying some nodes like individuals
+// that need a document context. These new nodes will be attached to the
+// provided document.
+func (nodes Nodes) FlattenAll(document *Document, result Nodes) {
 	for _, node := range nodes {
 		if IsNil(node) {
 			continue
 		}
 
-		result = append(result, Flatten(node)...)
+		result = append(result, Flatten(document, node)...)
 	}
 
 	return

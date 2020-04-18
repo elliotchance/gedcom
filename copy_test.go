@@ -16,32 +16,33 @@ func TestDeepCopy(t *testing.T) {
 		dateNode1,
 		dateNode2,
 	)
-	individualNode := gedcom.NewDocument().AddIndividual("P221",
+	doc := gedcom.NewDocument()
+	individualNode := doc.AddIndividual("P221",
 		birthNode,
 		deathNode,
 	)
 
 	t.Run("Nil", func(t *testing.T) {
-		actual := gedcom.DeepCopy(nil)
+		actual := gedcom.DeepCopy(nil, doc)
 
 		assert.Nil(t, actual)
 	})
 
 	t.Run("NoChildren", func(t *testing.T) {
-		actual := gedcom.DeepCopy(dateNode1)
+		actual := gedcom.DeepCopy(dateNode1, doc)
 
 		assert.True(t, actual != dateNode1)
 	})
 
 	t.Run("Birth", func(t *testing.T) {
-		actual := gedcom.DeepCopy(birthNode)
+		actual := gedcom.DeepCopy(birthNode, doc)
 
 		assert.True(t, actual != birthNode)
 		assert.True(t, actual.Nodes()[0] != dateNode1)
 	})
 
 	t.Run("Death", func(t *testing.T) {
-		actual := gedcom.DeepCopy(deathNode)
+		actual := gedcom.DeepCopy(deathNode, doc)
 
 		assert.True(t, actual != deathNode)
 		assert.True(t, actual.Nodes()[0] != dateNode1)
@@ -49,7 +50,7 @@ func TestDeepCopy(t *testing.T) {
 	})
 
 	t.Run("Individual", func(t *testing.T) {
-		actual := gedcom.DeepCopy(individualNode)
+		actual := gedcom.DeepCopy(individualNode, doc)
 
 		assert.True(t, actual != individualNode)
 		assert.True(t, actual.Nodes()[0] != birthNode)

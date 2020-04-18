@@ -149,7 +149,8 @@ func TestFilter(t *testing.T) {
 		},
 	} {
 		t.Run("", func(t *testing.T) {
-			node := gedcom.Filter(root, test.filter)
+			doc := gedcom.NewDocument()
+			node := gedcom.Filter(root, doc, test.filter)
 			result := gedcom.GEDCOMString(node, 0)
 			assert.Equal(t, test.expected, result)
 		})
@@ -190,7 +191,8 @@ func TestWhitelistTagFilter(t *testing.T) {
 	} {
 		t.Run("", func(t *testing.T) {
 			filter := gedcom.WhitelistTagFilter(test.tags...)
-			result := gedcom.GEDCOMString(gedcom.Filter(root, filter), 0)
+			doc := gedcom.NewDocument()
+			result := gedcom.GEDCOMString(gedcom.Filter(root, doc, filter), 0)
 			assert.Equal(t, test.expected, result)
 		})
 	}
@@ -233,7 +235,8 @@ func TestBlacklistTagFilter(t *testing.T) {
 	} {
 		t.Run("", func(t *testing.T) {
 			filter := gedcom.BlacklistTagFilter(test.tags...)
-			result := gedcom.GEDCOMString(gedcom.Filter(root, filter), 0)
+			doc := gedcom.NewDocument()
+			result := gedcom.GEDCOMString(gedcom.Filter(root, doc, filter), 0)
 			assert.Equal(t, test.expected, result)
 		})
 	}
@@ -261,7 +264,8 @@ func TestOfficialTagFilter(t *testing.T) {
 	} {
 		t.Run("", func(t *testing.T) {
 			filter := gedcom.OfficialTagFilter()
-			result := gedcom.GEDCOMString(gedcom.Filter(root, filter), 0)
+			doc := gedcom.NewDocument()
+			result := gedcom.GEDCOMString(gedcom.Filter(root, doc, filter), 0)
 			assert.Equal(t, test.expected, result)
 		})
 	}
@@ -355,7 +359,8 @@ func TestSimpleNameFilter(t *testing.T) {
 	} {
 		t.Run("", func(t *testing.T) {
 			filter := gedcom.SimpleNameFilter(test.format)
-			result := gedcom.GEDCOMString(gedcom.Filter(test.root, filter), 0)
+			doc := gedcom.NewDocument()
+			result := gedcom.GEDCOMString(gedcom.Filter(test.root, doc, filter), 0)
 			assert.Equal(t, test.expected, result)
 		})
 	}
@@ -488,7 +493,8 @@ func TestOnlyVitalsTagFilter(t *testing.T) {
 	} {
 		t.Run(testName, func(t *testing.T) {
 			filter := gedcom.OnlyVitalsTagFilter()
-			result := gedcom.GEDCOMString(gedcom.Filter(test.root, filter), 0)
+			doc := gedcom.NewDocument()
+			result := gedcom.GEDCOMString(gedcom.Filter(test.root, doc, filter), 0)
 			assert.Equal(t, test.expected, result)
 		})
 	}
@@ -547,7 +553,8 @@ func TestRemoveEmptyDeathTagFilter(t *testing.T) {
 	} {
 		t.Run(testName, func(t *testing.T) {
 			filter := gedcom.RemoveEmptyDeathTagFilter()
-			result := gedcom.GEDCOMString(gedcom.Filter(test.root, filter), 0)
+			doc := gedcom.NewDocument()
+			result := gedcom.GEDCOMString(gedcom.Filter(test.root, doc, filter), 0)
 			assert.Equal(t, test.expected, result)
 		})
 	}
