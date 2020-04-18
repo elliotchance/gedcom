@@ -13,30 +13,30 @@ type PlaceListPage struct {
 	googleAnalyticsID string
 	options           *PublishShowOptions
 	indexLetters      []rune
+	placesMap         map[string]*place
 }
 
-func NewPlaceListPage(document *gedcom.Document, googleAnalyticsID string, options *PublishShowOptions, indexLetters []rune) *PlaceListPage {
+func NewPlaceListPage(document *gedcom.Document, googleAnalyticsID string, options *PublishShowOptions, indexLetters []rune, placesMap map[string]*place) *PlaceListPage {
 	return &PlaceListPage{
 		document:          document,
 		googleAnalyticsID: googleAnalyticsID,
 		options:           options,
 		indexLetters:      indexLetters,
+		placesMap:         placesMap,
 	}
 }
 
 func (c *PlaceListPage) WriteHTMLTo(w io.Writer) (int64, error) {
 	table := []core.Component{}
 
-	places := GetPlaces(c.document)
-
 	// Get all countries
 	countries := gedcom.NewStringSet()
-	for _, place := range places {
+	for _, place := range c.placesMap {
 		countries.Add(place.country)
 	}
 
 	sortedPlaces := []*place{}
-	for _, placeName := range places {
+	for _, placeName := range c.placesMap {
 		sortedPlaces = append(sortedPlaces, placeName)
 	}
 
@@ -60,7 +60,7 @@ func (c *PlaceListPage) WriteHTMLTo(w io.Writer) (int64, error) {
 			table = append(table, countryTitle)
 		}
 
-		placeEntry := NewPlaceInList(c.document, place)
+		placeEntry := NewPlaceInList(c.document, place, c.placesMap)
 		table = append(table, placeEntry)
 
 		lastCountry = place.country
@@ -74,7 +74,7 @@ func (c *PlaceListPage) WriteHTMLTo(w io.Writer) (int64, error) {
 
 	return core.NewPage("Places", core.NewComponents(
 		NewPublishHeader(c.document, "", selectedPlacesTab, c.options,
-			c.indexLetters),
+			c.indexLetters, c.placesMap),
 		core.NewNavPillsRow(pills),
 		core.NewSpace(),
 		core.NewRow(

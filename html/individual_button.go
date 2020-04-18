@@ -14,13 +14,15 @@ type IndividualButton struct {
 	individual *gedcom.IndividualNode
 	document   *gedcom.Document
 	visibility LivingVisibility
+	placesMap  map[string]*place
 }
 
-func NewIndividualButton(document *gedcom.Document, individual *gedcom.IndividualNode, visibility LivingVisibility) *IndividualButton {
+func NewIndividualButton(document *gedcom.Document, individual *gedcom.IndividualNode, visibility LivingVisibility, placesMap map[string]*place) *IndividualButton {
 	return &IndividualButton{
 		individual: individual,
 		document:   document,
 		visibility: visibility,
+		placesMap:  placesMap,
 	}
 }
 
@@ -40,7 +42,7 @@ func (c *IndividualButton) WriteHTMLTo(w io.Writer) (int64, error) {
 	onclick := ""
 	if c.individual != nil {
 		onclick = fmt.Sprintf(`location.href='%s'`,
-			PageIndividual(c.document, c.individual, c.visibility))
+			PageIndividual(c.document, c.individual, c.visibility, c.placesMap))
 	}
 
 	eventDates := NewIndividualDates(c.individual, c.visibility)

@@ -24,15 +24,17 @@ type PublishHeader struct {
 	selectedTab  string
 	options      *PublishShowOptions
 	indexLetters []rune
+	placesMap    map[string]*place
 }
 
-func NewPublishHeader(document *gedcom.Document, extraTab string, selectedTab string, options *PublishShowOptions, indexLetters []rune) *PublishHeader {
+func NewPublishHeader(document *gedcom.Document, extraTab string, selectedTab string, options *PublishShowOptions, indexLetters []rune, placesMap map[string]*place) *PublishHeader {
 	return &PublishHeader{
 		document:     document,
 		extraTab:     extraTab,
 		selectedTab:  selectedTab,
 		options:      options,
 		indexLetters: indexLetters,
+		placesMap:    placesMap,
 	}
 }
 
@@ -51,7 +53,7 @@ func (c *PublishHeader) WriteHTMLTo(w io.Writer) (int64, error) {
 	}
 
 	if c.options.ShowPlaces {
-		badge := core.NewCountBadge(len(GetPlaces(c.document)))
+		badge := core.NewCountBadge(len(c.placesMap))
 		item := core.NewNavItem(
 			core.NewComponents(core.NewText("Places "), badge),
 			c.selectedTab == selectedPlacesTab,

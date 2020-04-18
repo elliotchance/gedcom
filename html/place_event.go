@@ -10,13 +10,15 @@ type PlaceEvent struct {
 	node       gedcom.Node
 	document   *gedcom.Document
 	visibility LivingVisibility
+	placesMap  map[string]*place
 }
 
-func NewPlaceEvent(document *gedcom.Document, node gedcom.Node, visibility LivingVisibility) *PlaceEvent {
+func NewPlaceEvent(document *gedcom.Document, node gedcom.Node, visibility LivingVisibility, placesMap map[string]*place) *PlaceEvent {
 	return &PlaceEvent{
 		document:   document,
 		node:       node,
 		visibility: visibility,
+		placesMap:  placesMap,
 	}
 }
 
@@ -31,7 +33,8 @@ func (c *PlaceEvent) WriteHTMLTo(w io.Writer) (int64, error) {
 	}
 
 	individual := individualForNode(c.document, c.node)
-	var person core.Component = NewIndividualLink(c.document, individual, c.visibility)
+	var person core.Component = NewIndividualLink(c.document, individual,
+		c.visibility, c.placesMap)
 	isLiving := individual != nil && individual.IsLiving()
 
 	if isLiving {

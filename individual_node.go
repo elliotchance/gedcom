@@ -772,7 +772,7 @@ func (node *IndividualNode) ageAt(at DateRange) (Age, Age) {
 		startAge.Constraint = AgeConstraintBeforeBirth
 		endAge.Constraint = AgeConstraintBeforeBirth
 
-	case at.IsAfter(estimatedDeathDate.DateRange()):
+	case at.IsAfter(estimatedDeathDate.DateRange()) && estimatedDeathDate != nil:
 		startAge.Constraint = AgeConstraintAfterDeath
 		endAge.Constraint = AgeConstraintAfterDeath
 
@@ -1009,7 +1009,9 @@ func (node *IndividualNode) incorrectEventOrderWarnings() (warnings Warnings) {
 }
 
 func (node *IndividualNode) tooOldWarnings() (warnings Warnings) {
-	if _, max := node.Age(); max.Years() > DefaultMaxLivingAge {
+	estimatedDeathDate, _ := node.EstimatedDeathDate()
+	_, max := node.Age()
+	if max.Years() > DefaultMaxLivingAge && estimatedDeathDate != nil {
 		warnings = Warnings{
 			NewIndividualTooOldWarning(node, max.Years()),
 		}

@@ -13,13 +13,15 @@ type AllParentButtons struct {
 	individual *gedcom.IndividualNode
 	document   *gedcom.Document
 	visibility LivingVisibility
+	placesMap  map[string]*place
 }
 
-func NewAllParentButtons(document *gedcom.Document, individual *gedcom.IndividualNode, visibility LivingVisibility) *AllParentButtons {
+func NewAllParentButtons(document *gedcom.Document, individual *gedcom.IndividualNode, visibility LivingVisibility, placesMap map[string]*place) *AllParentButtons {
 	return &AllParentButtons{
 		individual: individual,
 		document:   document,
 		visibility: visibility,
+		placesMap:  placesMap,
 	}
 }
 
@@ -36,7 +38,7 @@ func (c *AllParentButtons) WriteHTMLTo(w io.Writer) (int64, error) {
 		}
 
 		components = append(components,
-			NewParentButtons(c.document, family, c.visibility))
+			NewParentButtons(c.document, family, c.visibility, c.placesMap))
 	}
 
 	// If there are no families we still want to show an empty family. We just
@@ -44,7 +46,7 @@ func (c *AllParentButtons) WriteHTMLTo(w io.Writer) (int64, error) {
 	if len(components) == 0 {
 		familyNode := gedcom.NewDocument().AddFamily("")
 		components = []core.Component{
-			NewParentButtons(c.document, familyNode, c.visibility),
+			NewParentButtons(c.document, familyNode, c.visibility, c.placesMap),
 		}
 	}
 

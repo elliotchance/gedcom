@@ -63,7 +63,7 @@ func PageIndividuals(firstLetter rune) string {
 	return fmt.Sprintf("individuals-%c.html", firstLetter)
 }
 
-func PageIndividual(document *gedcom.Document, individual *gedcom.IndividualNode, visibility LivingVisibility) string {
+func PageIndividual(document *gedcom.Document, individual *gedcom.IndividualNode, visibility LivingVisibility, placesMap map[string]*place) string {
 	if individual.IsLiving() {
 		switch visibility {
 		case LivingVisibilityHide, LivingVisibilityPlaceholder:
@@ -74,7 +74,7 @@ func PageIndividual(document *gedcom.Document, individual *gedcom.IndividualNode
 		}
 	}
 
-	individuals := GetIndividuals(document)
+	individuals := GetIndividuals(document, placesMap)
 
 	for key, value := range individuals {
 		if value.Is(individual) {
@@ -89,9 +89,7 @@ func PagePlaces() string {
 	return "places.html"
 }
 
-func PagePlace(document *gedcom.Document, place string) string {
-	places := GetPlaces(document)
-
+func PagePlace(place string, places map[string]*place) string {
 	for key, value := range places {
 		if value.PrettyName == place {
 			return fmt.Sprintf("%s.html", key)
@@ -157,7 +155,7 @@ func colorClassForIndividual(individual *gedcom.IndividualNode) string {
 	return colorClassForSex(individual.Sex())
 }
 
-func getUniqueKey(individualMap map[string]*gedcom.IndividualNode, s string) string {
+func getUniqueKey(individualMap map[string]*gedcom.IndividualNode, s string, placesMap map[string]*place) string {
 	i := -1
 	for {
 		i += 1

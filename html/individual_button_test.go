@@ -12,6 +12,6 @@ func TestIndividualButton_WriteHTMLTo(t *testing.T) {
 
 	c := testComponent(t, "IndividualButton")
 
-	c(html.NewIndividualButton(doc, elliot, html.LivingVisibilityPlaceholder)).
+	c(html.NewIndividualButton(doc, elliot, html.LivingVisibilityPlaceholder, nil)).
 		Returns("<button class=\"btn btn-outline-info btn-block\" onclick=\"location.href='elliot-chance.html'\" type=\"button\"><strong>Elliot Chance</strong><br/><em>b.</em> 4 Jan 1843&nbsp;&nbsp;&nbsp;<em>d.</em> 17 Mar 1907&nbsp;</button>")
 }

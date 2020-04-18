@@ -15,15 +15,17 @@ type IndividualListPage struct {
 	googleAnalyticsID string
 	options           *PublishShowOptions
 	indexLetters      []rune
+	placesMap         map[string]*place
 }
 
-func NewIndividualListPage(document *gedcom.Document, selectedLetter rune, googleAnalyticsID string, options *PublishShowOptions, indexLetters []rune) *IndividualListPage {
+func NewIndividualListPage(document *gedcom.Document, selectedLetter rune, googleAnalyticsID string, options *PublishShowOptions, indexLetters []rune, placesMap map[string]*place) *IndividualListPage {
 	return &IndividualListPage{
 		document:          document,
 		selectedLetter:    selectedLetter,
 		googleAnalyticsID: googleAnalyticsID,
 		options:           options,
 		indexLetters:      indexLetters,
+		placesMap:         placesMap,
 	}
 }
 
@@ -77,7 +79,8 @@ func (c *IndividualListPage) WriteHTMLTo(w io.Writer) (int64, error) {
 			lastSurname = newSurname
 		}
 
-		table = append(table, NewIndividualInList(c.document, i, c.options.LivingVisibility))
+		table = append(table, NewIndividualInList(c.document, i,
+			c.options.LivingVisibility, c.placesMap))
 	}
 
 	livingRow := core.NewRow(
@@ -94,10 +97,12 @@ func (c *IndividualListPage) WriteHTMLTo(w io.Writer) (int64, error) {
 	}
 
 	return core.NewPage("Individuals", core.NewComponents(
-		NewPublishHeader(c.document, "", selectedIndividualsTab, c.options, c.indexLetters),
+		NewPublishHeader(c.document, "", selectedIndividualsTab,
+			c.options, c.indexLetters, c.placesMap),
 		livingRow,
 		core.NewSpace(),
-		NewIndividualIndexHeader(c.document, c.selectedLetter, c.options.LivingVisibility, c.indexLetters),
+		NewIndividualIndexHeader(c.document, c.selectedLetter,
+			c.options.LivingVisibility, c.indexLetters),
 		core.NewSpace(),
 		NewSurnameIndex(c.document, c.selectedLetter, c.options.LivingVisibility),
 		core.NewSpace(),

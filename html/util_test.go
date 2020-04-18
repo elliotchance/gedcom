@@ -2,9 +2,12 @@ package html_test
 
 import (
 	"bytes"
+	"github.com/antchfx/htmlquery"
 	"github.com/elliotchance/gedcom/html/core"
 	"github.com/elliotchance/tf"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"strings"
 	"testing"
 )
 
@@ -19,4 +22,19 @@ func testComponent(t *testing.T, name string) func(args ...interface{}) *tf.F {
 
 		return string(data)
 	})
+}
+
+func assertTextByXPath(t *testing.T, body, query string, expected []string) {
+	doc, err := htmlquery.Parse(strings.NewReader(body))
+	require.NoError(t, err)
+
+	nodes, err := htmlquery.QueryAll(doc, query)
+	require.NoError(t, err)
+
+	var nodeTexts []string
+	for _, node := range nodes {
+		nodeTexts = append(nodeTexts, node.Data)
+	}
+
+	assert.Equal(t, nodeTexts, expected)
 }
