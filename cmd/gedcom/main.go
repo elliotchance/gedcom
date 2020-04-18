@@ -25,6 +25,7 @@ func usage() string {
 		fmt.Sprintf("\t%s query     - Query with gedcomq", os.Args[0]),
 		fmt.Sprintf("\t%s tune      - Used to calculate ideal weights and similarities", os.Args[0]),
 		fmt.Sprintf("\t%s version   - Show version and exit", os.Args[0]),
+		fmt.Sprintf("\t%s warnings  - Show warnings for a gedcom file", os.Args[0]),
 	}
 
 	return strings.Join(lines, "\n")
@@ -50,6 +51,9 @@ func main() {
 
 	case "version":
 		runVersionCommand()
+
+	case "warnings":
+		runWarningsCommand()
 
 	default:
 		fatalln("unknown command:", os.Args[1])
