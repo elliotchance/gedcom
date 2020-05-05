@@ -1,7 +1,5 @@
 package gedcom
 
-import "fmt"
-
 // ChildNode is the natural, adopted, or sealed (LDS) child of a father and a
 // mother.
 type ChildNode struct {
@@ -18,7 +16,11 @@ func newChildNode(family *FamilyNode, value string, children ...Node) *ChildNode
 
 func newChildNodeWithIndividual(family *FamilyNode, individual *IndividualNode) *ChildNode {
 	// TODO: check individual belongs to the same document as family
-	return newChildNode(family, fmt.Sprintf("@%s@", individual.Pointer()))
+
+	famChild := NewNode(TagFamilyChild, family.Identifier(), "")
+	individual.AddNode(famChild)
+	
+	return newChildNode(family, individual.Identifier())
 }
 
 func (node *ChildNode) Family() *FamilyNode {
