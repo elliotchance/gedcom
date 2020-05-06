@@ -640,7 +640,3 @@ func TestFamilyNode_Warnings(t *testing.T) {
 		})
 	}
 }
-
-func TestSetHusband(t *testing.T) {
-
-}
