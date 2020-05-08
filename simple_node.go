@@ -56,6 +56,15 @@ func (node *SimpleNode) Pointer() string {
 	return node.pointer
 }
 
+// Identifier returns the identifier for the node; empty string if the node is nil
+func (node *SimpleNode) Identifier() string {
+	if node == nil {
+		return ""
+	}
+	
+	return fmt.Sprintf("@%s@", node.pointer)
+}
+
 // Equals compares two nodes for value equality.
 //
 // 1. If either or both nodes are nil then false is always returned.

@@ -139,23 +139,48 @@ func (node *FamilyNode) AddChild(individual *IndividualNode) *ChildNode {
 
 func (node *FamilyNode) SetHusband(individual *IndividualNode) *FamilyNode {
 	if individual == nil {
-		DeleteNodesWithTag(node, TagHusband)
+		husband := node.Husband().Individual()
+		nodes := husband.Nodes()
 
+		for _, subNode := range nodes {
+			if subNode.Tag() == TagFamilySpouse && subNode.Value() == node.Identifier() {
+				husband.DeleteNode(subNode)
+			}
+		}
+		
+		DeleteNodesWithTag(node, TagHusband)
+		node.husband = nil
+		node.cachedHusband = true
 		return node
 	}
+	
+	n := NewNode(TagFamilySpouse, node.Identifier(), "")
+	individual.AddNode(n)
 
 	return node.SetHusbandPointer(individual.Pointer())
 }
 
 func (node *FamilyNode) SetWife(individual *IndividualNode) *FamilyNode {
 	if individual == nil {
-		DeleteNodesWithTag(node, TagWife)
+		wife := node.Wife().Individual()
+		nodes := wife.Nodes()
 
+		for _, subNode := range nodes {
+			if subNode.Tag() == TagFamilySpouse && subNode.Value() == node.Identifier() {
+				wife.DeleteNode(subNode)
+			}
+		}
+		
+		DeleteNodesWithTag(node, TagWife)
+		node.wife = nil
+		node.cachedWife = true
 		return node
 	}
 
-	return node.SetWifePointer(individual.Pointer())
-}
+	n := NewNode(TagFamilySpouse, node.Identifier(), "")
+	individual.AddNode(n)
+	
+	return node.SetWifePointer(individual.Pointer())}
 
 func (node *FamilyNode) SetWifePointer(pointer string) *FamilyNode {
 	wife := node.Wife()

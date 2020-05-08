@@ -161,7 +161,7 @@ func (nodes Nodes) FlattenAll(document *Document, result Nodes) {
 func (nodes Nodes) deleteNode(n Node) (Nodes, bool) {
 	for i, node2 := range nodes {
 		if node2 == n {
-			return append(nodes[:i], nodes[i+2:]...), true
+			return append(nodes[:i], nodes[i+1:]...), true
 		}
 	}
 
