@@ -138,9 +138,9 @@ func (node *FamilyNode) AddChild(individual *IndividualNode) *ChildNode {
 }
 
 func (node *FamilyNode) SetHusband(individual *IndividualNode) *FamilyNode {
-	if individual == nil {
+	if IsNil(individual) {
 		husband := node.Husband().Individual()
-		if husband == nil {
+		if IsNil(husband) {
 			return node
 		}
 		nodes := husband.Nodes()
@@ -164,9 +164,9 @@ func (node *FamilyNode) SetHusband(individual *IndividualNode) *FamilyNode {
 }
 
 func (node *FamilyNode) SetWife(individual *IndividualNode) *FamilyNode {
-	if individual == nil {
+	if IsNil(individual) {
 		wife := node.Wife().Individual()
-		if wife == nil {
+		if IsNil(wife) {
 			return node
 		}
 		nodes := wife.Nodes()
