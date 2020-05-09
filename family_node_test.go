@@ -63,6 +63,31 @@ var familyTests = []struct {
 		husband: nil,
 		wife: jane,
 	},
+	{
+		doc: func(doc *gedcom.Document) {
+				jane := individual(doc, "P2", "Jane /Doe/", "3 Mar 1803", "14 June 1877")
+				elliot := individual(doc, "P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907")
+				doc.AddFamilyWithHusbandAndWife("F3", elliot, jane)
+		},
+		husband: elliot,
+		wife: jane,
+	},
+	{
+		doc: func(doc *gedcom.Document) {
+				elliot := individual(doc, "P1", "Elliot /Chance/", "4 Jan 1843", "17 Mar 1907")
+				doc.AddFamilyWithHusbandAndWife("F3", elliot, nil)
+		},
+		husband: elliot,
+		wife: nil,
+	},
+	{
+		doc: func(doc *gedcom.Document) {
+				jane := individual(doc, "P2", "Jane /Doe/", "3 Mar 1803", "14 June 1877")	
+				doc.AddFamilyWithHusbandAndWife("F3", nil, jane)
+		},
+		husband: nil,
+		wife: jane,
+	},
 }
 
 func TestFamilyNode_Husband(t *testing.T) {

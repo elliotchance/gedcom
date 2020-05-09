@@ -138,10 +138,13 @@ func (node *FamilyNode) AddChild(individual *IndividualNode) *ChildNode {
 }
 
 func (node *FamilyNode) SetHusband(individual *IndividualNode) *FamilyNode {
-	if individual == nil {
+	if IsNil(individual) {
 		husband := node.Husband().Individual()
+		if IsNil(husband) {
+			return node
+		}
 		nodes := husband.Nodes()
-
+		
 		for _, subNode := range nodes {
 			if subNode.Tag() == TagFamilySpouse && subNode.Value() == node.Identifier() {
 				husband.DeleteNode(subNode)
@@ -161,8 +164,11 @@ func (node *FamilyNode) SetHusband(individual *IndividualNode) *FamilyNode {
 }
 
 func (node *FamilyNode) SetWife(individual *IndividualNode) *FamilyNode {
-	if individual == nil {
+	if IsNil(individual) {
 		wife := node.Wife().Individual()
+		if IsNil(wife) {
+			return node
+		}
 		nodes := wife.Nodes()
 
 		for _, subNode := range nodes {
@@ -180,7 +186,8 @@ func (node *FamilyNode) SetWife(individual *IndividualNode) *FamilyNode {
 	n := NewNode(TagFamilySpouse, node.Identifier(), "")
 	individual.AddNode(n)
 	
-	return node.SetWifePointer(individual.Pointer())}
+	return node.SetWifePointer(individual.Pointer())
+}
 
 func (node *FamilyNode) SetWifePointer(pointer string) *FamilyNode {
 	wife := node.Wife()
