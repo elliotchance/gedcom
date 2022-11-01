@@ -6,6 +6,7 @@ import (
 	"github.com/elliotchance/gedcom/html/core"
 	"github.com/elliotchance/gedcom/util"
 	"io"
+	"os"
 	"sort"
 )
 
@@ -177,8 +178,32 @@ func (c *DiffPage) WriteHTMLTo(w io.Writer) (int64, error) {
 		precalculatedComparisons = append(precalculatedComparisons, comparison)
 	}
 
+	args := os.Args
+	var rightGedcom string
+	var leftGedcom string
+	for index, arg := range args {
+		if arg == "-right-gedcom" {
+			rightGedcom = args[index+1]
+			continue
+		}
+		if arg == "-left-gedcom" {
+			leftGedcom = args[index+1]
+			continue
+		}
+	}
+	class := "text-center"
+	attr := map[string]string{}
+	headerTag := "h5"
 	// The index at the top of the page.
-	rows := []core.Component{}
+	rows := []core.Component{
+		core.NewTableRow(
+			core.NewTableCell(
+				core.NewTag(headerTag, attr, core.NewText(leftGedcom))).Class(class),
+			core.NewTableCell(
+				core.NewTag(headerTag, attr, core.NewText("Similarity score"))).Class(class),
+			core.NewTableCell(
+				core.NewTag(headerTag, attr, core.NewText(rightGedcom))).Class(class)),
+	}
 	for _, comparison := range precalculatedComparisons {
 		weightedSimilarity := c.weightedSimilarity(comparison.comparison)
 
