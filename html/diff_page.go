@@ -211,17 +211,17 @@ func (c *DiffPage) WriteHTMLTo(w io.Writer) (int64, error) {
 		rightClass := ""
 
 		switch {
-		case comparison.comparison.Left != nil && comparison.comparison.Right == nil:
+		case comparison.comparison.Left != nil && comparison.comparison.Right == nil: //right is missing
 			leftClass = "bg-warning"
 
-		case comparison.comparison.Left == nil && comparison.comparison.Right != nil:
+		case comparison.comparison.Left == nil && comparison.comparison.Right != nil: //left is missing
 			rightClass = "bg-primary"
 
-		case weightedSimilarity < 1:
+		case weightedSimilarity < 1: //neither are missing, but they aren't identical
 			leftClass = "bg-info"
 			rightClass = "bg-info"
 
-		case c.filterFlags.HideEqual:
+		case c.filterFlags.HideEqual: //neither are missing, and they are identical (therefore equal); if user said to hide equal, hide this row
 			continue
 		}
 		rows = append(rows, c.getRow(comparison, leftClass, rightClass, weightedSimilarity))
