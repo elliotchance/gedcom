@@ -224,23 +224,7 @@ func (c *DiffPage) WriteHTMLTo(w io.Writer) (int64, error) {
 		case c.filterFlags.HideEqual:
 			continue
 		}
-
-		leftNameAndDates := NewIndividualNameAndDatesLink(comparison.comparison.Left, c.visibility, "")
-		rightNameAndDates := NewIndividualNameAndDatesLink(comparison.comparison.Right, c.visibility, "")
-
-		left := core.NewTableCell(leftNameAndDates).Class(leftClass)
-		right := core.NewTableCell(rightNameAndDates).Class(rightClass)
-
-		middle := core.NewTableCell(core.NewText(""))
-		if weightedSimilarity != 0 {
-			similarityString := fmt.Sprintf("%.2f%%", weightedSimilarity*100)
-			middle = core.NewTableCell(core.NewText(similarityString)).
-				Class("text-center " + leftClass)
-		}
-
-		tableRow := core.NewTableRow(left, middle, right)
-
-		rows = append(rows, tableRow)
+		rows = append(rows, c.getRow(comparison, leftClass, rightClass, weightedSimilarity))
 	}
 
 	// Individual pages
@@ -259,6 +243,24 @@ func (c *DiffPage) WriteHTMLTo(w io.Writer) (int64, error) {
 		core.NewRow(core.NewColumn(core.EntireRow, core.NewComponents(components...))),
 		c.googleAnalyticsID,
 	).WriteHTMLTo(w)
+}
+
+func (c *DiffPage) getRow(comparison *IndividualCompare, leftClass string, rightClass string, weightedSimilarity float64) *core.TableRow {
+
+	leftNameAndDates := NewIndividualNameAndDatesLink(comparison.comparison.Left, c.visibility, "")
+	rightNameAndDates := NewIndividualNameAndDatesLink(comparison.comparison.Right, c.visibility, "")
+
+	left := core.NewTableCell(leftNameAndDates).Class(leftClass)
+	right := core.NewTableCell(rightNameAndDates).Class(rightClass)
+
+	middle := core.NewTableCell(core.NewText(""))
+	if weightedSimilarity != 0 {
+		similarityString := fmt.Sprintf("%.2f%%", weightedSimilarity*100)
+		middle = core.NewTableCell(core.NewText(similarityString)).
+			Class("text-center " + leftClass)
+	}
+
+	return core.NewTableRow(left, middle, right)
 }
 
 func (c *DiffPage) shouldSkip(comparison *IndividualCompare) bool {
