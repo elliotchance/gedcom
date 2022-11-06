@@ -6,7 +6,6 @@ import (
 	"github.com/elliotchance/gedcom/html/core"
 	"github.com/elliotchance/gedcom/util"
 	"io"
-	"os"
 	"sort"
 )
 
@@ -34,9 +33,11 @@ type DiffPage struct {
 	progress          chan gedcom.Progress
 	compareOptions    *gedcom.IndividualNodesCompareOptions
 	visibility        LivingVisibility
+	leftGedcomPath    string
+	rightGedcomPath   string
 }
 
-func NewDiffPage(comparisons gedcom.IndividualComparisons, filterFlags *gedcom.FilterFlags, googleAnalyticsID string, show, sort string, progress chan gedcom.Progress, compareOptions *gedcom.IndividualNodesCompareOptions, visibility LivingVisibility) *DiffPage {
+func NewDiffPage(comparisons gedcom.IndividualComparisons, filterFlags *gedcom.FilterFlags, googleAnalyticsID string, show, sort string, progress chan gedcom.Progress, compareOptions *gedcom.IndividualNodesCompareOptions, visibility LivingVisibility, leftGedcomPath string, rightGedcomPath string) *DiffPage {
 	return &DiffPage{
 		comparisons:       comparisons,
 		filterFlags:       filterFlags,
@@ -46,6 +47,8 @@ func NewDiffPage(comparisons gedcom.IndividualComparisons, filterFlags *gedcom.F
 		progress:          progress,
 		compareOptions:    compareOptions,
 		visibility:        visibility,
+		leftGedcomPath: leftGedcomPath,
+		rightGedcomPath: rightGedcomPath,
 	}
 }
 
@@ -178,32 +181,12 @@ func (c *DiffPage) WriteHTMLTo(w io.Writer) (int64, error) {
 		precalculatedComparisons = append(precalculatedComparisons, comparison)
 	}
 
-	args := os.Args
-	var rightGedcom string
-	var leftGedcom string
-	for index, arg := range args {
-		if arg == "-right-gedcom" {
-			rightGedcom = args[index+1]
-			continue
-		}
-		if arg == "-left-gedcom" {
-			leftGedcom = args[index+1]
-			continue
-		}
-	}
-	class := "text-center"
-	attr := map[string]string{}
-	headerTag := "h5"
 	// The index at the top of the page.
-	rows := []core.Component{
-		core.NewTableRow(
-			core.NewTableCell(
-				core.NewTag(headerTag, attr, core.NewText(leftGedcom))).Class(class),
-			core.NewTableCell(
-				core.NewTag(headerTag, attr, core.NewText("Similarity score"))).Class(class),
-			core.NewTableCell(
-				core.NewTag(headerTag, attr, core.NewText(rightGedcom))).Class(class)),
-	}
+	var rows []core.Component
+	numOnlyLeft := 0
+	numOnlyRight := 0
+	numSimilar := 0
+	numEqual := 0
 	for _, comparison := range precalculatedComparisons {
 		weightedSimilarity := c.weightedSimilarity(comparison.comparison)
 
@@ -213,25 +196,49 @@ func (c *DiffPage) WriteHTMLTo(w io.Writer) (int64, error) {
 		switch {
 		case comparison.comparison.Left != nil && comparison.comparison.Right == nil: //right is missing
 			leftClass = "bg-warning"
+			numOnlyLeft++
 
 		case comparison.comparison.Left == nil && comparison.comparison.Right != nil: //left is missing
 			rightClass = "bg-primary"
+			numOnlyRight++
 
 		case weightedSimilarity < 1: //neither are missing, but they aren't identical
 			leftClass = "bg-info"
 			rightClass = "bg-info"
+			numSimilar++
 
-		case c.filterFlags.HideEqual: //neither are missing, and they are identical (therefore equal); if user said to hide equal, hide this row
+		case c.filterFlags.HideEqual: //are identical, but user said to hide equals
+			numEqual++
 			continue
+		default:
+			numEqual++
 		}
 		rows = append(rows, c.getRow(comparison, leftClass, rightClass, weightedSimilarity))
 	}
+
+	leftHeader := fmt.Sprint(c.leftGedcomPath, " (", numOnlyLeft, " only in left)")
+	rightHeader := fmt.Sprint(c.rightGedcomPath, " (", numOnlyRight, " only in right)")
+	class := "text-center"
+	attr := map[string]string{}
+	headerTag := "h5"
+	wereHidden := ""
+	if c.filterFlags.HideEqual {
+		wereHidden = " - were hidden"
+	}
+	middleHeader := fmt.Sprint("Similarity score", " (", numSimilar, " similar, and ", numEqual, " equal", wereHidden, ")")
+	header := []core.Component{core.NewTableRow(
+		core.NewTableCell(
+			core.NewTag(headerTag, attr, core.NewText(leftHeader))).Class(class),
+		core.NewTableCell(
+			core.NewTag(headerTag, attr, core.NewText(middleHeader))).Class(class),
+		core.NewTableCell(
+			core.NewTag(headerTag, attr, core.NewText(rightHeader))).Class(class))}
 
 	// Individual pages
 	components := []core.Component{
 		core.NewSpace(),
 		core.NewCard(core.NewText("Individuals"), core.CardNoBadgeCount,
-			core.NewTable("", rows...)),
+			core.NewTable("",  append(header, rows...)...)),
 		core.NewSpace(),
 	}
 	for _, comparison := range precalculatedComparisons {

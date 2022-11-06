@@ -80,6 +80,8 @@ func runDiffCommand() {
 		"The Google Analytics ID, like 'UA-78454410-2'.")
 
 	flag.BoolVar(&optionProgress, "progress", false, "Show progress bar.")
+	//No reference because it is currently being accessed in SimpleNode.Equals(), so the only way to pass it to Equals() would be to pass it in every single SimpleNode.
+	flag.Bool("ancestry-source-matching", false, "Match Ancestry.com sources by Ancestry Source ID (_APID) instead of default matching algorithm (GEDCOM SOUR).")
 
 	flag.IntVar(&optionJobs, "jobs", 1, util.CLIDescription(`Number of jobs to run in
 		parallel. If you are comparing large trees this will make the process
@@ -279,8 +281,7 @@ func runDiffCommand() {
 	diffProgress := make(chan gedcom.Progress)
 
 	page := html.NewDiffPage(comparisons, filterFlags, optionGoogleAnalyticsID,
-		optionShow, optionSort, diffProgress, compareOptions, html.LivingVisibilityShow)
-
+		optionShow, optionSort, diffProgress, compareOptions, html.LivingVisibilityShow, optionLeftGedcomFile, optionRightGedcomFile)
 	go func() {
 		_, err = page.WriteHTMLTo(out)
 		if err != nil {

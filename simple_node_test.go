@@ -64,6 +64,51 @@ func TestSimpleNode_Equals(t *testing.T) {
 	}
 }
 
+func TestAncestryNode_Equals(t *testing.T) {
+	//test when source ids are the same
+	original := GetAncestryIndividual("@S291470533@", "@S291470520@", "@S291470520@", "@S291470520@", "@S291470520@")
+	assert.True(t, gedcom.DeepEqualNodes(gedcom.newDocumentFromString(original).Nodes(), gedcom.newDocumentFromString(original).Nodes()))
+
+	//test when source ids are different, but _apid stays the same
+	left := gedcom.newDocumentFromString(GetAncestryIndividual("@S222222222@", "@S444444444@", "@S666666666@", "@S888888888@", "@S111111111@"))
+	right := gedcom.newDocumentFromString(GetAncestryIndividual("@S333333333@", "@S555555555@", "@S777777777@", "@S999999999@", "@S000000000@"))
+	assert.True(t, gedcom.DeepEqualNodes(left.Nodes(), right.Nodes()))
+}
+
+// This is an actual gedcom entry, hope that's ok.
+func GetAncestryIndividual(source1 string, source2 string, source3 string, source4 string, source5 string) string {
+	return "0 @I152151456706@ INDI" +
+		"\n1 NAME Jacob /Yourow/" +
+		"\n2 GIVN Jacob" +
+		"\n2 SURN Yourow" +
+		"\n2 SOUR " + source1 +
+		"\n3 PAGE New York City Municipal Archives; New York, New York; Borough: Manhattan; Volume Number: 13" +
+		"\n3 _APID 1,61406::6159341" +
+		"\n2 SOUR " + source2 +
+		"\n3 PAGE Year: 1930; Census Place: Bronx, Bronx, New York; Page: 42A; Enumeration District: 0430; FHL microfilm: 2341213" +
+		"\n3 _APID 1,6224::30826480" +
+		"\n1 SEX M" +
+		"\n1 FAMS @F89@" +
+		"\n1 BIRT" +
+		"\n2 DATE abt 1888" +
+		"\n2 PLAC Russia" +
+		"\n2 SOUR " + source3 +
+		"\n3 PAGE Year: 1930; Census Place: Bronx, Bronx, New York; Page: 42A; Enumeration District: 0430; FHL microfilm: 2341213" +
+		"\n3 _APID 1,6224::30826480" +
+		"\n1 EVEN" +
+		"\n2 TYPE Arrival" +
+		"\n2 DATE 1905" +
+		"\n2 SOUR " + source4 +
+		"\n3 PAGE Year: 1930; Census Place: Bronx, Bronx, New York; Page: 42A; Enumeration District: 0430; FHL microfilm: 2341213" +
+		"\n3 _APID 1,6224::30826480" +
+		"\n1 RESI Marital Status: Married; Relation to Head: Head" +
+		"\n2 DATE 1930" +
+		"\n2 PLAC Bronx, Bronx, New York, USA" +
+		"\n2 SOUR " + source5 +
+		"\n3 PAGE Year: 1930; Census Place: Bronx, Bronx, New York; Page: 42A; Enumeration District: 0430; FHL microfilm: 2341213" +
+		"\n3 _APID 1,6224::30826480"
+}
+
 func TestSimpleNode_Tag(t *testing.T) {
 	Tag := tf.Function(t, (*gedcom.SimpleNode).Tag)
 

@@ -3,6 +3,7 @@ package gedcom
 import (
 	"bytes"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"sync"
 )
@@ -84,28 +85,26 @@ func (node *SimpleNode) Equals(node2 Node) bool {
 	}
 
 	tag := node2.Tag()
-	//if both Ancestry sources, only check if their _APID is the same
-	if node.Tag().String() == "Source" && tag.String() == "Source" {
-		found := false
-	ancestry:
-		for _, leftNode := range node.Nodes() {
-			for _, rightNode := range node2.Nodes() {
-				leftValue := leftNode.Value()
-				rightValue := rightNode.Value()
-				if leftNode.Tag().String() == "_APID" && rightNode.Tag().String() == "_APID" && rightValue == leftValue {
-					found = true
-					break ancestry
-				}
-			}
-		}
-		if found { //can't just return found, because they may be non-ancestry sources
-			return true
-		}
-	}
 	if node.tag != tag {
 		return false
 	}
 
+	useAncestrySourceMatching := flag.Lookup("ancestry-source-matching").Value.String() //indexes a map CommandLine.formal
+	//if both Ancestry sources, only check if their _APID is the same
+	if useAncestrySourceMatching == "true" && node.Tag().String() == "Source" && tag.String() == "Source" {
+		if node.Value() == node2.Value() { //if they have the same source id, then no need to check the apid
+			return true
+		}
+		for _, leftNode := range node.Nodes() {
+			for _, rightNode := range node2.Nodes() {
+				if leftNode.Tag().String() == "_APID" &&
+					rightNode.Tag().String() == "_APID" &&
+					rightNode.Value() == leftNode.Value() {
+					return true
+				}
+			}
+		}
+	}
 	value := node2.Value()
 	if node.value != value {
 		return false
