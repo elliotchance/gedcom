@@ -24,7 +24,9 @@ func (c *Page) WriteHTMLTo(w io.Writer) (int64, error) {
 	footer := NewFooterRow()
 	title := NewTag("title", nil, NewText(c.title))
 
-	n := appendString(w, `<html><head><meta charset="UTF-8">`)
+  // make all html files mobile friendly
+	n := appendString(w, `<html><head><meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1">`)
+
 	n += appendComponent(w, googleAnalytics)
 	n += appendComponent(w, title)
 	n += appendString(w, `<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
