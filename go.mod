@@ -1,4 +1,4 @@
-module github.com/elliotchance/gedcom
+module github.com/elliotchance/gedcom/v39
 
 go 1.13
 
