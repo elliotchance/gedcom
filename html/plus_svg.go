@@ -2,8 +2,9 @@ package html
 
 import (
 	"fmt"
-	"github.com/elliotchance/gedcom/html/core"
 	"io"
+
+	"github.com/elliotchance/gedcom/v39/html/core"
 )
 
 // PlusSVG draws a "+" as an SVG with each line of the "+" being optional.

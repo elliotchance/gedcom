@@ -1,9 +1,10 @@
 package html
 
 import (
-	"github.com/elliotchance/gedcom"
 	"io"
 	"time"
+
+	"github.com/elliotchance/gedcom/v39"
 )
 
 type Age struct {

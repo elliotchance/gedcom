@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/v39"
 	"github.com/elliotchance/tf"
 )
 

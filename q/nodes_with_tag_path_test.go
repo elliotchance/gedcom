@@ -1,11 +1,12 @@
 package q_test
 
 import (
-	"github.com/elliotchance/gedcom"
-	"github.com/elliotchance/gedcom/q"
+	"testing"
+
+	"github.com/elliotchance/gedcom/v39"
+	"github.com/elliotchance/gedcom/v39/q"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestNodesWithTagPathExpr_Evaluate(t *testing.T) {

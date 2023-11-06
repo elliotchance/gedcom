@@ -3,12 +3,13 @@ package q
 import (
 	"errors"
 	"fmt"
-	"github.com/elliotchance/gedcom"
 	"io"
 	"reflect"
 	"sort"
 	"strings"
 	"unicode"
+
+	"github.com/elliotchance/gedcom/v39"
 )
 
 type CSVFormatter struct {

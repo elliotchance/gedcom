@@ -1,10 +1,11 @@
 package gedcom_test
 
 import (
-	"github.com/elliotchance/gedcom"
-	"github.com/stretchr/testify/assert"
 	"sort"
 	"testing"
+
+	"github.com/elliotchance/gedcom/v39"
+	"github.com/stretchr/testify/assert"
 )
 
 const (

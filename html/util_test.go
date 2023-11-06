@@ -2,13 +2,14 @@ package html_test
 
 import (
 	"bytes"
+	"strings"
+	"testing"
+
 	"github.com/antchfx/htmlquery"
-	"github.com/elliotchance/gedcom/html/core"
+	"github.com/elliotchance/gedcom/v39/html/core"
 	"github.com/elliotchance/tf"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"strings"
-	"testing"
 )
 
 func testComponent(t *testing.T, name string) func(args ...interface{}) *tf.F {

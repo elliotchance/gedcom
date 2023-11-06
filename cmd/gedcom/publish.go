@@ -13,12 +13,13 @@ package main
 
 import (
 	"flag"
-	"github.com/elliotchance/gedcom"
-	"github.com/elliotchance/gedcom/html"
-	"github.com/elliotchance/gedcom/html/core"
-	"github.com/elliotchance/gedcom/util"
 	"log"
 	"os"
+
+	"github.com/elliotchance/gedcom/v39"
+	"github.com/elliotchance/gedcom/v39/html"
+	"github.com/elliotchance/gedcom/v39/html/core"
+	"github.com/elliotchance/gedcom/v39/util"
 )
 
 func runPublishCommand() {

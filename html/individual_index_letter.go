@@ -1,9 +1,10 @@
 package html
 
 import (
-	"github.com/elliotchance/gedcom/html/core"
 	"io"
 	"unicode"
+
+	"github.com/elliotchance/gedcom/v39/html/core"
 )
 
 type IndividualIndexLetter struct {

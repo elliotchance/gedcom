@@ -3,8 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/elliotchance/gedcom"
 	"os"
+
+	"github.com/elliotchance/gedcom/v39"
 )
 
 func runWarningsCommand() {

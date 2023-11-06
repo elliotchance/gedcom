@@ -2,10 +2,11 @@ package gedcom_test
 
 import (
 	"fmt"
-	"github.com/elliotchance/gedcom"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/elliotchance/gedcom/v39"
+	"github.com/stretchr/testify/assert"
 )
 
 //                              4 Sep    19 Sep

@@ -2,9 +2,10 @@ package html
 
 import (
 	"fmt"
-	"github.com/elliotchance/gedcom/html/core"
 	"io"
 	"unicode"
+
+	"github.com/elliotchance/gedcom/v39/html/core"
 )
 
 type SurnameLink struct {

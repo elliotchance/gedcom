@@ -1,10 +1,11 @@
 package html
 
 import (
-	"github.com/elliotchance/gedcom"
-	"github.com/elliotchance/gedcom/html/core"
 	"io"
 	"sort"
+
+	"github.com/elliotchance/gedcom/v39"
+	"github.com/elliotchance/gedcom/v39/html/core"
 )
 
 // IndividualEvents is the table of events show in the "Events" section of the

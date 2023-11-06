@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elliotchance/gedcom"
+	"github.com/elliotchance/gedcom/v39"
 	"github.com/elliotchance/tf"
 	"github.com/stretchr/testify/assert"
 )

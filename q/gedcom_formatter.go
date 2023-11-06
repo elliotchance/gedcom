@@ -2,9 +2,10 @@ package q
 
 import (
 	"fmt"
-	"github.com/elliotchance/gedcom"
 	"io"
 	"reflect"
+
+	"github.com/elliotchance/gedcom/v39"
 )
 
 type GEDCOMFormatter struct {

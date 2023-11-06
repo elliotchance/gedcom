@@ -1,8 +1,9 @@
 package core_test
 
 import (
-	"github.com/elliotchance/gedcom/html/core"
 	"testing"
+
+	"github.com/elliotchance/gedcom/v39/html/core"
 )
 
 func TestRow_WriteHTMLTo(t *testing.T) {

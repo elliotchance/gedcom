@@ -12,10 +12,11 @@ package main
 
 import (
 	"flag"
-	"github.com/elliotchance/gedcom"
-	"github.com/elliotchance/gedcom/q"
-	"github.com/elliotchance/gedcom/util"
 	"os"
+
+	"github.com/elliotchance/gedcom/v39"
+	"github.com/elliotchance/gedcom/v39/q"
+	"github.com/elliotchance/gedcom/v39/util"
 )
 
 func runQueryCommand() {

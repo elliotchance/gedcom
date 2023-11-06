@@ -1,8 +1,9 @@
 package html
 
 import (
-	"github.com/elliotchance/gedcom"
 	"strings"
+
+	"github.com/elliotchance/gedcom/v39"
 )
 
 type place struct {

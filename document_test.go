@@ -5,7 +5,8 @@ import (
 	"testing"
 
 	"fmt"
-	"github.com/elliotchance/gedcom"
+
+	"github.com/elliotchance/gedcom/v39"
 	"github.com/stretchr/testify/assert"
 )
 

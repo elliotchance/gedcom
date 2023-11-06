@@ -14,14 +14,15 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/cheggaaa/pb"
-	"github.com/elliotchance/gedcom"
-	"github.com/elliotchance/gedcom/html"
-	"github.com/elliotchance/gedcom/util"
 	"log"
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/cheggaaa/pb"
+	"github.com/elliotchance/gedcom/v39"
+	"github.com/elliotchance/gedcom/v39/html"
+	"github.com/elliotchance/gedcom/v39/util"
 )
 
 func newDocumentFromGEDCOMFile(path string, optionAllowMultiLine, optionAllowInvalidIndents bool) (*gedcom.Document, error) {

@@ -2,9 +2,10 @@ package q_test
 
 import (
 	"errors"
-	"github.com/elliotchance/gedcom/q"
-	"github.com/elliotchance/tf"
 	"testing"
+
+	"github.com/elliotchance/gedcom/v39/q"
+	"github.com/elliotchance/tf"
 )
 
 func TestLastExpr_Evaluate(t *testing.T) {
