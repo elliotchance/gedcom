@@ -4,7 +4,8 @@ import (
 	"testing"
 
 	"errors"
-	"github.com/elliotchance/gedcom/q"
+
+	"github.com/elliotchance/gedcom/v39/q"
 	"github.com/elliotchance/tf"
 )
 

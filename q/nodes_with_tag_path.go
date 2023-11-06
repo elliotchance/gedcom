@@ -2,8 +2,9 @@ package q
 
 import (
 	"fmt"
-	"github.com/elliotchance/gedcom"
 	"reflect"
+
+	"github.com/elliotchance/gedcom/v39"
 )
 
 // NodesWithTagPathExpr is a function. See Evaluate.

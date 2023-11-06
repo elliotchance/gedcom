@@ -1,9 +1,10 @@
 package gedcom_test
 
 import (
-	"github.com/elliotchance/gedcom"
-	"github.com/elliotchance/tf"
 	"testing"
+
+	"github.com/elliotchance/gedcom/v39"
+	"github.com/elliotchance/tf"
 )
 
 func TestSourceNode_Title(t *testing.T) {

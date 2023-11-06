@@ -3,11 +3,12 @@ package q_test
 import (
 	"testing"
 
-	"github.com/elliotchance/gedcom"
-	"github.com/elliotchance/gedcom/q"
+	"sort"
+
+	"github.com/elliotchance/gedcom/v39"
+	"github.com/elliotchance/gedcom/v39/q"
 	"github.com/elliotchance/tf"
 	"github.com/stretchr/testify/assert"
-	"sort"
 )
 
 func TestEngine_Start(t *testing.T) {

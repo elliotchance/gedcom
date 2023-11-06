@@ -2,9 +2,10 @@ package html
 
 import (
 	"fmt"
-	"github.com/elliotchance/gedcom"
-	"github.com/elliotchance/gedcom/html/core"
 	"io"
+
+	"github.com/elliotchance/gedcom/v39"
+	"github.com/elliotchance/gedcom/v39/html/core"
 )
 
 type DiffRow struct {

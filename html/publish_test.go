@@ -3,8 +3,8 @@ package html_test
 import (
 	"testing"
 
-	"github.com/elliotchance/gedcom"
-	"github.com/elliotchance/gedcom/html"
+	"github.com/elliotchance/gedcom/v39"
+	"github.com/elliotchance/gedcom/v39/html"
 	"github.com/stretchr/testify/assert"
 )
 

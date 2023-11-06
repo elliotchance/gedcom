@@ -1,9 +1,10 @@
 package html
 
 import (
-	"github.com/elliotchance/gedcom"
-	"github.com/elliotchance/gedcom/html/core"
 	"io"
+
+	"github.com/elliotchance/gedcom/v39"
+	"github.com/elliotchance/gedcom/v39/html/core"
 )
 
 // EventDate shows a date like "d. 1882" but will not show anything if the date

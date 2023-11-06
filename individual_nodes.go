@@ -2,10 +2,11 @@ package gedcom
 
 import (
 	"fmt"
-	"github.com/elliotchance/gedcom/util"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/elliotchance/gedcom/v39/util"
 )
 
 // DefaultMinimumSimilarity is a sensible value to provide to the

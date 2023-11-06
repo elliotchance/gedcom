@@ -23,11 +23,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/elliotchance/gedcom"
 	"log"
 	"math/rand"
 	"os"
 	"runtime/pprof"
+
+	"github.com/elliotchance/gedcom/v39"
 )
 
 type TuneFlags struct {

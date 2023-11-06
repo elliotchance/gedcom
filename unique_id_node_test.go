@@ -2,9 +2,10 @@ package gedcom_test
 
 import (
 	"errors"
-	"github.com/elliotchance/gedcom"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/elliotchance/gedcom/v39"
+	"github.com/stretchr/testify/assert"
 )
 
 var uniqueIDNodeTests = map[string]struct {

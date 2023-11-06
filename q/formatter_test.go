@@ -3,10 +3,11 @@ package q_test
 import (
 	"bytes"
 	"errors"
-	"github.com/elliotchance/gedcom"
-	"github.com/elliotchance/gedcom/q"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/elliotchance/gedcom/v39"
+	"github.com/elliotchance/gedcom/v39/q"
+	"github.com/stretchr/testify/assert"
 )
 
 var formatterTests = []struct {

@@ -2,9 +2,10 @@ package core_test
 
 import (
 	"bytes"
-	"github.com/elliotchance/gedcom/html/core"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/elliotchance/gedcom/v39/html/core"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFooterRow_WriteHTMLTo(t *testing.T) {

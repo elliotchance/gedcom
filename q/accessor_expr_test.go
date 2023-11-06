@@ -1,10 +1,11 @@
 package q_test
 
 import (
-	"github.com/elliotchance/gedcom/q"
+	"testing"
+
+	"github.com/elliotchance/gedcom/v39/q"
 	"github.com/elliotchance/tf"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 type MyStruct struct {

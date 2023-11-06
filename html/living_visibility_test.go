@@ -1,10 +1,11 @@
 package html_test
 
 import (
-	"github.com/elliotchance/gedcom/html"
+	"testing"
+
+	"github.com/elliotchance/gedcom/v39/html"
 	"github.com/elliotchance/tf"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestNewLivingVisibility(t *testing.T) {

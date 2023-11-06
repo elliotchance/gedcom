@@ -2,10 +2,11 @@ package html
 
 import (
 	"fmt"
-	"github.com/elliotchance/gedcom"
-	"github.com/elliotchance/gedcom/html/core"
 	"io"
 	"sort"
+
+	"github.com/elliotchance/gedcom/v39"
+	"github.com/elliotchance/gedcom/v39/html/core"
 )
 
 // IndividualListPage is the page that lists of all the individuals.

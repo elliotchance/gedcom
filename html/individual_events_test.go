@@ -2,10 +2,11 @@ package html_test
 
 import (
 	"bytes"
-	"github.com/elliotchance/gedcom"
-	"github.com/elliotchance/gedcom/html"
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/elliotchance/gedcom/v39"
+	"github.com/elliotchance/gedcom/v39/html"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewIndividualEvents(t *testing.T) {
