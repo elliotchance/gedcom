@@ -18,7 +18,7 @@ func NewTable(tableClass string, content ...Component) *Table {
 }
 
 func (c *Table) WriteHTMLTo(w io.Writer) (int64, error) {
-	n := appendSprintf(w, `<table class="table %s">`, c.tableClass)
+	n := appendSprintf(w, `<table class="table table-responsive %s">`, c.tableClass)
 	n += appendComponent(w, NewComponents(c.content...))
 	n += appendString(w, "</table>")
 

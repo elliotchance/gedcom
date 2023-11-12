@@ -3,6 +3,7 @@ package gedcom
 import (
 	"bytes"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"sync"
 )
@@ -61,7 +62,7 @@ func (node *SimpleNode) Identifier() string {
 	if node == nil {
 		return ""
 	}
-	
+
 	return fmt.Sprintf("@%s@", node.pointer)
 }
 
@@ -88,6 +89,22 @@ func (node *SimpleNode) Equals(node2 Node) bool {
 		return false
 	}
 
+	useAncestrySourceMatching := flag.Lookup("ancestry-source-matching").Value.String() //indexes a map CommandLine.formal
+	//if both Ancestry sources, only check if their _APID is the same
+	if useAncestrySourceMatching == "true" && node.Tag().String() == "Source" && tag.String() == "Source" {
+		if node.Value() == node2.Value() { //if they have the same source id, then no need to check the apid
+			return true
+		}
+		for _, leftNode := range node.Nodes() {
+			for _, rightNode := range node2.Nodes() {
+				if leftNode.Tag().String() == "_APID" &&
+					rightNode.Tag().String() == "_APID" &&
+					rightNode.Value() == leftNode.Value() {
+					return true
+				}
+			}
+		}
+	}
 	value := node2.Value()
 	if node.value != value {
 		return false

@@ -137,7 +137,6 @@ type NodeDiff struct {
 //    R 2 DATE Aft. 2001
 //    R 2 PLAC Surry, England
 //    R 1 NAME J. /Smith/
-//
 func CompareNodes(left, right Node) *NodeDiff {
 	result := &NodeDiff{}
 
@@ -263,7 +262,6 @@ func (nd *NodeDiff) String() string {
 //   LR 1 DEAT                | true
 //   LR 2 PLAC England        | true
 //    R 1 NAME J. /Smith/     | false
-//
 func (nd *NodeDiff) IsDeepEqual() bool {
 	leftIsNil := IsNil(nd.Left)
 	rightIsNil := IsNil(nd.Right)
@@ -345,7 +343,7 @@ func (nd *NodeDiff) LeftNode() Node {
 
 // RightNode returns the flattening Node value that favors the right side.
 //
-// To favor means to return the Left value when both the Left and Right are set.
+// To favor means to return the Right value when both the Left and Right are set.
 func (nd *NodeDiff) RightNode() Node {
 	n := nd.Right
 
