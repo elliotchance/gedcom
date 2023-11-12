@@ -2,29 +2,29 @@
 //
 // CompareNodes recursively compares two nodes. For example:
 //
-//   0 INDI @P3@           |  0 INDI @P4@
-//   1 NAME John /Smith/   |  1 NAME J. /Smith/
-//   1 BIRT                |  1 BIRT
-//   2 DATE 3 SEP 1943     |  2 DATE Abt. Sep 1943
-//   1 DEAT                |  1 BIRT
-//   2 PLAC England        |  2 DATE 3 SEP 1943
-//   1 BIRT                |  1 DEAT
-//   2 DATE Abt. Oct 1943  |  2 DATE Aft. 2001
-//                         |  2 PLAC Surry, England
+//	0 INDI @P3@           |  0 INDI @P4@
+//	1 NAME John /Smith/   |  1 NAME J. /Smith/
+//	1 BIRT                |  1 BIRT
+//	2 DATE 3 SEP 1943     |  2 DATE Abt. Sep 1943
+//	1 DEAT                |  1 BIRT
+//	2 PLAC England        |  2 DATE 3 SEP 1943
+//	1 BIRT                |  1 DEAT
+//	2 DATE Abt. Oct 1943  |  2 DATE Aft. 2001
+//	                      |  2 PLAC Surry, England
 //
 // Produces a *NodeDiff than can be rendered with the String method:
 //
-//   LR 0 INDI @P3@
-//   L  1 NAME John /Smith/
-//   LR 1 BIRT
-//   L  2 DATE Abt. Oct 1943
-//   LR 2 DATE 3 SEP 1943
-//    R 2 DATE Abt. Sep 1943
-//   LR 1 DEAT
-//   L  2 PLAC England
-//    R 2 DATE Aft. 2001
-//    R 2 PLAC Surry, England
-//    R 1 NAME J. /Smith/
+//	LR 0 INDI @P3@
+//	L  1 NAME John /Smith/
+//	LR 1 BIRT
+//	L  2 DATE Abt. Oct 1943
+//	LR 2 DATE 3 SEP 1943
+//	 R 2 DATE Abt. Sep 1943
+//	LR 1 DEAT
+//	L  2 PLAC England
+//	 R 2 DATE Aft. 2001
+//	 R 2 PLAC Surry, England
+//	 R 1 NAME J. /Smith/
 package gedcom
 
 import (
@@ -54,10 +54,10 @@ import (
 // considered to be equal because the BirthNode.Equals regards all BirthNodes as
 // equal (see specific documentation for a complete explanation):
 //
-//   BIRT               |  BIRT               |  BIRT
-//     DATE 3 SEP 1943  |    DATE 3 SEP 1943  |    PLAC England
-//   BIRT               |    PLAC England     |    DATE 3 SEP 1943
-//     PLAC England     |                     |  BIRT
+//	BIRT               |  BIRT               |  BIRT
+//	  DATE 3 SEP 1943  |    DATE 3 SEP 1943  |    PLAC England
+//	BIRT               |    PLAC England     |    DATE 3 SEP 1943
+//	  PLAC England     |                     |  BIRT
 //
 // However, the semantics of Equals is quite different for other types of nodes.
 // For example ResidenceNodes are considered equal only if they have the same
@@ -92,7 +92,7 @@ type NodeDiff struct {
 // If you need to be sure the root node are the equal after the comparison, you
 // can use (this is also nil safe):
 //
-//   d.Left.Equals(d.Right)
+//	d.Left.Equals(d.Right)
 //
 // The algorithm to perform the diff is actually very simple:
 //
@@ -110,15 +110,15 @@ type NodeDiff struct {
 //
 // Here are two individuals that have slightly different data:
 //
-//   0 INDI @P3@           |  0 INDI @P4@
-//   1 NAME John /Smith/   |  1 NAME J. /Smith/
-//   1 BIRT                |  1 BIRT
-//   2 DATE 3 SEP 1943     |  2 DATE Abt. Sep 1943
-//   1 DEAT                |  1 BIRT
-//   2 PLAC England        |  2 DATE 3 SEP 1943
-//   1 BIRT                |  1 DEAT
-//   2 DATE Abt. Oct 1943  |  2 DATE Aft. 2001
-//                         |  2 PLAC Surry, England
+//	0 INDI @P3@           |  0 INDI @P4@
+//	1 NAME John /Smith/   |  1 NAME J. /Smith/
+//	1 BIRT                |  1 BIRT
+//	2 DATE 3 SEP 1943     |  2 DATE Abt. Sep 1943
+//	1 DEAT                |  1 BIRT
+//	2 PLAC England        |  2 DATE 3 SEP 1943
+//	1 BIRT                |  1 DEAT
+//	2 DATE Abt. Oct 1943  |  2 DATE Aft. 2001
+//	                      |  2 PLAC Surry, England
 //
 // In this case both of the root nodes are different (because of the different
 // pointer values). The returned left and right will have the respective root
@@ -126,18 +126,17 @@ type NodeDiff struct {
 //
 // Here is the output, rendered with NodeDiff.String():
 //
-//   LR 0 INDI @P3@
-//   L  1 NAME John /Smith/
-//   LR 1 BIRT
-//   L  2 DATE Abt. Oct 1943
-//   LR 2 DATE 3 SEP 1943
-//    R 2 DATE Abt. Sep 1943
-//   LR 1 DEAT
-//   L  2 PLAC England
-//    R 2 DATE Aft. 2001
-//    R 2 PLAC Surry, England
-//    R 1 NAME J. /Smith/
-//
+//	LR 0 INDI @P3@
+//	L  1 NAME John /Smith/
+//	LR 1 BIRT
+//	L  2 DATE Abt. Oct 1943
+//	LR 2 DATE 3 SEP 1943
+//	 R 2 DATE Abt. Sep 1943
+//	LR 1 DEAT
+//	L  2 PLAC England
+//	 R 2 DATE Aft. 2001
+//	 R 2 PLAC Surry, England
+//	 R 1 NAME J. /Smith/
 func CompareNodes(left, right Node) *NodeDiff {
 	result := &NodeDiff{}
 
@@ -218,17 +217,17 @@ func (nd *NodeDiff) string(indent int) string {
 
 // String returns a readable comparison of nodes, like:
 //
-//   LR 0 INDI @P3@
-//   L  1 NAME John /Smith/
-//   LR 1 BIRT
-//   L  2 DATE Abt. Oct 1943
-//   LR 2 DATE 3 SEP 1943
-//    R 2 DATE Abt. Sep 1943
-//   LR 1 DEAT
-//   L  2 PLAC England
-//    R 2 DATE Aft. 2001
-//    R 2 PLAC Surry, England
-//    R 1 NAME J. /Smith/
+//	LR 0 INDI @P3@
+//	L  1 NAME John /Smith/
+//	LR 1 BIRT
+//	L  2 DATE Abt. Oct 1943
+//	LR 2 DATE 3 SEP 1943
+//	 R 2 DATE Abt. Sep 1943
+//	LR 1 DEAT
+//	L  2 PLAC England
+//	 R 2 DATE Aft. 2001
+//	 R 2 PLAC Surry, England
+//	 R 1 NAME J. /Smith/
 //
 // The L/R/LR represent which side has the node, followed by the GEDCOM indent
 // and node line.
@@ -237,8 +236,8 @@ func (nd *NodeDiff) string(indent int) string {
 // displayed as two separate lines even though they both belong to the same
 // NodeDiff:
 //
-//   LR 0 INDI @P3@
-//   LR 0 INDI @P4@
+//	LR 0 INDI @P3@
+//	LR 0 INDI @P4@
 //
 // You should not rely on this format to be machine readable as it may change in
 // the future.
@@ -254,16 +253,15 @@ func (nd *NodeDiff) String() string {
 // The following diff (rendered with String) shows each NodeDiff and if it would
 // be considered DeepEqual:
 //
-//   LR 0 INDI @P3@           | false
-//   LR 1 NAME John /Smith/   | true
-//   LR 1 BIRT                | false
-//   L  2 DATE Abt. Oct 1943  | false
-//   LR 2 DATE 3 SEP 1943     | true
-//    R 2 DATE Abt. Sep 1943  | false
-//   LR 1 DEAT                | true
-//   LR 2 PLAC England        | true
-//    R 1 NAME J. /Smith/     | false
-//
+//	LR 0 INDI @P3@           | false
+//	LR 1 NAME John /Smith/   | true
+//	LR 1 BIRT                | false
+//	L  2 DATE Abt. Oct 1943  | false
+//	LR 2 DATE 3 SEP 1943     | true
+//	 R 2 DATE Abt. Sep 1943  | false
+//	LR 1 DEAT                | true
+//	LR 2 PLAC England        | true
+//	 R 1 NAME J. /Smith/     | false
 func (nd *NodeDiff) IsDeepEqual() bool {
 	leftIsNil := IsNil(nd.Left)
 	rightIsNil := IsNil(nd.Right)
@@ -345,7 +343,7 @@ func (nd *NodeDiff) LeftNode() Node {
 
 // RightNode returns the flattening Node value that favors the right side.
 //
-// To favor means to return the Left value when both the Left and Right are set.
+// To favor means to return the Right value when both the Left and Right are set.
 func (nd *NodeDiff) RightNode() Node {
 	n := nd.Right
 

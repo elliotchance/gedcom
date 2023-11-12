@@ -61,7 +61,7 @@ func (node *SimpleNode) Identifier() string {
 	if node == nil {
 		return ""
 	}
-	
+
 	return fmt.Sprintf("@%s@", node.pointer)
 }
 
@@ -84,6 +84,24 @@ func (node *SimpleNode) Equals(node2 Node) bool {
 	}
 
 	tag := node2.Tag()
+	//if both Ancestry sources, only check if their _APID is the same
+	if node.Tag().String() == "Source" && tag.String() == "Source" {
+		found := false
+	ancestry:
+		for _, leftNode := range node.Nodes() {
+			for _, rightNode := range node2.Nodes() {
+				leftValue := leftNode.Value()
+				rightValue := rightNode.Value()
+				if leftNode.Tag().String() == "_APID" && rightNode.Tag().String() == "_APID" && rightValue == leftValue {
+					found = true
+					break ancestry
+				}
+			}
+		}
+		if found { //can't just return found, because they may be non-ancestry sources
+			return true
+		}
+	}
 	if node.tag != tag {
 		return false
 	}

@@ -3,6 +3,7 @@ package html
 import (
 	"fmt"
 	"io"
+	"os"
 	"sort"
 
 	"github.com/elliotchance/gedcom/v39"
@@ -178,8 +179,32 @@ func (c *DiffPage) WriteHTMLTo(w io.Writer) (int64, error) {
 		precalculatedComparisons = append(precalculatedComparisons, comparison)
 	}
 
+	args := os.Args
+	var rightGedcom string
+	var leftGedcom string
+	for index, arg := range args {
+		if arg == "-right-gedcom" {
+			rightGedcom = args[index+1]
+			continue
+		}
+		if arg == "-left-gedcom" {
+			leftGedcom = args[index+1]
+			continue
+		}
+	}
+	class := "text-center"
+	attr := map[string]string{}
+	headerTag := "h5"
 	// The index at the top of the page.
-	rows := []core.Component{}
+	rows := []core.Component{
+		core.NewTableRow(
+			core.NewTableCell(
+				core.NewTag(headerTag, attr, core.NewText(leftGedcom))).Class(class),
+			core.NewTableCell(
+				core.NewTag(headerTag, attr, core.NewText("Similarity score"))).Class(class),
+			core.NewTableCell(
+				core.NewTag(headerTag, attr, core.NewText(rightGedcom))).Class(class)),
+	}
 	for _, comparison := range precalculatedComparisons {
 		weightedSimilarity := c.weightedSimilarity(comparison.comparison)
 
@@ -187,36 +212,20 @@ func (c *DiffPage) WriteHTMLTo(w io.Writer) (int64, error) {
 		rightClass := ""
 
 		switch {
-		case comparison.comparison.Left != nil && comparison.comparison.Right == nil:
+		case comparison.comparison.Left != nil && comparison.comparison.Right == nil: //right is missing
 			leftClass = "bg-warning"
 
-		case comparison.comparison.Left == nil && comparison.comparison.Right != nil:
+		case comparison.comparison.Left == nil && comparison.comparison.Right != nil: //left is missing
 			rightClass = "bg-primary"
 
-		case weightedSimilarity < 1:
+		case weightedSimilarity < 1: //neither are missing, but they aren't identical
 			leftClass = "bg-info"
 			rightClass = "bg-info"
 
-		case c.filterFlags.HideEqual:
+		case c.filterFlags.HideEqual: //neither are missing, and they are identical (therefore equal); if user said to hide equal, hide this row
 			continue
 		}
-
-		leftNameAndDates := NewIndividualNameAndDatesLink(comparison.comparison.Left, c.visibility, "")
-		rightNameAndDates := NewIndividualNameAndDatesLink(comparison.comparison.Right, c.visibility, "")
-
-		left := core.NewTableCell(leftNameAndDates).Class(leftClass)
-		right := core.NewTableCell(rightNameAndDates).Class(rightClass)
-
-		middle := core.NewTableCell(core.NewText(""))
-		if weightedSimilarity != 0 {
-			similarityString := fmt.Sprintf("%.2f%%", weightedSimilarity*100)
-			middle = core.NewTableCell(core.NewText(similarityString)).
-				Class("text-center " + leftClass)
-		}
-
-		tableRow := core.NewTableRow(left, middle, right)
-
-		rows = append(rows, tableRow)
+		rows = append(rows, c.getRow(comparison, leftClass, rightClass, weightedSimilarity))
 	}
 
 	// Individual pages
@@ -235,6 +244,24 @@ func (c *DiffPage) WriteHTMLTo(w io.Writer) (int64, error) {
 		core.NewRow(core.NewColumn(core.EntireRow, core.NewComponents(components...))),
 		c.googleAnalyticsID,
 	).WriteHTMLTo(w)
+}
+
+func (c *DiffPage) getRow(comparison *IndividualCompare, leftClass string, rightClass string, weightedSimilarity float64) *core.TableRow {
+
+	leftNameAndDates := NewIndividualNameAndDatesLink(comparison.comparison.Left, c.visibility, "")
+	rightNameAndDates := NewIndividualNameAndDatesLink(comparison.comparison.Right, c.visibility, "")
+
+	left := core.NewTableCell(leftNameAndDates).Class(leftClass)
+	right := core.NewTableCell(rightNameAndDates).Class(rightClass)
+
+	middle := core.NewTableCell(core.NewText(""))
+	if weightedSimilarity != 0 {
+		similarityString := fmt.Sprintf("%.2f%%", weightedSimilarity*100)
+		middle = core.NewTableCell(core.NewText(similarityString)).
+			Class("text-center " + leftClass)
+	}
+
+	return core.NewTableRow(left, middle, right)
 }
 
 func (c *DiffPage) shouldSkip(comparison *IndividualCompare) bool {
