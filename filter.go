@@ -231,3 +231,29 @@ func RemoveDuplicateNamesFilter() FilterFunction {
 		return node, true
 	}
 }
+
+// NormalizeDateFilter returns a filter that normalizes date strings to a
+// consistent format. When enabled, it parses date strings and reformats them
+// to a standard format.
+//
+// See the Filter function.
+func NormalizeDateFilter() FilterFunction {
+	return func(node Node) (Node, bool) {
+		if dateNode, ok := node.(*DateNode); ok {
+			// Normalize the date by re-formatting it
+			normalized := dateNode.String()
+			if normalized != dateNode.Value() {
+				newNode := newNode(
+					nil,
+					nil,
+					TagDate,
+					normalized,
+					dateNode.Pointer(),
+				)
+				return newNode, false
+			}
+		}
+
+		return node, true
+	}
+}
