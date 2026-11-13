@@ -559,3 +559,63 @@ func TestRemoveEmptyDeathTagFilter(t *testing.T) {
 		})
 	}
 }
+
+func TestNormalizeDateFilter(t *testing.T) {
+	// ghost:ignore
+	for testName, test := range map[string]struct {
+		root     gedcom.Node
+		expected string
+	}{
+		"DateWithRange": {
+			root: gedcom.NewDocument().AddIndividual("P1",
+				gedcom.NewBirthNode("",
+					gedcom.NewDateNode("Bet. 6 MAY 1989 and 7 MAY 1989"),
+				),
+			),
+			expected: `0 @P1@ INDI
+1 BIRT
+2 DATE Bet. 6 MAY 1989 and 7 MAY 1989
+`,
+		},
+		"DateWithApproximate": {
+			root: gedcom.NewDocument().AddIndividual("P1",
+				gedcom.NewBirthNode("",
+					gedcom.NewDateNode("Abt. 6 MAY 1989"),
+				),
+			),
+			expected: `0 @P1@ INDI
+1 BIRT
+2 DATE Abt. 6 MAY 1989
+`,
+		},
+		"DateWithConstraint": {
+			root: gedcom.NewDocument().AddIndividual("P1",
+				gedcom.NewBirthNode("",
+					gedcom.NewDateNode("Aft. 6 MAY 1989"),
+				),
+			),
+			expected: `0 @P1@ INDI
+1 BIRT
+2 DATE Aft. 6 MAY 1989
+`,
+		},
+		"SimpleDate": {
+			root: gedcom.NewDocument().AddIndividual("P1",
+				gedcom.NewBirthNode("",
+					gedcom.NewDateNode("6 MAY 1989"),
+				),
+			),
+			expected: `0 @P1@ INDI
+1 BIRT
+2 DATE 6 MAY 1989
+`,
+		},
+	} {
+		t.Run(testName, func(t *testing.T) {
+			filter := gedcom.NormalizeDateFilter()
+			doc := gedcom.NewDocument()
+			result := gedcom.GEDCOMString(gedcom.Filter(test.root, doc, filter), 0)
+			assert.Equal(t, test.expected, result)
+		})
+	}
+}
